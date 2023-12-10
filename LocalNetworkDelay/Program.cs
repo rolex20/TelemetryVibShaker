@@ -9,16 +9,17 @@ namespace LocalNetworkDelay
     internal class Program
     {
 
-
+        private static readonly string DefaultServerAddress = "192.168.1.248";
 
         static void Main(string[] args)
         {
             byte[] datagramBytes = { 10, 20 };
             float average = (float)0.0;
             int samples = 10;
-            string arduinoIP = "192.168.1.249";
             int remotePort = 54671;
             int localPort = 54672;
+
+            string arduinoIP = GetServerAddress(args);
 
             // Create a UDP client and connect to the Arduino IP and port
             UdpClient client = new UdpClient(localPort);
@@ -30,6 +31,8 @@ namespace LocalNetworkDelay
             // Create a stopwatch to measure the network delay
             Stopwatch sw = new Stopwatch();
 
+
+            Console.WriteLine("Destination Address: " + arduinoIP + "\n");
 
             int passes = 0;
             for (int i = 1; i <= samples + 1; i++)
@@ -61,6 +64,16 @@ namespace LocalNetworkDelay
             Console.ReadKey();
 
 
+        }
+
+        private static string GetServerAddress(string[] args)
+        {
+            if (args.Length == 0)
+            {
+                return DefaultServerAddress;
+            }
+
+            return args[0];
         }
     }
 }
