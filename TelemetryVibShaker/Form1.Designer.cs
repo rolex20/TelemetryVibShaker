@@ -105,6 +105,9 @@
             btnStop = new Button();
             openFileDialog1 = new OpenFileDialog();
             toolTip1 = new ToolTip(components);
+            timer1 = new System.Windows.Forms.Timer(components);
+            statusStrip1 = new StatusStrip();
+            toolStripStatusLabel1 = new ToolStripStatusLabel();
             tabs.SuspendLayout();
             tabNormalSoundEffects.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier2).BeginInit();
@@ -119,6 +122,7 @@
             ((System.ComponentModel.ISupportInitialize)trkEffectTimeout).BeginInit();
             tabMonitor.SuspendLayout();
             panel1.SuspendLayout();
+            statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // tabs
@@ -364,6 +368,7 @@
             txtArduinoPort.Size = new Size(106, 23);
             txtArduinoPort.TabIndex = 25;
             txtArduinoPort.Text = "54671";
+            txtArduinoPort.KeyPress += txtArduinoPort_KeyPress;
             // 
             // label11
             // 
@@ -663,6 +668,7 @@
             txtListeningPort.TabIndex = 1;
             txtListeningPort.Text = "54671";
             toolTip1.SetToolTip(txtListeningPort, "Make sure your export.lua script sends UDP packets to this port");
+            txtListeningPort.KeyPress += txtListeningPort_KeyPress;
             // 
             // label15
             // 
@@ -880,17 +886,39 @@
             // 
             // btnStop
             // 
+            btnStop.Enabled = false;
             btnStop.Location = new Point(462, 457);
             btnStop.Name = "btnStop";
             btnStop.Size = new Size(75, 23);
             btnStop.TabIndex = 2;
             btnStop.Text = "&Stop";
             btnStop.UseVisualStyleBackColor = true;
+            btnStop.Click += btnStop_Click;
             // 
             // openFileDialog1
             // 
             openFileDialog1.FileName = "openFileDialog1";
             openFileDialog1.Filter = "WAV Files|*.wav|MP3 files|*.mp3|All files|*.*";
+            // 
+            // timer1
+            // 
+            timer1.Interval = 1000;
+            timer1.Tick += timer1_Tick;
+            // 
+            // statusStrip1
+            // 
+            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
+            statusStrip1.Location = new Point(0, 496);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Size = new Size(566, 22);
+            statusStrip1.TabIndex = 3;
+            statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            toolStripStatusLabel1.Size = new Size(29, 17);
+            toolStripStatusLabel1.Text = "Idle.";
             // 
             // frmMain
             // 
@@ -898,7 +926,8 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnStop;
-            ClientSize = new Size(566, 491);
+            ClientSize = new Size(566, 518);
+            Controls.Add(statusStrip1);
             Controls.Add(btnStop);
             Controls.Add(btnStartListening);
             Controls.Add(tabs);
@@ -927,7 +956,10 @@
             tabMonitor.PerformLayout();
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
+            statusStrip1.ResumeLayout(false);
+            statusStrip1.PerformLayout();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -1007,5 +1039,8 @@
         private CheckBox chkEnableAoASoundEffects2;
         private ComboBox cmbAudioDevice1;
         private Label label33;
+        private System.Windows.Forms.Timer timer1;
+        private StatusStrip statusStrip1;
+        private ToolStripStatusLabel toolStripStatusLabel1;
     }
 }

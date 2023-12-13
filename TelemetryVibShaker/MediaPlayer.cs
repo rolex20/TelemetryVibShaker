@@ -18,7 +18,6 @@ namespace TelemetryVibShaker
         }
 
         private WaveOut? waveOut = null;
-        private AudioFileReader? waveProvider = null;
         private int deviceIndex = 0;
         private String? audioFile= null;
         public void Open(string AudioFilePath)

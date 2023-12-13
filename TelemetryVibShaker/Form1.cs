@@ -7,6 +7,9 @@ using System.Net.Sockets;
 using TelemetryVibShaker.Properties;
 using System.Text.Json;
 using System.Diagnostics;
+using System.Windows.Forms;
+using System.Net;
+using System.Text;
 
 namespace TelemetryVibShaker
 {
@@ -42,19 +45,6 @@ namespace TelemetryVibShaker
         }
 
 
-        private void btnStartListening_Click(object sender, EventArgs e)
-        {
-            // Check if files exist
-            if (!CheckFileExists(txtSoundEffect1)) return;
-            if (!CheckFileExists(txtSoundEffect2)) return;
-            if (!CheckFileExists(txtJSON)) return;
-
-            // Display stats if required
-            if (chkChangeToMonitor.Checked) tabs.SelectTab(3);
-        }
-
-
-
         private bool CheckFileExists(TextBox tb)
         {
             bool exist = File.Exists(tb.Text);
@@ -77,13 +67,17 @@ namespace TelemetryVibShaker
             updateSelectedFile(txtSoundEffect2, "Select an NWAVE compatible audio file", (String)btnSoundEffect2.Tag);
         }
 
-        private void updateSelectedFile(TextBox tb, String title, String filter)
+        private DialogResult updateSelectedFile(TextBox tb, String title, String filter)
         {
+            DialogResult result;
             openFileDialog1.Filter = filter;
             openFileDialog1.FileName = tb.Text;
             openFileDialog1.Title = title;
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            result = openFileDialog1.ShowDialog();
+            if (result == DialogResult.OK)
                 tb.Text = openFileDialog1.FileName;
+
+            return result;
         }
 
 
@@ -95,7 +89,35 @@ namespace TelemetryVibShaker
 
         private void btnJSONFile_Click(object sender, EventArgs e)
         {
-            updateSelectedFile(txtJSON, "Select an JSON file defining AoA for each aircraft", (String)btnJSONFile.Tag);
+            DialogResult jsonSelection = updateSelectedFile(txtJSON, "Select an JSON file defining AoA for each aircraft", (String)btnJSONFile.Tag);
+            try
+            {
+                if (jsonSelection == DialogResult.OK)
+                {
+
+                    // Try to parse with a test
+                    // Throw exception if there is a problem with the .json file
+                    string json = File.ReadAllText(txtJSON.Text);
+
+                    JSONroot = JsonSerializer.Deserialize<Root>(json);
+                    string datagram = "F-16C_50";  // Test unit should exist in .JSON file
+                    var unit = JSONroot.units.unit.FirstOrDefault(u => u.typeName == datagram);
+                    if (unit != null)
+                    {
+                        Debug.Print($"AoA1 of {datagram}: {unit.AoA1}");
+                    }
+                    else
+                    {
+                        Debug.Print("{datagram} not found.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("There was a problem with the .JSON file, please check the file.  " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+            }
+
         }
 
         private void checkBox5_CheckedChanged(object sender, EventArgs e)
@@ -297,6 +319,249 @@ namespace TelemetryVibShaker
         private void trkEffectTimeout_Scroll(object sender, EventArgs e)
         {
             updateEffectsTimeout();
+        }
+
+        private void btnStop_Click(object sender, EventArgs e)
+        {
+            // Stop the player
+            if (soundManager != null)
+            {
+                soundManager.Stop();
+                soundManager = null;
+                UpdateSoundEffectStatus(EffectStatus.NotPlayingEffect);
+            }
+
+
+            // Stop the UDP listener
+            if (listener != null)
+            {
+                listener.Close();
+                listener = null;
+            }
+
+
+            // Reenable some controls
+            ChangeStatus(txtSoundEffect1, true);
+            ChangeStatus(txtSoundEffect2, true);
+            ChangeStatus(txtJSON, true);
+            ChangeStatus(btnSoundEffect1, true);
+            ChangeStatus(btnSoundEffect2, true);
+            ChangeStatus(btnJSONFile, true);
+            ChangeStatus(txtListeningPort, true);
+
+
+            // Adjust valid operations
+            timer1.Enabled = false;
+            ChangeStatus(btnStop, false);
+            ChangeStatus(btnStartListening, true);
+
+
+            // Update status
+            toolStripStatusLabel1.Text = "Idle.";
+
+        }
+
+        private void ChangeStatus(Control control, bool newStatus)
+        {
+            control.Enabled = newStatus;
+        }
+
+        // This Callback function is called from another thread, not the UI thread
+        private void receiveDataCallback(IAsyncResult ar)
+        {
+            stopwatch.Restart();  // Track the time to process this datagram
+            bool needs_update = false;
+
+            try
+            {
+                // get the remote endpoint
+                IPEndPoint remoteEP = (IPEndPoint)ar.AsyncState;
+
+
+                // get the received data
+                byte[] receiveData = listener.EndReceive(ar, ref remoteEP);
+                String datagram = Encoding.ASCII.GetString(receiveData, 0, receiveData.Length);
+
+                // Update statistics and UI status controls
+                long newSecond = Environment.TickCount64 / 1000;
+                if (lastSecond != newSecond)
+                {
+                    lblDatagramsPerSecond.Text = dps.ToString();  // update datagrams per second
+                    dps = 1; // reset the counter
+                    lastSecond = newSecond;
+                    needs_update = true;
+                }
+                else
+                {
+                    needs_update = false;
+                    dps++;
+                }
+
+                // Always process each datagram received
+                if (Single.TryParse(datagram, out float AoA))
+                {
+                    if (soundManager.UpdateEffect(AoA))
+                    {
+                        // If volume has changed after updating the AoA then update UI
+                        // right now, this UI status is updated more than once per second, but only if the new effect status has changed
+                        if (soundManager.SoundIsActive())
+                            UpdateSoundEffectStatus(EffectStatus.PlayingEffect);
+                        else
+                            UpdateSoundEffectStatus(EffectStatus.SoundEffectsReady);
+                    }
+
+
+                    // Track lastAoA even if a second has not yet been completed
+                    // This is to make sure we report the last AoA received, at least, in timer1()
+                    if (lastAoA != AoA)
+                        lastAoA = AoA;
+
+                }
+                else  // If not numeric, then datagram received must be an aircraft type name
+                {
+                    var unit = JSONroot.units.unit.FirstOrDefault(u => u.typeName == datagram);
+                    currentUnitType = datagram;
+
+                    if (unit != null)  // If found, use the limits defined in the JSON file
+                    {
+                        soundManager.AoA1 = unit.AoA1;
+                        soundManager.AoA2 = unit.AoA2;
+                    }
+                    else  // basically ignore the limits, because the unit type was not found in the JSON File
+                    {
+                        soundManager.AoA1 = 360;
+                        soundManager.AoA2 = 360;
+                    }
+
+                    if (lblCurrentUnitType.Tag != currentUnitType) // this is not expected to change often
+                    {
+                        lblCurrentUnitType.Tag = currentUnitType;
+                        lblCurrentUnitType.Text = currentUnitType + $"({soundManager.AoA1},{soundManager.AoA2})";  // update the UI
+                    }
+
+
+                }
+                stopwatch.Stop(); // at this point the datagram has been fully processed
+
+                if (needs_update) // update the processing time once every second only
+                {
+                    TimeSpan elapsed = stopwatch.Elapsed;
+                    lblProcessingTime.Text = elapsed.Milliseconds.ToString();
+                }
+
+                // Go back to listening mode
+                listener.BeginReceive(new AsyncCallback(receiveDataCallback), null);
+
+            }
+            catch (NullReferenceException)
+            {
+                toolStripStatusLabel1.Text = "Listener is closed.  Receive callback function stopped.";
+            }
+        }
+
+
+        private void btnStartListening_Click(object sender, EventArgs e)
+        {
+            // Check if files exist
+            if (!CheckFileExists(txtSoundEffect1)) return;
+            if (!CheckFileExists(txtSoundEffect2)) return;
+            if (!CheckFileExists(txtJSON)) return;
+
+            // Display stats if required
+            if (chkChangeToMonitor.Checked) tabs.SelectTab(3);
+
+
+            // Check and parse .json file
+            // Throw exception if there is a problem
+            try
+            {
+                string json = File.ReadAllText(txtJSON.Text);
+                JSONroot = JsonSerializer.Deserialize<Root>(json);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("There was a problem with the .JSON file, please check the file.  " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+
+            // Check if the user has selected a valid audio device
+            if (cmbAudioDevice1.SelectedIndex == -1)
+            {
+                MessageBox.Show("Please select a valid audio device first.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                cmbAudioDevice1.Focus();
+                return;
+            }
+
+            // Start playing sound effects with volume 0, this minimizes any delay when the effect is actually needed
+            soundManager = new AoA_SoundManager(txtSoundEffect1.Text, txtSoundEffect2.Text, (float)trkVolumeMultiplier1.Value / 100.0f, (float)trkVolumeMultiplier2.Value / 100.0f, cmbAudioDevice1.SelectedIndex);
+            UpdateSoundEffectStatus(EffectStatus.SoundEffectsReady);
+
+
+            // Sanitize port range using the ephemeral range
+            if (Int32.TryParse(txtListeningPort.Text, out int value))
+            {
+                if (value < 49152) value = 49152;
+                if (value > 65535) value = 65535;
+                txtListeningPort.Text = value.ToString();
+            }
+
+            // Creates the UDP socket
+            listener = new UdpClient(int.Parse(txtListeningPort.Text));
+
+            // Start listening for incoming data in a new thread
+            listener.BeginReceive(new AsyncCallback(receiveDataCallback), null);
+
+
+            // Disable some controls
+            ChangeStatus(txtSoundEffect1, false);
+            ChangeStatus(txtSoundEffect2, false);
+            ChangeStatus(txtJSON, false);
+            ChangeStatus(btnSoundEffect1, false);
+            ChangeStatus(btnSoundEffect2, false);
+            ChangeStatus(btnJSONFile, false);
+            ChangeStatus(txtListeningPort, false);
+
+
+            // Adjust valid operations
+            ChangeStatus(btnStartListening, false);
+            ChangeStatus(btnStop, true);
+            toolStripStatusLabel1.Text = "Listening...";
+
+            timer1.Enabled = true;
+
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if ((soundManager.SoundIsActive()) && (Environment.TickCount64 / 1000 - lastSecond > trkEffectTimeout.Value))
+            {
+                soundManager.MuteEffects();
+                UpdateSoundEffectStatus(EffectStatus.EffectCanceled);
+            }
+
+            // Also make sure we report the last AoA received
+            if ((float)lblLastAoA.Tag != lastAoA)
+            {
+                lblLastAoA.Tag = lastAoA;
+                lblLastAoA.Text = lastAoA.ToString() + "°";
+            }
+        }
+
+        private void AllowOnlyDigits(object sender, KeyPressEventArgs e)
+        {
+            // Only allow numbers
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+                e.Handled = true;
+        }
+
+        private void txtListeningPort_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            AllowOnlyDigits(sender, e);
+        }
+
+        private void txtArduinoPort_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            AllowOnlyDigits(sender, e);
         }
     }
 }
