@@ -8,7 +8,7 @@ namespace FloatingPointPerformance
         static void Main(string[] args)
         {
             // Define the number of iterations
-            int loop = 6*1000000;
+            int loop = 90000000;
 
             // Define the variables for each data type
             float a = 1000, b = 45, c = 12000, d = 2, e = 7, f = 1024;
@@ -24,12 +24,12 @@ namespace FloatingPointPerformance
             stopwatch.Start();
             for (int x = 0; x < loop; x++)
             {
-                a = (float)Math.Sin(a);
-                b = (float)Math.Asin(b);
-                c = (float)Math.Sqrt(c);
+                //a = (float)Math.Sin(a);
+                //b = (float)Math.Asin(b);
+                //c = (float)Math.Sqrt(c);
                 d = d + d - d + d;
                 e = e * e + e * e;
-                f = f / f / f / f / f;
+                f = f / f / f / f / f + e - d;
             }
             stopwatch.Stop();
             Console.WriteLine("Float: {0} ms", stopwatch.ElapsedMilliseconds);
@@ -38,12 +38,12 @@ namespace FloatingPointPerformance
             stopwatch.Restart();
             for (int x = 0; x < loop; x++)
             {
-                g = Math.Sin(g);
-                h = Math.Asin(h);
-                i = Math.Sqrt(i);
+                //g = Math.Sin(g);
+                //h = Math.Asin(h);
+                //i = Math.Sqrt(i);
                 j = j + j - j + j;
                 k = k * k + k * k;
-                l = l / l / l / l / l;
+                l = l / l / l / l / l + k - j;
             }
             stopwatch.Stop();
             Console.WriteLine("Double: {0} ms", stopwatch.ElapsedMilliseconds);
