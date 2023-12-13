@@ -3,33 +3,42 @@
 
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
+using System.Net.Sockets;
 using TelemetryVibShaker.Properties;
+using System.Text.Json;
+using System.Diagnostics;
 
 namespace TelemetryVibShaker
 {
     public partial class frmMain : Form
     {
+        private UdpClient listener;
+        private long lastSecond; // second of the last received datagram
+        private float lastAoA;  // last AoA correctly parsed
+        private int dps; // datagrams received per second
+
+        private Root JSONroot;  // json root object
+        private String currentUnitType;  // current type of aircraft used by the player
+
+        private AoA_SoundManager soundManager; // manages sound effects according to the current AoA
+
+        enum EffectStatus
+        {
+            Invalid,
+            NotPlayingEffect,
+            SoundEffectsReady,
+            PlayingEffect, // 1 or 2
+            EffectCanceled, // 1 and 2
+        }
+
+        // To measure processing time per datagram
+        Stopwatch stopwatch;
 
 
 
         public frmMain()
         {
             InitializeComponent();
-        }
-
-        private void frmMain_Load(object sender, EventArgs e)
-        {
-            fillAudioDevices();
-
-            // Load the settings for all controls in the form
-            LoadSettings(this);
-
-            // Restore previous location
-            this.Location = new Point(Properties.Settings.Default.XCoordinate, Properties.Settings.Default.YCoordinate);
-
-            updateVolumeMultiplier(lblVolumeMultiplier1, trkVolumeMultiplier1);
-            updateVolumeMultiplier(lblVolumeMultiplier2, trkVolumeMultiplier2);
-            updateEffectsTimeout();
         }
 
 
@@ -77,14 +86,11 @@ namespace TelemetryVibShaker
                 tb.Text = openFileDialog1.FileName;
         }
 
-        private void trackBar1_Scroll(object sender, EventArgs e)
-        {
-            updateEffectsTimeout();
-        }
 
         private void updateEffectsTimeout()
         {
             lblEffectTimeout.Text = trkEffectTimeout.Value.ToString() + " second(s)";
+            lblEffectTimeout.Tag = trkEffectTimeout.Value;
         }
 
         private void btnJSONFile_Click(object sender, EventArgs e)
@@ -100,16 +106,22 @@ namespace TelemetryVibShaker
         private void updateVolumeMultiplier(Label label, TrackBar trackBar)
         {
             label.Text = trackBar.Value.ToString() + "%";
+            label.Tag = trackBar.Value;
         }
 
         private void trkVolumeMultiplier1_Scroll(object sender, EventArgs e)
         {
             updateVolumeMultiplier(lblVolumeMultiplier1, trkVolumeMultiplier1);
+            if (soundManager != null)
+                soundManager.VolumeAmplifier1 = (float)trkVolumeMultiplier1.Value / 100.0f;
         }
 
         private void trkVolumeMultiplier2_Scroll(object sender, EventArgs e)
         {
             updateVolumeMultiplier(lblVolumeMultiplier2, trkVolumeMultiplier2);
+            if (soundManager != null)
+                soundManager.VolumeAmplifier2 = (float)trkVolumeMultiplier2.Value / 100.0f;
+
         }
 
         private void fillAudioDevices()
@@ -220,5 +232,71 @@ namespace TelemetryVibShaker
             }
         }
 
+        // Only update status if, UI is not up to date.
+        private void UpdateSoundEffectStatus(EffectStatus newStatus)
+        {
+            EffectStatus currentStatus = (EffectStatus)lblSoundStatus.Tag;
+
+
+            if (currentStatus != newStatus)
+            {
+                lblSoundStatus.Tag = currentStatus;
+                switch (newStatus)
+                {
+                    case EffectStatus.NotPlayingEffect:
+                        lblSoundStatus.Text = "Not playing sounds.";
+                        break;
+                    case EffectStatus.SoundEffectsReady:
+                        lblSoundStatus.Text = "Sound effects ready.";
+                        break;
+                    case EffectStatus.PlayingEffect:
+                        lblSoundStatus.Text = "Playing effect...";
+                        break;
+                    case EffectStatus.EffectCanceled:
+                        lblSoundStatus.Text = "Alarm canceled.";
+                        break;
+                }
+            }
+
+        }
+
+
+        private void frmMain_Load(object sender, EventArgs e)
+        {
+            fillAudioDevices();
+
+            // Load the settings for all controls in the form
+            LoadSettings(this);
+
+            // Restore previous location
+            this.Location = new Point(Properties.Settings.Default.XCoordinate, Properties.Settings.Default.YCoordinate);
+
+            updateVolumeMultiplier(lblVolumeMultiplier1, trkVolumeMultiplier1);
+            updateVolumeMultiplier(lblVolumeMultiplier2, trkVolumeMultiplier2);
+            updateEffectsTimeout();
+
+            lblCurrentUnitType.Tag = "";
+
+            lblLastAoA.Text = "";
+            lblLastAoA.Tag = (float)0.0;
+
+            lblDatagramsPerSecond.Text = "";
+            lblProcessingTime.Text = "";
+
+            stopwatch = new Stopwatch();
+
+            lblSoundStatus.Tag = EffectStatus.Invalid;
+            UpdateSoundEffectStatus(EffectStatus.NotPlayingEffect);
+
+            // Make it easier for the additional UDP listener thread to update the UI
+            Label.CheckForIllegalCrossThreadCalls = false;
+            TextBox.CheckForIllegalCrossThreadCalls = false;
+
+        }
+
+        private void trkEffectTimeout_Scroll(object sender, EventArgs e)
+        {
+            updateEffectsTimeout();
+        }
     }
 }

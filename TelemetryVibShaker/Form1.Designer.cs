@@ -86,15 +86,15 @@
             panel1 = new Panel();
             label31 = new Label();
             label32 = new Label();
-            label30 = new Label();
+            lblDatagramsPerSecond = new Label();
             label29 = new Label();
-            label28 = new Label();
+            lblProcessingTime = new Label();
             label27 = new Label();
             label26 = new Label();
-            label18 = new Label();
-            label20 = new Label();
+            lblCurrentUnitType = new Label();
+            lblSoundStatus = new Label();
             label19 = new Label();
-            label22 = new Label();
+            lblLastAoA = new Label();
             label24 = new Label();
             label21 = new Label();
             label25 = new Label();
@@ -644,7 +644,7 @@
             trkEffectTimeout.TabIndex = 3;
             toolTip1.SetToolTip(trkEffectTimeout, "After the specified number of seconds, all effects are stopped if no more UDP telemetry is received from export.lua");
             trkEffectTimeout.Value = 1;
-            trkEffectTimeout.Scroll += trackBar1_Scroll;
+            trkEffectTimeout.Scroll += trkEffectTimeout_Scroll;
             // 
             // label16
             // 
@@ -689,15 +689,15 @@
             // 
             panel1.Controls.Add(label31);
             panel1.Controls.Add(label32);
-            panel1.Controls.Add(label30);
+            panel1.Controls.Add(lblDatagramsPerSecond);
             panel1.Controls.Add(label29);
-            panel1.Controls.Add(label28);
+            panel1.Controls.Add(lblProcessingTime);
             panel1.Controls.Add(label27);
             panel1.Controls.Add(label26);
-            panel1.Controls.Add(label18);
-            panel1.Controls.Add(label20);
+            panel1.Controls.Add(lblCurrentUnitType);
+            panel1.Controls.Add(lblSoundStatus);
             panel1.Controls.Add(label19);
-            panel1.Controls.Add(label22);
+            panel1.Controls.Add(lblLastAoA);
             panel1.Controls.Add(label24);
             panel1.Controls.Add(label21);
             panel1.Controls.Add(label25);
@@ -725,14 +725,14 @@
             label32.TabIndex = 15;
             label32.Text = "Flaps:";
             // 
-            // label30
+            // lblDatagramsPerSecond
             // 
-            label30.AutoSize = true;
-            label30.Location = new Point(388, 162);
-            label30.Name = "label30";
-            label30.Size = new Size(44, 15);
-            label30.TabIndex = 14;
-            label30.Text = "label30";
+            lblDatagramsPerSecond.AutoSize = true;
+            lblDatagramsPerSecond.Location = new Point(388, 162);
+            lblDatagramsPerSecond.Name = "lblDatagramsPerSecond";
+            lblDatagramsPerSecond.Size = new Size(49, 15);
+            lblDatagramsPerSecond.TabIndex = 14;
+            lblDatagramsPerSecond.Text = "number";
             // 
             // label29
             // 
@@ -743,14 +743,14 @@
             label29.TabIndex = 13;
             label29.Text = "Datagrams received per second:";
             // 
-            // label28
+            // lblProcessingTime
             // 
-            label28.AutoSize = true;
-            label28.Location = new Point(141, 161);
-            label28.Name = "label28";
-            label28.Size = new Size(44, 15);
-            label28.TabIndex = 12;
-            label28.Text = "label28";
+            lblProcessingTime.AutoSize = true;
+            lblProcessingTime.Location = new Point(141, 161);
+            lblProcessingTime.Name = "lblProcessingTime";
+            lblProcessingTime.Size = new Size(31, 15);
+            lblProcessingTime.TabIndex = 12;
+            lblProcessingTime.Text = "time";
             // 
             // label27
             // 
@@ -770,23 +770,23 @@
             label26.TabIndex = 10;
             label26.Text = "none";
             // 
-            // label18
+            // lblCurrentUnitType
             // 
-            label18.AutoSize = true;
-            label18.Location = new Point(101, 78);
-            label18.Name = "label18";
-            label18.Size = new Size(34, 15);
-            label18.TabIndex = 9;
-            label18.Text = "none";
+            lblCurrentUnitType.AutoSize = true;
+            lblCurrentUnitType.Location = new Point(101, 78);
+            lblCurrentUnitType.Name = "lblCurrentUnitType";
+            lblCurrentUnitType.Size = new Size(34, 15);
+            lblCurrentUnitType.TabIndex = 9;
+            lblCurrentUnitType.Text = "none";
             // 
-            // label20
+            // lblSoundStatus
             // 
-            label20.AutoSize = true;
-            label20.Location = new Point(61, 12);
-            label20.Name = "label20";
-            label20.Size = new Size(113, 15);
-            label20.TabIndex = 3;
-            label20.Text = "Not playing sounds.";
+            lblSoundStatus.AutoSize = true;
+            lblSoundStatus.Location = new Point(61, 12);
+            lblSoundStatus.Name = "lblSoundStatus";
+            lblSoundStatus.Size = new Size(113, 15);
+            lblSoundStatus.TabIndex = 3;
+            lblSoundStatus.Text = "Not playing sounds.";
             // 
             // label19
             // 
@@ -797,14 +797,14 @@
             label19.TabIndex = 2;
             label19.Text = "Sound:";
             // 
-            // label22
+            // lblLastAoA
             // 
-            label22.AutoSize = true;
-            label22.Location = new Point(101, 104);
-            label22.Name = "label22";
-            label22.Size = new Size(34, 15);
-            label22.TabIndex = 5;
-            label22.Text = "none";
+            lblLastAoA.AutoSize = true;
+            lblLastAoA.Location = new Point(101, 104);
+            lblLastAoA.Name = "lblLastAoA";
+            lblLastAoA.Size = new Size(34, 15);
+            lblLastAoA.TabIndex = 5;
+            lblLastAoA.Text = "none";
             // 
             // label24
             // 
@@ -984,21 +984,21 @@
         private Button btnJSONFile;
         private TextBox txtJSON;
         private Label label17;
-        private Label label20;
+        private Label lblSoundStatus;
         private Label label19;
         private Label label24;
         private Label label23;
-        private Label label22;
+        private Label lblLastAoA;
         private Label label21;
         private Label label25;
         private CheckBox chkShowStatistics;
         private Panel panel1;
-        private Label label18;
+        private Label lblCurrentUnitType;
         private Label label26;
         private Label label29;
-        private Label label28;
+        private Label lblProcessingTime;
         private Label label27;
-        private Label label30;
+        private Label lblDatagramsPerSecond;
         private Label label31;
         private Label label32;
         private Label lblVolumeMultiplier2;
