@@ -9,7 +9,7 @@
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="cmbAudioDevice1" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="chkEnableAoASoundEffects1" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -37,6 +37,57 @@
     </Setting>
     <Setting Name="genericBool" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="txtArduinoIP" Type="System.String" Scope="User">
+      <Value Profile="(Default)">192.168.1.249</Value>
+    </Setting>
+    <Setting Name="txtArduinoPort" Type="System.String" Scope="User">
+      <Value Profile="(Default)">54671</Value>
+    </Setting>
+    <Setting Name="chkVibrateMotorForSpeedBrake" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="chkVibrateMotorForFlaps" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="numMinIntensitySpeedBrakes" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="numMaxIntensitySpeedBrakes" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">255</Value>
+    </Setting>
+    <Setting Name="numMinIntensityFlaps" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="chkTWatchVibrate" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="chkTWatchDisplayBackground" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="txtTWatchIP" Type="System.String" Scope="User">
+      <Value Profile="(Default)">192.168.1.248</Value>
+    </Setting>
+    <Setting Name="txtTWatchPort" Type="System.String" Scope="User">
+      <Value Profile="(Default)">54671</Value>
+    </Setting>
+    <Setting Name="txtListeningPort" Type="System.String" Scope="User">
+      <Value Profile="(Default)">54671</Value>
+    </Setting>
+    <Setting Name="trkEffectTimeout" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="txtJSON" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\Users\ralch\source\repos\UDPEchoServer1\AoA_UDP_Server\units.json</Value>
+    </Setting>
+    <Setting Name="chkChangeToMonitor" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="chkShowStatistics" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="numMaxIntensityFlaps" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">255</Value>
     </Setting>
   </Settings>
 </SettingsFile>

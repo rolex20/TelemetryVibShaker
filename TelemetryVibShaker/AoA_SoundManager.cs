@@ -5,20 +5,34 @@ namespace TelemetryVibShaker
     internal class AoA_SoundManager
     {
 
-        private float volumeAmplifier;
-        public float VolumeAmplifier
+        private float volumeAmplifier1;
+        public float VolumeAmplifier1
         {
-            get { return volumeAmplifier; }
+            get { return volumeAmplifier1; }
             set
             {
-                if (value < 0.0f) volumeAmplifier = 0.0f;
-                else if (value > 1.0f) volumeAmplifier = 1.0f;
-                else volumeAmplifier = value;
+                if (value < 0.0f) volumeAmplifier1 = 0.0f;
+                else if (value > 1.0f) volumeAmplifier1 = 1.0f;
+                else volumeAmplifier1 = value;
 
-                if (mp1 != null) mp1.Volume = lastVolume1 * volumeAmplifier;
-                if (mp2 != null) mp2.Volume = lastVolume2 * volumeAmplifier;
+                if (mp1 != null) mp1.Volume = lastVolume1 * volumeAmplifier1;
             }
         }
+
+        private float volumeAmplifier2;
+        public float VolumeAmplifier2
+        {
+            get { return volumeAmplifier2; }
+            set
+            {
+                if (value < 0.0f) volumeAmplifier2 = 0.0f;
+                else if (value > 1.0f) volumeAmplifier2 = 1.0f;
+                else volumeAmplifier2 = value;
+
+                if (mp2 != null) mp2.Volume = lastVolume2 * volumeAmplifier2;
+            }
+        }
+
 
         public float AoA1;          // Optimal angle of attack.  Lower limit. (Sound Effect 1)
         public float AoA2;          // Optimal angle of attack.  Upper limit. (Sound Effect 1)
@@ -32,7 +46,7 @@ namespace TelemetryVibShaker
         private float lastVolume2; // cached volume for mp2
 
 
-        public AoA_SoundManager(String sound1, String sound2, float VolAmplifier, int AudioDeviceIndex)
+        public AoA_SoundManager(String sound1, String sound2, float VolAmplifier1, float VolAmplifier2, int AudioDeviceIndex)
         {
             mp1 = new MediaPlayer(AudioDeviceIndex);
             mp1.Open(sound1);
@@ -46,7 +60,8 @@ namespace TelemetryVibShaker
             mp2.Volume = 0.0f;
             mp2.PlayLooping();
 
-            VolumeAmplifier = VolAmplifier;
+            VolumeAmplifier1 = VolAmplifier1;
+            VolumeAmplifier2 = VolAmplifier2;
 
             // Basically ignore the limits, because the unit type is not known at this point
             AoA1 = 360.0f;
@@ -110,7 +125,7 @@ namespace TelemetryVibShaker
                 if (lastVolume1 != newVolume) // Avoid calling MediaPlayer.Volume if not needed 
                 {
                     lastVolume1 = newVolume;
-                    newVolume *= volumeAmplifier;
+                    newVolume *= volumeAmplifier1;
                     mp1.Volume = newVolume;  //mp1.Dispatcher.BeginInvoke(new Action(() => { mp1.Volume = newVolume; }));
                     volumeHasChanged = true;
                 }
@@ -136,7 +151,7 @@ namespace TelemetryVibShaker
                 if (lastVolume2 != newVolume) // Avoid calling MediaPlayer.Volume if not needed 
                 {
                     lastVolume2 = newVolume;
-                    newVolume *= volumeAmplifier;
+                    newVolume *= volumeAmplifier2;
                     mp2.Volume = newVolume; //mp2.Dispatcher.BeginInvoke(new Action(() => { mp2.Volume = newVolume; }));
                     volumeHasChanged = true;
                 }

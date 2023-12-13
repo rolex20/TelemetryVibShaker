@@ -1,0 +1,46 @@
+{
+  "units": {
+    "unit": [
+      {
+        "typeName": "F-16C_50",          
+        "AoA1": 11,
+        "AoA2": 15
+      },
+      {
+        "typeName": "FA-18C",          
+        "AoA1": 11,
+        "AoA2": 15
+      },
+      {
+        "typeName": "F-14",          
+        "AoA1": 8,
+        "AoA2": 12
+      },
+      {
+        "typeName": "F-15C",          
+        "AoA1": 9,
+        "AoA2": 13
+      },
+      {
+        "typeName": "Mig-29A",          
+        "AoA1": 10,
+        "AoA2": 14
+      },
+      {
+        "typeName": "Su-27",          
+        "AoA1": 11,
+        "AoA2": 15
+      },
+      {
+        "typeName": "Su-33",          
+        "AoA1": 11,
+        "AoA2": 15
+      },
+      {
+        "typeName": "F-5E",          
+        "AoA1": 11,
+        "AoA2": 15
+      }
+    ]
+  }
+}
