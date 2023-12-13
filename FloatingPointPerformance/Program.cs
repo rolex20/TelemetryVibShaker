@@ -8,12 +8,14 @@ namespace FloatingPointPerformance
         static void Main(string[] args)
         {
             // Define the number of iterations
-            int loop = 3*1000000;
+            int loop = 6*1000000;
 
             // Define the variables for each data type
             float a = 1000, b = 45, c = 12000, d = 2, e = 7, f = 1024;
             double g = 1000, h = 45, i = 12000, j = 2, k = 7, l = 1024;
             decimal m = 1000, n = 45, o = 12000, p = 2, q = 7, r = 1024;
+
+            Console.WriteLine("Working...");
 
             // Create a stopwatch to measure the execution time
             Stopwatch stopwatch = new Stopwatch();
