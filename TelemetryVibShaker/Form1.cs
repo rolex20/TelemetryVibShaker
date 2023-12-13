@@ -24,18 +24,8 @@ namespace TelemetryVibShaker
             // Load the settings for all controls in the form
             LoadSettings(this);
 
-            // Restore previous settings
+            // Restore previous location
             this.Location = new Point(Properties.Settings.Default.XCoordinate, Properties.Settings.Default.YCoordinate);
-            /*
-                        cmbAudioDevice1.SelectedIndex = Properties.Settings.Default.cmbAudioDevice1;
-                        chkEnableAoASoundEffects1.Checked = Properties.Settings.Default.chkEnableAoASoundEffects1;
-                        chkEnableAoASoundEffects2.Checked = Properties.Settings.Default.chkEnableAoASoundEffects2;
-                        txtSoundEffect1.Text = Properties.Settings.Default.txtSoundEffect1;
-                        txtSoundEffect2.Text = Properties.Settings.Default.txtSoundEffect2;
-                        trkVolumeMultiplier1.Value = Properties.Settings.Default.trkVolumeMultiplier1;
-                        trkVolumeMultiplier2.Value= Properties.Settings.Default.trkVolumeMultiplier2;
-            */
-
 
             updateVolumeMultiplier(lblVolumeMultiplier1, trkVolumeMultiplier1);
             updateVolumeMultiplier(lblVolumeMultiplier2, trkVolumeMultiplier2);
