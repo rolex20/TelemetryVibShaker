@@ -49,7 +49,7 @@ namespace TelemetryVibShaker.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public int cmbAudioDevice1 {
             get {
                 return ((int)(this["cmbAudioDevice1"]));
@@ -164,6 +164,210 @@ namespace TelemetryVibShaker.Properties {
             }
             set {
                 this["genericBool"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("192.168.1.249")]
+        public string txtArduinoIP {
+            get {
+                return ((string)(this["txtArduinoIP"]));
+            }
+            set {
+                this["txtArduinoIP"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("54671")]
+        public string txtArduinoPort {
+            get {
+                return ((string)(this["txtArduinoPort"]));
+            }
+            set {
+                this["txtArduinoPort"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool chkVibrateMotorForSpeedBrake {
+            get {
+                return ((bool)(this["chkVibrateMotorForSpeedBrake"]));
+            }
+            set {
+                this["chkVibrateMotorForSpeedBrake"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool chkVibrateMotorForFlaps {
+            get {
+                return ((bool)(this["chkVibrateMotorForFlaps"]));
+            }
+            set {
+                this["chkVibrateMotorForFlaps"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int numMinIntensitySpeedBrakes {
+            get {
+                return ((int)(this["numMinIntensitySpeedBrakes"]));
+            }
+            set {
+                this["numMinIntensitySpeedBrakes"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("255")]
+        public int numMaxIntensitySpeedBrakes {
+            get {
+                return ((int)(this["numMaxIntensitySpeedBrakes"]));
+            }
+            set {
+                this["numMaxIntensitySpeedBrakes"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int numMinIntensityFlaps {
+            get {
+                return ((int)(this["numMinIntensityFlaps"]));
+            }
+            set {
+                this["numMinIntensityFlaps"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool chkTWatchVibrate {
+            get {
+                return ((bool)(this["chkTWatchVibrate"]));
+            }
+            set {
+                this["chkTWatchVibrate"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool chkTWatchDisplayBackground {
+            get {
+                return ((bool)(this["chkTWatchDisplayBackground"]));
+            }
+            set {
+                this["chkTWatchDisplayBackground"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("192.168.1.248")]
+        public string txtTWatchIP {
+            get {
+                return ((string)(this["txtTWatchIP"]));
+            }
+            set {
+                this["txtTWatchIP"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("54671")]
+        public string txtTWatchPort {
+            get {
+                return ((string)(this["txtTWatchPort"]));
+            }
+            set {
+                this["txtTWatchPort"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("54671")]
+        public string txtListeningPort {
+            get {
+                return ((string)(this["txtListeningPort"]));
+            }
+            set {
+                this["txtListeningPort"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int trkEffectTimeout {
+            get {
+                return ((int)(this["trkEffectTimeout"]));
+            }
+            set {
+                this["trkEffectTimeout"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\ralch\\source\\repos\\UDPEchoServer1\\AoA_UDP_Server\\units.json")]
+        public string txtJSON {
+            get {
+                return ((string)(this["txtJSON"]));
+            }
+            set {
+                this["txtJSON"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool chkChangeToMonitor {
+            get {
+                return ((bool)(this["chkChangeToMonitor"]));
+            }
+            set {
+                this["chkChangeToMonitor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool chkShowStatistics {
+            get {
+                return ((bool)(this["chkShowStatistics"]));
+            }
+            set {
+                this["chkShowStatistics"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("255")]
+        public int numMaxIntensityFlaps {
+            get {
+                return ((int)(this["numMaxIntensityFlaps"]));
+            }
+            set {
+                this["numMaxIntensityFlaps"] = value;
             }
         }
     }

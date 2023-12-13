@@ -58,19 +58,19 @@
             numMinIntensityFlaps = new NumericUpDown();
             label8 = new Label();
             label9 = new Label();
-            checkBox2 = new CheckBox();
+            chkVibrateMotorForFlaps = new CheckBox();
             numMaxIntensitySpeedBrakes = new NumericUpDown();
             numMinIntensitySpeedBrakes = new NumericUpDown();
             label7 = new Label();
             label6 = new Label();
             label5 = new Label();
-            checkBox1 = new CheckBox();
+            chkVibrateMotorForSpeedBrake = new CheckBox();
             tabTTGO20V3 = new TabPage();
-            checkBox4 = new CheckBox();
-            checkBox3 = new CheckBox();
-            textBox1 = new TextBox();
+            chkTWatchDisplayBackground = new CheckBox();
+            chkTWatchVibrate = new CheckBox();
+            txtTWatchPort = new TextBox();
             label13 = new Label();
-            textBox2 = new TextBox();
+            txtTWatchIP = new TextBox();
             label14 = new Label();
             label12 = new Label();
             tabSettings = new TabPage();
@@ -80,7 +80,7 @@
             lblEffectTimeout = new Label();
             trkEffectTimeout = new TrackBar();
             label16 = new Label();
-            textBox3 = new TextBox();
+            txtListeningPort = new TextBox();
             label15 = new Label();
             tabMonitor = new TabPage();
             panel1 = new Panel();
@@ -342,13 +342,13 @@
             tabArduino.Controls.Add(numMinIntensityFlaps);
             tabArduino.Controls.Add(label8);
             tabArduino.Controls.Add(label9);
-            tabArduino.Controls.Add(checkBox2);
+            tabArduino.Controls.Add(chkVibrateMotorForFlaps);
             tabArduino.Controls.Add(numMaxIntensitySpeedBrakes);
             tabArduino.Controls.Add(numMinIntensitySpeedBrakes);
             tabArduino.Controls.Add(label7);
             tabArduino.Controls.Add(label6);
             tabArduino.Controls.Add(label5);
-            tabArduino.Controls.Add(checkBox1);
+            tabArduino.Controls.Add(chkVibrateMotorForSpeedBrake);
             tabArduino.Location = new Point(4, 24);
             tabArduino.Name = "tabArduino";
             tabArduino.Padding = new Padding(3);
@@ -400,7 +400,7 @@
             numMaxIntensityFlaps.Size = new Size(106, 23);
             numMaxIntensityFlaps.TabIndex = 21;
             toolTip1.SetToolTip(numMaxIntensityFlaps, "Intensity of the vibration when the speed brakes are deployed at its maximum range.");
-            numMaxIntensityFlaps.Value = new decimal(new int[] { 200, 0, 0, 0 });
+            numMaxIntensityFlaps.Value = new decimal(new int[] { 255, 0, 0, 0 });
             // 
             // numMinIntensityFlaps
             // 
@@ -431,14 +431,14 @@
             label9.TabIndex = 18;
             label9.Text = "Minimum Intensity:";
             // 
-            // checkBox2
+            // chkVibrateMotorForFlaps
             // 
-            checkBox2.Location = new Point(11, 165);
-            checkBox2.Name = "checkBox2";
-            checkBox2.Size = new Size(486, 41);
-            checkBox2.TabIndex = 17;
-            checkBox2.Text = "Vibrate Motors with Flaps Telemetry:  Attach vibration motor where you want to feel this haptic effect.";
-            checkBox2.UseVisualStyleBackColor = true;
+            chkVibrateMotorForFlaps.Location = new Point(11, 165);
+            chkVibrateMotorForFlaps.Name = "chkVibrateMotorForFlaps";
+            chkVibrateMotorForFlaps.Size = new Size(486, 41);
+            chkVibrateMotorForFlaps.TabIndex = 17;
+            chkVibrateMotorForFlaps.Text = "Vibrate Motor 2 with Flaps Telemetry:  Attach vibration motor where you want to feel this haptic effect.";
+            chkVibrateMotorForFlaps.UseVisualStyleBackColor = true;
             // 
             // numMaxIntensitySpeedBrakes
             // 
@@ -449,7 +449,7 @@
             numMaxIntensitySpeedBrakes.Size = new Size(106, 23);
             numMaxIntensitySpeedBrakes.TabIndex = 16;
             toolTip1.SetToolTip(numMaxIntensitySpeedBrakes, "Intensity of the vibration when the speed brakes are deployed at its maximum range.");
-            numMaxIntensitySpeedBrakes.Value = new decimal(new int[] { 200, 0, 0, 0 });
+            numMaxIntensitySpeedBrakes.Value = new decimal(new int[] { 255, 0, 0, 0 });
             // 
             // numMinIntensitySpeedBrakes
             // 
@@ -488,24 +488,24 @@
             label5.TabIndex = 11;
             label5.Text = "Send UDP datagrams with telemetry information to two small vibration motors controlled by a networked Arduino microcontroller.  The vibration motors are supposed to be attached to your hotas or stick.";
             // 
-            // checkBox1
+            // chkVibrateMotorForSpeedBrake
             // 
-            checkBox1.Checked = true;
-            checkBox1.CheckState = CheckState.Checked;
-            checkBox1.Location = new Point(17, 78);
-            checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(486, 41);
-            checkBox1.TabIndex = 0;
-            checkBox1.Text = "Vibrate Motors with Speed Brake Telemetry:  Attach vibration motor near your throttle.";
-            checkBox1.UseVisualStyleBackColor = true;
+            chkVibrateMotorForSpeedBrake.Checked = true;
+            chkVibrateMotorForSpeedBrake.CheckState = CheckState.Checked;
+            chkVibrateMotorForSpeedBrake.Location = new Point(17, 78);
+            chkVibrateMotorForSpeedBrake.Name = "chkVibrateMotorForSpeedBrake";
+            chkVibrateMotorForSpeedBrake.Size = new Size(486, 41);
+            chkVibrateMotorForSpeedBrake.TabIndex = 0;
+            chkVibrateMotorForSpeedBrake.Text = "Vibrate Motor 1 with Speed Brake Telemetry:  Attach vibration motor near your throttle.";
+            chkVibrateMotorForSpeedBrake.UseVisualStyleBackColor = true;
             // 
             // tabTTGO20V3
             // 
-            tabTTGO20V3.Controls.Add(checkBox4);
-            tabTTGO20V3.Controls.Add(checkBox3);
-            tabTTGO20V3.Controls.Add(textBox1);
+            tabTTGO20V3.Controls.Add(chkTWatchDisplayBackground);
+            tabTTGO20V3.Controls.Add(chkTWatchVibrate);
+            tabTTGO20V3.Controls.Add(txtTWatchPort);
             tabTTGO20V3.Controls.Add(label13);
-            tabTTGO20V3.Controls.Add(textBox2);
+            tabTTGO20V3.Controls.Add(txtTWatchIP);
             tabTTGO20V3.Controls.Add(label14);
             tabTTGO20V3.Controls.Add(label12);
             tabTTGO20V3.Location = new Point(4, 24);
@@ -516,35 +516,35 @@
             tabTTGO20V3.Text = "T-Watch 2020 V3";
             tabTTGO20V3.UseVisualStyleBackColor = true;
             // 
-            // checkBox4
+            // chkTWatchDisplayBackground
             // 
-            checkBox4.Checked = true;
-            checkBox4.CheckState = CheckState.Checked;
-            checkBox4.Location = new Point(17, 133);
-            checkBox4.Name = "checkBox4";
-            checkBox4.Size = new Size(468, 41);
-            checkBox4.TabIndex = 31;
-            checkBox4.Text = "Change display background color based on AoA:  Yellow when below optimal AoA, Green when in optimal AoA and Red when above optimal AoA.";
-            checkBox4.UseVisualStyleBackColor = true;
+            chkTWatchDisplayBackground.Checked = true;
+            chkTWatchDisplayBackground.CheckState = CheckState.Checked;
+            chkTWatchDisplayBackground.Location = new Point(17, 133);
+            chkTWatchDisplayBackground.Name = "chkTWatchDisplayBackground";
+            chkTWatchDisplayBackground.Size = new Size(468, 41);
+            chkTWatchDisplayBackground.TabIndex = 31;
+            chkTWatchDisplayBackground.Text = "Change display background color based on AoA:  Yellow when below optimal AoA, Green when in optimal AoA and Red when above optimal AoA.";
+            chkTWatchDisplayBackground.UseVisualStyleBackColor = true;
             // 
-            // checkBox3
+            // chkTWatchVibrate
             // 
-            checkBox3.Checked = true;
-            checkBox3.CheckState = CheckState.Checked;
-            checkBox3.Location = new Point(17, 86);
-            checkBox3.Name = "checkBox3";
-            checkBox3.Size = new Size(283, 41);
-            checkBox3.TabIndex = 30;
-            checkBox3.Text = "Vibrate Motors with AoA Telemetry:  XXX";
-            checkBox3.UseVisualStyleBackColor = true;
+            chkTWatchVibrate.Checked = true;
+            chkTWatchVibrate.CheckState = CheckState.Checked;
+            chkTWatchVibrate.Location = new Point(17, 86);
+            chkTWatchVibrate.Name = "chkTWatchVibrate";
+            chkTWatchVibrate.Size = new Size(442, 41);
+            chkTWatchVibrate.TabIndex = 30;
+            chkTWatchVibrate.Text = "Vibrate Motors with AoA Telemetry:  Only when beyond optimal AoA range.";
+            chkTWatchVibrate.UseVisualStyleBackColor = true;
             // 
-            // textBox1
+            // txtTWatchPort
             // 
-            textBox1.Location = new Point(338, 203);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(106, 23);
-            textBox1.TabIndex = 29;
-            textBox1.Text = "54671";
+            txtTWatchPort.Location = new Point(338, 203);
+            txtTWatchPort.Name = "txtTWatchPort";
+            txtTWatchPort.Size = new Size(106, 23);
+            txtTWatchPort.TabIndex = 29;
+            txtTWatchPort.Text = "54671";
             // 
             // label13
             // 
@@ -555,13 +555,13 @@
             label13.TabIndex = 28;
             label13.Text = "UDP Port:";
             // 
-            // textBox2
+            // txtTWatchIP
             // 
-            textBox2.Location = new Point(134, 203);
-            textBox2.Name = "textBox2";
-            textBox2.Size = new Size(106, 23);
-            textBox2.TabIndex = 27;
-            textBox2.Text = "192.168.1.248";
+            txtTWatchIP.Location = new Point(134, 203);
+            txtTWatchIP.Name = "txtTWatchIP";
+            txtTWatchIP.Size = new Size(106, 23);
+            txtTWatchIP.TabIndex = 27;
+            txtTWatchIP.Text = "192.168.1.248";
             // 
             // label14
             // 
@@ -588,7 +588,7 @@
             tabSettings.Controls.Add(lblEffectTimeout);
             tabSettings.Controls.Add(trkEffectTimeout);
             tabSettings.Controls.Add(label16);
-            tabSettings.Controls.Add(textBox3);
+            tabSettings.Controls.Add(txtListeningPort);
             tabSettings.Controls.Add(label15);
             tabSettings.Location = new Point(4, 24);
             tabSettings.Name = "tabSettings";
@@ -655,14 +655,14 @@
             label16.TabIndex = 2;
             label16.Text = "Effect Timeout:";
             // 
-            // textBox3
+            // txtListeningPort
             // 
-            textBox3.Location = new Point(106, 12);
-            textBox3.Name = "textBox3";
-            textBox3.Size = new Size(116, 23);
-            textBox3.TabIndex = 1;
-            textBox3.Text = "54671";
-            toolTip1.SetToolTip(textBox3, "Make sure your export.lua script sends UDP packets to this port");
+            txtListeningPort.Location = new Point(106, 12);
+            txtListeningPort.Name = "txtListeningPort";
+            txtListeningPort.Size = new Size(116, 23);
+            txtListeningPort.TabIndex = 1;
+            txtListeningPort.Text = "54671";
+            toolTip1.SetToolTip(txtListeningPort, "Make sure your export.lua script sends UDP packets to this port");
             // 
             // label15
             // 
@@ -863,9 +863,9 @@
             chkChangeToMonitor.CheckState = CheckState.Checked;
             chkChangeToMonitor.Location = new Point(14, 20);
             chkChangeToMonitor.Name = "chkChangeToMonitor";
-            chkChangeToMonitor.Size = new Size(333, 19);
+            chkChangeToMonitor.Size = new Size(298, 19);
             chkChangeToMonitor.TabIndex = 0;
-            chkChangeToMonitor.Text = "Automatically change to monitor tab when Starting Server";
+            chkChangeToMonitor.Text = "Automatically change to monitor tab at server start.";
             chkChangeToMonitor.UseVisualStyleBackColor = true;
             // 
             // btnStartListening
@@ -953,14 +953,14 @@
         private TabPage tabSettings;
         private CheckBox chkEnableAoASoundEffects1;
         private Label label4;
-        private CheckBox checkBox1;
+        private CheckBox chkVibrateMotorForSpeedBrake;
         private Label label5;
         private Label label7;
         private Label label6;
         private NumericUpDown numMinIntensitySpeedBrakes;
         private NumericUpDown numMaxIntensitySpeedBrakes;
         private ToolTip toolTip1;
-        private CheckBox checkBox2;
+        private CheckBox chkVibrateMotorForFlaps;
         private NumericUpDown numMaxIntensityFlaps;
         private NumericUpDown numMinIntensityFlaps;
         private Label label8;
@@ -970,14 +970,14 @@
         private TextBox txtArduinoPort;
         private Label label11;
         private Label label12;
-        private TextBox textBox1;
+        private TextBox txtTWatchPort;
         private Label label13;
-        private TextBox textBox2;
+        private TextBox txtTWatchIP;
         private Label label14;
-        private CheckBox checkBox3;
-        private CheckBox checkBox4;
+        private CheckBox chkTWatchVibrate;
+        private CheckBox chkTWatchDisplayBackground;
         private Label label15;
-        private TextBox textBox3;
+        private TextBox txtListeningPort;
         private TrackBar trkEffectTimeout;
         private Label label16;
         private Label lblEffectTimeout;
