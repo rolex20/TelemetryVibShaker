@@ -32,12 +32,18 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             tabs = new TabControl();
             tabNormalSoundEffects = new TabPage();
+            cmbAudioDevice1 = new ComboBox();
+            label33 = new Label();
+            chkEnableAoASoundEffects2 = new CheckBox();
+            lblVolumeMultiplier2 = new Label();
+            trkVolumeMultiplier2 = new TrackBar();
+            label34 = new Label();
             label4 = new Label();
-            chkEnableAoASoundEffects = new CheckBox();
+            chkEnableAoASoundEffects1 = new CheckBox();
             btnSoundEffect2 = new Button();
             btnSoundEffect1 = new Button();
-            lblVolumeMultiplier = new Label();
-            trkVolumeMultiplier = new TrackBar();
+            lblVolumeMultiplier1 = new Label();
+            trkVolumeMultiplier1 = new TrackBar();
             label3 = new Label();
             txtSoundEffect2 = new TextBox();
             label2 = new Label();
@@ -78,30 +84,31 @@
             label15 = new Label();
             tabMonitor = new TabPage();
             panel1 = new Panel();
+            label31 = new Label();
+            label32 = new Label();
+            label30 = new Label();
+            label29 = new Label();
+            label28 = new Label();
+            label27 = new Label();
+            label26 = new Label();
+            label18 = new Label();
             label20 = new Label();
             label19 = new Label();
-            chkShowStatistics = new CheckBox();
-            label25 = new Label();
-            label24 = new Label();
-            label23 = new Label();
             label22 = new Label();
+            label24 = new Label();
             label21 = new Label();
+            label25 = new Label();
+            label23 = new Label();
+            chkShowStatistics = new CheckBox();
             chkChangeToMonitor = new CheckBox();
             btnStartListening = new Button();
             btnStop = new Button();
             openFileDialog1 = new OpenFileDialog();
             toolTip1 = new ToolTip(components);
-            label18 = new Label();
-            label26 = new Label();
-            label27 = new Label();
-            label28 = new Label();
-            label29 = new Label();
-            label30 = new Label();
-            label31 = new Label();
-            label32 = new Label();
             tabs.SuspendLayout();
             tabNormalSoundEffects.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier2).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier1).BeginInit();
             tabArduino.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numMaxIntensityFlaps).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numMinIntensityFlaps).BeginInit();
@@ -124,17 +131,23 @@
             tabs.Location = new Point(24, 22);
             tabs.Name = "tabs";
             tabs.SelectedIndex = 0;
-            tabs.Size = new Size(517, 334);
+            tabs.Size = new Size(517, 429);
             tabs.TabIndex = 0;
             // 
             // tabNormalSoundEffects
             // 
+            tabNormalSoundEffects.Controls.Add(cmbAudioDevice1);
+            tabNormalSoundEffects.Controls.Add(label33);
+            tabNormalSoundEffects.Controls.Add(chkEnableAoASoundEffects2);
+            tabNormalSoundEffects.Controls.Add(lblVolumeMultiplier2);
+            tabNormalSoundEffects.Controls.Add(trkVolumeMultiplier2);
+            tabNormalSoundEffects.Controls.Add(label34);
             tabNormalSoundEffects.Controls.Add(label4);
-            tabNormalSoundEffects.Controls.Add(chkEnableAoASoundEffects);
+            tabNormalSoundEffects.Controls.Add(chkEnableAoASoundEffects1);
             tabNormalSoundEffects.Controls.Add(btnSoundEffect2);
             tabNormalSoundEffects.Controls.Add(btnSoundEffect1);
-            tabNormalSoundEffects.Controls.Add(lblVolumeMultiplier);
-            tabNormalSoundEffects.Controls.Add(trkVolumeMultiplier);
+            tabNormalSoundEffects.Controls.Add(lblVolumeMultiplier1);
+            tabNormalSoundEffects.Controls.Add(trkVolumeMultiplier1);
             tabNormalSoundEffects.Controls.Add(label3);
             tabNormalSoundEffects.Controls.Add(txtSoundEffect2);
             tabNormalSoundEffects.Controls.Add(label2);
@@ -143,10 +156,72 @@
             tabNormalSoundEffects.Location = new Point(4, 24);
             tabNormalSoundEffects.Name = "tabNormalSoundEffects";
             tabNormalSoundEffects.Padding = new Padding(3);
-            tabNormalSoundEffects.Size = new Size(509, 306);
+            tabNormalSoundEffects.Size = new Size(509, 401);
             tabNormalSoundEffects.TabIndex = 0;
             tabNormalSoundEffects.Text = "Normal AoA Sound Effects";
             tabNormalSoundEffects.UseVisualStyleBackColor = true;
+            // 
+            // cmbAudioDevice1
+            // 
+            cmbAudioDevice1.FormattingEnabled = true;
+            cmbAudioDevice1.Location = new Point(103, 77);
+            cmbAudioDevice1.Name = "cmbAudioDevice1";
+            cmbAudioDevice1.Size = new Size(343, 23);
+            cmbAudioDevice1.TabIndex = 16;
+            // 
+            // label33
+            // 
+            label33.AutoSize = true;
+            label33.Location = new Point(17, 80);
+            label33.Name = "label33";
+            label33.Size = new Size(80, 15);
+            label33.TabIndex = 15;
+            label33.Text = "Audio Device:";
+            // 
+            // chkEnableAoASoundEffects2
+            // 
+            chkEnableAoASoundEffects2.AutoSize = true;
+            chkEnableAoASoundEffects2.Checked = true;
+            chkEnableAoASoundEffects2.CheckState = CheckState.Checked;
+            chkEnableAoASoundEffects2.Location = new Point(19, 255);
+            chkEnableAoASoundEffects2.Name = "chkEnableAoASoundEffects2";
+            chkEnableAoASoundEffects2.Size = new Size(268, 19);
+            chkEnableAoASoundEffects2.TabIndex = 14;
+            chkEnableAoASoundEffects2.Text = "Enable Sound Effect when beyond AoA range:";
+            chkEnableAoASoundEffects2.UseVisualStyleBackColor = true;
+            // 
+            // lblVolumeMultiplier2
+            // 
+            lblVolumeMultiplier2.AutoSize = true;
+            lblVolumeMultiplier2.Location = new Point(454, 343);
+            lblVolumeMultiplier2.Name = "lblVolumeMultiplier2";
+            lblVolumeMultiplier2.Size = new Size(111, 15);
+            lblVolumeMultiplier2.TabIndex = 13;
+            lblVolumeMultiplier2.Text = "lblVolumeMultiplier";
+            // 
+            // trkVolumeMultiplier2
+            // 
+            trkVolumeMultiplier2.LargeChange = 10;
+            trkVolumeMultiplier2.Location = new Point(126, 334);
+            trkVolumeMultiplier2.Maximum = 100;
+            trkVolumeMultiplier2.Minimum = 1;
+            trkVolumeMultiplier2.Name = "trkVolumeMultiplier2";
+            trkVolumeMultiplier2.Size = new Size(322, 45);
+            trkVolumeMultiplier2.SmallChange = 5;
+            trkVolumeMultiplier2.TabIndex = 12;
+            trkVolumeMultiplier2.TickFrequency = 10;
+            toolTip1.SetToolTip(trkVolumeMultiplier2, "General modifier of volume for the sound effects.  100% is the original sound effect volume.");
+            trkVolumeMultiplier2.Value = 60;
+            trkVolumeMultiplier2.Scroll += trkVolumeMultiplier2_Scroll;
+            // 
+            // label34
+            // 
+            label34.AutoSize = true;
+            label34.Location = new Point(19, 343);
+            label34.Name = "label34";
+            label34.Size = new Size(101, 15);
+            label34.TabIndex = 11;
+            label34.Text = "Volume Multiplier";
             // 
             // label4
             // 
@@ -156,21 +231,21 @@
             label4.TabIndex = 10;
             label4.Text = resources.GetString("label4.Text");
             // 
-            // chkEnableAoASoundEffects
+            // chkEnableAoASoundEffects1
             // 
-            chkEnableAoASoundEffects.AutoSize = true;
-            chkEnableAoASoundEffects.Checked = true;
-            chkEnableAoASoundEffects.CheckState = CheckState.Checked;
-            chkEnableAoASoundEffects.Location = new Point(17, 78);
-            chkEnableAoASoundEffects.Name = "chkEnableAoASoundEffects";
-            chkEnableAoASoundEffects.Size = new Size(136, 19);
-            chkEnableAoASoundEffects.TabIndex = 9;
-            chkEnableAoASoundEffects.Text = "Enable Sound Effects";
-            chkEnableAoASoundEffects.UseVisualStyleBackColor = true;
+            chkEnableAoASoundEffects1.AutoSize = true;
+            chkEnableAoASoundEffects1.Checked = true;
+            chkEnableAoASoundEffects1.CheckState = CheckState.Checked;
+            chkEnableAoASoundEffects1.Location = new Point(17, 115);
+            chkEnableAoASoundEffects1.Name = "chkEnableAoASoundEffects1";
+            chkEnableAoASoundEffects1.Size = new Size(282, 19);
+            chkEnableAoASoundEffects1.TabIndex = 9;
+            chkEnableAoASoundEffects1.Text = "Enable Sound Effect when in optimal AoA range:";
+            chkEnableAoASoundEffects1.UseVisualStyleBackColor = true;
             // 
             // btnSoundEffect2
             // 
-            btnSoundEffect2.Location = new Point(456, 191);
+            btnSoundEffect2.Location = new Point(456, 303);
             btnSoundEffect2.Name = "btnSoundEffect2";
             btnSoundEffect2.Size = new Size(37, 23);
             btnSoundEffect2.TabIndex = 8;
@@ -181,7 +256,7 @@
             // 
             // btnSoundEffect1
             // 
-            btnSoundEffect1.Location = new Point(456, 130);
+            btnSoundEffect1.Location = new Point(456, 167);
             btnSoundEffect1.Name = "btnSoundEffect1";
             btnSoundEffect1.Size = new Size(37, 23);
             btnSoundEffect1.TabIndex = 7;
@@ -190,34 +265,34 @@
             btnSoundEffect1.UseVisualStyleBackColor = true;
             btnSoundEffect1.Click += btnSoundEffect1_Click;
             // 
-            // lblVolumeMultiplier
+            // lblVolumeMultiplier1
             // 
-            lblVolumeMultiplier.AutoSize = true;
-            lblVolumeMultiplier.Location = new Point(456, 242);
-            lblVolumeMultiplier.Name = "lblVolumeMultiplier";
-            lblVolumeMultiplier.Size = new Size(111, 15);
-            lblVolumeMultiplier.TabIndex = 6;
-            lblVolumeMultiplier.Text = "lblVolumeMultiplier";
+            lblVolumeMultiplier1.AutoSize = true;
+            lblVolumeMultiplier1.Location = new Point(456, 204);
+            lblVolumeMultiplier1.Name = "lblVolumeMultiplier1";
+            lblVolumeMultiplier1.Size = new Size(111, 15);
+            lblVolumeMultiplier1.TabIndex = 6;
+            lblVolumeMultiplier1.Text = "lblVolumeMultiplier";
             // 
-            // trkVolumeMultiplier
+            // trkVolumeMultiplier1
             // 
-            trkVolumeMultiplier.LargeChange = 10;
-            trkVolumeMultiplier.Location = new Point(124, 233);
-            trkVolumeMultiplier.Maximum = 100;
-            trkVolumeMultiplier.Minimum = 1;
-            trkVolumeMultiplier.Name = "trkVolumeMultiplier";
-            trkVolumeMultiplier.Size = new Size(322, 45);
-            trkVolumeMultiplier.SmallChange = 5;
-            trkVolumeMultiplier.TabIndex = 5;
-            trkVolumeMultiplier.TickFrequency = 10;
-            toolTip1.SetToolTip(trkVolumeMultiplier, "General modifier of volume for the sound effects.  100% is the original sound effect volume.");
-            trkVolumeMultiplier.Value = 60;
-            trkVolumeMultiplier.Scroll += trkVolumeMultiplier_Scroll;
+            trkVolumeMultiplier1.LargeChange = 10;
+            trkVolumeMultiplier1.Location = new Point(124, 195);
+            trkVolumeMultiplier1.Maximum = 100;
+            trkVolumeMultiplier1.Minimum = 1;
+            trkVolumeMultiplier1.Name = "trkVolumeMultiplier1";
+            trkVolumeMultiplier1.Size = new Size(322, 45);
+            trkVolumeMultiplier1.SmallChange = 5;
+            trkVolumeMultiplier1.TabIndex = 5;
+            trkVolumeMultiplier1.TickFrequency = 10;
+            toolTip1.SetToolTip(trkVolumeMultiplier1, "General modifier of volume for the sound effects.  100% is the original sound effect volume.");
+            trkVolumeMultiplier1.Value = 60;
+            trkVolumeMultiplier1.Scroll += trkVolumeMultiplier1_Scroll;
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(17, 242);
+            label3.Location = new Point(17, 204);
             label3.Name = "label3";
             label3.Size = new Size(101, 15);
             label3.TabIndex = 4;
@@ -225,7 +300,7 @@
             // 
             // txtSoundEffect2
             // 
-            txtSoundEffect2.Location = new Point(17, 192);
+            txtSoundEffect2.Location = new Point(17, 304);
             txtSoundEffect2.Name = "txtSoundEffect2";
             txtSoundEffect2.Size = new Size(429, 23);
             txtSoundEffect2.TabIndex = 3;
@@ -234,7 +309,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(17, 174);
+            label2.Location = new Point(17, 286);
             label2.Name = "label2";
             label2.Size = new Size(255, 15);
             label2.TabIndex = 2;
@@ -242,7 +317,7 @@
             // 
             // txtSoundEffect1
             // 
-            txtSoundEffect1.Location = new Point(17, 130);
+            txtSoundEffect1.Location = new Point(17, 167);
             txtSoundEffect1.Name = "txtSoundEffect1";
             txtSoundEffect1.Size = new Size(429, 23);
             txtSoundEffect1.TabIndex = 1;
@@ -251,7 +326,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(17, 112);
+            label1.Location = new Point(17, 149);
             label1.Name = "label1";
             label1.Size = new Size(225, 15);
             label1.TabIndex = 0;
@@ -277,7 +352,7 @@
             tabArduino.Location = new Point(4, 24);
             tabArduino.Name = "tabArduino";
             tabArduino.Padding = new Padding(3);
-            tabArduino.Size = new Size(509, 306);
+            tabArduino.Size = new Size(509, 401);
             tabArduino.TabIndex = 1;
             tabArduino.Text = "2xVibMotors";
             tabArduino.UseVisualStyleBackColor = true;
@@ -436,7 +511,7 @@
             tabTTGO20V3.Location = new Point(4, 24);
             tabTTGO20V3.Name = "tabTTGO20V3";
             tabTTGO20V3.Padding = new Padding(3);
-            tabTTGO20V3.Size = new Size(509, 306);
+            tabTTGO20V3.Size = new Size(509, 401);
             tabTTGO20V3.TabIndex = 2;
             tabTTGO20V3.Text = "T-Watch 2020 V3";
             tabTTGO20V3.UseVisualStyleBackColor = true;
@@ -517,7 +592,7 @@
             tabSettings.Controls.Add(label15);
             tabSettings.Location = new Point(4, 24);
             tabSettings.Name = "tabSettings";
-            tabSettings.Size = new Size(509, 306);
+            tabSettings.Size = new Size(509, 401);
             tabSettings.TabIndex = 4;
             tabSettings.Text = "General Settings";
             tabSettings.UseVisualStyleBackColor = true;
@@ -605,7 +680,7 @@
             tabMonitor.Controls.Add(chkChangeToMonitor);
             tabMonitor.Location = new Point(4, 24);
             tabMonitor.Name = "tabMonitor";
-            tabMonitor.Size = new Size(509, 306);
+            tabMonitor.Size = new Size(509, 401);
             tabMonitor.TabIndex = 3;
             tabMonitor.Text = "Monitor";
             tabMonitor.UseVisualStyleBackColor = true;
@@ -632,173 +707,6 @@
             panel1.Size = new Size(492, 197);
             panel1.TabIndex = 10;
             // 
-            // label20
-            // 
-            label20.AutoSize = true;
-            label20.Location = new Point(61, 12);
-            label20.Name = "label20";
-            label20.Size = new Size(113, 15);
-            label20.TabIndex = 3;
-            label20.Text = "Not playing sounds.";
-            // 
-            // label19
-            // 
-            label19.AutoSize = true;
-            label19.Location = new Point(11, 12);
-            label19.Name = "label19";
-            label19.Size = new Size(44, 15);
-            label19.TabIndex = 2;
-            label19.Text = "Sound:";
-            // 
-            // chkShowStatistics
-            // 
-            chkShowStatistics.AutoSize = true;
-            chkShowStatistics.Checked = true;
-            chkShowStatistics.CheckState = CheckState.Checked;
-            chkShowStatistics.Location = new Point(15, 55);
-            chkShowStatistics.Name = "chkShowStatistics";
-            chkShowStatistics.Size = new Size(299, 19);
-            chkShowStatistics.TabIndex = 9;
-            chkShowStatistics.Text = "Show statistics and additional info once per second.";
-            chkShowStatistics.UseVisualStyleBackColor = true;
-            chkShowStatistics.CheckedChanged += checkBox5_CheckedChanged;
-            // 
-            // label25
-            // 
-            label25.AutoSize = true;
-            label25.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label25.Location = new Point(12, 49);
-            label25.Name = "label25";
-            label25.Size = new Size(220, 15);
-            label25.TabIndex = 8;
-            label25.Text = "Last Telemetry received by export.lua:";
-            // 
-            // label24
-            // 
-            label24.AutoSize = true;
-            label24.Location = new Point(202, 78);
-            label24.Name = "label24";
-            label24.Size = new Size(79, 15);
-            label24.TabIndex = 7;
-            label24.Text = "Speed Brakes:";
-            // 
-            // label23
-            // 
-            label23.AutoSize = true;
-            label23.Location = new Point(61, 104);
-            label23.Name = "label23";
-            label23.Size = new Size(33, 15);
-            label23.TabIndex = 6;
-            label23.Text = "AoA:";
-            // 
-            // label22
-            // 
-            label22.AutoSize = true;
-            label22.Location = new Point(101, 104);
-            label22.Name = "label22";
-            label22.Size = new Size(34, 15);
-            label22.TabIndex = 5;
-            label22.Text = "none";
-            // 
-            // label21
-            // 
-            label21.AutoSize = true;
-            label21.Location = new Point(12, 78);
-            label21.Name = "label21";
-            label21.Size = new Size(83, 15);
-            label21.TabIndex = 4;
-            label21.Text = "Last Unit Type:";
-            // 
-            // chkChangeToMonitor
-            // 
-            chkChangeToMonitor.AutoSize = true;
-            chkChangeToMonitor.Checked = true;
-            chkChangeToMonitor.CheckState = CheckState.Checked;
-            chkChangeToMonitor.Location = new Point(14, 20);
-            chkChangeToMonitor.Name = "chkChangeToMonitor";
-            chkChangeToMonitor.Size = new Size(333, 19);
-            chkChangeToMonitor.TabIndex = 0;
-            chkChangeToMonitor.Text = "Automatically change to monitor tab when Starting Server";
-            chkChangeToMonitor.UseVisualStyleBackColor = true;
-            // 
-            // btnStartListening
-            // 
-            btnStartListening.Location = new Point(346, 378);
-            btnStartListening.Name = "btnStartListening";
-            btnStartListening.Size = new Size(100, 23);
-            btnStartListening.TabIndex = 0;
-            btnStartListening.Text = "Start &Listening";
-            btnStartListening.UseVisualStyleBackColor = true;
-            btnStartListening.Click += btnStartListening_Click;
-            // 
-            // btnStop
-            // 
-            btnStop.Location = new Point(462, 378);
-            btnStop.Name = "btnStop";
-            btnStop.Size = new Size(75, 23);
-            btnStop.TabIndex = 2;
-            btnStop.Text = "&Stop";
-            btnStop.UseVisualStyleBackColor = true;
-            // 
-            // openFileDialog1
-            // 
-            openFileDialog1.FileName = "openFileDialog1";
-            openFileDialog1.Filter = "WAV Files|*.wav|MP3 files|*.mp3|All files|*.*";
-            // 
-            // label18
-            // 
-            label18.AutoSize = true;
-            label18.Location = new Point(101, 78);
-            label18.Name = "label18";
-            label18.Size = new Size(34, 15);
-            label18.TabIndex = 9;
-            label18.Text = "none";
-            // 
-            // label26
-            // 
-            label26.AutoSize = true;
-            label26.Location = new Point(287, 78);
-            label26.Name = "label26";
-            label26.Size = new Size(34, 15);
-            label26.TabIndex = 10;
-            label26.Text = "none";
-            // 
-            // label27
-            // 
-            label27.AutoSize = true;
-            label27.Location = new Point(12, 161);
-            label27.Name = "label27";
-            label27.Size = new Size(123, 15);
-            label27.TabIndex = 11;
-            label27.Text = "Processing Time (ms):";
-            // 
-            // label28
-            // 
-            label28.AutoSize = true;
-            label28.Location = new Point(141, 161);
-            label28.Name = "label28";
-            label28.Size = new Size(44, 15);
-            label28.TabIndex = 12;
-            label28.Text = "label28";
-            // 
-            // label29
-            // 
-            label29.AutoSize = true;
-            label29.Location = new Point(207, 162);
-            label29.Name = "label29";
-            label29.Size = new Size(175, 15);
-            label29.TabIndex = 13;
-            label29.Text = "Datagrams received per second:";
-            // 
-            // label30
-            // 
-            label30.AutoSize = true;
-            label30.Location = new Point(388, 162);
-            label30.Name = "label30";
-            label30.Size = new Size(44, 15);
-            label30.TabIndex = 14;
-            label30.Text = "label30";
-            // 
             // label31
             // 
             label31.AutoSize = true;
@@ -817,24 +725,193 @@
             label32.TabIndex = 15;
             label32.Text = "Flaps:";
             // 
+            // label30
+            // 
+            label30.AutoSize = true;
+            label30.Location = new Point(388, 162);
+            label30.Name = "label30";
+            label30.Size = new Size(44, 15);
+            label30.TabIndex = 14;
+            label30.Text = "label30";
+            // 
+            // label29
+            // 
+            label29.AutoSize = true;
+            label29.Location = new Point(207, 162);
+            label29.Name = "label29";
+            label29.Size = new Size(175, 15);
+            label29.TabIndex = 13;
+            label29.Text = "Datagrams received per second:";
+            // 
+            // label28
+            // 
+            label28.AutoSize = true;
+            label28.Location = new Point(141, 161);
+            label28.Name = "label28";
+            label28.Size = new Size(44, 15);
+            label28.TabIndex = 12;
+            label28.Text = "label28";
+            // 
+            // label27
+            // 
+            label27.AutoSize = true;
+            label27.Location = new Point(12, 161);
+            label27.Name = "label27";
+            label27.Size = new Size(123, 15);
+            label27.TabIndex = 11;
+            label27.Text = "Processing Time (ms):";
+            // 
+            // label26
+            // 
+            label26.AutoSize = true;
+            label26.Location = new Point(287, 78);
+            label26.Name = "label26";
+            label26.Size = new Size(34, 15);
+            label26.TabIndex = 10;
+            label26.Text = "none";
+            // 
+            // label18
+            // 
+            label18.AutoSize = true;
+            label18.Location = new Point(101, 78);
+            label18.Name = "label18";
+            label18.Size = new Size(34, 15);
+            label18.TabIndex = 9;
+            label18.Text = "none";
+            // 
+            // label20
+            // 
+            label20.AutoSize = true;
+            label20.Location = new Point(61, 12);
+            label20.Name = "label20";
+            label20.Size = new Size(113, 15);
+            label20.TabIndex = 3;
+            label20.Text = "Not playing sounds.";
+            // 
+            // label19
+            // 
+            label19.AutoSize = true;
+            label19.Location = new Point(11, 12);
+            label19.Name = "label19";
+            label19.Size = new Size(44, 15);
+            label19.TabIndex = 2;
+            label19.Text = "Sound:";
+            // 
+            // label22
+            // 
+            label22.AutoSize = true;
+            label22.Location = new Point(101, 104);
+            label22.Name = "label22";
+            label22.Size = new Size(34, 15);
+            label22.TabIndex = 5;
+            label22.Text = "none";
+            // 
+            // label24
+            // 
+            label24.AutoSize = true;
+            label24.Location = new Point(202, 78);
+            label24.Name = "label24";
+            label24.Size = new Size(79, 15);
+            label24.TabIndex = 7;
+            label24.Text = "Speed Brakes:";
+            // 
+            // label21
+            // 
+            label21.AutoSize = true;
+            label21.Location = new Point(12, 78);
+            label21.Name = "label21";
+            label21.Size = new Size(83, 15);
+            label21.TabIndex = 4;
+            label21.Text = "Last Unit Type:";
+            // 
+            // label25
+            // 
+            label25.AutoSize = true;
+            label25.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label25.Location = new Point(12, 49);
+            label25.Name = "label25";
+            label25.Size = new Size(220, 15);
+            label25.TabIndex = 8;
+            label25.Text = "Last Telemetry received by export.lua:";
+            // 
+            // label23
+            // 
+            label23.AutoSize = true;
+            label23.Location = new Point(61, 104);
+            label23.Name = "label23";
+            label23.Size = new Size(33, 15);
+            label23.TabIndex = 6;
+            label23.Text = "AoA:";
+            // 
+            // chkShowStatistics
+            // 
+            chkShowStatistics.AutoSize = true;
+            chkShowStatistics.Checked = true;
+            chkShowStatistics.CheckState = CheckState.Checked;
+            chkShowStatistics.Location = new Point(15, 55);
+            chkShowStatistics.Name = "chkShowStatistics";
+            chkShowStatistics.Size = new Size(299, 19);
+            chkShowStatistics.TabIndex = 9;
+            chkShowStatistics.Text = "Show statistics and additional info once per second.";
+            chkShowStatistics.UseVisualStyleBackColor = true;
+            chkShowStatistics.CheckedChanged += checkBox5_CheckedChanged;
+            // 
+            // chkChangeToMonitor
+            // 
+            chkChangeToMonitor.AutoSize = true;
+            chkChangeToMonitor.Checked = true;
+            chkChangeToMonitor.CheckState = CheckState.Checked;
+            chkChangeToMonitor.Location = new Point(14, 20);
+            chkChangeToMonitor.Name = "chkChangeToMonitor";
+            chkChangeToMonitor.Size = new Size(333, 19);
+            chkChangeToMonitor.TabIndex = 0;
+            chkChangeToMonitor.Text = "Automatically change to monitor tab when Starting Server";
+            chkChangeToMonitor.UseVisualStyleBackColor = true;
+            // 
+            // btnStartListening
+            // 
+            btnStartListening.Location = new Point(346, 457);
+            btnStartListening.Name = "btnStartListening";
+            btnStartListening.Size = new Size(100, 23);
+            btnStartListening.TabIndex = 0;
+            btnStartListening.Text = "Start &Listening";
+            btnStartListening.UseVisualStyleBackColor = true;
+            btnStartListening.Click += btnStartListening_Click;
+            // 
+            // btnStop
+            // 
+            btnStop.Location = new Point(462, 457);
+            btnStop.Name = "btnStop";
+            btnStop.Size = new Size(75, 23);
+            btnStop.TabIndex = 2;
+            btnStop.Text = "&Stop";
+            btnStop.UseVisualStyleBackColor = true;
+            // 
+            // openFileDialog1
+            // 
+            openFileDialog1.FileName = "openFileDialog1";
+            openFileDialog1.Filter = "WAV Files|*.wav|MP3 files|*.mp3|All files|*.*";
+            // 
             // frmMain
             // 
             AcceptButton = btnStartListening;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnStop;
-            ClientSize = new Size(577, 422);
+            ClientSize = new Size(566, 491);
             Controls.Add(btnStop);
             Controls.Add(btnStartListening);
             Controls.Add(tabs);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
             Name = "frmMain";
             Text = "Telemetry Vib-Sound-Shaker [UDP Server]";
+            FormClosing += frmMain_FormClosing;
             Load += frmMain_Load;
             tabs.ResumeLayout(false);
             tabNormalSoundEffects.ResumeLayout(false);
             tabNormalSoundEffects.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier).EndInit();
+            ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier2).EndInit();
+            ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier1).EndInit();
             tabArduino.ResumeLayout(false);
             tabArduino.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)numMaxIntensityFlaps).EndInit();
@@ -866,15 +943,15 @@
         private TextBox txtSoundEffect2;
         private Label label2;
         private TextBox txtSoundEffect1;
-        private TrackBar trkVolumeMultiplier;
+        private TrackBar trkVolumeMultiplier1;
         private Label label3;
-        private Label lblVolumeMultiplier;
+        private Label lblVolumeMultiplier1;
         private Button btnSoundEffect2;
         private Button btnSoundEffect1;
         private CheckBox chkChangeToMonitor;
         private OpenFileDialog openFileDialog1;
         private TabPage tabSettings;
-        private CheckBox chkEnableAoASoundEffects;
+        private CheckBox chkEnableAoASoundEffects1;
         private Label label4;
         private CheckBox checkBox1;
         private Label label5;
@@ -924,5 +1001,11 @@
         private Label label30;
         private Label label31;
         private Label label32;
+        private Label lblVolumeMultiplier2;
+        private TrackBar trkVolumeMultiplier2;
+        private Label label34;
+        private CheckBox chkEnableAoASoundEffects2;
+        private ComboBox cmbAudioDevice1;
+        private Label label33;
     }
 }
