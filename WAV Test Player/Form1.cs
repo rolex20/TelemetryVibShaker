@@ -31,7 +31,16 @@ namespace WAV_Test_Player
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            // create a device enumerator
+            var enumerator = new MMDeviceEnumerator();
 
+            // get the index of the device named "Output Sound Device 2"
+            for (int i = 0; i < WaveOut.DeviceCount; i++)
+            {
+                var device = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)[i];
+
+                cmbSoundDevice.Items.Add(device.FriendlyName);
+            }
         }
 
         private void btnPlay_Click(object sender, EventArgs e)
@@ -40,18 +49,7 @@ namespace WAV_Test_Player
             var enumerator = new MMDeviceEnumerator();
 
             // get the index of the device named "Output Sound Device 2"
-            int deviceIndex = -1;
-            for (int i = 0; i < WaveOut.DeviceCount; i++)
-            {
-                var device = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)[i];
-
-                //Console.WriteLine("Device ID[{0}] = [{1}]", i, device.FriendlyName);
-                if (device.FriendlyName == txtSoundDevice.Text)
-                {
-                    deviceIndex = i;
-                    break;
-                }
-            }
+            int deviceIndex = cmbSoundDevice.SelectedIndex;
 
             // check if the device was found
             if (deviceIndex == -1)

@@ -32,12 +32,12 @@
             this.txtWAVFile = new System.Windows.Forms.TextBox();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.txtSoundDevice = new System.Windows.Forms.TextBox();
             this.btnPlay = new System.Windows.Forms.Button();
             this.btnStop = new System.Windows.Forms.Button();
             this.tbVolume = new System.Windows.Forms.TrackBar();
             this.label3 = new System.Windows.Forms.Label();
             this.lblVolume = new System.Windows.Forms.Label();
+            this.cmbSoundDevice = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.tbVolume)).BeginInit();
             this.SuspendLayout();
             // 
@@ -79,15 +79,6 @@
             this.label2.Size = new System.Drawing.Size(108, 13);
             this.label2.TabIndex = 3;
             this.label2.Text = "Select Sound Device";
-            // 
-            // txtSoundDevice
-            // 
-            this.txtSoundDevice.Location = new System.Drawing.Point(139, 114);
-            this.txtSoundDevice.Name = "txtSoundDevice";
-            this.txtSoundDevice.Size = new System.Drawing.Size(261, 20);
-            this.txtSoundDevice.TabIndex = 4;
-            this.txtSoundDevice.Text = "Speakers (High Definition Audio Device)";
-            this.txtSoundDevice.TextChanged += new System.EventHandler(this.txtSoundDevice_TextChanged);
             // 
             // btnPlay
             // 
@@ -139,18 +130,26 @@
             this.lblVolume.TabIndex = 9;
             this.lblVolume.Text = "100%";
             // 
+            // cmbSoundDevice
+            // 
+            this.cmbSoundDevice.FormattingEnabled = true;
+            this.cmbSoundDevice.Location = new System.Drawing.Point(139, 109);
+            this.cmbSoundDevice.Name = "cmbSoundDevice";
+            this.cmbSoundDevice.Size = new System.Drawing.Size(261, 21);
+            this.cmbSoundDevice.TabIndex = 10;
+            // 
             // Form1
             // 
             this.AcceptButton = this.btnPlay;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(543, 246);
+            this.Controls.Add(this.cmbSoundDevice);
             this.Controls.Add(this.lblVolume);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.tbVolume);
             this.Controls.Add(this.btnStop);
             this.Controls.Add(this.btnPlay);
-            this.Controls.Add(this.txtSoundDevice);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.txtWAVFile);
@@ -171,12 +170,12 @@
         private System.Windows.Forms.TextBox txtWAVFile;
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox txtSoundDevice;
         private System.Windows.Forms.Button btnPlay;
         private System.Windows.Forms.Button btnStop;
         private System.Windows.Forms.TrackBar tbVolume;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label lblVolume;
+        private System.Windows.Forms.ComboBox cmbSoundDevice;
     }
 }
 
