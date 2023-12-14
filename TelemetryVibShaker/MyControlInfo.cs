@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 namespace TelemetryVibShaker
 {
@@ -28,7 +24,10 @@ namespace TelemetryVibShaker
             }
             else if (control is ComboBox)
             {
-                (control as ComboBox).SelectedIndex = (int)value;
+                int v = (int)value;
+                int c = (int)(control as ComboBox).Items.Count;
+
+                if (v<c) (control as ComboBox).SelectedIndex = v;
             }
             else if (control is TrackBar)
             {

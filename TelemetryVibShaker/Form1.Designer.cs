@@ -84,6 +84,8 @@
             label15 = new Label();
             tabMonitor = new TabPage();
             panel1 = new Panel();
+            lblServerThread = new Label();
+            label18 = new Label();
             label31 = new Label();
             label32 = new Label();
             lblDatagramsPerSecond = new Label();
@@ -105,6 +107,9 @@
             btnStop = new Button();
             openFileDialog1 = new OpenFileDialog();
             toolTip1 = new ToolTip(components);
+            timer1 = new System.Windows.Forms.Timer(components);
+            statusStrip1 = new StatusStrip();
+            toolStripStatusLabel1 = new ToolStripStatusLabel();
             tabs.SuspendLayout();
             tabNormalSoundEffects.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier2).BeginInit();
@@ -119,6 +124,7 @@
             ((System.ComponentModel.ISupportInitialize)trkEffectTimeout).BeginInit();
             tabMonitor.SuspendLayout();
             panel1.SuspendLayout();
+            statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // tabs
@@ -364,6 +370,7 @@
             txtArduinoPort.Size = new Size(106, 23);
             txtArduinoPort.TabIndex = 25;
             txtArduinoPort.Text = "54671";
+            txtArduinoPort.KeyPress += txtArduinoPort_KeyPress;
             // 
             // label11
             // 
@@ -545,6 +552,7 @@
             txtTWatchPort.Size = new Size(106, 23);
             txtTWatchPort.TabIndex = 29;
             txtTWatchPort.Text = "54671";
+            txtTWatchPort.KeyPress += txtTWatchPort_KeyPress;
             // 
             // label13
             // 
@@ -663,6 +671,7 @@
             txtListeningPort.TabIndex = 1;
             txtListeningPort.Text = "54671";
             toolTip1.SetToolTip(txtListeningPort, "Make sure your export.lua script sends UDP packets to this port");
+            txtListeningPort.KeyPress += txtListeningPort_KeyPress;
             // 
             // label15
             // 
@@ -687,6 +696,8 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(lblServerThread);
+            panel1.Controls.Add(label18);
             panel1.Controls.Add(label31);
             panel1.Controls.Add(label32);
             panel1.Controls.Add(lblDatagramsPerSecond);
@@ -704,13 +715,31 @@
             panel1.Controls.Add(label23);
             panel1.Location = new Point(3, 97);
             panel1.Name = "panel1";
-            panel1.Size = new Size(492, 197);
+            panel1.Size = new Size(492, 249);
             panel1.TabIndex = 10;
+            // 
+            // lblServerThread
+            // 
+            lblServerThread.AutoSize = true;
+            lblServerThread.Location = new Point(148, 11);
+            lblServerThread.Name = "lblServerThread";
+            lblServerThread.Size = new Size(17, 15);
+            lblServerThread.TabIndex = 18;
+            lblServerThread.Text = "id";
+            // 
+            // label18
+            // 
+            label18.AutoSize = true;
+            label18.Location = new Point(13, 11);
+            label18.Name = "label18";
+            label18.Size = new Size(129, 15);
+            label18.TabIndex = 17;
+            label18.Text = "UDP Server - Thread ID:";
             // 
             // label31
             // 
             label31.AutoSize = true;
-            label31.Location = new Point(287, 104);
+            label31.Location = new Point(288, 132);
             label31.Name = "label31";
             label31.Size = new Size(34, 15);
             label31.TabIndex = 16;
@@ -719,7 +748,7 @@
             // label32
             // 
             label32.AutoSize = true;
-            label32.Location = new Point(202, 104);
+            label32.Location = new Point(203, 132);
             label32.Name = "label32";
             label32.Size = new Size(37, 15);
             label32.TabIndex = 15;
@@ -728,7 +757,7 @@
             // lblDatagramsPerSecond
             // 
             lblDatagramsPerSecond.AutoSize = true;
-            lblDatagramsPerSecond.Location = new Point(388, 162);
+            lblDatagramsPerSecond.Location = new Point(420, 190);
             lblDatagramsPerSecond.Name = "lblDatagramsPerSecond";
             lblDatagramsPerSecond.Size = new Size(49, 15);
             lblDatagramsPerSecond.TabIndex = 14;
@@ -737,7 +766,7 @@
             // label29
             // 
             label29.AutoSize = true;
-            label29.Location = new Point(207, 162);
+            label29.Location = new Point(239, 190);
             label29.Name = "label29";
             label29.Size = new Size(175, 15);
             label29.TabIndex = 13;
@@ -746,25 +775,26 @@
             // lblProcessingTime
             // 
             lblProcessingTime.AutoSize = true;
-            lblProcessingTime.Location = new Point(141, 161);
+            lblProcessingTime.Location = new Point(164, 189);
             lblProcessingTime.Name = "lblProcessingTime";
             lblProcessingTime.Size = new Size(31, 15);
             lblProcessingTime.TabIndex = 12;
+            lblProcessingTime.Tag = "0";
             lblProcessingTime.Text = "time";
             // 
             // label27
             // 
             label27.AutoSize = true;
-            label27.Location = new Point(12, 161);
+            label27.Location = new Point(13, 189);
             label27.Name = "label27";
-            label27.Size = new Size(123, 15);
+            label27.Size = new Size(149, 15);
             label27.TabIndex = 11;
-            label27.Text = "Processing Time (ms):";
+            label27.Text = "Max Processing Time (ms):";
             // 
             // label26
             // 
             label26.AutoSize = true;
-            label26.Location = new Point(287, 78);
+            label26.Location = new Point(288, 106);
             label26.Name = "label26";
             label26.Size = new Size(34, 15);
             label26.TabIndex = 10;
@@ -773,7 +803,7 @@
             // lblCurrentUnitType
             // 
             lblCurrentUnitType.AutoSize = true;
-            lblCurrentUnitType.Location = new Point(101, 78);
+            lblCurrentUnitType.Location = new Point(102, 106);
             lblCurrentUnitType.Name = "lblCurrentUnitType";
             lblCurrentUnitType.Size = new Size(34, 15);
             lblCurrentUnitType.TabIndex = 9;
@@ -782,7 +812,7 @@
             // lblSoundStatus
             // 
             lblSoundStatus.AutoSize = true;
-            lblSoundStatus.Location = new Point(61, 12);
+            lblSoundStatus.Location = new Point(62, 40);
             lblSoundStatus.Name = "lblSoundStatus";
             lblSoundStatus.Size = new Size(113, 15);
             lblSoundStatus.TabIndex = 3;
@@ -791,7 +821,7 @@
             // label19
             // 
             label19.AutoSize = true;
-            label19.Location = new Point(11, 12);
+            label19.Location = new Point(12, 40);
             label19.Name = "label19";
             label19.Size = new Size(44, 15);
             label19.TabIndex = 2;
@@ -800,7 +830,7 @@
             // lblLastAoA
             // 
             lblLastAoA.AutoSize = true;
-            lblLastAoA.Location = new Point(101, 104);
+            lblLastAoA.Location = new Point(102, 132);
             lblLastAoA.Name = "lblLastAoA";
             lblLastAoA.Size = new Size(34, 15);
             lblLastAoA.TabIndex = 5;
@@ -809,7 +839,7 @@
             // label24
             // 
             label24.AutoSize = true;
-            label24.Location = new Point(202, 78);
+            label24.Location = new Point(203, 106);
             label24.Name = "label24";
             label24.Size = new Size(79, 15);
             label24.TabIndex = 7;
@@ -818,7 +848,7 @@
             // label21
             // 
             label21.AutoSize = true;
-            label21.Location = new Point(12, 78);
+            label21.Location = new Point(13, 106);
             label21.Name = "label21";
             label21.Size = new Size(83, 15);
             label21.TabIndex = 4;
@@ -828,7 +858,7 @@
             // 
             label25.AutoSize = true;
             label25.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label25.Location = new Point(12, 49);
+            label25.Location = new Point(13, 77);
             label25.Name = "label25";
             label25.Size = new Size(220, 15);
             label25.TabIndex = 8;
@@ -837,7 +867,7 @@
             // label23
             // 
             label23.AutoSize = true;
-            label23.Location = new Point(61, 104);
+            label23.Location = new Point(62, 132);
             label23.Name = "label23";
             label23.Size = new Size(33, 15);
             label23.TabIndex = 6;
@@ -880,17 +910,39 @@
             // 
             // btnStop
             // 
+            btnStop.Enabled = false;
             btnStop.Location = new Point(462, 457);
             btnStop.Name = "btnStop";
             btnStop.Size = new Size(75, 23);
             btnStop.TabIndex = 2;
             btnStop.Text = "&Stop";
             btnStop.UseVisualStyleBackColor = true;
+            btnStop.Click += btnStop_Click;
             // 
             // openFileDialog1
             // 
             openFileDialog1.FileName = "openFileDialog1";
             openFileDialog1.Filter = "WAV Files|*.wav|MP3 files|*.mp3|All files|*.*";
+            // 
+            // timer1
+            // 
+            timer1.Interval = 1000;
+            timer1.Tick += timer1_Tick;
+            // 
+            // statusStrip1
+            // 
+            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
+            statusStrip1.Location = new Point(0, 496);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Size = new Size(566, 22);
+            statusStrip1.TabIndex = 3;
+            statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            toolStripStatusLabel1.Size = new Size(29, 17);
+            toolStripStatusLabel1.Text = "Idle.";
             // 
             // frmMain
             // 
@@ -898,7 +950,8 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnStop;
-            ClientSize = new Size(566, 491);
+            ClientSize = new Size(566, 518);
+            Controls.Add(statusStrip1);
             Controls.Add(btnStop);
             Controls.Add(btnStartListening);
             Controls.Add(tabs);
@@ -927,7 +980,10 @@
             tabMonitor.PerformLayout();
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
+            statusStrip1.ResumeLayout(false);
+            statusStrip1.PerformLayout();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -1007,5 +1063,10 @@
         private CheckBox chkEnableAoASoundEffects2;
         private ComboBox cmbAudioDevice1;
         private Label label33;
+        private System.Windows.Forms.Timer timer1;
+        private StatusStrip statusStrip1;
+        private ToolStripStatusLabel toolStripStatusLabel1;
+        private Label label18;
+        private Label lblServerThread;
     }
 }
