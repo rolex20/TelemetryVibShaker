@@ -1,27 +1,25 @@
-
-
-
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using System.Net.Sockets;
-using TelemetryVibShaker.Properties;
 using System.Text.Json;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Net;
 using System.Text;
 
+
 namespace TelemetryVibShaker
 {
     public partial class frmMain : Form
     {
-        private UdpClient listener;
+        private UdpClient listenerUdp;
+        private Thread threadServerUdp;
         private long lastSecond; // second of the last received datagram
         private float lastAoA;  // last AoA correctly parsed
         private int dps; // datagrams received per second
 
         private Root JSONroot;  // json root object
-        private String currentUnitType;  // current type of aircraft used by the player
+        private string currentUnitType;  // current type of aircraft used by the player
 
         private AoA_SoundManager soundManager; // manages sound effects according to the current AoA
 
@@ -59,15 +57,15 @@ namespace TelemetryVibShaker
 
         private void btnSoundEffect1_Click(object sender, EventArgs e)
         {
-            updateSelectedFile(txtSoundEffect1, "Select an NWAVE compatible audio file", (String)btnSoundEffect1.Tag);
+            updateSelectedFile(txtSoundEffect1, "Select an NWAVE compatible audio file", (string)btnSoundEffect1.Tag);
         }
 
         private void btnSoundEffect2_Click(object sender, EventArgs e)
         {
-            updateSelectedFile(txtSoundEffect2, "Select an NWAVE compatible audio file", (String)btnSoundEffect2.Tag);
+            updateSelectedFile(txtSoundEffect2, "Select an NWAVE compatible audio file", (string)btnSoundEffect2.Tag);
         }
 
-        private DialogResult updateSelectedFile(TextBox tb, String title, String filter)
+        private DialogResult updateSelectedFile(TextBox tb, string title, string filter)
         {
             DialogResult result;
             openFileDialog1.Filter = filter;
@@ -89,7 +87,7 @@ namespace TelemetryVibShaker
 
         private void btnJSONFile_Click(object sender, EventArgs e)
         {
-            DialogResult jsonSelection = updateSelectedFile(txtJSON, "Select an JSON file defining AoA for each aircraft", (String)btnJSONFile.Tag);
+            DialogResult jsonSelection = updateSelectedFile(txtJSON, "Select an JSON file defining AoA for each aircraft", (string)btnJSONFile.Tag);
             try
             {
                 if (jsonSelection == DialogResult.OK)
@@ -163,6 +161,9 @@ namespace TelemetryVibShaker
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Properties.Settings.Default.XCoordinate = this.Location.X;
+            Properties.Settings.Default.YCoordinate = this.Location.Y;
+
             // Save the settings for all controls in the form
             SaveSettings(this);
 
@@ -257,8 +258,8 @@ namespace TelemetryVibShaker
         // Only update status if, UI is not up to date.
         private void UpdateSoundEffectStatus(EffectStatus newStatus)
         {
-            EffectStatus currentStatus = (EffectStatus)lblSoundStatus.Tag;
 
+            EffectStatus currentStatus = (EffectStatus)lblSoundStatus.Tag;
 
             if (currentStatus != newStatus)
             {
@@ -297,22 +298,25 @@ namespace TelemetryVibShaker
             updateVolumeMultiplier(lblVolumeMultiplier2, trkVolumeMultiplier2);
             updateEffectsTimeout();
 
-            lblCurrentUnitType.Tag = "";
+            lblCurrentUnitType.Tag = string.Empty;
 
-            lblLastAoA.Text = "";
+            lblLastAoA.Text = string.Empty;
             lblLastAoA.Tag = (float)0.0;
 
-            lblDatagramsPerSecond.Text = "";
-            lblProcessingTime.Text = "";
+            lblDatagramsPerSecond.Text = string.Empty;
+            lblProcessingTime.Text = string.Empty;
+            lblServerThread.Text = string.Empty;
+
 
             stopwatch = new Stopwatch();
 
+            btnStop.Tag = false;
             lblSoundStatus.Tag = EffectStatus.Invalid;
             UpdateSoundEffectStatus(EffectStatus.NotPlayingEffect);
 
-            // Make it easier for the additional UDP listener thread to update the UI
-            Label.CheckForIllegalCrossThreadCalls = false;
-            TextBox.CheckForIllegalCrossThreadCalls = false;
+            // Make it easier for the additional UDP listenerUdp thread to update the UI
+            //Label.CheckForIllegalCrossThreadCalls = false;
+            //TextBox.CheckForIllegalCrossThreadCalls = false;
 
         }
 
@@ -323,6 +327,9 @@ namespace TelemetryVibShaker
 
         private void btnStop_Click(object sender, EventArgs e)
         {
+            // Signal stop request
+            btnStop.Tag = true;
+
             // Stop the player
             if (soundManager != null)
             {
@@ -332,11 +339,11 @@ namespace TelemetryVibShaker
             }
 
 
-            // Stop the UDP listener
-            if (listener != null)
+            // Stop the UDP listenerUdp
+            if (listenerUdp != null)
             {
-                listener.Close();
-                listener = null;
+                listenerUdp.Close();
+                listenerUdp = null;
             }
 
 
@@ -366,30 +373,56 @@ namespace TelemetryVibShaker
             control.Enabled = newStatus;
         }
 
+
+
         // This Callback function is called from another thread, not the UI thread
-        private void receiveDataCallback(IAsyncResult ar)
+        private void UDPServer()
         {
-            stopwatch.Restart();  // Track the time to process this datagram
-            bool needs_update = false;
+            // Creates the UDP socket
+            listenerUdp = new UdpClient(int.Parse(txtListeningPort.Text));
 
-            try
+            IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
+
+            byte[] receiveData;
+
+            while (listenerUdp != null)
             {
-                // get the remote endpoint
-                IPEndPoint remoteEP = (IPEndPoint)ar.AsyncState;
+                try
+                {
+                    receiveData = null;
+                    receiveData = listenerUdp.Receive(ref sender); // Wait here until a new datagram is received
+                }
+                catch (Exception ex)
+                {
+                    if ((bool)btnStop.Tag) // The user requested to stop
+                    {
+                        btnStop.Tag = false; // Stop-request clear
+                        return; // Stop listenning
+                    }
+
+                    // Some error did happened
+                    BeginInvoke(new Action(() => { toolStripStatusLabel1.Text = ex.Message; }));
+                    return; // Stop listening
+                }
 
 
-                // get the received data
-                byte[] receiveData = listener.EndReceive(ar, ref remoteEP);
-                String datagram = Encoding.ASCII.GetString(receiveData, 0, receiveData.Length);
+                // Process the datagram received
+
+
+                stopwatch.Restart();  // Track the time to process this datagram
+                bool needs_update = false;
+
+                string datagram = Encoding.ASCII.GetString(receiveData, 0, receiveData.Length);
 
                 // Update statistics and UI status controls
                 long newSecond = Environment.TickCount64 / 1000;
-                if (lastSecond != newSecond)
+                if (lastSecond != newSecond && chkShowStatistics.Checked)
                 {
-                    lblDatagramsPerSecond.Text = dps.ToString();  // update datagrams per second
+                    //lblDatagramsPerSecond.Text = dps.ToString();  // update datagrams per second
+                    BeginInvoke(new Action(() => { lblDatagramsPerSecond.Text = dps.ToString();  /* update datagrams per second  */ }));
                     dps = 1; // reset the counter
                     lastSecond = newSecond;
-                    needs_update = true;
+                    needs_update = true;  // Update required for statistics, but only if the user wants to see them
                 }
                 else
                 {
@@ -433,30 +466,30 @@ namespace TelemetryVibShaker
                         soundManager.AoA2 = 360;
                     }
 
-                    if (lblCurrentUnitType.Tag != currentUnitType) // this is not expected to change often
+                    if (lblCurrentUnitType.Tag != currentUnitType) // this is not expected to change often, so I am ok with updating it as soon as possible
                     {
-                        lblCurrentUnitType.Tag = currentUnitType;
-                        lblCurrentUnitType.Text = currentUnitType + $"({soundManager.AoA1},{soundManager.AoA2})";  // update the UI
+                        BeginInvoke(new Action(() =>
+                        {
+                            lblCurrentUnitType.Tag = currentUnitType;
+                            lblCurrentUnitType.Text = currentUnitType + $"({soundManager.AoA1},{soundManager.AoA2})";  // update the UI
+                        }));
                     }
 
 
                 }
                 stopwatch.Stop(); // at this point the datagram has been fully processed
 
-                if (needs_update) // update the processing time once every second only
+                if (needs_update) // update the processing time once every second only and if requested by user
                 {
                     TimeSpan elapsed = stopwatch.Elapsed;
-                    lblProcessingTime.Text = elapsed.Milliseconds.ToString();
+                    if ((int)lblProcessingTime.Tag < elapsed.Milliseconds)
+                    {
+                        lblProcessingTime.Tag = elapsed.Milliseconds;
+                        BeginInvoke(new Action(() => { lblProcessingTime.Text = elapsed.Milliseconds.ToString(); }));
+                    }
                 }
+            } // end-while
 
-                // Go back to listening mode
-                listener.BeginReceive(new AsyncCallback(receiveDataCallback), null);
-
-            }
-            catch (NullReferenceException)
-            {
-                toolStripStatusLabel1.Text = "Listener is closed.  Receive callback function stopped.";
-            }
         }
 
 
@@ -468,7 +501,7 @@ namespace TelemetryVibShaker
             if (!CheckFileExists(txtJSON)) return;
 
             // Display stats if required
-            if (chkChangeToMonitor.Checked) tabs.SelectTab(3);
+            if (chkChangeToMonitor.Checked) tabs.SelectTab(4);
 
 
             // Check and parse .json file
@@ -481,6 +514,8 @@ namespace TelemetryVibShaker
             catch (Exception ex)
             {
                 MessageBox.Show("There was a problem with the .JSON file, please check the file.  " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtJSON.Focus();
+                return;
             }
 
 
@@ -505,12 +540,11 @@ namespace TelemetryVibShaker
                 txtListeningPort.Text = value.ToString();
             }
 
-            // Creates the UDP socket
-            listener = new UdpClient(int.Parse(txtListeningPort.Text));
-
-            // Start listening for incoming data in a new thread
-            listener.BeginReceive(new AsyncCallback(receiveDataCallback), null);
-
+            lblProcessingTime.Tag = 0;  // Reset max processing time tracker
+            // Start a new thread to act as the UDP Server
+            threadServerUdp = new Thread(UDPServer);
+            threadServerUdp.Start();
+            lblServerThread.Text = threadServerUdp.ManagedThreadId.ToString();
 
             // Disable some controls
             ChangeStatus(txtSoundEffect1, false);
@@ -560,6 +594,11 @@ namespace TelemetryVibShaker
         }
 
         private void txtArduinoPort_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            AllowOnlyDigits(sender, e);
+        }
+
+        private void txtTWatchPort_KeyPress(object sender, KeyPressEventArgs e)
         {
             AllowOnlyDigits(sender, e);
         }
