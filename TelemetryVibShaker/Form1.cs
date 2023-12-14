@@ -1,8 +1,8 @@
-using NAudio.CoreAudioApi;
-using NAudio.Wave;
-using System.Net.Sockets;
-using System.Text.Json;
-using System.Diagnostics;
+//using NAudio.CoreAudioApi;
+//using NAudio.Wave;
+//using System.Net.Sockets;
+//using System.Text.Json;
+//using System.Diagnostics;
 using System.Windows.Forms;
 using System.Net;
 using System.Text;
@@ -12,16 +12,11 @@ namespace TelemetryVibShaker
 {
     public partial class frmMain : Form
     {
-        private UdpClient listenerUdp;
-        private Thread threadServerUdp;
-        private long lastSecond; // second of the last received datagram
-        private float lastAoA;  // last AoA correctly parsed
-        private int dps; // datagrams received per second
-
-        private Root JSONroot;  // json root object
-        private string currentUnitType;  // current type of aircraft used by the player
+        private Thread threadTelemetryServer;
 
         private AoA_SoundManager soundManager; // manages sound effects according to the current AoA
+        private TelemetryServer telemetry;
+
 
         enum EffectStatus
         {
@@ -31,10 +26,6 @@ namespace TelemetryVibShaker
             PlayingEffect, // 1 or 2
             EffectCanceled, // 1 and 2
         }
-
-        // To measure processing time per datagram
-        Stopwatch stopwatch;
-
 
 
         public frmMain()
@@ -88,34 +79,11 @@ namespace TelemetryVibShaker
         private void btnJSONFile_Click(object sender, EventArgs e)
         {
             DialogResult jsonSelection = updateSelectedFile(txtJSON, "Select an JSON file defining AoA for each aircraft", (string)btnJSONFile.Tag);
-            try
+            if (jsonSelection == DialogResult.OK)
             {
-                if (jsonSelection == DialogResult.OK)
-                {
-
-                    // Try to parse with a test
-                    // Throw exception if there is a problem with the .json file
-                    string json = File.ReadAllText(txtJSON.Text);
-
-                    JSONroot = JsonSerializer.Deserialize<Root>(json);
-                    string datagram = "F-16C_50";  // Test unit should exist in .JSON file
-                    var unit = JSONroot.units.unit.FirstOrDefault(u => u.typeName == datagram);
-                    if (unit != null)
-                    {
-                        Debug.Print($"AoA1 of {datagram}: {unit.AoA1}");
-                    }
-                    else
-                    {
-                        Debug.Print("{datagram} not found.");
-                    }
-                }
+                if (!TelemetryServer.TestJSONFile(txtJSON.Text))
+                    MessageBox.Show("There was a problem with the .JSON file, please check the file.  " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show("There was a problem with the .JSON file, please check the file.  " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-            }
-
         }
 
         private void checkBox5_CheckedChanged(object sender, EventArgs e)
@@ -308,8 +276,6 @@ namespace TelemetryVibShaker
             lblServerThread.Text = string.Empty;
 
 
-            stopwatch = new Stopwatch();
-
             btnStop.Tag = false;
             lblSoundStatus.Tag = EffectStatus.Invalid;
             UpdateSoundEffectStatus(EffectStatus.NotPlayingEffect);
@@ -328,7 +294,7 @@ namespace TelemetryVibShaker
         private void btnStop_Click(object sender, EventArgs e)
         {
             // Signal stop request
-            btnStop.Tag = true;
+            telemetry.Stop();
 
             // Stop the player
             if (soundManager != null)
@@ -378,117 +344,6 @@ namespace TelemetryVibShaker
         // This Callback function is called from another thread, not the UI thread
         private void UDPServer()
         {
-            // Creates the UDP socket
-            listenerUdp = new UdpClient(int.Parse(txtListeningPort.Text));
-
-            IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
-
-            byte[] receiveData;
-
-            while (listenerUdp != null)
-            {
-                try
-                {
-                    receiveData = null;
-                    receiveData = listenerUdp.Receive(ref sender); // Wait here until a new datagram is received
-                }
-                catch (Exception ex)
-                {
-                    if ((bool)btnStop.Tag) // The user requested to stop
-                    {
-                        btnStop.Tag = false; // Stop-request clear
-                        return; // Stop listenning
-                    }
-
-                    // Some error did happened
-                    BeginInvoke(new Action(() => { toolStripStatusLabel1.Text = ex.Message; }));
-                    return; // Stop listening
-                }
-
-
-                // Process the datagram received
-
-
-                stopwatch.Restart();  // Track the time to process this datagram
-                bool needs_update = false;
-
-                string datagram = Encoding.ASCII.GetString(receiveData, 0, receiveData.Length);
-
-                // Update statistics and UI status controls
-                long newSecond = Environment.TickCount64 / 1000;
-                if (lastSecond != newSecond && chkShowStatistics.Checked)
-                {
-                    //lblDatagramsPerSecond.Text = dps.ToString();  // update datagrams per second
-                    BeginInvoke(new Action(() => { lblDatagramsPerSecond.Text = dps.ToString();  /* update datagrams per second  */ }));
-                    dps = 1; // reset the counter
-                    lastSecond = newSecond;
-                    needs_update = true;  // Update required for statistics, but only if the user wants to see them
-                }
-                else
-                {
-                    needs_update = false;
-                    dps++;
-                }
-
-                // Always process each datagram received
-                if (Single.TryParse(datagram, out float AoA))
-                {
-                    if (soundManager.UpdateEffect(AoA))
-                    {
-                        // If volume has changed after updating the AoA then update UI
-                        // right now, this UI status is updated more than once per second, but only if the new effect status has changed
-                        if (soundManager.SoundIsActive())
-                            UpdateSoundEffectStatus(EffectStatus.PlayingEffect);
-                        else
-                            UpdateSoundEffectStatus(EffectStatus.SoundEffectsReady);
-                    }
-
-
-                    // Track lastAoA even if a second has not yet been completed
-                    // This is to make sure we report the last AoA received, at least, in timer1()
-                    if (lastAoA != AoA)
-                        lastAoA = AoA;
-
-                }
-                else  // If not numeric, then datagram received must be an aircraft type name
-                {
-                    var unit = JSONroot.units.unit.FirstOrDefault(u => u.typeName == datagram);
-                    currentUnitType = datagram;
-
-                    if (unit != null)  // If found, use the limits defined in the JSON file
-                    {
-                        soundManager.AoA1 = unit.AoA1;
-                        soundManager.AoA2 = unit.AoA2;
-                    }
-                    else  // basically ignore the limits, because the unit type was not found in the JSON File
-                    {
-                        soundManager.AoA1 = 360;
-                        soundManager.AoA2 = 360;
-                    }
-
-                    if (lblCurrentUnitType.Tag != currentUnitType) // this is not expected to change often, so I am ok with updating it as soon as possible
-                    {
-                        BeginInvoke(new Action(() =>
-                        {
-                            lblCurrentUnitType.Tag = currentUnitType;
-                            lblCurrentUnitType.Text = currentUnitType + $"({soundManager.AoA1},{soundManager.AoA2})";  // update the UI
-                        }));
-                    }
-
-
-                }
-                stopwatch.Stop(); // at this point the datagram has been fully processed
-
-                if (needs_update) // update the processing time once every second only and if requested by user
-                {
-                    TimeSpan elapsed = stopwatch.Elapsed;
-                    if ((int)lblProcessingTime.Tag < elapsed.Milliseconds)
-                    {
-                        lblProcessingTime.Tag = elapsed.Milliseconds;
-                        BeginInvoke(new Action(() => { lblProcessingTime.Text = elapsed.Milliseconds.ToString(); }));
-                    }
-                }
-            } // end-while
 
         }
 
@@ -542,9 +397,9 @@ namespace TelemetryVibShaker
 
             lblProcessingTime.Tag = 0;  // Reset max processing time tracker
             // Start a new thread to act as the UDP Server
-            threadServerUdp = new Thread(UDPServer);
-            threadServerUdp.Start();
-            lblServerThread.Text = threadServerUdp.ManagedThreadId.ToString();
+            threadTelemetryServer = new Thread(UDPServer);
+            threadTelemetryServer.Start();
+            lblServerThread.Text = threadTelemetryServer.ManagedThreadId.ToString();
 
             // Disable some controls
             ChangeStatus(txtSoundEffect1, false);
