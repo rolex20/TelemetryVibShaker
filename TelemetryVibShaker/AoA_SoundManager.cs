@@ -4,6 +4,7 @@ namespace TelemetryVibShaker
     // This is a specialized class to manage AoA sound effects
     internal class AoA_SoundManager
     {
+        public SoundEffectStatus Status = SoundEffectStatus.Invalid;
 
         private float volumeAmplifier1;
         public float VolumeAmplifier1
@@ -48,6 +49,8 @@ namespace TelemetryVibShaker
 
         public AoA_SoundManager(String sound1, String sound2, float VolAmplifier1, float VolAmplifier2, int AudioDeviceIndex)
         {
+            Status = SoundEffectStatus.NotPlaying;
+
             mp1 = new MediaPlayer(AudioDeviceIndex);
             mp1.Open(sound1);
             lastVolume1 = 0.0f;
@@ -66,6 +69,8 @@ namespace TelemetryVibShaker
             // Basically ignore the limits, because the unit type is not known at this point
             AoA1 = 360;
             AoA2 = 360;
+
+            Status = SoundEffectStatus.Ready;
         }
 
         public void Stop()
@@ -84,6 +89,8 @@ namespace TelemetryVibShaker
 
             lastVolume1 = 0.0f;
             lastVolume2 = 0.0f;
+
+            Status = SoundEffectStatus.NotPlaying;
         }
 
         public bool SoundIsActive()
@@ -105,7 +112,7 @@ namespace TelemetryVibShaker
                 lastVolume2 = 0.0f;
                 mp2.Volume = 0.0f;
             }
-
+            Status = SoundEffectStatus.Ready;
         }
 
         // This function is called on every frame, so avoid function calls, etc.
@@ -167,6 +174,7 @@ namespace TelemetryVibShaker
 
             }
 
+            Status = (lastVolume1 > 0.0f || lastVolume2 > 0.0f) ? SoundEffectStatus.Playing : SoundEffectStatus.Ready;
             return volumeHasChanged;
         }
     }

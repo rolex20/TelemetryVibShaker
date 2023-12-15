@@ -21,10 +21,6 @@ namespace TelemetryVibShaker
         public int dps; // datagrams received per second
         public int maxProcessingTime; // time of the datagram that took longer to process
 
-        SoundEffectStatus soundEffectStatus;
-        public SoundEffectStatus SoundEffectStatus { get { return soundEffectStatus; } }
-
-
         public string CurrentUnitType; // current type of aircraft used by the player
         public string CurrentUnitInfo { 
             get 
@@ -103,7 +99,7 @@ namespace TelemetryVibShaker
 
             lastSecond = 0;
 
-            while (listenerUdp != null)
+            while (!cancelationToken && listenerUdp != null)
             {
                 try
                 {
@@ -124,40 +120,32 @@ namespace TelemetryVibShaker
                 // Process the datagram received
 
 
-                stopwatch.Restart();  // Track the time to process this datagram
+                if (statistics) stopwatch.Restart();  // Track the time to process this datagram
                 bool needs_update = false;
 
                 string datagram = Encoding.ASCII.GetString(receiveData, 0, receiveData.Length);
 
                 // Update statistics and UI status controls
                 long newSecond = Environment.TickCount64 / 1000;
-                if (lastSecond != newSecond && statistics)
-                {
-                    //lblDatagramsPerSecond.Text = dps.ToString();  // update datagrams per second
-                    //BeginInvoke(new Action(() => { lblDatagramsPerSecond.Text = dps.ToString();  /* update datagrams per second  */ }));
-                    dps = 1; // reset the counter
-                    lastSecond = newSecond;
-                    needs_update = true;  // Update required for statistics, but only if the user wants to see them
-                }
-                else
-                {
-                    needs_update = false;
-                    dps++;
-                }
+                if (statistics)
+                    if (lastSecond != newSecond )
+                    {
+                        //lblDatagramsPerSecond.Text = dps.ToString();  // update datagrams per second
+                        //BeginInvoke(new Action(() => { lblDatagramsPerSecond.Text = dps.ToString();  /* update datagrams per second  */ }));
+                        dps = 1; // reset the counter
+                        lastSecond = newSecond;
+                        needs_update = true;  // Update required for statistics, but only if the user wants to see them
+                    }
+                    else
+                    {
+                        needs_update = false;
+                        dps++;
+                    }
 
                 // Always process each datagram received
                 if (Int32.TryParse(datagram, out int AoA))
                 {
-                    if (soundManager.UpdateEffect(AoA))
-                    {
-                        // If volume has changed after updating the AoA then update UI
-                        // right now, this UI status is updated more than once per second, but only if the new effect status has changed
-                        if (soundManager.SoundIsActive())
-                            soundEffectStatus = SoundEffectStatus.Playing;
-                        else
-                            soundEffectStatus = SoundEffectStatus.Ready;
-                    }
-
+                    soundManager.UpdateEffect(AoA));
 
                     // Track lastAoA even if a second has not yet been completed
                     // This is to make sure we report the last AoA received, at least, in timer1()
@@ -180,20 +168,15 @@ namespace TelemetryVibShaker
                         soundManager.AoA2 = 360;
                     }
 
-                    if (CurrentUnitType != lastUnitType) // this is not expected to change often, so I am ok with updating it as soon as possible
-                    {
-                        CurrentUnitType = lastUnitType;
-                    }
-
-
+                    // this is not expected to change often, so I am ok with updating it as soon as possible
+                    if (CurrentUnitType != lastUnitType) CurrentUnitType = lastUnitType;
                 }
-                stopwatch.Stop(); // at this point the datagram has been fully processed
-
+                
+                if (statistics) stopwatch.Stop(); // at this point the datagram has been fully processed
                 if (needs_update) // update the processing time once every second only and if requested by user
-                {
+                {                   
                     TimeSpan elapsed = stopwatch.Elapsed;
-                    if (maxProcessingTime < elapsed.Milliseconds)
-                        maxProcessingTime = elapsed.Milliseconds;
+                    if (maxProcessingTime < elapsed.Milliseconds) maxProcessingTime = elapsed.Milliseconds;
                 }
             } // end-while
 
