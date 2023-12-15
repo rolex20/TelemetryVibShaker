@@ -34,8 +34,8 @@ namespace TelemetryVibShaker
         }
 
 
-        public float AoA1;          // Optimal angle of attack.  Lower limit. (Sound Effect 1)
-        public float AoA2;          // Optimal angle of attack.  Upper limit. (Sound Effect 1)
+        public int AoA1;          // Optimal angle of attack.  Lower limit. (Sound Effect 1)
+        public int AoA2;          // Optimal angle of attack.  Upper limit. (Sound Effect 1)
                                     // If newAoA > AoA2 then Sound Effect 2 should be heard.
 
         private MediaPlayer mp1;    // for the optimal AoA sound effect
@@ -64,8 +64,8 @@ namespace TelemetryVibShaker
             VolumeAmplifier2 = VolAmplifier2;
 
             // Basically ignore the limits, because the unit type is not known at this point
-            AoA1 = 360.0f;
-            AoA2 = 360.0f;
+            AoA1 = 360;
+            AoA2 = 360;
         }
 
         public void Stop()
@@ -111,7 +111,7 @@ namespace TelemetryVibShaker
         // This function is called on every frame, so avoid function calls, etc.
         // In this one case, I don't mind repeating 20 lines instead of creating a generic subrotine
         // Dispatcher.BeginInvoke is used because the async callback UDP listenerUdp runs in a different thread than the UI
-        public bool UpdateEffect(float newAoA)
+        public bool UpdateEffect(int newAoA)
         {
             bool volumeHasChanged = false;
 

@@ -1,7 +1,6 @@
-//using NAudio.CoreAudioApi;
-//using NAudio.Wave;
+using NAudio.CoreAudioApi;
+using NAudio.Wave;
 //using System.Net.Sockets;
-//using System.Text.Json;
 //using System.Diagnostics;
 using System.Windows.Forms;
 using System.Net;
@@ -12,20 +11,11 @@ namespace TelemetryVibShaker
 {
     public partial class frmMain : Form
     {
-        private Thread threadTelemetryServer;
+        private AoA_SoundManager soundManager;  // manages sound effects according to the current AoA
+        private TelemetryServer telemetry;      // controls all telemetry logic
+        private Thread threadTelemetry; // this thread runs the telemetry
+        private long lastSecond; // second of the last udp datagram processed
 
-        private AoA_SoundManager soundManager; // manages sound effects according to the current AoA
-        private TelemetryServer telemetry;
-
-
-        enum EffectStatus
-        {
-            Invalid,
-            NotPlayingEffect,
-            SoundEffectsReady,
-            PlayingEffect, // 1 or 2
-            EffectCanceled, // 1 and 2
-        }
 
 
         public frmMain()
@@ -81,8 +71,9 @@ namespace TelemetryVibShaker
             DialogResult jsonSelection = updateSelectedFile(txtJSON, "Select an JSON file defining AoA for each aircraft", (string)btnJSONFile.Tag);
             if (jsonSelection == DialogResult.OK)
             {
-                if (!TelemetryServer.TestJSONFile(txtJSON.Text))
-                    MessageBox.Show("There was a problem with the .JSON file, please check the file.  " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                string error = TelemetryServer.TestJSONFile(txtJSON.Text);
+                if (string.IsNullOrEmpty(error))
+                    MessageBox.Show(error, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -224,26 +215,26 @@ namespace TelemetryVibShaker
         }
 
         // Only update status if, UI is not up to date.
-        private void UpdateSoundEffectStatus(EffectStatus newStatus)
+        private void UpdateSoundEffectStatus(SoundEffectStatus newStatus)
         {
 
-            EffectStatus currentStatus = (EffectStatus)lblSoundStatus.Tag;
+            SoundEffectStatus currentStatus = (SoundEffectStatus)lblSoundStatus.Tag;
 
             if (currentStatus != newStatus)
             {
                 lblSoundStatus.Tag = currentStatus;
                 switch (newStatus)
                 {
-                    case EffectStatus.NotPlayingEffect:
+                    case SoundEffectStatus.NotPlaying:
                         lblSoundStatus.Text = "Not playing sounds.";
                         break;
-                    case EffectStatus.SoundEffectsReady:
+                    case SoundEffectStatus.Ready:
                         lblSoundStatus.Text = "Sound effects ready.";
                         break;
-                    case EffectStatus.PlayingEffect:
+                    case SoundEffectStatus.Playing:
                         lblSoundStatus.Text = "Playing effect...";
                         break;
-                    case EffectStatus.EffectCanceled:
+                    case SoundEffectStatus.Canceled:
                         lblSoundStatus.Text = "Alarm canceled.";
                         break;
                 }
@@ -277,12 +268,15 @@ namespace TelemetryVibShaker
 
 
             btnStop.Tag = false;
-            lblSoundStatus.Tag = EffectStatus.Invalid;
-            UpdateSoundEffectStatus(EffectStatus.NotPlayingEffect);
+            lblSoundStatus.Tag = SoundEffectStatus.Invalid;
+            UpdateSoundEffectStatus(SoundEffectStatus.NotPlaying);
 
             // Make it easier for the additional UDP listenerUdp thread to update the UI
             //Label.CheckForIllegalCrossThreadCalls = false;
             //TextBox.CheckForIllegalCrossThreadCalls = false;
+
+            soundManager = null;
+            telemetry = null;
 
         }
 
@@ -293,6 +287,9 @@ namespace TelemetryVibShaker
 
         private void btnStop_Click(object sender, EventArgs e)
         {
+            if (telemetry == null) return;
+
+
             // Signal stop request
             telemetry.Stop();
 
@@ -301,16 +298,12 @@ namespace TelemetryVibShaker
             {
                 soundManager.Stop();
                 soundManager = null;
-                UpdateSoundEffectStatus(EffectStatus.NotPlayingEffect);
+                UpdateSoundEffectStatus(SoundEffectStatus.NotPlaying);
             }
 
 
             // Stop the UDP listenerUdp
-            if (listenerUdp != null)
-            {
-                listenerUdp.Close();
-                listenerUdp = null;
-            }
+            telemetry.Stop();
 
 
             // Reenable some controls
@@ -341,7 +334,7 @@ namespace TelemetryVibShaker
 
 
 
-        // This Callback function is called from another thread, not the UI thread
+        // Create a new thread and run the telemetry
         private void UDPServer()
         {
 
@@ -350,25 +343,20 @@ namespace TelemetryVibShaker
 
         private void btnStartListening_Click(object sender, EventArgs e)
         {
+            lastSecond = 0; // reset tracker
+
             // Check if files exist
             if (!CheckFileExists(txtSoundEffect1)) return;
             if (!CheckFileExists(txtSoundEffect2)) return;
             if (!CheckFileExists(txtJSON)) return;
 
-            // Display stats if required
-            if (chkChangeToMonitor.Checked) tabs.SelectTab(4);
 
 
-            // Check and parse .json file
-            // Throw exception if there is a problem
-            try
+            // Check if the JSON file is valid
+            string error = TelemetryServer.TestJSONFile(txtJSON.Text);
+            if (!string.IsNullOrEmpty(error))
             {
-                string json = File.ReadAllText(txtJSON.Text);
-                JSONroot = JsonSerializer.Deserialize<Root>(json);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("There was a problem with the .JSON file, please check the file.  " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(error, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 txtJSON.Focus();
                 return;
             }
@@ -384,7 +372,7 @@ namespace TelemetryVibShaker
 
             // Start playing sound effects with volume 0, this minimizes any delay when the effect is actually needed
             soundManager = new AoA_SoundManager(txtSoundEffect1.Text, txtSoundEffect2.Text, (float)trkVolumeMultiplier1.Value / 100.0f, (float)trkVolumeMultiplier2.Value / 100.0f, cmbAudioDevice1.SelectedIndex);
-            UpdateSoundEffectStatus(EffectStatus.SoundEffectsReady);
+            UpdateSoundEffectStatus(SoundEffectStatus.Ready);
 
 
             // Sanitize port range using the ephemeral range
@@ -395,11 +383,13 @@ namespace TelemetryVibShaker
                 txtListeningPort.Text = value.ToString();
             }
 
+
+
             lblProcessingTime.Tag = 0;  // Reset max processing time tracker
             // Start a new thread to act as the UDP Server
-            threadTelemetryServer = new Thread(UDPServer);
-            threadTelemetryServer.Start();
-            lblServerThread.Text = threadTelemetryServer.ManagedThreadId.ToString();
+            threadTelemetry = new Thread(UDPServer);
+            threadTelemetry.Start();
+            lblServerThread.Text = threadTelemetry.ManagedThreadId.ToString();
 
             // Disable some controls
             ChangeStatus(txtSoundEffect1, false);
@@ -418,22 +408,46 @@ namespace TelemetryVibShaker
 
             timer1.Enabled = true;
 
+            // Display stats if required
+            if (chkChangeToMonitor.Checked) tabs.SelectTab(4);
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
+            if (telemetry != null) lastSecond = telemetry.lastSecond;
             if ((soundManager.SoundIsActive()) && (Environment.TickCount64 / 1000 - lastSecond > trkEffectTimeout.Value))
             {
                 soundManager.MuteEffects();
-                UpdateSoundEffectStatus(EffectStatus.EffectCanceled);
+                UpdateSoundEffectStatus(SoundEffectStatus.Canceled);
             }
 
-            // Also make sure we report the last AoA received
-            if ((float)lblLastAoA.Tag != lastAoA)
+            // Statistics are updated once per second
+            if (chkShowStatistics.Checked && telemetry.IsRunning())
             {
-                lblLastAoA.Tag = lastAoA;
-                lblLastAoA.Text = lastAoA.ToString() + "°";
+                // Report the last AoA received
+                if ((int)lblLastAoA.Tag != telemetry.lastAoA)
+                {
+                    lblLastAoA.Tag = telemetry.lastAoA;
+                    lblLastAoA.Text = telemetry.lastAoA.ToString() + "°";
+                }
+
+                // Report datagrams per second
+                if ((int)lblDatagramsPerSecond.Tag != telemetry.dps)
+                {
+                    lblDatagramsPerSecond.Tag = telemetry.dps;
+                    lblDatagramsPerSecond.Text = telemetry.dps.ToString();
+                }
+
+                // Report sound effect
+                UpdateSoundEffectStatus(telemetry.SoundEffectStatus);
+
+                // Report unit type
+                if (!telemetry.CurrentUnitType.Equals(lblCurrentUnitType))
+                {
+                    lblCurrentUnitType.Text = telemetry.CurrentUnitType;
+                }
             }
+
         }
 
         private void AllowOnlyDigits(object sender, KeyPressEventArgs e)

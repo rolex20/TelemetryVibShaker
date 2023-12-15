@@ -743,6 +743,7 @@
             label31.Name = "label31";
             label31.Size = new Size(34, 15);
             label31.TabIndex = 16;
+            label31.Tag = "0";
             label31.Text = "none";
             // 
             // label32
@@ -761,6 +762,7 @@
             lblDatagramsPerSecond.Name = "lblDatagramsPerSecond";
             lblDatagramsPerSecond.Size = new Size(49, 15);
             lblDatagramsPerSecond.TabIndex = 14;
+            lblDatagramsPerSecond.Tag = "0";
             lblDatagramsPerSecond.Text = "number";
             // 
             // label29
@@ -798,6 +800,7 @@
             label26.Name = "label26";
             label26.Size = new Size(34, 15);
             label26.TabIndex = 10;
+            label26.Tag = "0";
             label26.Text = "none";
             // 
             // lblCurrentUnitType
@@ -816,6 +819,7 @@
             lblSoundStatus.Name = "lblSoundStatus";
             lblSoundStatus.Size = new Size(113, 15);
             lblSoundStatus.TabIndex = 3;
+            lblSoundStatus.Tag = "0";
             lblSoundStatus.Text = "Not playing sounds.";
             // 
             // label19
@@ -834,6 +838,7 @@
             lblLastAoA.Name = "lblLastAoA";
             lblLastAoA.Size = new Size(34, 15);
             lblLastAoA.TabIndex = 5;
+            lblLastAoA.Tag = "0";
             lblLastAoA.Text = "none";
             // 
             // label24
