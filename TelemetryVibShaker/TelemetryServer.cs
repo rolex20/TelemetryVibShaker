@@ -1,27 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Text.Json;
 using System.Text;
-using System.Runtime.Intrinsics.Arm;
-using System.Threading;
-using TelemetryVibShaker;
 using System.Diagnostics;
-using System.Xml.XPath;
+
 
 namespace TelemetryVibShaker
 {
     internal class TelemetryServer
     {
-        public long lastSecond; // second of the last received datagram
-        public int lastAoA;  // last AoA correctly parsed
-        public int dps; // datagrams received per second
-        public int maxProcessingTime; // time of the datagram that took longer to process
-
+        public long LastSecond; // second of the last received datagram
+        public TelemetryData LastData; // last telemetry datagram received
+        public int DPS; // datagrams received per second
+        public int MaxProcessingTime; // time of the datagram that took longer to process
         public string CurrentUnitType; // current type of aircraft used by the player
+
+        private AoA_SoundManager soundManager;
+        private VibrationMotor[] vibMotor;
+        private Root jsonRoot;
+        private bool cancelationToken;
+        private bool statistics;
+        private int listeningPort;
+
         public string CurrentUnitInfo { 
             get 
             {
@@ -33,17 +33,10 @@ namespace TelemetryVibShaker
         public string LastErrorMsg { get { return lastErrorMsg; } }
 
 
-        private AoA_SoundManager soundManager;
 
-        private Root jsonRoot;
-
-        private bool cancelationToken;
-        private bool statistics;
-        private int listeningPort;
-
-        public void Stop()
+        public void Abort()
         {
-            cancelationToken = true;
+            cancelationToken = true; // it might not be immediate, but it's simpler and it works
         }
 
         public bool IsRunning()
@@ -51,9 +44,10 @@ namespace TelemetryVibShaker
             return (!cancelationToken);
         }
 
-        public TelemetryServer(AoA_SoundManager SoundManager, bool CalculateStats, int ListeningPort)
+        public TelemetryServer(AoA_SoundManager SoundManager, VibrationMotor[] Motor, bool CalculateStats, int ListeningPort)
         {
             soundManager = SoundManager;
+            vibMotor = Motor;
             jsonRoot = null;
             statistics = CalculateStats;
             this.listeningPort = ListeningPort;
@@ -86,7 +80,7 @@ namespace TelemetryVibShaker
             cancelationToken = false;
             CurrentUnitType = "none";
             lastErrorMsg = string.Empty;
-            maxProcessingTime = 0;
+            MaxProcessingTime = 0;
 
             // Creates the UDP socket
             UdpClient listenerUdp = new UdpClient(listeningPort);
@@ -97,23 +91,22 @@ namespace TelemetryVibShaker
 
             byte[] receiveData;
 
-            lastSecond = 0;
+            LastSecond = 0;
 
             while (!cancelationToken && listenerUdp != null)
             {
                 try
                 {
-                    receiveData = null;
                     receiveData = listenerUdp.Receive(ref sender); // Wait here until a new datagram is received
                 }
                 catch (Exception ex)
                 {
                     if (cancelationToken) // The user requested to stop in another thread (UI Thread)
-                        return; // Stop listenning
+                        return; // Abort listenning
 
                     // Some error did happened
                     lastErrorMsg = ex.Message;
-                    return; // Stop listening
+                    return; // Abort listening
                 }
 
 
@@ -123,37 +116,50 @@ namespace TelemetryVibShaker
                 if (statistics) stopwatch.Restart();  // Track the time to process this datagram
                 bool needs_update = false;
 
-                string datagram = Encoding.ASCII.GetString(receiveData, 0, receiveData.Length);
+                //string datagram = Encoding.ASCII.GetString(receiveData, 0, receiveData.Length);
 
                 // Update statistics and UI status controls
                 long newSecond = Environment.TickCount64 / 1000;
                 if (statistics)
-                    if (lastSecond != newSecond )
+                    if (LastSecond != newSecond )
                     {
-                        //lblDatagramsPerSecond.Text = dps.ToString();  // update datagrams per second
-                        //BeginInvoke(new Action(() => { lblDatagramsPerSecond.Text = dps.ToString();  /* update datagrams per second  */ }));
-                        dps = 1; // reset the counter
-                        lastSecond = newSecond;
+                        //lblDatagramsPerSecond.Text = DPS.ToString();  // update datagrams per second
+                        //BeginInvoke(new Action(() => { lblDatagramsPerSecond.Text = DPS.ToString();  /* update datagrams per second  */ }));
+                        DPS = 1; // reset the counter
+                        LastSecond = newSecond;
                         needs_update = true;  // Update required for statistics, but only if the user wants to see them
                     }
                     else
                     {
                         needs_update = false;
-                        dps++;
+                        DPS++;
                     }
 
                 // Always process each datagram received
-                if (Int32.TryParse(datagram, out int AoA))
-                {
-                    soundManager.UpdateEffect(AoA));
+                // datagram is composed of: AoA, SpeedBrakes, Flaps (each one in one byte)
+                // AoA possible values: 0-255
+                // SpeedBreaks possible values: 0-100
+                // Flaps possible values: 0-100
 
-                    // Track lastAoA even if a second has not yet been completed
-                    // This is to make sure we report the last AoA received, at least, in timer1()
-                    if (lastAoA != AoA) lastAoA = AoA;
+                if (receiveData.Length == 3)
+                {
+                    // Obtain telemetry data
+                    LastData.AoA = receiveData[0];
+                    LastData.SpeedBrakes = receiveData[1];
+                    LastData.Flaps = receiveData[2];
+
+                    // Update the sound effects
+                    soundManager.UpdateEffect(LastData.AoA);
+
+                    // Update vibration-motors effects
+                    for (int i = 0; i < vibMotor.Length; i++)
+                        vibMotor[i].ProcessEffect(LastData);
+
 
                 }
                 else  // If not numeric, then datagram received must be an aircraft type name
                 {
+                    string datagram = Encoding.ASCII.GetString(receiveData, 0, receiveData.Length);
                     var unit = jsonRoot.units.unit.FirstOrDefault(u => u.typeName == datagram);
                     string lastUnitType = datagram;
 
@@ -161,11 +167,16 @@ namespace TelemetryVibShaker
                     {
                         soundManager.AoA1 = unit.AoA1;
                         soundManager.AoA2 = unit.AoA2;
+                        for (int i = 0; i < vibMotor.Length; i++)
+                            vibMotor[i].ChangeAoARange(unit.AoA1, unit.AoA2);
                     }
                     else  // basically ignore the limits, because the unit type was not found in the JSON File
                     {
                         soundManager.AoA1 = 360;
                         soundManager.AoA2 = 360;
+                        for (int i = 0; i < vibMotor.Length; i++)
+                            vibMotor[i].ChangeAoARange(360, 360);
+
                     }
 
                     // this is not expected to change often, so I am ok with updating it as soon as possible
@@ -176,7 +187,7 @@ namespace TelemetryVibShaker
                 if (needs_update) // update the processing time once every second only and if requested by user
                 {                   
                     TimeSpan elapsed = stopwatch.Elapsed;
-                    if (maxProcessingTime < elapsed.Milliseconds) maxProcessingTime = elapsed.Milliseconds;
+                    if (MaxProcessingTime < elapsed.Milliseconds) MaxProcessingTime = elapsed.Milliseconds;
                 }
             } // end-while
 

@@ -1,10 +1,6 @@
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
-//using System.Net.Sockets;
-//using System.Diagnostics;
-using System.Windows.Forms;
-using System.Net;
-using System.Text;
+
 
 
 namespace TelemetryVibShaker
@@ -232,7 +228,7 @@ namespace TelemetryVibShaker
                         lblSoundStatus.Text = "Sound effects ready.";
                         break;
                     case SoundEffectStatus.Playing:
-                        lblSoundStatus.Text = "Playing effect...";
+                        lblSoundStatus.Text = "Playing effectType...";
                         break;
                     case SoundEffectStatus.Canceled:
                         lblSoundStatus.Text = "Alarm canceled.";
@@ -289,21 +285,19 @@ namespace TelemetryVibShaker
         {
             if (telemetry == null) return;
 
+            timer1.Enabled = false;
 
             // Signal stop request
-            telemetry.Stop();
+            telemetry.Abort();
 
-            // Stop the player
+            // Abort the players
             if (soundManager != null)
             {
                 soundManager.Stop();
                 soundManager = null;
                 UpdateSoundEffectStatus(SoundEffectStatus.NotPlaying);
             }
-
-
-            // Stop the UDP listenerUdp
-            telemetry.Stop();
+            telemetry = null;
 
 
             // Reenable some controls
@@ -317,7 +311,6 @@ namespace TelemetryVibShaker
 
 
             // Adjust valid operations
-            timer1.Enabled = false;
             ChangeStatus(btnStop, false);
             ChangeStatus(btnStartListening, true);
 
@@ -335,9 +328,9 @@ namespace TelemetryVibShaker
 
 
         // Create a new thread and run the telemetry
-        private void UDPServer()
+        private void DoTelemetry()
         {
-
+            telemetry.Run();
         }
 
 
@@ -370,9 +363,11 @@ namespace TelemetryVibShaker
                 return;
             }
 
-            // Start playing sound effects with volume 0, this minimizes any delay when the effect is actually needed
+            // Start playing sound effects with volume 0, this minimizes any delay when the effectType is actually needed
             soundManager = new AoA_SoundManager(txtSoundEffect1.Text, txtSoundEffect2.Text, (float)trkVolumeMultiplier1.Value / 100.0f, (float)trkVolumeMultiplier2.Value / 100.0f, cmbAudioDevice1.SelectedIndex);
-            UpdateSoundEffectStatus(SoundEffectStatus.Ready);
+            soundManager.EnableEffect1 = chkEnableAoASoundEffects1.Checked;
+            soundManager.EnableEffect2 = chkEnableAoASoundEffects2.Checked;
+            UpdateSoundEffectStatus(soundManager.Status);
 
 
             // Sanitize port range using the ephemeral range
@@ -387,7 +382,7 @@ namespace TelemetryVibShaker
 
             lblProcessingTime.Tag = 0;  // Reset max processing time tracker
             // Start a new thread to act as the UDP Server
-            threadTelemetry = new Thread(UDPServer);
+            threadTelemetry = new Thread(DoTelemetry);
             threadTelemetry.Start();
             lblServerThread.Text = threadTelemetry.ManagedThreadId.ToString();
 
@@ -414,7 +409,7 @@ namespace TelemetryVibShaker
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            if (telemetry != null) lastSecond = telemetry.lastSecond;
+            if (telemetry != null) lastSecond = telemetry.LastSecond;
             if ((soundManager.SoundIsActive()) && (Environment.TickCount64 / 1000 - lastSecond > trkEffectTimeout.Value))
             {
                 soundManager.MuteEffects();
@@ -425,21 +420,21 @@ namespace TelemetryVibShaker
             if (chkShowStatistics.Checked && telemetry.IsRunning())
             {
                 // Report the last AoA received
-                if ((int)lblLastAoA.Tag != telemetry.lastAoA)
+                if ((int)lblLastAoA.Tag != telemetry.LastData.AoA)
                 {
-                    lblLastAoA.Tag = telemetry.lastAoA;
-                    lblLastAoA.Text = telemetry.lastAoA.ToString() + "°";
+                    lblLastAoA.Tag = telemetry.LastData.AoA;
+                    lblLastAoA.Text = telemetry.LastData.AoA.ToString() + "°";
                 }
 
                 // Report datagrams per second
-                if ((int)lblDatagramsPerSecond.Tag != telemetry.dps)
+                if ((int)lblDatagramsPerSecond.Tag != telemetry.DPS)
                 {
-                    lblDatagramsPerSecond.Tag = telemetry.dps;
-                    lblDatagramsPerSecond.Text = telemetry.dps.ToString();
+                    lblDatagramsPerSecond.Tag = telemetry.DPS;
+                    lblDatagramsPerSecond.Text = telemetry.DPS.ToString();
                 }
 
-                // Report sound effect
-                UpdateSoundEffectStatus(telemetry.SoundEffectStatus);
+                // Report sound effectType
+                UpdateSoundEffectStatus(soundManager.Status);
 
                 // Report unit type
                 if (!telemetry.CurrentUnitType.Equals(lblCurrentUnitType))
@@ -470,6 +465,17 @@ namespace TelemetryVibShaker
         private void txtTWatchPort_KeyPress(object sender, KeyPressEventArgs e)
         {
             AllowOnlyDigits(sender, e);
+        }
+
+        private void chkEnableAoASoundEffects1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (soundManager != null) soundManager.EnableEffect1 = chkEnableAoASoundEffects1.Checked;
+
+        }
+
+        private void chkEnableAoASoundEffects2_CheckedChanged(object sender, EventArgs e)
+        {
+            if (soundManager != null) soundManager.EnableEffect2 = chkEnableAoASoundEffects1.Checked;
         }
     }
 }

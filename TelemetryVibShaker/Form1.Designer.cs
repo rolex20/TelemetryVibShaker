@@ -195,6 +195,7 @@
             chkEnableAoASoundEffects2.TabIndex = 14;
             chkEnableAoASoundEffects2.Text = "Enable Sound Effect when beyond AoA range:";
             chkEnableAoASoundEffects2.UseVisualStyleBackColor = true;
+            chkEnableAoASoundEffects2.CheckedChanged += chkEnableAoASoundEffects2_CheckedChanged;
             // 
             // lblVolumeMultiplier2
             // 
@@ -216,7 +217,7 @@
             trkVolumeMultiplier2.SmallChange = 5;
             trkVolumeMultiplier2.TabIndex = 12;
             trkVolumeMultiplier2.TickFrequency = 10;
-            toolTip1.SetToolTip(trkVolumeMultiplier2, "General modifier of volume for the sound effects.  100% is the original sound effect volume.");
+            toolTip1.SetToolTip(trkVolumeMultiplier2, "General modifier of volume for the sound effects.  100% is the original sound effectType volume.");
             trkVolumeMultiplier2.Value = 60;
             trkVolumeMultiplier2.Scroll += trkVolumeMultiplier2_Scroll;
             // 
@@ -248,6 +249,7 @@
             chkEnableAoASoundEffects1.TabIndex = 9;
             chkEnableAoASoundEffects1.Text = "Enable Sound Effect when in optimal AoA range:";
             chkEnableAoASoundEffects1.UseVisualStyleBackColor = true;
+            chkEnableAoASoundEffects1.CheckedChanged += chkEnableAoASoundEffects1_CheckedChanged;
             // 
             // btnSoundEffect2
             // 
@@ -291,7 +293,7 @@
             trkVolumeMultiplier1.SmallChange = 5;
             trkVolumeMultiplier1.TabIndex = 5;
             trkVolumeMultiplier1.TickFrequency = 10;
-            toolTip1.SetToolTip(trkVolumeMultiplier1, "General modifier of volume for the sound effects.  100% is the original sound effect volume.");
+            toolTip1.SetToolTip(trkVolumeMultiplier1, "General modifier of volume for the sound effects.  100% is the original sound effectType volume.");
             trkVolumeMultiplier1.Value = 60;
             trkVolumeMultiplier1.Scroll += trkVolumeMultiplier1_Scroll;
             // 
@@ -444,7 +446,7 @@
             chkVibrateMotorForFlaps.Name = "chkVibrateMotorForFlaps";
             chkVibrateMotorForFlaps.Size = new Size(486, 41);
             chkVibrateMotorForFlaps.TabIndex = 17;
-            chkVibrateMotorForFlaps.Text = "Vibrate Motor 2 with Flaps Telemetry:  Attach vibration motor where you want to feel this haptic effect.";
+            chkVibrateMotorForFlaps.Text = "Vibrate Motor 2 with Flaps Telemetry:  Attach vibration motor where you want to feel this haptic effectType.";
             chkVibrateMotorForFlaps.UseVisualStyleBackColor = true;
             // 
             // numMaxIntensitySpeedBrakes
@@ -920,7 +922,7 @@
             btnStop.Name = "btnStop";
             btnStop.Size = new Size(75, 23);
             btnStop.TabIndex = 2;
-            btnStop.Text = "&Stop";
+            btnStop.Text = "&Abort";
             btnStop.UseVisualStyleBackColor = true;
             btnStop.Click += btnStop_Click;
             // 
