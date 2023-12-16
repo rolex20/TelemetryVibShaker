@@ -9,12 +9,14 @@ namespace TelemetryVibShaker
         private const int TFT_GREEN = 3;
         private const int TFT_RED = 4;
 
-        MotorStrengthPoints points;
-        VibrationEffectType effectType;
+        public bool Enabled;
+        private MotorStrengthPoints points;
+        private VibrationEffectType effectType;
         public VibrationEffectType EffectType { get { return effectType; } }
 
         public EffectDefinition(VibrationEffectType Effect, MotorStrengthPoints Points)
         {
+            Enabled = true;
             effectType = Effect;
             points = Points;
         }       
@@ -26,20 +28,21 @@ namespace TelemetryVibShaker
         }
 
 
-        // provides the output to send to a motor or a color
+        // Calculates the output (0..255) to send to a motor or a color (0..4) depending on the effectType
         public int CalculateOutput(TelemetryData Telemetry)
         {
+            if (!Enabled) return 0;
 
             switch (effectType)
             {
                 case VibrationEffectType.AoA:
-                    return points.Seg1SolveY(Telemetry.AoA);
+                    return points.CalculateOutput(Telemetry.AoA);
                     break;// just in case I add something else later
                 case VibrationEffectType.SpeedBrakes:
-                    return points.Seg2SolveY(Telemetry.SpeedBrakes);
+                    return points.CalculateOutput(Telemetry.SpeedBrakes);
                     break;
                 case VibrationEffectType.Flaps:
-                    return points.Seg2SolveY(Telemetry.Flaps);
+                    return points.CalculateOutput(Telemetry.Flaps);
                     break;
                 case VibrationEffectType.BackgroundAoA:
                     // For now the effectType is fixed
@@ -69,10 +72,14 @@ namespace TelemetryVibShaker
         private int GetBackgroundColor(int telemetry)
         {
             // For now the effectType is fixed to BLACK, YELLOW, GREEN, RED
-            if (telemetry == 0) return TFT_BLACK;
-            else if (telemetry <= points.x2) return TFT_YELLOW;
-            else if (telemetry <= points.x3) return TFT_DARKGREEN;
-            else return TFT_RED;
+            if (telemetry == 0) 
+                return TFT_BLACK;
+            else if (telemetry < points.x2) 
+                return TFT_YELLOW;
+            else if (telemetry <= points.x3) 
+                return TFT_DARKGREEN;
+            else 
+                return TFT_RED;
         }
 
 

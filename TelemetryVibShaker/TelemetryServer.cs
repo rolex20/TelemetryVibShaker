@@ -16,7 +16,7 @@ namespace TelemetryVibShaker
         public string CurrentUnitType; // current type of aircraft used by the player
 
         private AoA_SoundManager soundManager;
-        private VibrationMotor[] vibMotor;
+        private MotorController[] vibMotor;
         private Root jsonRoot;
         private bool cancelationToken;
         private bool statistics;
@@ -44,7 +44,7 @@ namespace TelemetryVibShaker
             return (!cancelationToken);
         }
 
-        public TelemetryServer(AoA_SoundManager SoundManager, VibrationMotor[] Motor, bool CalculateStats, int ListeningPort)
+        public TelemetryServer(AoA_SoundManager SoundManager, MotorController[] Motor, bool CalculateStats, int ListeningPort)
         {
             soundManager = SoundManager;
             vibMotor = Motor;
@@ -92,6 +92,11 @@ namespace TelemetryVibShaker
             byte[] receiveData;
 
             LastSecond = 0;
+
+            // Establish UDP target to send packets
+            for (int i = 0; i < vibMotor.Length; i++)
+                vibMotor[i].Connect();
+
 
             while (!cancelationToken && listenerUdp != null)
             {

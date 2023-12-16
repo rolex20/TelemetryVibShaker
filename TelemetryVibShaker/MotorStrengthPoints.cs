@@ -10,7 +10,7 @@ namespace TelemetryVibShaker
 {
     internal class MotorStrengthPoints
     {
-        //See diagram in: https://
+        //See diagram in: https://github.com/rolex20/TelemetryVibShaker/blob/master/TelemetryVibShaker/Points%20for%20Effects%20-%20Diagram.png
         //If effect is AoA then x2=AoA1, x3=AoA2
         public float x2, x3, x4, x5;
         public float y2, y3, y4, y5;
@@ -34,6 +34,20 @@ namespace TelemetryVibShaker
             m2 = SolveSlope(x4, y4, x5, y5);
 
         }
+
+        public int CalculateOutput(int telemetry)
+        {
+            if (telemetry < x2)
+                return 0;
+            else if (telemetry >= x2 && telemetry <= x3)
+                return Seg1SolveY(telemetry);
+            else
+                return Seg2SolveY(telemetry);
+        }
+
+
+
+
         
         /// <summary>
         /// Solves Y for the straight line in Segment 1: AoA
@@ -43,7 +57,7 @@ namespace TelemetryVibShaker
         /// </summary>
         /// <param name="x">x</param>
         /// <returns>y</returns>
-        public int Seg1SolveY(float x)
+        private int Seg1SolveY(float x)
         {
             // y = mx - mx1 + y1
             if (x2 == 360.0f) return 0; // Disable effects by sending 0 to the motors
@@ -60,7 +74,7 @@ namespace TelemetryVibShaker
         /// </summary>
         /// <param name="X">x</param>
         /// <returns>y</returns>
-        public int Seg2SolveY(float X)
+        private int Seg2SolveY(float X)
         {
             // y = mx - mx1 + y1
 
