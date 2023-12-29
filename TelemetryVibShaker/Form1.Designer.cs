@@ -362,7 +362,7 @@
             tabArduino.Padding = new Padding(3);
             tabArduino.Size = new Size(509, 401);
             tabArduino.TabIndex = 1;
-            tabArduino.Text = "2xVibMotors";
+            tabArduino.Text = "Arduino";
             tabArduino.UseVisualStyleBackColor = true;
             // 
             // txtArduinoPort
@@ -448,6 +448,7 @@
             chkVibrateMotorForFlaps.TabIndex = 17;
             chkVibrateMotorForFlaps.Text = "Vibrate Motor 2 with Flaps Telemetry:  Attach vibration motor where you want to feel this haptic effectType.";
             chkVibrateMotorForFlaps.UseVisualStyleBackColor = true;
+            chkVibrateMotorForFlaps.CheckedChanged += chkVibrateMotorForFlaps_CheckedChanged;
             // 
             // numMaxIntensitySpeedBrakes
             // 
@@ -507,6 +508,7 @@
             chkVibrateMotorForSpeedBrake.TabIndex = 0;
             chkVibrateMotorForSpeedBrake.Text = "Vibrate Motor 1 with Speed Brake Telemetry:  Attach vibration motor near your throttle.";
             chkVibrateMotorForSpeedBrake.UseVisualStyleBackColor = true;
+            chkVibrateMotorForSpeedBrake.CheckedChanged += chkVibrateMotorForSpeedBrake_CheckedChanged;
             // 
             // tabTTGO20V3
             // 
@@ -535,6 +537,7 @@
             chkTWatchDisplayBackground.TabIndex = 31;
             chkTWatchDisplayBackground.Text = "Change display background color based on AoA:  Yellow when below optimal AoA, Green when in optimal AoA and Red when above optimal AoA.";
             chkTWatchDisplayBackground.UseVisualStyleBackColor = true;
+            chkTWatchDisplayBackground.CheckedChanged += chkTWatchDisplayBackground_CheckedChanged;
             // 
             // chkTWatchVibrate
             // 
@@ -546,6 +549,7 @@
             chkTWatchVibrate.TabIndex = 30;
             chkTWatchVibrate.Text = "Vibrate Motors with AoA Telemetry:  Only when beyond optimal AoA range.";
             chkTWatchVibrate.UseVisualStyleBackColor = true;
+            chkTWatchVibrate.CheckedChanged += chkTWatchVibrate_CheckedChanged;
             // 
             // txtTWatchPort
             // 
@@ -812,6 +816,7 @@
             lblCurrentUnitType.Name = "lblCurrentUnitType";
             lblCurrentUnitType.Size = new Size(34, 15);
             lblCurrentUnitType.TabIndex = 9;
+            lblCurrentUnitType.Tag = "0";
             lblCurrentUnitType.Text = "none";
             // 
             // lblSoundStatus
@@ -887,9 +892,9 @@
             chkShowStatistics.CheckState = CheckState.Checked;
             chkShowStatistics.Location = new Point(15, 55);
             chkShowStatistics.Name = "chkShowStatistics";
-            chkShowStatistics.Size = new Size(299, 19);
+            chkShowStatistics.Size = new Size(300, 19);
             chkShowStatistics.TabIndex = 9;
-            chkShowStatistics.Text = "Show statistics and additional info once per second.";
+            chkShowStatistics.Text = "Show Statistics and additional info once per second.";
             chkShowStatistics.UseVisualStyleBackColor = true;
             chkShowStatistics.CheckedChanged += checkBox5_CheckedChanged;
             // 

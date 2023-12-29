@@ -10,6 +10,12 @@ namespace TelemetryVibShaker
 {
     internal class MotorStrengthPoints
     {
+        private const int TFT_BLACK = 0;
+        private const int TFT_YELLOW = 1;
+        private const int TFT_DARKGREEN = 2;
+        private const int TFT_GREEN = 3;
+        private const int TFT_RED = 4;
+
         //See diagram in: https://github.com/rolex20/TelemetryVibShaker/blob/master/TelemetryVibShaker/Points%20for%20Effects%20-%20Diagram.png
         //If effect is AoA then x2=AoA1, x3=AoA2
         public float x2, x3, x4, x5;
@@ -35,6 +41,14 @@ namespace TelemetryVibShaker
 
         }
 
+        /// <summary>
+        /// Calculates output to send to a vibration motor
+        /// If telemetry is between x2 and x3 it will use linear interpolation from the two points x2,y2 and x3,y3
+        /// If telemetry is less than x2, the return value will be 0
+        /// If telemetry is larger than x3 it will use linear interpolation from the two points x4,y4 and x5,y5
+        /// </summary>
+        /// <param name="telemetry"></param>
+        /// <returns></returns>
         public int CalculateOutput(int telemetry)
         {
             if (telemetry < x2)
@@ -45,10 +59,27 @@ namespace TelemetryVibShaker
                 return Seg2SolveY(telemetry);
         }
 
+        /// <summary>
+        /// Return a color code for the TWatch based on telemetry
+        /// For now the color is fixed to Yellow (<x2), Green (x2-x3), Red (>x3)
+        /// </summary>
+        /// <param name="telemetry">telemetry data</param>
+        /// <returns></returns>
+        public int GetBackgroundColor(int telemetry)
+        {
+            // For now the effectType is fixed to BLACK, YELLOW, GREEN, RED
+            if (telemetry == 0)
+                return TFT_BLACK;
+            else if (telemetry < x2)
+                return TFT_YELLOW;
+            else if (telemetry <= x3)
+                return TFT_DARKGREEN;
+            else
+                return TFT_RED;
+        }
 
 
 
-        
         /// <summary>
         /// Solves Y for the straight line in Segment 1: AoA
         /// It uses the equation of the line that passes between two points

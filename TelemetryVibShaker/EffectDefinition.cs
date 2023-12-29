@@ -3,20 +3,14 @@ namespace TelemetryVibShaker
 {
     internal class EffectDefinition
     {
-        private const int TFT_BLACK = 0;
-        private const int TFT_YELLOW = 1;
-        private const int TFT_DARKGREEN = 2;
-        private const int TFT_GREEN = 3;
-        private const int TFT_RED = 4;
-
         public bool Enabled;
         private MotorStrengthPoints points;
         private VibrationEffectType effectType;
         public VibrationEffectType EffectType { get { return effectType; } }
 
-        public EffectDefinition(VibrationEffectType Effect, MotorStrengthPoints Points)
+        public EffectDefinition(VibrationEffectType Effect, MotorStrengthPoints Points, bool Enabled)
         {
-            Enabled = true;
+            this.Enabled = Enabled;
             effectType = Effect;
             points = Points;
         }       
@@ -44,19 +38,16 @@ namespace TelemetryVibShaker
                 case VibrationEffectType.Flaps:
                     return points.CalculateOutput(Telemetry.Flaps);
                     break;
-                case VibrationEffectType.BackgroundAoA:
-                    // For now the effectType is fixed
-                    return GetBackgroundColor(Telemetry.AoA);
+                case VibrationEffectType.BackgroundAoA:                   
+                    return points.GetBackgroundColor(Telemetry.AoA);
 
                     break;
                 case VibrationEffectType.BackgroundSpeedBrakes:
-                    // For now the effectType is fixed
-                    return GetBackgroundColor(Telemetry.SpeedBrakes);
+                    return points.GetBackgroundColor(Telemetry.SpeedBrakes);
                     break;
 
                 case VibrationEffectType.BackgroundFlaps:
-                    // For now the effectType is fixed
-                    return GetBackgroundColor(Telemetry.Flaps);
+                    return points.GetBackgroundColor(Telemetry.Flaps);
                     break;
                 case VibrationEffectType.Nothing:
                     return 0;
@@ -69,18 +60,7 @@ namespace TelemetryVibShaker
 
         } // CalculateOutput
 
-        private int GetBackgroundColor(int telemetry)
-        {
-            // For now the effectType is fixed to BLACK, YELLOW, GREEN, RED
-            if (telemetry == 0) 
-                return TFT_BLACK;
-            else if (telemetry < points.x2) 
-                return TFT_YELLOW;
-            else if (telemetry <= points.x3) 
-                return TFT_DARKGREEN;
-            else 
-                return TFT_RED;
-        }
+
 
 
     }

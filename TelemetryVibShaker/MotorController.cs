@@ -9,14 +9,16 @@ namespace TelemetryVibShaker
         private string serverIP;
         private int serverPort;
         public bool Enabled;
-        public MotorController(string IP, int Port, EffectDefinition[] Effect)
+        public string Name;
+        public MotorController(string Name, string IP, int Port, EffectDefinition[] Effect, bool Enabled)
         {
             effect = Effect;
+            this.Name = Name;
             udpSender = null;
             serverIP = IP;
             serverPort = Port;
             datagram = new byte[effect.Length];
-            Enabled = true;
+            this.Enabled = Enabled;
         }
 
         public void Connect()

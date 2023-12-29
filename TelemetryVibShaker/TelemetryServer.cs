@@ -19,7 +19,7 @@ namespace TelemetryVibShaker
         private MotorController[] vibMotor;
         private Root jsonRoot;
         private bool cancelationToken;
-        private bool statistics;
+        private bool Statistics;
         private int listeningPort;
 
         public string CurrentUnitInfo { 
@@ -49,10 +49,11 @@ namespace TelemetryVibShaker
             soundManager = SoundManager;
             vibMotor = Motor;
             jsonRoot = null;
-            statistics = CalculateStats;
+            Statistics = CalculateStats;
             this.listeningPort = ListeningPort;
             lastErrorMsg = string.Empty;
             cancelationToken = false;
+            LastData = new TelemetryData();
         }
 
         public bool SetJSON(string FilePath)
@@ -97,7 +98,6 @@ namespace TelemetryVibShaker
             for (int i = 0; i < vibMotor.Length; i++)
                 vibMotor[i].Connect();
 
-
             while (!cancelationToken && listenerUdp != null)
             {
                 try
@@ -118,21 +118,21 @@ namespace TelemetryVibShaker
                 // Process the datagram received
 
 
-                if (statistics) stopwatch.Restart();  // Track the time to process this datagram
+                if (Statistics) stopwatch.Restart();  // Track the time to process this datagram
                 bool needs_update = false;
 
                 //string datagram = Encoding.ASCII.GetString(receiveData, 0, receiveData.Length);
 
-                // Update statistics and UI status controls
+                // Update Statistics and UI status controls
                 long newSecond = Environment.TickCount64 / 1000;
-                if (statistics)
+                if (Statistics)
                     if (LastSecond != newSecond )
                     {
                         //lblDatagramsPerSecond.Text = DPS.ToString();  // update datagrams per second
                         //BeginInvoke(new Action(() => { lblDatagramsPerSecond.Text = DPS.ToString();  /* update datagrams per second  */ }));
                         DPS = 1; // reset the counter
                         LastSecond = newSecond;
-                        needs_update = true;  // Update required for statistics, but only if the user wants to see them
+                        needs_update = true;  // Update required for Statistics, but only if the user wants to see them
                     }
                     else
                     {
@@ -188,7 +188,7 @@ namespace TelemetryVibShaker
                     if (CurrentUnitType != lastUnitType) CurrentUnitType = lastUnitType;
                 }
                 
-                if (statistics) stopwatch.Stop(); // at this point the datagram has been fully processed
+                if (Statistics) stopwatch.Stop(); // at this point the datagram has been fully processed
                 if (needs_update) // update the processing time once every second only and if requested by user
                 {                   
                     TimeSpan elapsed = stopwatch.Elapsed;

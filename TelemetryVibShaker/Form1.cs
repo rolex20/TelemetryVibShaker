@@ -7,6 +7,12 @@ namespace TelemetryVibShaker
 {
     public partial class frmMain : Form
     {
+        private const int ARDUINO = 0;
+        private const int TWATCH = 1;
+
+        private MotorController[] motorControllers; // currently the interface is fixed to 2 (Arduino and TWatch) and each with 2 effects
+        private EffectDefinition[] arduinoEffects;  // currently only two vibration motors connected
+        private EffectDefinition[] TWatchEffects; // curently only 1 motor and 1 display connected
         private AoA_SoundManager soundManager;  // manages sound effects according to the current AoA
         private TelemetryServer telemetry;      // controls all telemetry logic
         private Thread threadTelemetry; // this thread runs the telemetry
@@ -241,6 +247,11 @@ namespace TelemetryVibShaker
 
         private void frmMain_Load(object sender, EventArgs e)
         {
+            soundManager = null;
+            telemetry = null;
+            motorControllers = null;
+
+
             fillAudioDevices();
 
             // Load the settings for all controls in the form
@@ -271,8 +282,6 @@ namespace TelemetryVibShaker
             //Label.CheckForIllegalCrossThreadCalls = false;
             //TextBox.CheckForIllegalCrossThreadCalls = false;
 
-            soundManager = null;
-            telemetry = null;
 
         }
 
@@ -333,6 +342,62 @@ namespace TelemetryVibShaker
             telemetry.Run();
         }
 
+        private void PrepareControllers()
+        {
+            //        private MotorController[] motorControllers; // currently the interface is fixed to 2 (Arduino and TWatch) and each with 2 effects
+            // /       private EffectDefinition[] arduinoEffects;  // currently only two vibration motors connected
+            //        private EffectDefinition TWatchEffects; // curently only 1 motor and 1 display connected
+
+            motorControllers = new MotorController[2]; // one for Arduino and the other for the TWatch
+
+            // Define Arduino Effects First
+            arduinoEffects = new EffectDefinition[2];
+
+            // Speed brake data points
+            MotorStrengthPoints points = new MotorStrengthPoints(1, (float)numMinIntensitySpeedBrakes.Value, 5, (float)numMinIntensitySpeedBrakes.Value, 6, (float)numMinIntensitySpeedBrakes.Value, 100, (float)numMaxIntensitySpeedBrakes.Value);
+            arduinoEffects[0] = new EffectDefinition(VibrationEffectType.AoA, points, chkVibrateMotorForSpeedBrake.Checked);
+
+
+
+            // Flaps data points
+            points = new MotorStrengthPoints(1, (float)numMinIntensitySpeedBrakes.Value, 5, (float)numMinIntensitySpeedBrakes.Value, 6, (float)numMinIntensitySpeedBrakes.Value, 100, (float)numMaxIntensitySpeedBrakes.Value);
+            arduinoEffects[1] = new EffectDefinition(VibrationEffectType.AoA, points, chkVibrateMotorForFlaps.Checked);
+
+            // Now the first MotorController can be defined (Arduino)
+            motorControllers[ARDUINO] = new MotorController("Arduino", txtArduinoIP.Text, Int32.Parse(txtArduinoPort.Text), arduinoEffects, (chkVibrateMotorForSpeedBrake.Checked || chkVibrateMotorForFlaps.Checked));
+
+            // Now Define TWatch Effects
+            TWatchEffects = new EffectDefinition[2];
+
+            // AoA data points
+            // The 15 and 16 doesnt matter too much, they will be replaced by the actual aircraft AoA ranges
+            // For the TWatch the vibration strength doesn't matter too much because
+            // currently I have only found how to turn them on or off, not how to control the strength
+            // however this interface simplifies the creation of effect points
+            points = new MotorStrengthPoints(11, 100, 15, 100, 16, 100, 255, 255);
+            TWatchEffects[0] = new EffectDefinition(VibrationEffectType.AoA, points, chkTWatchVibrate.Checked);
+
+            // AoA Background Color Display
+            // Will show Yellow,Green or Red depending on AoA
+            // The 15 and 16 doesnt matter too much, they will be replaced by the actual aircraft AoA ranges
+            // For the AoA Background Color Display the vibration strength doesn't matter too much because
+            // currently I have only found how to turn them on or off, not how to control the strength
+            // however this interface simplifies the creation of effect points
+            points = new MotorStrengthPoints(11, 100, 15, 100, 16, 100, 255, 255);
+            TWatchEffects[1] = new EffectDefinition(VibrationEffectType.AoA, points, chkTWatchDisplayBackground.Checked);
+
+            // Now the second MotorController can be defined (TWatch)
+            motorControllers[TWATCH] = new MotorController("TWatch-2020V3", txtTWatchIP.Text, Int32.Parse(txtTWatchPort.Text), TWatchEffects, (chkTWatchVibrate.Checked || chkTWatchDisplayBackground.Checked));
+
+            // Start playing sound effects with volume 0, this minimizes any delay when the effectType is actually needed
+            soundManager = new AoA_SoundManager(txtSoundEffect1.Text, txtSoundEffect2.Text, (float)trkVolumeMultiplier1.Value / 100.0f, (float)trkVolumeMultiplier2.Value / 100.0f, cmbAudioDevice1.SelectedIndex);
+            soundManager.EnableEffect1 = chkEnableAoASoundEffects1.Checked;
+            soundManager.EnableEffect2 = chkEnableAoASoundEffects2.Checked;
+            UpdateSoundEffectStatus(soundManager.Status);
+
+            telemetry = new TelemetryServer(soundManager, motorControllers, chkShowStatistics.Checked, Int32.Parse(txtListeningPort.Text));
+        }
+
 
         private void btnStartListening_Click(object sender, EventArgs e)
         {
@@ -363,13 +428,6 @@ namespace TelemetryVibShaker
                 return;
             }
 
-            // Start playing sound effects with volume 0, this minimizes any delay when the effectType is actually needed
-            soundManager = new AoA_SoundManager(txtSoundEffect1.Text, txtSoundEffect2.Text, (float)trkVolumeMultiplier1.Value / 100.0f, (float)trkVolumeMultiplier2.Value / 100.0f, cmbAudioDevice1.SelectedIndex);
-            soundManager.EnableEffect1 = chkEnableAoASoundEffects1.Checked;
-            soundManager.EnableEffect2 = chkEnableAoASoundEffects2.Checked;
-            UpdateSoundEffectStatus(soundManager.Status);
-
-
             // Sanitize port range using the ephemeral range
             if (Int32.TryParse(txtListeningPort.Text, out int value))
             {
@@ -377,6 +435,12 @@ namespace TelemetryVibShaker
                 if (value > 65535) value = 65535;
                 txtListeningPort.Text = value.ToString();
             }
+
+            // Prepare SoundManager, TelemetryServer, MotorControllers
+            PrepareControllers();
+
+
+
 
 
 
@@ -419,22 +483,26 @@ namespace TelemetryVibShaker
             // Statistics are updated once per second
             if (chkShowStatistics.Checked && telemetry.IsRunning())
             {
+                // Report sound effectType
+                UpdateSoundEffectStatus(soundManager.Status);
+
                 // Report the last AoA received
-                if ((int)lblLastAoA.Tag != telemetry.LastData.AoA)
+                int x = Convert.ToInt32(lblLastAoA.Tag);
+                if (x <= 0) return; // if no value has been received yet, dont update nothing
+
+
+                if (x != telemetry.LastData.AoA)
                 {
-                    lblLastAoA.Tag = telemetry.LastData.AoA;
+                    lblLastAoA.Tag = (int)telemetry.LastData.AoA;
                     lblLastAoA.Text = telemetry.LastData.AoA.ToString() + "°";
                 }
 
                 // Report datagrams per second
-                if ((int)lblDatagramsPerSecond.Tag != telemetry.DPS)
+                if (Convert.ToInt32(lblDatagramsPerSecond.Tag) != telemetry.DPS)
                 {
                     lblDatagramsPerSecond.Tag = telemetry.DPS;
                     lblDatagramsPerSecond.Text = telemetry.DPS.ToString();
                 }
-
-                // Report sound effectType
-                UpdateSoundEffectStatus(soundManager.Status);
 
                 // Report unit type
                 if (!telemetry.CurrentUnitType.Equals(lblCurrentUnitType))
@@ -477,5 +545,29 @@ namespace TelemetryVibShaker
         {
             if (soundManager != null) soundManager.EnableEffect2 = chkEnableAoASoundEffects1.Checked;
         }
+
+        private void chkVibrateMotorForSpeedBrake_CheckedChanged(object sender, EventArgs e)
+        {
+            if (arduinoEffects[0] != null)
+                arduinoEffects[0].Enabled = chkVibrateMotorForSpeedBrake.Checked;
+        }
+
+        private void chkVibrateMotorForFlaps_CheckedChanged(object sender, EventArgs e)
+        {
+            if (arduinoEffects[1] != null)
+                arduinoEffects[1].Enabled = chkVibrateMotorForFlaps.Checked;
+        }
+        private void chkTWatchVibrate_CheckedChanged(object sender, EventArgs e)
+        {
+            if (TWatchEffects[0] != null)
+                TWatchEffects[0].Enabled = chkTWatchVibrate.Checked;
+        }
+
+        private void chkTWatchDisplayBackground_CheckedChanged(object sender, EventArgs e)
+        {
+            if (TWatchEffects[1] != null)
+                TWatchEffects[1].Enabled = chkTWatchDisplayBackground.Checked;
+        }
+
     }
 }
