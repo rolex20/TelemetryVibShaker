@@ -506,7 +506,7 @@ namespace TelemetryVibShaker
             }
 
             // Statistics are updated once per second
-            if (chkShowStatistics.Checked && telemetry.IsRunning())
+            if (chkShowStatistics.Checked && telemetry.IsRunning() && tabs.SelectedIndex == 4)
             {
                 // Report sound effectType
                 UpdateSoundEffectStatus(soundManager.Status);
