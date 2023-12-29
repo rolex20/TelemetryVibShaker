@@ -129,9 +129,10 @@ namespace TelemetryVibShaker
             if (EnableEffect1)
             {
                 if ((newAoA >= AoA1) && (newAoA <= AoA2))
-                {                    
-                    float newVolume = lastVolume1 + 0.20f; // progresively start the sound effectType
-                    if (newVolume > 1.0f) newVolume = 1.0f;
+                {
+                    //float newVolume = lastVolume1 + 0.20f; // progresively start the sound effectType
+                    //if (newVolume > 1.0f) newVolume = 1.0f;
+                    float newVolume = 1.0f;
 
                     if (lastVolume1 != newVolume) // Avoid calling MediaPlayer.Volume if not needed 
                     {
@@ -157,9 +158,10 @@ namespace TelemetryVibShaker
             if (EnableEffect2)
             {
                 if (newAoA > AoA2)
-                {                    
-                    float newVolume = lastVolume2 + 0.20f; // progresively start the sound effectType
-                    if (newVolume > 1.0f) newVolume = 1.0f;
+                {
+                    //float newVolume = lastVolume2 + 0.20f; // progresively start the sound effectType
+                    //if (newVolume > 1.0f) newVolume = 1.0f;
+                    float newVolume = 1.0f;
 
                     if (lastVolume2 != newVolume) // Avoid calling MediaPlayer.Volume if not needed 
                     {
@@ -188,6 +190,8 @@ namespace TelemetryVibShaker
                 Status = SoundEffectStatus.Ready;
             else
                 Status = SoundEffectStatus.Playing1;
+
+
             return volumeHasChanged;
         }
     }
