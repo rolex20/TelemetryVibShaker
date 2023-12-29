@@ -21,6 +21,7 @@ namespace TelemetryVibShaker
         private bool cancelationToken;
         private bool Statistics;
         private int listeningPort;
+        private UdpClient listenerUdp;
 
         public string CurrentUnitInfo { 
             get 
@@ -37,6 +38,13 @@ namespace TelemetryVibShaker
         public void Abort()
         {
             cancelationToken = true; // it might not be immediate, but it's simpler and it works
+
+            //force the udp server to abort
+            if (listenerUdp!=null)
+            {
+                listenerUdp.Close();
+                listenerUdp = null;
+            }
         }
 
         public bool IsRunning()
@@ -54,6 +62,7 @@ namespace TelemetryVibShaker
             lastErrorMsg = string.Empty;
             cancelationToken = false;
             LastData = new TelemetryData();
+            listenerUdp = null;
         }
 
         public bool SetJSON(string FilePath)
@@ -81,10 +90,12 @@ namespace TelemetryVibShaker
             cancelationToken = false;
             CurrentUnitType = "none";
             lastErrorMsg = string.Empty;
-            MaxProcessingTime = 0;
+            MaxProcessingTime = -1;
+            DPS = 0;
+            int iDPS = 0; // intermediate DPS
 
             // Creates the UDP socket
-            UdpClient listenerUdp = new UdpClient(listeningPort);
+            listenerUdp = new UdpClient(listeningPort);
 
             Stopwatch stopwatch = new Stopwatch();
 
@@ -119,7 +130,7 @@ namespace TelemetryVibShaker
 
 
                 if (Statistics) stopwatch.Restart();  // Track the time to process this datagram
-                bool needs_update = false;
+                //bool needs_update = false;
 
                 //string datagram = Encoding.ASCII.GetString(receiveData, 0, receiveData.Length);
 
@@ -130,14 +141,15 @@ namespace TelemetryVibShaker
                     {
                         //lblDatagramsPerSecond.Text = DPS.ToString();  // update datagrams per second
                         //BeginInvoke(new Action(() => { lblDatagramsPerSecond.Text = DPS.ToString();  /* update datagrams per second  */ }));
-                        DPS = 1; // reset the counter
+                        DPS = iDPS; // Only update when the last DPS per second has been calculated which is now
+                        iDPS = 1; // reset the counter
                         LastSecond = newSecond;
-                        needs_update = true;  // Update required for Statistics, but only if the user wants to see them
+                        //needs_update = true;  // Update required for Statistics, but only if the user wants to see them
                     }
                     else
                     {
-                        needs_update = false;
-                        DPS++;
+                        //needs_update = false;
+                        iDPS++;
                     }
 
                 // Always process each datagram received
@@ -187,13 +199,14 @@ namespace TelemetryVibShaker
                     // this is not expected to change often, so I am ok with updating it as soon as possible
                     if (CurrentUnitType != lastUnitType) CurrentUnitType = lastUnitType;
                 }
-                
-                if (Statistics) stopwatch.Stop(); // at this point the datagram has been fully processed
-                if (needs_update) // update the processing time once every second only and if requested by user
-                {                   
+
+                if (Statistics) 
+                {
+                    stopwatch.Stop(); // at this point the datagram has been fully processed
                     TimeSpan elapsed = stopwatch.Elapsed;
                     if (MaxProcessingTime < elapsed.Milliseconds) MaxProcessingTime = elapsed.Milliseconds;
                 }
+
             } // end-while
 
 
@@ -201,7 +214,7 @@ namespace TelemetryVibShaker
 
         public static string TestJSONFile(string JsonFilePath)
         {
-            string result = string.Empty;
+            string result;// = string.Empty;
             string json = File.ReadAllText(JsonFilePath);
             string intro = "There was a problem with the .JSON file, please check the file.  ";
 

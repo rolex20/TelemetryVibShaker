@@ -74,7 +74,7 @@ namespace TelemetryVibShaker
             if (jsonSelection == DialogResult.OK)
             {
                 string error = TelemetryServer.TestJSONFile(txtJSON.Text);
-                if (string.IsNullOrEmpty(error))
+                if (!string.IsNullOrEmpty(error))
                     MessageBox.Show(error, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -122,6 +122,9 @@ namespace TelemetryVibShaker
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            // Stop the telemetry if it is still running: kill the upd server, etc
+            btnStop_Click(null, null); 
+
             Properties.Settings.Default.XCoordinate = this.Location.X;
             Properties.Settings.Default.YCoordinate = this.Location.Y;
 
@@ -233,8 +236,11 @@ namespace TelemetryVibShaker
                     case SoundEffectStatus.Ready:
                         lblSoundStatus.Text = "Sound effects ready.";
                         break;
-                    case SoundEffectStatus.Playing:
-                        lblSoundStatus.Text = "Playing effectType...";
+                    case SoundEffectStatus.Playing1:
+                        lblSoundStatus.Text = "Playing in-AoA effect...";
+                        break;
+                    case SoundEffectStatus.Playing2:
+                        lblSoundStatus.Text = "Playing above-AoA effect...";
                         break;
                     case SoundEffectStatus.Canceled:
                         lblSoundStatus.Text = "Alarm canceled.";
@@ -250,6 +256,8 @@ namespace TelemetryVibShaker
             soundManager = null;
             telemetry = null;
             motorControllers = null;
+            TWatchEffects = null;
+            arduinoEffects = null;
 
 
             fillAudioDevices();
@@ -266,7 +274,7 @@ namespace TelemetryVibShaker
 
             lblCurrentUnitType.Tag = string.Empty;
 
-            lblLastAoA.Text = string.Empty;
+//            lblLastAoA.Text = string.Empty;
             lblLastAoA.Tag = (float)0.0;
 
             lblDatagramsPerSecond.Text = string.Empty;
@@ -340,6 +348,7 @@ namespace TelemetryVibShaker
         private void DoTelemetry()
         {
             telemetry.Run();
+            toolStripStatusLabel1.Text = "aborted";
         }
 
         private void PrepareControllers()
@@ -396,11 +405,15 @@ namespace TelemetryVibShaker
             UpdateSoundEffectStatus(soundManager.Status);
 
             telemetry = new TelemetryServer(soundManager, motorControllers, chkShowStatistics.Checked, Int32.Parse(txtListeningPort.Text));
+            telemetry.SetJSON(txtJSON.Text);
         }
 
 
         private void btnStartListening_Click(object sender, EventArgs e)
         {
+            // Display stats if required
+            if (chkChangeToMonitor.Checked) tabs.SelectTab(4);
+
             lastSecond = 0; // reset tracker
 
             // Check if files exist
@@ -443,8 +456,9 @@ namespace TelemetryVibShaker
 
 
 
-
-            lblProcessingTime.Tag = 0;  // Reset max processing time tracker
+            // Reset max processing time tracker
+            lblProcessingTime.Tag = -1;
+            lblProcessingTime.Text = String.Empty;
             // Start a new thread to act as the UDP Server
             threadTelemetry = new Thread(DoTelemetry);
             threadTelemetry.Start();
@@ -467,17 +481,28 @@ namespace TelemetryVibShaker
 
             timer1.Enabled = true;
 
-            // Display stats if required
-            if (chkChangeToMonitor.Checked) tabs.SelectTab(4);
+        }
+
+        private void UpdateValue(Label L, int value)
+        {
+            if (Convert.ToInt32(L.Tag) != value)
+            {
+                L.Tag = value;
+                L.Text = value.ToString();
+            }
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
             if (telemetry != null) lastSecond = telemetry.LastSecond;
+            
+            // check if we haven't received more telemetry so we should mute all effects
             if ((soundManager.SoundIsActive()) && (Environment.TickCount64 / 1000 - lastSecond > trkEffectTimeout.Value))
             {
                 soundManager.MuteEffects();
                 UpdateSoundEffectStatus(SoundEffectStatus.Canceled);
+                //Note: My arduino program and my TWatch programs, both include their own
+                //logic to stop the vibration motor if they don't receive more telemetry
             }
 
             // Statistics are updated once per second
@@ -486,29 +511,28 @@ namespace TelemetryVibShaker
                 // Report sound effectType
                 UpdateSoundEffectStatus(soundManager.Status);
 
+                // Report unit type
+                if (!telemetry.CurrentUnitType.Equals(lblCurrentUnitType.Text))
+                    lblCurrentUnitType.Text = telemetry.CurrentUnitType;
+
+                if (telemetry.LastData.AoA <= 0) return; // if no value has been received yet, dont update nothing else
+
                 // Report the last AoA received
-                int x = Convert.ToInt32(lblLastAoA.Tag);
-                if (x <= 0) return; // if no value has been received yet, dont update nothing
-
-
-                if (x != telemetry.LastData.AoA)
-                {
-                    lblLastAoA.Tag = (int)telemetry.LastData.AoA;
-                    lblLastAoA.Text = telemetry.LastData.AoA.ToString() + "°";
-                }
+                UpdateValue(lblLastAoA, telemetry.LastData.AoA);
+                lblLastAoA.Text.Append('°');
 
                 // Report datagrams per second
-                if (Convert.ToInt32(lblDatagramsPerSecond.Tag) != telemetry.DPS)
-                {
-                    lblDatagramsPerSecond.Tag = telemetry.DPS;
-                    lblDatagramsPerSecond.Text = telemetry.DPS.ToString();
-                }
+                UpdateValue(lblDatagramsPerSecond, telemetry.DPS);
 
-                // Report unit type
-                if (!telemetry.CurrentUnitType.Equals(lblCurrentUnitType))
-                {
-                    lblCurrentUnitType.Text = telemetry.CurrentUnitType;
-                }
+                // Report speed brakes
+                UpdateValue(lblLastSpeedBrakes, telemetry.LastData.SpeedBrakes);
+
+                // Report flaps
+                UpdateValue(lblLastFlaps, telemetry.LastData.Flaps);
+
+                // Report max processing time
+                UpdateValue(lblProcessingTime, telemetry.MaxProcessingTime);
+
             }
 
         }
@@ -548,24 +572,24 @@ namespace TelemetryVibShaker
 
         private void chkVibrateMotorForSpeedBrake_CheckedChanged(object sender, EventArgs e)
         {
-            if (arduinoEffects[0] != null)
+            if (arduinoEffects != null)
                 arduinoEffects[0].Enabled = chkVibrateMotorForSpeedBrake.Checked;
         }
 
         private void chkVibrateMotorForFlaps_CheckedChanged(object sender, EventArgs e)
         {
-            if (arduinoEffects[1] != null)
+            if (arduinoEffects != null)
                 arduinoEffects[1].Enabled = chkVibrateMotorForFlaps.Checked;
         }
         private void chkTWatchVibrate_CheckedChanged(object sender, EventArgs e)
         {
-            if (TWatchEffects[0] != null)
+            if (TWatchEffects != null)
                 TWatchEffects[0].Enabled = chkTWatchVibrate.Checked;
         }
 
         private void chkTWatchDisplayBackground_CheckedChanged(object sender, EventArgs e)
         {
-            if (TWatchEffects[1] != null)
+            if (TWatchEffects != null)
                 TWatchEffects[1].Enabled = chkTWatchDisplayBackground.Checked;
         }
 

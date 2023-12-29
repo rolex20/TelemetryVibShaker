@@ -86,13 +86,13 @@
             panel1 = new Panel();
             lblServerThread = new Label();
             label18 = new Label();
-            label31 = new Label();
+            lblLastFlaps = new Label();
             label32 = new Label();
             lblDatagramsPerSecond = new Label();
             label29 = new Label();
             lblProcessingTime = new Label();
             label27 = new Label();
-            label26 = new Label();
+            lblLastSpeedBrakes = new Label();
             lblCurrentUnitType = new Label();
             lblSoundStatus = new Label();
             label19 = new Label();
@@ -164,7 +164,7 @@
             tabNormalSoundEffects.Padding = new Padding(3);
             tabNormalSoundEffects.Size = new Size(509, 401);
             tabNormalSoundEffects.TabIndex = 0;
-            tabNormalSoundEffects.Text = "Normal AoA Sound Effects";
+            tabNormalSoundEffects.Text = "Sound Effects";
             tabNormalSoundEffects.UseVisualStyleBackColor = true;
             // 
             // cmbAudioDevice1
@@ -656,7 +656,7 @@
             trkEffectTimeout.Name = "trkEffectTimeout";
             trkEffectTimeout.Size = new Size(116, 45);
             trkEffectTimeout.TabIndex = 3;
-            toolTip1.SetToolTip(trkEffectTimeout, "After the specified number of seconds, all effects are stopped if no more UDP telemetry is received from export.lua");
+            toolTip1.SetToolTip(trkEffectTimeout, "After the specified number of seconds, sound effects are stopped if no more UDP telemetry is received from export.lua");
             trkEffectTimeout.Value = 1;
             trkEffectTimeout.Scroll += trkEffectTimeout_Scroll;
             // 
@@ -704,13 +704,13 @@
             // 
             panel1.Controls.Add(lblServerThread);
             panel1.Controls.Add(label18);
-            panel1.Controls.Add(label31);
+            panel1.Controls.Add(lblLastFlaps);
             panel1.Controls.Add(label32);
             panel1.Controls.Add(lblDatagramsPerSecond);
             panel1.Controls.Add(label29);
             panel1.Controls.Add(lblProcessingTime);
             panel1.Controls.Add(label27);
-            panel1.Controls.Add(label26);
+            panel1.Controls.Add(lblLastSpeedBrakes);
             panel1.Controls.Add(lblCurrentUnitType);
             panel1.Controls.Add(lblSoundStatus);
             panel1.Controls.Add(label19);
@@ -742,15 +742,15 @@
             label18.TabIndex = 17;
             label18.Text = "UDP Server - Thread ID:";
             // 
-            // label31
+            // lblLastFlaps
             // 
-            label31.AutoSize = true;
-            label31.Location = new Point(288, 132);
-            label31.Name = "label31";
-            label31.Size = new Size(34, 15);
-            label31.TabIndex = 16;
-            label31.Tag = "0";
-            label31.Text = "none";
+            lblLastFlaps.AutoSize = true;
+            lblLastFlaps.Location = new Point(288, 132);
+            lblLastFlaps.Name = "lblLastFlaps";
+            lblLastFlaps.Size = new Size(34, 15);
+            lblLastFlaps.TabIndex = 16;
+            lblLastFlaps.Tag = "0";
+            lblLastFlaps.Text = "none";
             // 
             // label32
             // 
@@ -799,15 +799,15 @@
             label27.TabIndex = 11;
             label27.Text = "Max Processing Time (ms):";
             // 
-            // label26
+            // lblLastSpeedBrakes
             // 
-            label26.AutoSize = true;
-            label26.Location = new Point(288, 106);
-            label26.Name = "label26";
-            label26.Size = new Size(34, 15);
-            label26.TabIndex = 10;
-            label26.Tag = "0";
-            label26.Text = "none";
+            lblLastSpeedBrakes.AutoSize = true;
+            lblLastSpeedBrakes.Location = new Point(288, 106);
+            lblLastSpeedBrakes.Name = "lblLastSpeedBrakes";
+            lblLastSpeedBrakes.Size = new Size(34, 15);
+            lblLastSpeedBrakes.TabIndex = 10;
+            lblLastSpeedBrakes.Tag = "0";
+            lblLastSpeedBrakes.Text = "none";
             // 
             // lblCurrentUnitType
             // 
@@ -1062,12 +1062,12 @@
         private CheckBox chkShowStatistics;
         private Panel panel1;
         private Label lblCurrentUnitType;
-        private Label label26;
+        private Label lblLastSpeedBrakes;
         private Label label29;
         private Label lblProcessingTime;
         private Label label27;
         private Label lblDatagramsPerSecond;
-        private Label label31;
+        private Label lblLastFlaps;
         private Label label32;
         private Label lblVolumeMultiplier2;
         private TrackBar trkVolumeMultiplier2;

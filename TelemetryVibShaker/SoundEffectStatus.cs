@@ -6,7 +6,8 @@ namespace TelemetryVibShaker
         Invalid,
         NotPlaying,
         Ready,
-        Playing, // 1 or 2
+        Playing1, // In AoA
+        Playing2, // Above AoA
         Canceled, // 1 and 2
     }
 
