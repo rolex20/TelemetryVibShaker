@@ -56,6 +56,7 @@ namespace WAV_Test_Player
 
             // create a wave out object and set the device number
             waveOut1 = new WaveOut();
+            waveOut1.Volume = 1.0f; //device-sound, not wavefile
             waveOut1.DeviceNumber = deviceIndex;
 
             // create a wave provider from a file
@@ -68,13 +69,14 @@ namespace WAV_Test_Player
             waveOut1.Init(loopStream1);
 
             // set the initial volume to 100%
-            waveOut1.Volume = tbVolume.Value / 100.0f;
+            waveProvider1.Volume = tbVolume.Value / 100.0f;
 
             waveOut1.Play();
 
 
             // create a wave out object and set the device number
             waveOut2 = new WaveOut();
+            waveOut2.Volume = 1.0f; //device-sound, not wavefile
             waveOut2.DeviceNumber = deviceIndex;
 
             // create a wave provider from a file
@@ -87,7 +89,7 @@ namespace WAV_Test_Player
             waveOut2.Init(loopStream2);
 
             // set the initial volume to 100%
-            waveOut2.Volume = tbVolume2.Value / 100.0f;
+            waveProvider2.Volume = tbVolume2.Value / 100.0f;
 
             waveOut2.Play();
 
@@ -99,8 +101,8 @@ namespace WAV_Test_Player
         {
             lblVolume2.Text = tbVolume2.Value.ToString() + "%";
             float newvolume = tbVolume2.Value / 100.0f;
-            if (waveOut2 != null)
-                waveOut2.Volume = newvolume;
+            if (waveProvider2 != null)
+                waveProvider2.Volume = newvolume;
         }
 
         private void btnStop_Click(object sender, EventArgs e)
@@ -121,8 +123,8 @@ namespace WAV_Test_Player
         {
             lblVolume.Text = tbVolume.Value.ToString() + "%";
             float newvolume = tbVolume.Value / 100.0f;
-            if (waveOut1 != null)
-                waveOut1.Volume = newvolume ;
+            if (waveProvider1 != null)
+                waveProvider1.Volume = newvolume ;
         }  
     }
 }
