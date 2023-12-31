@@ -254,6 +254,18 @@ namespace TelemetryVibShaker
 
         private void frmMain_Load(object sender, EventArgs e)
         {
+            // The TextChanged event is not exposed in the Designer:
+            numMinIntensitySpeedBrakes.TextChanged += numMinIntensitySpeedBrakes_ValueChanged;
+            numMaxIntensitySpeedBrakes.TextChanged += numMaxIntensitySpeedBrakes_ValueChanged;
+            numMinIntensityFlaps.TextChanged += numMinIntensityFlaps_ValueChanged;
+            numMaxIntensityFlaps.TextChanged += numMaxIntensityFlaps_ValueChanged;
+
+            // This tags are used to make sure no double processing is made between _TextChanged and _ValueChanged events
+            numMinIntensitySpeedBrakes.Tag = (long)0;
+            numMaxIntensitySpeedBrakes.Tag = (long)0;
+            numMinIntensityFlaps.Tag = (long)0;
+            numMaxIntensityFlaps.Tag = (long)0;
+
             soundManager = null;
             telemetry = null;
             motorControllers = null;
@@ -274,8 +286,6 @@ namespace TelemetryVibShaker
             updateEffectsTimeout();
 
             lblCurrentUnitType.Tag = string.Empty;
-
-            //            lblLastAoA.Text = string.Empty;
             lblLastAoA.Tag = (float)0.0;
 
             lblDatagramsPerSecond.Text = string.Empty;
@@ -283,13 +293,12 @@ namespace TelemetryVibShaker
             lblServerThread.Text = string.Empty;
 
 
+
             btnStop.Tag = false;
             lblSoundStatus.Tag = SoundEffectStatus.Invalid;
             UpdateSoundEffectStatus(SoundEffectStatus.NotPlaying);
 
-            // Make it easier for the additional UDP listenerUdp thread to update the UI
-            //Label.CheckForIllegalCrossThreadCalls = false;
-            //TextBox.CheckForIllegalCrossThreadCalls = false;
+
 
 
         }
@@ -316,6 +325,9 @@ namespace TelemetryVibShaker
                 UpdateSoundEffectStatus(SoundEffectStatus.NotPlaying);
             }
             telemetry = null;
+            motorControllers = null;
+            arduinoEffects = null;
+
 
 
             // Reenable some controls
@@ -355,7 +367,7 @@ namespace TelemetryVibShaker
         private void PrepareControllers()
         {
             //        private MotorController[] motorControllers; // currently the interface is fixed to 2 (Arduino and TWatch) and each with 2 effects
-            // /       private EffectDefinition[] arduinoEffects;  // currently only two vibration motors connected
+            //        private EffectDefinition[] arduinoEffects;  // currently only two vibration motors connected
             //        private EffectDefinition TWatchEffects; // curently only 1 motor and 1 display connected
 
             motorControllers = new MotorController[2]; // one for Arduino and the other for the TWatch
@@ -509,7 +521,7 @@ namespace TelemetryVibShaker
             if (chkShowStatistics.Checked && telemetry.IsRunning() && tabs.SelectedIndex == 4)
             {
                 // Report sound effectType
-                UpdateSoundEffectStatus(soundManager.Status);                    
+                UpdateSoundEffectStatus(soundManager.Status);
 
                 if (telemetry.LastData.AoA <= 0)
                 {
@@ -572,7 +584,6 @@ namespace TelemetryVibShaker
         private void chkEnableAoASoundEffects1_CheckedChanged(object sender, EventArgs e)
         {
             if (soundManager != null) soundManager.EnableEffect1 = chkEnableAoASoundEffects1.Checked;
-
         }
 
         private void chkEnableAoASoundEffects2_CheckedChanged(object sender, EventArgs e)
@@ -584,12 +595,18 @@ namespace TelemetryVibShaker
         {
             if (arduinoEffects != null)
                 arduinoEffects[0].Enabled = chkVibrateMotorForSpeedBrake.Checked;
+
+            if (motorControllers != null)
+                motorControllers[ARDUINO].Enabled = (chkVibrateMotorForSpeedBrake.Checked || chkVibrateMotorForFlaps.Checked);
         }
 
         private void chkVibrateMotorForFlaps_CheckedChanged(object sender, EventArgs e)
         {
             if (arduinoEffects != null)
                 arduinoEffects[1].Enabled = chkVibrateMotorForFlaps.Checked;
+
+            if (motorControllers != null)
+                motorControllers[ARDUINO].Enabled = (chkVibrateMotorForSpeedBrake.Checked || chkVibrateMotorForFlaps.Checked);
         }
         private void chkTWatchVibrate_CheckedChanged(object sender, EventArgs e)
         {
@@ -603,6 +620,94 @@ namespace TelemetryVibShaker
                 TWatchEffects[1].Enabled = chkTWatchDisplayBackground.Checked;
         }
 
+        private void UpdateIntensity(NumericUpDown control, EffectDefinition[] effects, int index, float min, float max)
+        {
+            long now = Environment.TickCount64 / 100; // if you type too fast, you might need to decrease this value
+            if ((long)control.Tag == now) return;  // don't do this twice (one for _ValueChanged and another one for _TextChanged)
+            control.Tag = now; // update the timestamp of the last time we updated the value
+
+            if (effects != null)
+            {
+                // Speed brake data points
+                MotorStrengthPoints points = new MotorStrengthPoints(1, min, 5, min, 6, min, 100, max);
+                effects[index].UpdatePoints(points);
+            }
+            Debug.Print(control.Value.ToString());
+        }
+
+        private void numMinIntensitySpeedBrakes_ValueChanged(object sender, EventArgs e)
+        {
+            NumericUpDown nud = (NumericUpDown)sender;
+            UpdateIntensity((NumericUpDown)nud, arduinoEffects, 0, (float)nud.Value, (float)numMaxIntensitySpeedBrakes.Value);
+            return;
+
+            long now = Environment.TickCount64 / 100;
+            if ((long)numMinIntensitySpeedBrakes.Tag == now) return;  // don't do this twice (one for _ValueChanged and another one for _TextChanged)
+            numMinIntensitySpeedBrakes.Tag = now;
+
+            if (arduinoEffects != null)
+            {
+                // Speed brake data points
+                MotorStrengthPoints points = new MotorStrengthPoints(1, (float)numMinIntensitySpeedBrakes.Value, 5, (float)numMinIntensitySpeedBrakes.Value, 6, (float)numMinIntensitySpeedBrakes.Value, 100, (float)numMaxIntensitySpeedBrakes.Value);
+                arduinoEffects[0].UpdatePoints(points);
+            }
+            Debug.Print(numMinIntensitySpeedBrakes.Value.ToString());
+        }
+
+        private void numMaxIntensitySpeedBrakes_ValueChanged(object sender, EventArgs e)
+        {
+            NumericUpDown nud = (NumericUpDown)sender;
+            UpdateIntensity((NumericUpDown)nud, arduinoEffects, 0, (float)numMinIntensitySpeedBrakes.Value, (float)nud.Value);
+            return;
+
+            long now = Environment.TickCount64 / 500;
+            if ((long)numMaxIntensitySpeedBrakes.Tag == now) return;  // don't do this twice (one for _ValueChanged and another one for _TextChanged)
+            numMaxIntensitySpeedBrakes.Tag = now;
+
+            if (arduinoEffects != null)
+            {
+                // Speed brake data points
+                MotorStrengthPoints points = new MotorStrengthPoints(1, (float)numMinIntensitySpeedBrakes.Value, 5, (float)numMinIntensitySpeedBrakes.Value, 6, (float)numMinIntensitySpeedBrakes.Value, 100, (float)numMaxIntensitySpeedBrakes.Value);
+                arduinoEffects[0].UpdatePoints(points);
+            }
+        }
+
+        private void numMinIntensityFlaps_ValueChanged(object sender, EventArgs e)
+        {
+            NumericUpDown nud = (NumericUpDown)sender;
+            UpdateIntensity((NumericUpDown)nud, arduinoEffects, 1, (float)nud.Value, (float)numMaxIntensityFlaps.Value);
+            return;
+
+
+            long now = Environment.TickCount64 / 500;
+            if ((long)numMinIntensityFlaps.Tag == now) return;  // don't do this twice (one for _ValueChanged and another one for _TextChanged)
+            numMinIntensityFlaps.Tag = now;
+
+            if (arduinoEffects != null)
+            {
+                // Flaps data points
+                MotorStrengthPoints points = new MotorStrengthPoints(1, (float)numMinIntensityFlaps.Value, 5, (float)numMinIntensityFlaps.Value, 6, (float)numMinIntensityFlaps.Value, 100, (float)numMaxIntensityFlaps.Value);
+                arduinoEffects[1].UpdatePoints(points);
+            }
+        }
+
+        private void numMaxIntensityFlaps_ValueChanged(object sender, EventArgs e)
+        {
+            NumericUpDown nud = (NumericUpDown)sender;
+            UpdateIntensity((NumericUpDown)nud, arduinoEffects, 1, (float)numMinIntensityFlaps.Value, (float)nud.Value);
+            return;
+
+            long now = Environment.TickCount64 / 500;
+            if ((long)numMaxIntensityFlaps.Tag == now) return;  // don't do this twice (one for _ValueChanged and another one for _TextChanged)
+            numMaxIntensityFlaps.Tag = now;
+
+            if (arduinoEffects != null)
+            {
+                // Flaps data points
+                MotorStrengthPoints points = new MotorStrengthPoints(1, (float)numMinIntensityFlaps.Value, 5, (float)numMinIntensityFlaps.Value, 6, (float)numMinIntensityFlaps.Value, 100, (float)numMaxIntensityFlaps.Value);
+                arduinoEffects[1].UpdatePoints(points);
+            }
+        }
 
     }
 }

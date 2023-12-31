@@ -408,19 +408,23 @@
             numMaxIntensityFlaps.Name = "numMaxIntensityFlaps";
             numMaxIntensityFlaps.Size = new Size(106, 23);
             numMaxIntensityFlaps.TabIndex = 21;
+            numMaxIntensityFlaps.Tag = "";
             toolTip1.SetToolTip(numMaxIntensityFlaps, "Intensity of the vibration when the speed brakes are deployed at its maximum range.");
             numMaxIntensityFlaps.Value = new decimal(new int[] { 255, 0, 0, 0 });
+            numMaxIntensityFlaps.ValueChanged += numMaxIntensityFlaps_ValueChanged;
             // 
             // numMinIntensityFlaps
             // 
             numMinIntensityFlaps.Location = new Point(134, 209);
             numMinIntensityFlaps.Maximum = new decimal(new int[] { 255, 0, 0, 0 });
-            numMinIntensityFlaps.Minimum = new decimal(new int[] { 50, 0, 0, 0 });
+            numMinIntensityFlaps.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numMinIntensityFlaps.Name = "numMinIntensityFlaps";
             numMinIntensityFlaps.Size = new Size(106, 23);
             numMinIntensityFlaps.TabIndex = 20;
+            numMinIntensityFlaps.Tag = "";
             toolTip1.SetToolTip(numMinIntensityFlaps, "Intensity of the vibration when the speed brakes are deployed at its initial stage.");
             numMinIntensityFlaps.Value = new decimal(new int[] { 100, 0, 0, 0 });
+            numMinIntensityFlaps.ValueChanged += numMinIntensityFlaps_ValueChanged;
             // 
             // label8
             // 
@@ -442,6 +446,8 @@
             // 
             // chkVibrateMotorForFlaps
             // 
+            chkVibrateMotorForFlaps.Checked = true;
+            chkVibrateMotorForFlaps.CheckState = CheckState.Checked;
             chkVibrateMotorForFlaps.Location = new Point(11, 165);
             chkVibrateMotorForFlaps.Name = "chkVibrateMotorForFlaps";
             chkVibrateMotorForFlaps.Size = new Size(486, 41);
@@ -458,19 +464,23 @@
             numMaxIntensitySpeedBrakes.Name = "numMaxIntensitySpeedBrakes";
             numMaxIntensitySpeedBrakes.Size = new Size(106, 23);
             numMaxIntensitySpeedBrakes.TabIndex = 16;
+            numMaxIntensitySpeedBrakes.Tag = "";
             toolTip1.SetToolTip(numMaxIntensitySpeedBrakes, "Intensity of the vibration when the speed brakes are deployed at its maximum range.");
             numMaxIntensitySpeedBrakes.Value = new decimal(new int[] { 255, 0, 0, 0 });
+            numMaxIntensitySpeedBrakes.ValueChanged += numMaxIntensitySpeedBrakes_ValueChanged;
             // 
             // numMinIntensitySpeedBrakes
             // 
             numMinIntensitySpeedBrakes.Location = new Point(134, 122);
             numMinIntensitySpeedBrakes.Maximum = new decimal(new int[] { 255, 0, 0, 0 });
-            numMinIntensitySpeedBrakes.Minimum = new decimal(new int[] { 50, 0, 0, 0 });
+            numMinIntensitySpeedBrakes.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numMinIntensitySpeedBrakes.Name = "numMinIntensitySpeedBrakes";
             numMinIntensitySpeedBrakes.Size = new Size(106, 23);
             numMinIntensitySpeedBrakes.TabIndex = 15;
+            numMinIntensitySpeedBrakes.Tag = "";
             toolTip1.SetToolTip(numMinIntensitySpeedBrakes, "Intensity of the vibration when the speed brakes are deployed at its initial stage.");
             numMinIntensitySpeedBrakes.Value = new decimal(new int[] { 100, 0, 0, 0 });
+            numMinIntensitySpeedBrakes.ValueChanged += numMinIntensitySpeedBrakes_ValueChanged;
             // 
             // label7
             // 

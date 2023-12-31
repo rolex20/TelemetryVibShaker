@@ -13,7 +13,12 @@ namespace TelemetryVibShaker
             this.Enabled = Enabled;
             effectType = Effect;
             points = Points;
-        }       
+        }
+
+        public void UpdatePoints(MotorStrengthPoints Points)
+        {
+            points = Points;
+        }
 
 
         public void ChangeAoARange(int AoA1, int AoA2)
