@@ -1,4 +1,6 @@
 ﻿
+using System.Diagnostics;
+
 namespace TelemetryVibShaker
 {
     // This is a specialized class to manage AoA sound effects
@@ -50,6 +52,11 @@ namespace TelemetryVibShaker
         private float lastVolume2; // cached volume for mp2
 
 
+        public void makeitsound1()
+        {
+            mp2.Volume = 0.8f;
+        }
+        
         public AoA_SoundManager(String sound1, String sound2, float VolAmplifier1, float VolAmplifier2, int AudioDeviceIndex)
         {
             Status = SoundEffectStatus.NotPlaying;
@@ -57,17 +64,17 @@ namespace TelemetryVibShaker
             mp1 = new MediaPlayer(AudioDeviceIndex);
             mp1.Open(sound1);
             lastVolume1 = 0.0f;
-            mp1.Volume = 0.0f;
-            mp1.PlayLooping();
-
-            mp2 = new MediaPlayer(AudioDeviceIndex);
-            mp2.Open(sound1);
-            lastVolume2 = 0.0f;
-            mp2.Volume = 0.0f;
-            mp2.PlayLooping();
-
+            //mp1.Volume = lastVolume1;  // redundant, below is reassigned
             VolumeAmplifier1 = VolAmplifier1;
+            mp1.PlayLooping();
+            
+            mp2 = new MediaPlayer(AudioDeviceIndex);
+            mp2.Open(sound2);
+            lastVolume2 = 0.0f;
+            //mp2.Volume = lastVolume2;  // redundant, below is reassigned
             VolumeAmplifier2 = VolAmplifier2;
+            mp2.PlayLooping();            
+
 
             // Basically ignore the limits, because the unit type is not known at this point
             AoA1 = 360;

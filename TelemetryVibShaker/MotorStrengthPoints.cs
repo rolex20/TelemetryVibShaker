@@ -123,9 +123,11 @@ namespace TelemetryVibShaker
         {
             x2 = AoA1;
             x3 = AoA2;
+            x4 = x3 + 1; // reassign this value based on the new x3
 
             // recalculate cached slopes
             m1 = SolveSlope(x2, y2, x3, y3);
+            m2 = SolveSlope(x4, y4, x5, y5);
         }
     }
 }

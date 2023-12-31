@@ -11,15 +11,21 @@ namespace TelemetryVibShaker
         }
 
         private float volume; // the backing field
-        public float Volume // Valid values between 0 and 1
+        public float Volume // Valid values between 0.0f and 1.0f
         {
             get { return volume; }
-            set { if (value>=0.0f && value<=1.0f) volume = value; }
+            set {
+                    volume = value; 
+                    if (waveProvider != null)
+                        waveProvider.Volume = volume; 
+            }
         }
 
         private WaveOut? waveOut = null;
         private int deviceIndex = 0;
         private String? audioFile= null;
+        private AudioFileReader? waveProvider = null;
+        private LoopStream? loopStream = null;
         public void Open(string AudioFilePath)
         {
             audioFile = AudioFilePath;
@@ -31,10 +37,11 @@ namespace TelemetryVibShaker
             waveOut = new WaveOut();
             waveOut.DeviceNumber = deviceIndex;
             
-            var waveProvider = new AudioFileReader(audioFile); // create a wave provider from a file
-            var loopStream = new LoopStream(waveProvider); // create a loop stream from the wave provider
+            waveProvider = new AudioFileReader(audioFile); // create a wave provider from a file
+            loopStream = new LoopStream(waveProvider); // create a loop stream from the wave provider
             waveOut.Init(loopStream); // initialize the wave out object with the loop stream
-            waveOut.Volume = volume; // set the initial volume
+            waveOut.Volume = 1.0f; // this is the volume of the whole device, don't use this to control each sound
+            waveProvider.Volume = volume; // this is what should be used to control the volume of each sound file
             waveOut.Play();
         }
 

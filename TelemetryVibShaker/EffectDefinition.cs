@@ -17,8 +17,8 @@ namespace TelemetryVibShaker
 
 
         public void ChangeAoARange(int AoA1, int AoA2)
-        {           
-            points.ChangeAoARange(AoA1, AoA2);
+        {
+            if (effectType == VibrationEffectType.AoA || effectType == VibrationEffectType.BackgroundAoA) points.ChangeAoARange(AoA1, AoA2);
         }
 
 

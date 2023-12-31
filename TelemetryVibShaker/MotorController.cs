@@ -25,7 +25,7 @@ namespace TelemetryVibShaker
 
         public void Connect()
         {
-            UdpClient udpSender = new UdpClient();
+            udpSender = new UdpClient();
             udpSender.Connect(serverIP, serverPort);
             connected = true;
         }
@@ -44,6 +44,7 @@ namespace TelemetryVibShaker
 
                 // send the message
                 // the destination is defined by the call to .Connect()
+                // for now, lets ignore the connected field.  anyways this fails if not connected
                 udpSender.BeginSend(datagram, datagram.Length, new AsyncCallback(SendCallback), udpSender);
             }
         }
@@ -57,7 +58,7 @@ namespace TelemetryVibShaker
         public void ChangeAoARange(int AoA1, int AoA2)
         {
             for(int i=0; i< effect.Length;i++)
-                effect[i].ChangeAoARange(AoA1, AoA2);
+                effect[i].ChangeAoARange(AoA1, AoA2); //ChangeAoARange() will check if this is an AoA type of effect
         }
 
         

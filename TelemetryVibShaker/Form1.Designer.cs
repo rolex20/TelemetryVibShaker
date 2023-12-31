@@ -745,7 +745,7 @@
             // lblLastFlaps
             // 
             lblLastFlaps.AutoSize = true;
-            lblLastFlaps.Location = new Point(288, 132);
+            lblLastFlaps.Location = new Point(318, 132);
             lblLastFlaps.Name = "lblLastFlaps";
             lblLastFlaps.Size = new Size(34, 15);
             lblLastFlaps.TabIndex = 16;
@@ -755,7 +755,7 @@
             // label32
             // 
             label32.AutoSize = true;
-            label32.Location = new Point(203, 132);
+            label32.Location = new Point(233, 132);
             label32.Name = "label32";
             label32.Size = new Size(37, 15);
             label32.TabIndex = 15;
@@ -789,6 +789,7 @@
             lblProcessingTime.TabIndex = 12;
             lblProcessingTime.Tag = "0";
             lblProcessingTime.Text = "time";
+            toolTip1.SetToolTip(lblProcessingTime, "This value is tracked for each different UnitType");
             // 
             // label27
             // 
@@ -802,7 +803,7 @@
             // lblLastSpeedBrakes
             // 
             lblLastSpeedBrakes.AutoSize = true;
-            lblLastSpeedBrakes.Location = new Point(288, 106);
+            lblLastSpeedBrakes.Location = new Point(318, 106);
             lblLastSpeedBrakes.Name = "lblLastSpeedBrakes";
             lblLastSpeedBrakes.Size = new Size(34, 15);
             lblLastSpeedBrakes.TabIndex = 10;
@@ -816,7 +817,7 @@
             lblCurrentUnitType.Name = "lblCurrentUnitType";
             lblCurrentUnitType.Size = new Size(34, 15);
             lblCurrentUnitType.TabIndex = 9;
-            lblCurrentUnitType.Tag = "0";
+            lblCurrentUnitType.Tag = "none";
             lblCurrentUnitType.Text = "none";
             // 
             // lblSoundStatus
@@ -851,7 +852,7 @@
             // label24
             // 
             label24.AutoSize = true;
-            label24.Location = new Point(203, 106);
+            label24.Location = new Point(233, 106);
             label24.Name = "label24";
             label24.Size = new Size(79, 15);
             label24.TabIndex = 7;

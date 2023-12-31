@@ -180,12 +180,15 @@ namespace TelemetryVibShaker
                     var unit = jsonRoot.units.unit.FirstOrDefault(u => u.typeName == datagram);
                     string lastUnitType = datagram;
 
+                    LastData.AoA = -1; // Signal that we haven't received yet new AoA telemetry
+                    MaxProcessingTime = 0; // Reset MaxProcessingTime with each new airplane
+
                     if (unit != null)  // If found, use the limits defined in the JSON file
                     {
                         soundManager.AoA1 = unit.AoA1;
                         soundManager.AoA2 = unit.AoA2;
                         for (int i = 0; i < vibMotor.Length; i++)
-                            vibMotor[i].ChangeAoARange(unit.AoA1, unit.AoA2);
+                            vibMotor[i].ChangeAoARange(unit.AoA1, unit.AoA2); // ChangeAoARange() will check if this is an AoA effect-type
                     }
                     else  // basically ignore the limits, because the unit type was not found in the JSON File
                     {
