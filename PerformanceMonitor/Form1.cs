@@ -9,7 +9,10 @@ namespace PerformanceMonitor
     public partial class frmMain : Form
     {
         private  PerformanceCounter cpuCounter0, cpuCounter1, cpuCounter2, cpuCounter3, cpuCounter4, cpuCounter5, cpuCounter6, cpuCounter7, cpuCounter8, cpuCounter9, cpuCounter10, cpuCounter11, cpuCounter12, cpuCounter13, cpuCounter14, cpuCounter15, cpuCounter16, cpuCounter17, cpuCounter18,cpuCounter19;
-
+        private PerformanceCounter diskCounterC, diskCounterN, diskCounterR;
+        private  PerformanceCounter gpuCounter;
+        private Stopwatch stopwatch;
+        private long ExCounter;  // Exceptions Counter
         private void btnGPU_Click(object sender, EventArgs e)
         {
             txtCounterName.Visible = false;
@@ -29,9 +32,7 @@ namespace PerformanceMonitor
             txtCounterName.Visible = true;
         }
 
-        private PerformanceCounter diskCounterC, diskCounterN, diskCounterR;
-        private  PerformanceCounter gpuCounter;
-        private Stopwatch stopwatch;
+
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint GetCurrentProcessorNumber();
@@ -52,6 +53,9 @@ namespace PerformanceMonitor
             lblMaxDiskR.Tag = 0.0f;
 
             lblMaxLoopTime.Tag = 0L;
+
+            lblExceptions.Tag = 0L;
+            ExCounter = 0L;
         }
         private void frmMain_Load(object sender, EventArgs e)
         {
@@ -97,6 +101,7 @@ namespace PerformanceMonitor
             catch (Exception ex)
             {
                 f = 0.0f;
+                ExCounter++;              
             }
            
             int v = (int)f;
@@ -118,6 +123,7 @@ namespace PerformanceMonitor
             catch (Exception ex)
             {
                 result = 0.0f;
+                ExCounter++;
             }
 
             if ((float)diskLabel.Tag != result)
@@ -167,7 +173,11 @@ namespace PerformanceMonitor
                 UpdateDisk(diskCounterN, lblDiskN, lblMaxDiskN);
                 UpdateDisk(diskCounterR, lblDiskR, lblMaxDiskR);
 
-
+                if (ExCounter != (long)lblExceptions.Tag)
+                {
+                    lblExceptions.Tag = ExCounter;
+                    lblExceptions.Text = ExCounter.ToString();
+                }
 
             stopwatch.Stop();
 

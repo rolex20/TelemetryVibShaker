@@ -121,6 +121,8 @@
             this.txtCategory = new System.Windows.Forms.TextBox();
             this.txtCounterName = new System.Windows.Forms.TextBox();
             this.btnGPU = new System.Windows.Forms.Button();
+            this.label36 = new System.Windows.Forms.Label();
+            this.lblExceptions = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -978,11 +980,32 @@
             this.btnGPU.Visible = false;
             this.btnGPU.Click += new System.EventHandler(this.btnGPU_Click);
             // 
+            // label36
+            // 
+            this.label36.AutoSize = true;
+            this.label36.Location = new System.Drawing.Point(640, 408);
+            this.label36.Name = "label36";
+            this.label36.Size = new System.Drawing.Size(65, 13);
+            this.label36.TabIndex = 93;
+            this.label36.Text = "Exceptions: ";
+            // 
+            // lblExceptions
+            // 
+            this.lblExceptions.AutoSize = true;
+            this.lblExceptions.Location = new System.Drawing.Point(710, 407);
+            this.lblExceptions.Name = "lblExceptions";
+            this.lblExceptions.Size = new System.Drawing.Size(16, 13);
+            this.lblExceptions.TabIndex = 94;
+            this.lblExceptions.Tag = "0";
+            this.lblExceptions.Text = "---";
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(825, 445);
+            this.Controls.Add(this.lblExceptions);
+            this.Controls.Add(this.label36);
             this.Controls.Add(this.btnGPU);
             this.Controls.Add(this.txtCounterName);
             this.Controls.Add(this.txtCategory);
@@ -1177,6 +1200,8 @@
         private System.Windows.Forms.TextBox txtCategory;
         private System.Windows.Forms.TextBox txtCounterName;
         private System.Windows.Forms.Button btnGPU;
+        private System.Windows.Forms.Label label36;
+        private System.Windows.Forms.Label lblExceptions;
     }
 }
 
