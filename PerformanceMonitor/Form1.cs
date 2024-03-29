@@ -59,6 +59,17 @@ namespace PerformanceMonitor
         }
         private void frmMain_Load(object sender, EventArgs e)
         {
+            // Get the current process
+            Process process = Process.GetCurrentProcess();
+
+            // Define the CPU affinity mask for CPUs 17 to 20
+            // CPUs are zero-indexed, so CPU 17 is represented by bit 16, and so on.
+            IntPtr affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
+
+            // Set the CPU affinity
+            process.ProcessorAffinity = affinityMask;
+
+
             ResetMaxCounters();
 
             gpuCounter = new PerformanceCounter("GPU", "% GPU Time", "_total");
