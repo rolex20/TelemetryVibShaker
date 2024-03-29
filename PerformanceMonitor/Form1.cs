@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Diagnostics;
+using Microsoft.Win32;
 
 
 namespace PerformanceMonitor
@@ -59,16 +60,28 @@ namespace PerformanceMonitor
         }
         private void frmMain_Load(object sender, EventArgs e)
         {
-            // Get the current process
-            Process process = Process.GetCurrentProcess();
 
-            // Define the CPU affinity mask for CPUs 17 to 20
-            // CPUs are zero-indexed, so CPU 17 is represented by bit 16, and so on.
-            IntPtr affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
+            // Open the registry key for the processor
+            RegistryKey regKey = Registry.LocalMachine.OpenSubKey("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0");
 
-            // Set the CPU affinity
-            process.ProcessorAffinity = affinityMask;
+            // Read the processor name from the registry
+            string processorName = regKey.GetValue("ProcessorNameString").ToString();
 
+            // Check if the processor name contains "Intel 12700K"
+            if (processorName.Contains("12700K"))
+            {
+
+                // Get the current process
+                Process process = Process.GetCurrentProcess();
+
+                // Define the CPU affinity mask for CPUs 17 to 20
+                // CPUs are zero-indexed, so CPU 17 is represented by bit 16, and so on.
+                IntPtr affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
+
+                // Set the CPU affinity
+                process.ProcessorAffinity = affinityMask;
+            }
+            regKey.Close();
 
             ResetMaxCounters();
 
