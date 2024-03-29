@@ -19,7 +19,7 @@ namespace PerformanceMonitor
             txtCategory.Visible = false;
             btnGPU.Visible = false;
 
-            gpuCounter = new PerformanceCounter(txtCategory.Text, txtCounterName.Text, true);
+            gpuCounter = new PerformanceCounter("GPU", txtCategory.Text, txtCounterName.Text, true);
         }
 
         private void pbGPU0_Click(object sender, EventArgs e)
@@ -61,11 +61,11 @@ namespace PerformanceMonitor
         {
             ResetMaxCounters();
 
-            gpuCounter = new PerformanceCounter("GPU Engine", "Utilization Percentage");
+            gpuCounter = new PerformanceCounter("GPU", "% GPU Time", "_total");
 
             diskCounterC = new PerformanceCounter("PhysicalDisk", "Disk Bytes/sec", "0 C:", true);
-            diskCounterN = new PerformanceCounter("PhysicalDisk", "Disk Bytes/sec", "0 N:", true);
-            diskCounterR = new PerformanceCounter("PhysicalDisk", "Disk Bytes/sec", "0 R:", true);
+            diskCounterN = new PerformanceCounter("PhysicalDisk", "Disk Bytes/sec", "1 N:", true);
+            diskCounterR = new PerformanceCounter("PhysicalDisk", "Disk Bytes/sec", "2 R:", true);
 
             cpuCounter0 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,0", true);
             cpuCounter1 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,1", true);
