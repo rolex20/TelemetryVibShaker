@@ -971,7 +971,7 @@
             this.txtCounterName.Name = "txtCounterName";
             this.txtCounterName.Size = new System.Drawing.Size(120, 20);
             this.txtCounterName.TabIndex = 91;
-            this.txtCounterName.Text = "_total";
+            this.txtCounterName.Text = "nvidia geforce rtx 4090(01:00)";
             this.txtCounterName.Visible = false;
             // 
             // btnGPU

@@ -99,8 +99,8 @@ namespace PerformanceMonitor
                 // Set the CPU affinity
                 currentProcess.ProcessorAffinity = affinityMask;
 
-                gpuUtilizationCounter = new PerformanceCounter("GPU", "% GPU Time", "_total");
-                gpuFanCounter = new PerformanceCounter("GPU", "% GPU Fan Speed", "_total");
+                gpuUtilizationCounter = new PerformanceCounter("GPU", "% GPU Time", "nvidia geforce rtx 4090(01:00)");
+                gpuFanCounter = new PerformanceCounter("GPU", "% GPU Fan Speed", "nvidia geforce rtx 4090(01:00)");
 
                 lblCPU.Tag = true;  // special tag to indicate that this is a 12700K
             }
@@ -222,7 +222,7 @@ namespace PerformanceMonitor
                 lblCurrentProcessor.Text = processorNumber.ToString();
 
                 UpdateCounter(gpuUtilizationCounter, pbGPU0, lblGPU0);
-                //UpdateCounter(gpuFanCounter, pbGPUFanSpeed, lblGPUFanSpeed);
+                UpdateCounter(gpuFanCounter, pbGPUFanSpeed, lblGPUFanSpeed);
             
                 UpdateCounter(cpuCounter0, pbCPU0, lblCPU0);
                 UpdateCounter(cpuCounter1, pbCPU1, lblCPU1);
