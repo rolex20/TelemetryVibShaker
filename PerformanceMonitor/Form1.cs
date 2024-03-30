@@ -15,6 +15,16 @@ namespace PerformanceMonitor
         private  PerformanceCounter gpuUtilizationCounter, gpuFanCounter;
         private Stopwatch stopwatch;
         private long ExCounter;  // Exceptions Counter
+
+        // Import the GetCurrentThread API
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr GetCurrentThread();
+
+        // Import the SetThreadIdealProcessor API
+        [DllImport("kernel32.dll")]
+        public static extern uint SetThreadIdealProcessor(IntPtr hThread, uint dwIdealProcessor);
+
+
         private void btnGPU_Click(object sender, EventArgs e)
         {
             txtCounterName.Visible = false;
@@ -185,14 +195,12 @@ namespace PerformanceMonitor
                     Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
                     if ((bool)lblCPU.Tag) // special flag equals True when this processor is a 12700K
                     {
-                        // Get the current process
-                        Process currentProcess = Process.GetCurrentProcess();
+                        // Get the pseudo handle for the current thread
+                        IntPtr currentThreadHandle = GetCurrentThread();
 
-                        // Iterate over all threads in the current process
-                        foreach (ProcessThread thread in currentProcess.Threads)
-                            thread.IdealProcessor = 19; // Set the IdealProcessor to 19 for each thread                       
-
-                    }
+                        // Set the ideal processor for the current thread to 19.   GpuPerfCounters is assigned 18
+                        uint previousIdealProcessor = SetThreadIdealProcessor(currentThreadHandle, 19);
+                }
                     timer1.Tag = true;
                 }
 
