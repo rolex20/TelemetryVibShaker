@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Diagnostics;
 using Microsoft.Win32;
+using System.Threading;
 
 
 namespace PerformanceMonitor
@@ -11,7 +12,7 @@ namespace PerformanceMonitor
     {
         private  PerformanceCounter cpuCounter0, cpuCounter1, cpuCounter2, cpuCounter3, cpuCounter4, cpuCounter5, cpuCounter6, cpuCounter7, cpuCounter8, cpuCounter9, cpuCounter10, cpuCounter11, cpuCounter12, cpuCounter13, cpuCounter14, cpuCounter15, cpuCounter16, cpuCounter17, cpuCounter18,cpuCounter19;
         private PerformanceCounter diskCounterC, diskCounterN, diskCounterR;
-        private  PerformanceCounter gpuCounter;
+        private  PerformanceCounter gpuUtilizationCounter, gpuFanCounter;
         private Stopwatch stopwatch;
         private long ExCounter;  // Exceptions Counter
         private void btnGPU_Click(object sender, EventArgs e)
@@ -20,7 +21,7 @@ namespace PerformanceMonitor
             txtCategory.Visible = false;
             btnGPU.Visible = false;
 
-            gpuCounter = new PerformanceCounter("GPU", txtCategory.Text, txtCounterName.Text, true);
+            gpuUtilizationCounter = new PerformanceCounter("GPU", txtCategory.Text, txtCounterName.Text, true);
         }
 
         private void pbGPU0_Click(object sender, EventArgs e)
@@ -60,6 +61,9 @@ namespace PerformanceMonitor
         }
         private void frmMain_Load(object sender, EventArgs e)
         {
+            ResetMaxCounters();
+
+            timer1.Tag = false;
 
             // Open the registry key for the processor
             RegistryKey regKey = Registry.LocalMachine.OpenSubKey("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0");
@@ -67,25 +71,34 @@ namespace PerformanceMonitor
             // Read the processor name from the registry
             string processorName = regKey.GetValue("ProcessorNameString").ToString();
 
+            // Get the current process
+            Process currentProcess = Process.GetCurrentProcess();
+
             // Check if the processor name contains "Intel 12700K"
             if (processorName.Contains("12700K"))
             {
-
-                // Get the current process
-                Process process = Process.GetCurrentProcess();
-
                 // Define the CPU affinity mask for CPUs 17 to 20
                 // CPUs are zero-indexed, so CPU 17 is represented by bit 16, and so on.
                 IntPtr affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
 
                 // Set the CPU affinity
-                process.ProcessorAffinity = affinityMask;
+                currentProcess.ProcessorAffinity = affinityMask;
+
+                gpuUtilizationCounter = new PerformanceCounter("GPU", "% GPU Time", "_total");
+                gpuFanCounter = new PerformanceCounter("GPU", "% GPU Fan Speed", "_total");
+
+                lblCPU.Tag = true;  // special tag to indicate that this is a 12700K
             }
+            else
+            {
+                gpuUtilizationCounter = new PerformanceCounter("GPU Engine", "Utilization Percentage", true);  //Generic for debugging
+                lblCPU.Tag = false; // special tag to indicate that this is a 12700K
+            }
+
             regKey.Close();
 
-            ResetMaxCounters();
-
-            gpuCounter = new PerformanceCounter("GPU", "% GPU Time", "_total");
+            // Change the priority class to BelowNormal
+            currentProcess.PriorityClass = ProcessPriorityClass.BelowNormal;
 
             diskCounterC = new PerformanceCounter("PhysicalDisk", "Disk Bytes/sec", "0 C:", true);
             diskCounterN = new PerformanceCounter("PhysicalDisk", "Disk Bytes/sec", "1 N:", true);
@@ -113,6 +126,7 @@ namespace PerformanceMonitor
             cpuCounter19 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,19", true);
 
             stopwatch = new Stopwatch();
+            timer1.Enabled = chkEnabled.Checked;
         }
 
         private void UpdateCounter(PerformanceCounter cpuCounter, ProgressBar pb, Label lbl)
@@ -166,11 +180,19 @@ namespace PerformanceMonitor
         private void timer1_Tick(object sender, EventArgs e)
         {
             stopwatch.Restart();
+            if (!(bool)timer1.Tag) // only do this once
+            {
+                Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
+                if ((bool)lblCPU.Tag) Process.GetCurrentProcess().Threads[0].IdealProcessor = 19;
+                timer1.Tag = true;
+            }
 
-                uint processorNumber = GetCurrentProcessorNumber();
+
+            uint processorNumber = GetCurrentProcessorNumber();
                 lblCurrentProcessor.Text = processorNumber.ToString();
 
-                UpdateCounter(gpuCounter, pbGPU0, lblGPU0);
+                UpdateCounter(gpuUtilizationCounter, pbGPU0, lblGPU0);
+                UpdateCounter(gpuFanCounter, pbGPUFanSpeed, lblGPUFanSpeed);
             
                 UpdateCounter(cpuCounter0, pbCPU0, lblCPU0);
                 UpdateCounter(cpuCounter1, pbCPU1, lblCPU1);

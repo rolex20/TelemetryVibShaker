@@ -32,7 +32,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.chkEnabled = new System.Windows.Forms.CheckBox();
-            this.label2 = new System.Windows.Forms.Label();
+            this.lblCPU = new System.Windows.Forms.Label();
             this.pbCPU0 = new System.Windows.Forms.ProgressBar();
             this.pbGPU0 = new System.Windows.Forms.ProgressBar();
             this.label4 = new System.Windows.Forms.Label();
@@ -123,6 +123,9 @@
             this.btnGPU = new System.Windows.Forms.Button();
             this.label36 = new System.Windows.Forms.Label();
             this.lblExceptions = new System.Windows.Forms.Label();
+            this.lblGPUFanSpeed = new System.Windows.Forms.Label();
+            this.pbGPUFanSpeed = new System.Windows.Forms.ProgressBar();
+            this.label38 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -138,7 +141,6 @@
             // 
             // timer1
             // 
-            this.timer1.Enabled = true;
             this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
@@ -155,16 +157,16 @@
             this.chkEnabled.UseVisualStyleBackColor = true;
             this.chkEnabled.CheckedChanged += new System.EventHandler(this.chkEnabled_CheckedChanged);
             // 
-            // label2
+            // lblCPU
             // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label2.Location = new System.Drawing.Point(16, 57);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(47, 13);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "CPU[0]";
+            this.lblCPU.AutoSize = true;
+            this.lblCPU.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCPU.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.lblCPU.Location = new System.Drawing.Point(16, 57);
+            this.lblCPU.Name = "lblCPU";
+            this.lblCPU.Size = new System.Drawing.Size(47, 13);
+            this.lblCPU.TabIndex = 2;
+            this.lblCPU.Text = "CPU[0]";
             // 
             // pbCPU0
             // 
@@ -729,7 +731,7 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(571, 314);
+            this.label5.Location = new System.Drawing.Point(572, 313);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(54, 11);
             this.label5.TabIndex = 67;
@@ -739,7 +741,7 @@
             // 
             this.lblDiskC.AutoSize = true;
             this.lblDiskC.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDiskC.Location = new System.Drawing.Point(628, 314);
+            this.lblDiskC.Location = new System.Drawing.Point(629, 313);
             this.lblDiskC.Name = "lblDiskC";
             this.lblDiskC.Size = new System.Drawing.Size(26, 11);
             this.lblDiskC.TabIndex = 68;
@@ -749,7 +751,7 @@
             // 
             this.lblMaxDiskC.AutoSize = true;
             this.lblMaxDiskC.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMaxDiskC.Location = new System.Drawing.Point(708, 314);
+            this.lblMaxDiskC.Location = new System.Drawing.Point(709, 313);
             this.lblMaxDiskC.Name = "lblMaxDiskC";
             this.lblMaxDiskC.Size = new System.Drawing.Size(26, 11);
             this.lblMaxDiskC.TabIndex = 70;
@@ -760,7 +762,7 @@
             // 
             this.label24.AutoSize = true;
             this.label24.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label24.Location = new System.Drawing.Point(672, 314);
+            this.label24.Location = new System.Drawing.Point(673, 313);
             this.label24.Name = "label24";
             this.label24.Size = new System.Drawing.Size(33, 11);
             this.label24.TabIndex = 69;
@@ -770,7 +772,7 @@
             // 
             this.label27.AutoSize = true;
             this.label27.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label27.Location = new System.Drawing.Point(750, 314);
+            this.label27.Location = new System.Drawing.Point(751, 313);
             this.label27.Name = "label27";
             this.label27.Size = new System.Drawing.Size(33, 11);
             this.label27.TabIndex = 71;
@@ -780,7 +782,7 @@
             // 
             this.label28.AutoSize = true;
             this.label28.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label28.Location = new System.Drawing.Point(750, 340);
+            this.label28.Location = new System.Drawing.Point(751, 339);
             this.label28.Name = "label28";
             this.label28.Size = new System.Drawing.Size(33, 11);
             this.label28.TabIndex = 76;
@@ -790,7 +792,7 @@
             // 
             this.lblMaxDiskN.AutoSize = true;
             this.lblMaxDiskN.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMaxDiskN.Location = new System.Drawing.Point(708, 340);
+            this.lblMaxDiskN.Location = new System.Drawing.Point(709, 339);
             this.lblMaxDiskN.Name = "lblMaxDiskN";
             this.lblMaxDiskN.Size = new System.Drawing.Size(26, 11);
             this.lblMaxDiskN.TabIndex = 75;
@@ -801,7 +803,7 @@
             // 
             this.label30.AutoSize = true;
             this.label30.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label30.Location = new System.Drawing.Point(672, 340);
+            this.label30.Location = new System.Drawing.Point(673, 339);
             this.label30.Name = "label30";
             this.label30.Size = new System.Drawing.Size(33, 11);
             this.label30.TabIndex = 74;
@@ -811,7 +813,7 @@
             // 
             this.lblDiskN.AutoSize = true;
             this.lblDiskN.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDiskN.Location = new System.Drawing.Point(628, 340);
+            this.lblDiskN.Location = new System.Drawing.Point(629, 339);
             this.lblDiskN.Name = "lblDiskN";
             this.lblDiskN.Size = new System.Drawing.Size(26, 11);
             this.lblDiskN.TabIndex = 73;
@@ -821,7 +823,7 @@
             // 
             this.label32.AutoSize = true;
             this.label32.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label32.Location = new System.Drawing.Point(571, 340);
+            this.label32.Location = new System.Drawing.Point(572, 339);
             this.label32.Name = "label32";
             this.label32.Size = new System.Drawing.Size(54, 11);
             this.label32.TabIndex = 72;
@@ -831,7 +833,7 @@
             // 
             this.label19.AutoSize = true;
             this.label19.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label19.Location = new System.Drawing.Point(750, 366);
+            this.label19.Location = new System.Drawing.Point(751, 365);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(33, 11);
             this.label19.TabIndex = 81;
@@ -841,7 +843,7 @@
             // 
             this.lblMaxDiskR.AutoSize = true;
             this.lblMaxDiskR.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMaxDiskR.Location = new System.Drawing.Point(708, 366);
+            this.lblMaxDiskR.Location = new System.Drawing.Point(709, 365);
             this.lblMaxDiskR.Name = "lblMaxDiskR";
             this.lblMaxDiskR.Size = new System.Drawing.Size(26, 11);
             this.lblMaxDiskR.TabIndex = 80;
@@ -852,7 +854,7 @@
             // 
             this.label31.AutoSize = true;
             this.label31.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label31.Location = new System.Drawing.Point(672, 366);
+            this.label31.Location = new System.Drawing.Point(673, 365);
             this.label31.Name = "label31";
             this.label31.Size = new System.Drawing.Size(33, 11);
             this.label31.TabIndex = 79;
@@ -862,7 +864,7 @@
             // 
             this.lblDiskR.AutoSize = true;
             this.lblDiskR.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDiskR.Location = new System.Drawing.Point(628, 366);
+            this.lblDiskR.Location = new System.Drawing.Point(629, 365);
             this.lblDiskR.Name = "lblDiskR";
             this.lblDiskR.Size = new System.Drawing.Size(26, 11);
             this.lblDiskR.TabIndex = 78;
@@ -872,7 +874,7 @@
             // 
             this.label34.AutoSize = true;
             this.label34.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label34.Location = new System.Drawing.Point(571, 366);
+            this.label34.Location = new System.Drawing.Point(572, 365);
             this.label34.Name = "label34";
             this.label34.Size = new System.Drawing.Size(54, 11);
             this.label34.TabIndex = 77;
@@ -953,29 +955,29 @@
             // 
             // txtCategory
             // 
-            this.txtCategory.Location = new System.Drawing.Point(562, 261);
+            this.txtCategory.Location = new System.Drawing.Point(564, 16);
             this.txtCategory.Name = "txtCategory";
             this.txtCategory.Size = new System.Drawing.Size(74, 20);
             this.txtCategory.TabIndex = 90;
-            this.txtCategory.Text = "GPU Engine";
+            this.txtCategory.Text = "GPU SM Clock (MHz)";
             this.txtCategory.Visible = false;
             // 
             // txtCounterName
             // 
-            this.txtCounterName.Location = new System.Drawing.Point(641, 261);
+            this.txtCounterName.Location = new System.Drawing.Point(643, 16);
             this.txtCounterName.Name = "txtCounterName";
             this.txtCounterName.Size = new System.Drawing.Size(120, 20);
             this.txtCounterName.TabIndex = 91;
-            this.txtCounterName.Text = "Utilization Percentage";
+            this.txtCounterName.Text = "_total";
             this.txtCounterName.Visible = false;
             // 
             // btnGPU
             // 
-            this.btnGPU.Location = new System.Drawing.Point(767, 261);
+            this.btnGPU.Location = new System.Drawing.Point(769, 16);
             this.btnGPU.Name = "btnGPU";
             this.btnGPU.Size = new System.Drawing.Size(35, 20);
             this.btnGPU.TabIndex = 92;
-            this.btnGPU.Text = "->";
+            this.btnGPU.Text = "→";
             this.btnGPU.UseVisualStyleBackColor = true;
             this.btnGPU.Visible = false;
             this.btnGPU.Click += new System.EventHandler(this.btnGPU_Click);
@@ -999,11 +1001,43 @@
             this.lblExceptions.Tag = "0";
             this.lblExceptions.Text = "---";
             // 
+            // lblGPUFanSpeed
+            // 
+            this.lblGPUFanSpeed.AutoSize = true;
+            this.lblGPUFanSpeed.Location = new System.Drawing.Point(789, 270);
+            this.lblGPUFanSpeed.Name = "lblGPUFanSpeed";
+            this.lblGPUFanSpeed.Size = new System.Drawing.Size(13, 13);
+            this.lblGPUFanSpeed.TabIndex = 97;
+            this.lblGPUFanSpeed.Text = "--";
+            // 
+            // pbGPUFanSpeed
+            // 
+            this.pbGPUFanSpeed.Location = new System.Drawing.Point(627, 264);
+            this.pbGPUFanSpeed.Name = "pbGPUFanSpeed";
+            this.pbGPUFanSpeed.Size = new System.Drawing.Size(156, 23);
+            this.pbGPUFanSpeed.TabIndex = 96;
+            this.pbGPUFanSpeed.Tag = "Utilization Percentage";
+            // 
+            // label38
+            // 
+            this.label38.AutoSize = true;
+            this.label38.Font = new System.Drawing.Font("Arial Rounded MT Bold", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label38.ForeColor = System.Drawing.Color.YellowGreen;
+            this.label38.Location = new System.Drawing.Point(583, 268);
+            this.label38.Name = "label38";
+            this.label38.Size = new System.Drawing.Size(43, 12);
+            this.label38.TabIndex = 95;
+            this.label38.Tag = "GPU Engine";
+            this.label38.Text = "Fan %";
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(825, 445);
+            this.Controls.Add(this.lblGPUFanSpeed);
+            this.Controls.Add(this.pbGPUFanSpeed);
+            this.Controls.Add(this.label38);
             this.Controls.Add(this.lblExceptions);
             this.Controls.Add(this.label36);
             this.Controls.Add(this.btnGPU);
@@ -1093,12 +1127,14 @@
             this.Controls.Add(this.lblCPU0);
             this.Controls.Add(this.pbGPU0);
             this.Controls.Add(this.pbCPU0);
-            this.Controls.Add(this.label2);
+            this.Controls.Add(this.lblCPU);
             this.Controls.Add(this.chkEnabled);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.label4);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.MaximizeBox = false;
             this.Name = "frmMain";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "Performance Monitor Light";
             this.Load += new System.EventHandler(this.frmMain_Load);
             this.ResumeLayout(false);
@@ -1111,7 +1147,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.CheckBox chkEnabled;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label lblCPU;
         private System.Windows.Forms.ProgressBar pbCPU0;
         private System.Windows.Forms.ProgressBar pbGPU0;
         private System.Windows.Forms.Label label4;
@@ -1202,6 +1238,9 @@
         private System.Windows.Forms.Button btnGPU;
         private System.Windows.Forms.Label label36;
         private System.Windows.Forms.Label lblExceptions;
+        private System.Windows.Forms.Label lblGPUFanSpeed;
+        private System.Windows.Forms.ProgressBar pbGPUFanSpeed;
+        private System.Windows.Forms.Label label38;
     }
 }
 
