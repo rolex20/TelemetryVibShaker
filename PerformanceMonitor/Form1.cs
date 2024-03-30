@@ -180,12 +180,21 @@ namespace PerformanceMonitor
         private void timer1_Tick(object sender, EventArgs e)
         {
             stopwatch.Restart();
-            if (!(bool)timer1.Tag) // only do this once
-            {
-                Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
-                if ((bool)lblCPU.Tag) Process.GetCurrentProcess().Threads[0].IdealProcessor = 19;
-                timer1.Tag = true;
-            }
+                if (!(bool)timer1.Tag) // only do this once
+                {
+                    Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
+                    if ((bool)lblCPU.Tag) // special flag equals True when this processor is a 12700K
+                    {
+                        // Get the current process
+                        Process currentProcess = Process.GetCurrentProcess();
+
+                        // Iterate over all threads in the current process
+                        foreach (ProcessThread thread in currentProcess.Threads)
+                            thread.IdealProcessor = 19; // Set the IdealProcessor to 19 for each thread                       
+
+                    }
+                    timer1.Tag = true;
+                }
 
 
             uint processorNumber = GetCurrentProcessorNumber();
