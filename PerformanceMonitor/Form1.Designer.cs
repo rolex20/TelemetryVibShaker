@@ -170,13 +170,16 @@
             // 
             // pbCPU0
             // 
+            this.pbCPU0.BackColor = System.Drawing.SystemColors.Control;
             this.pbCPU0.Location = new System.Drawing.Point(65, 53);
             this.pbCPU0.Name = "pbCPU0";
             this.pbCPU0.Size = new System.Drawing.Size(156, 23);
             this.pbCPU0.TabIndex = 3;
+            this.pbCPU0.Value = 50;
             // 
             // pbGPU0
             // 
+            this.pbGPU0.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pbGPU0.Location = new System.Drawing.Point(627, 223);
             this.pbGPU0.Name = "pbGPU0";
             this.pbGPU0.Size = new System.Drawing.Size(156, 23);
@@ -1131,6 +1134,7 @@
             this.Controls.Add(this.chkEnabled);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.label4);
+            this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.MaximizeBox = false;
             this.Name = "frmMain";

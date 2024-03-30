@@ -4,6 +4,8 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using Microsoft.Win32;
 using System.Threading;
+using System.Drawing;
+using System.Linq;
 
 
 namespace PerformanceMonitor
@@ -68,9 +70,12 @@ namespace PerformanceMonitor
 
             lblExceptions.Tag = 0L;
             ExCounter = 0L;
+
+
         }
         private void frmMain_Load(object sender, EventArgs e)
         {
+            InitializeTags();
             ResetMaxCounters();
 
             timer1.Tag = false;
@@ -144,7 +149,7 @@ namespace PerformanceMonitor
             float f;
             try
             {
-                f = cpuCounter.NextValue();
+                f = cpuCounter.NextValue() ;
             }
             catch (Exception ex)
             {
@@ -154,9 +159,17 @@ namespace PerformanceMonitor
            
             int v = (int)f;
 
-            if (pb.Value != v)
+            if ((int)lbl.Tag != v)
             {
-                pb.Value = v;
+                lbl.Tag = v;
+
+                System.Drawing.Color color = f <= 100.0f ? (System.Drawing.Color) pb.Tag: System.Drawing.Color.Red;
+                if (pb.ForeColor != color) pb.ForeColor = color;                 
+                pb.Value = v <= 100 ? v : 100;
+
+
+                color = f <= 100.0f ? System.Drawing.Color.Black : System.Drawing.Color.Red;
+                if (lbl.ForeColor != color) lbl.ForeColor = color;
                 lbl.Text = $"{f:F1}%";
             }
         }
@@ -166,7 +179,7 @@ namespace PerformanceMonitor
             float result;
             try
             {
-                result = diskCounter.NextValue() / (1048576.0f);
+                result = diskCounter.NextValue() / (1048576.0f); // show value in MB/s
             }
             catch (Exception ex)
             {
@@ -209,7 +222,7 @@ namespace PerformanceMonitor
                 lblCurrentProcessor.Text = processorNumber.ToString();
 
                 UpdateCounter(gpuUtilizationCounter, pbGPU0, lblGPU0);
-                UpdateCounter(gpuFanCounter, pbGPUFanSpeed, lblGPUFanSpeed);
+                //UpdateCounter(gpuFanCounter, pbGPUFanSpeed, lblGPUFanSpeed);
             
                 UpdateCounter(cpuCounter0, pbCPU0, lblCPU0);
                 UpdateCounter(cpuCounter1, pbCPU1, lblCPU1);
@@ -262,6 +275,32 @@ namespace PerformanceMonitor
         private void button1_Click(object sender, EventArgs e)
         {
             ResetMaxCounters();
+
+        }
+
+        private void InitializeTags()
+        {
+            var labels = this.Controls.OfType<Label>()
+                            .Where(c => (c.Name.StartsWith("lblCPU")) || (c.Name.StartsWith("lblGPU")))
+                            .ToList();
+            foreach (var label in labels)
+            {
+                label.Tag = 0; // Needs initial assignment in UpdateCounters()
+            }
+            //lblGPUFanSpeed.Tag = 0;
+            //lblGPU0.Tag = 0;
+
+
+            var progressbars = this.Controls.OfType<ProgressBar>()
+                            .Where(c => (c.Name.StartsWith("pbCPU")) || (c.Name.StartsWith("pbGPU")))
+                            .ToList();
+            foreach (var progressbar in progressbars)
+            {
+                progressbar.Tag = progressbar.ForeColor; // Save default bar color for use in UpdateCounters()
+            }
+            //pbGPU0.Tag = pbGPU0.ForeColor;
+            //pbGPUFanSpeed.Tag = pbGPUFanSpeed.ForeColor;
+
 
         }
     }
