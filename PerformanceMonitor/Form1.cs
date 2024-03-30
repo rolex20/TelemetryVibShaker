@@ -4,7 +4,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using Microsoft.Win32;
 using System.Threading;
-using System.Drawing;
+using System.ServiceProcess;
 using System.Linq;
 
 
@@ -12,9 +12,15 @@ namespace PerformanceMonitor
 {
     public partial class frmMain : Form
     {
-        private  PerformanceCounter cpuCounter0, cpuCounter1, cpuCounter2, cpuCounter3, cpuCounter4, cpuCounter5, cpuCounter6, cpuCounter7, cpuCounter8, cpuCounter9, cpuCounter10, cpuCounter11, cpuCounter12, cpuCounter13, cpuCounter14, cpuCounter15, cpuCounter16, cpuCounter17, cpuCounter18,cpuCounter19;
+        private PerformanceCounter cpuCounter0, cpuCounter1, cpuCounter2, cpuCounter3, cpuCounter4, cpuCounter5, cpuCounter6, cpuCounter7, cpuCounter8, cpuCounter9, cpuCounter10, cpuCounter11, cpuCounter12, cpuCounter13, cpuCounter14, cpuCounter15, cpuCounter16, cpuCounter17, cpuCounter18, cpuCounter19;
+
+        private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            StopService("GpuPerfCounters");
+        }
+
         private PerformanceCounter diskCounterC, diskCounterN, diskCounterR;
-        private  PerformanceCounter gpuUtilizationCounter, gpuFanCounter;
+        private PerformanceCounter gpuUtilizationCounter, gpuFanCounter;
         private Stopwatch stopwatch;
         private long ExCounter;  // Exceptions Counter
 
@@ -70,15 +76,16 @@ namespace PerformanceMonitor
 
             lblExceptions.Tag = 0L;
             ExCounter = 0L;
-
-
         }
         private void frmMain_Load(object sender, EventArgs e)
         {
+            timer1.Enabled = false;
+            timer1.Tag = false; // flag for one-time control in timer1_Tick()
+            StartService("GpuPerfCounters");
             InitializeTags();
             ResetMaxCounters();
 
-            timer1.Tag = false;
+
 
             // Open the registry key for the processor
             RegistryKey regKey = Registry.LocalMachine.OpenSubKey("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0");
@@ -149,22 +156,22 @@ namespace PerformanceMonitor
             float f;
             try
             {
-                f = cpuCounter.NextValue() ;
+                f = cpuCounter.NextValue();
             }
             catch (Exception ex)
             {
                 f = 0.0f;
-                ExCounter++;              
+                ExCounter++;
             }
-           
+
             int v = (int)f;
 
             if ((int)lbl.Tag != v)
             {
                 lbl.Tag = v;
 
-                System.Drawing.Color color = f <= 100.0f ? (System.Drawing.Color) pb.Tag: System.Drawing.Color.Red;
-                if (pb.ForeColor != color) pb.ForeColor = color;                 
+                System.Drawing.Color color = f <= 100.0f ? (System.Drawing.Color)pb.Tag : System.Drawing.Color.Red;
+                if (pb.ForeColor != color) pb.ForeColor = color;
                 pb.Value = v <= 100 ? v : 100;
 
 
@@ -203,57 +210,57 @@ namespace PerformanceMonitor
         private void timer1_Tick(object sender, EventArgs e)
         {
             stopwatch.Restart();
-                if (!(bool)timer1.Tag) // only do this once
+            if (!(bool)timer1.Tag) // only do this once
+            {
+                Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
+                if ((bool)lblCPU.Tag) // special flag equals True when this processor is a 12700K
                 {
-                    Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
-                    if ((bool)lblCPU.Tag) // special flag equals True when this processor is a 12700K
-                    {
-                        // Get the pseudo handle for the current thread
-                        IntPtr currentThreadHandle = GetCurrentThread();
+                    // Get the pseudo handle for the current thread
+                    IntPtr currentThreadHandle = GetCurrentThread();
 
-                        // Set the ideal processor for the current thread to 19.   GpuPerfCounters is assigned 18
-                        uint previousIdealProcessor = SetThreadIdealProcessor(currentThreadHandle, 19);
+                    // Set the ideal processor for the current thread to 19.   GpuPerfCounters is assigned 18
+                    uint previousIdealProcessor = SetThreadIdealProcessor(currentThreadHandle, 19);
                 }
-                    timer1.Tag = true;
-                }
+                timer1.Tag = true;  // flag for one-time control in timer1_Tick()
+            }
 
 
             uint processorNumber = GetCurrentProcessorNumber();
-                lblCurrentProcessor.Text = processorNumber.ToString();
+            lblCurrentProcessor.Text = processorNumber.ToString();
 
-                UpdateCounter(gpuUtilizationCounter, pbGPU0, lblGPU0);
-                UpdateCounter(gpuFanCounter, pbGPUFanSpeed, lblGPUFanSpeed);
-            
-                UpdateCounter(cpuCounter0, pbCPU0, lblCPU0);
-                UpdateCounter(cpuCounter1, pbCPU1, lblCPU1);
-                UpdateCounter(cpuCounter2, pbCPU2, lblCPU2);
-                UpdateCounter(cpuCounter3, pbCPU3, lblCPU3);
-                UpdateCounter(cpuCounter4, pbCPU4, lblCPU4);
-                UpdateCounter(cpuCounter5, pbCPU5, lblCPU5);
-                UpdateCounter(cpuCounter6, pbCPU6, lblCPU6);
-                UpdateCounter(cpuCounter7, pbCPU7, lblCPU7);
-                UpdateCounter(cpuCounter8, pbCPU8, lblCPU8);
-                UpdateCounter(cpuCounter9, pbCPU9, lblCPU9);
-                UpdateCounter(cpuCounter10, pbCPU10, lblCPU10);
-                UpdateCounter(cpuCounter11, pbCPU11, lblCPU11);
-                UpdateCounter(cpuCounter12, pbCPU12, lblCPU12);
-                UpdateCounter(cpuCounter13, pbCPU13, lblCPU13);
-                UpdateCounter(cpuCounter14, pbCPU14, lblCPU14);
-                UpdateCounter(cpuCounter15, pbCPU15, lblCPU15);
-                UpdateCounter(cpuCounter16, pbCPU16, lblCPU16);
-                UpdateCounter(cpuCounter17, pbCPU17, lblCPU17);
-                UpdateCounter(cpuCounter18, pbCPU18, lblCPU18);
-                UpdateCounter(cpuCounter19, pbCPU18, lblCPU19);
+            UpdateCounter(gpuUtilizationCounter, pbGPU0, lblGPU0);
+            UpdateCounter(gpuFanCounter, pbGPUFanSpeed, lblGPUFanSpeed);
 
-                UpdateDisk(diskCounterC, lblDiskC, lblMaxDiskC);
-                UpdateDisk(diskCounterN, lblDiskN, lblMaxDiskN);
-                UpdateDisk(diskCounterR, lblDiskR, lblMaxDiskR);
+            UpdateCounter(cpuCounter0, pbCPU0, lblCPU0);
+            UpdateCounter(cpuCounter1, pbCPU1, lblCPU1);
+            UpdateCounter(cpuCounter2, pbCPU2, lblCPU2);
+            UpdateCounter(cpuCounter3, pbCPU3, lblCPU3);
+            UpdateCounter(cpuCounter4, pbCPU4, lblCPU4);
+            UpdateCounter(cpuCounter5, pbCPU5, lblCPU5);
+            UpdateCounter(cpuCounter6, pbCPU6, lblCPU6);
+            UpdateCounter(cpuCounter7, pbCPU7, lblCPU7);
+            UpdateCounter(cpuCounter8, pbCPU8, lblCPU8);
+            UpdateCounter(cpuCounter9, pbCPU9, lblCPU9);
+            UpdateCounter(cpuCounter10, pbCPU10, lblCPU10);
+            UpdateCounter(cpuCounter11, pbCPU11, lblCPU11);
+            UpdateCounter(cpuCounter12, pbCPU12, lblCPU12);
+            UpdateCounter(cpuCounter13, pbCPU13, lblCPU13);
+            UpdateCounter(cpuCounter14, pbCPU14, lblCPU14);
+            UpdateCounter(cpuCounter15, pbCPU15, lblCPU15);
+            UpdateCounter(cpuCounter16, pbCPU16, lblCPU16);
+            UpdateCounter(cpuCounter17, pbCPU17, lblCPU17);
+            UpdateCounter(cpuCounter18, pbCPU18, lblCPU18);
+            UpdateCounter(cpuCounter19, pbCPU18, lblCPU19);
 
-                if (ExCounter != (long)lblExceptions.Tag)
-                {
-                    lblExceptions.Tag = ExCounter;
-                    lblExceptions.Text = ExCounter.ToString();
-                }
+            UpdateDisk(diskCounterC, lblDiskC, lblMaxDiskC);
+            UpdateDisk(diskCounterN, lblDiskN, lblMaxDiskN);
+            UpdateDisk(diskCounterR, lblDiskR, lblMaxDiskR);
+
+            if (ExCounter != (long)lblExceptions.Tag)
+            {
+                lblExceptions.Tag = ExCounter;
+                lblExceptions.Text = ExCounter.ToString();
+            }
 
             stopwatch.Stop();
 
@@ -287,8 +294,7 @@ namespace PerformanceMonitor
             {
                 label.Tag = 0; // Needs initial assignment in UpdateCounters()
             }
-            //lblGPUFanSpeed.Tag = 0;
-            //lblGPU0.Tag = 0;
+
 
 
             var progressbars = this.Controls.OfType<ProgressBar>()
@@ -298,10 +304,30 @@ namespace PerformanceMonitor
             {
                 progressbar.Tag = progressbar.ForeColor; // Save default bar color for use in UpdateCounters()
             }
-            //pbGPU0.Tag = pbGPU0.ForeColor;
-            //pbGPUFanSpeed.Tag = pbGPUFanSpeed.ForeColor;
-
-
         }
+
+        private void StartService(string serviceName)
+        {
+            // Create an instance of ServiceController
+            ServiceController serviceController = new ServiceController(serviceName);
+
+            // Check if the service is already running or in the process of starting
+            if (serviceController.Status != ServiceControllerStatus.Running &&
+                serviceController.Status != ServiceControllerStatus.StartPending)
+                // Start the service
+                serviceController.Start();
+        }
+
+        private void StopService(string serviceName)
+        {
+            // Create an instance of ServiceController
+            ServiceController serviceController = new ServiceController(serviceName);
+
+            // Check if the service is already running or in the process of starting
+            if (serviceController.Status == ServiceControllerStatus.Running )
+                // Stop the service
+                serviceController.Stop();
+        }
+
     }
 }
