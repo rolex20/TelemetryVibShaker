@@ -20,6 +20,12 @@ namespace PerformanceMonitor
         }
 
         private PerformanceCounter diskCounterC, diskCounterN, diskCounterR;
+
+        private void lblMaxDiskC_Click(object sender, EventArgs e)
+        {
+
+        }
+
         private PerformanceCounter gpuUtilizationCounter, gpuFanCounter;
         private Stopwatch stopwatch;
         private long ExCounter;  // Exceptions Counter
@@ -210,6 +216,14 @@ namespace PerformanceMonitor
         private void timer1_Tick(object sender, EventArgs e)
         {
             stopwatch.Restart();
+
+            if (chkAutoMoveTop.Checked)
+            {
+                if (this.Top != 10) this.Top = 10;
+                this.TopMost = true;
+            }
+
+
             if (!(bool)timer1.Tag) // only do this once
             {
                 Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
