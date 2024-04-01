@@ -210,18 +210,20 @@
             // lblCPU0
             // 
             this.lblCPU0.AutoSize = true;
+            this.lblCPU0.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU0.Location = new System.Drawing.Point(227, 52);
             this.lblCPU0.Name = "lblCPU0";
-            this.lblCPU0.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU0.Size = new System.Drawing.Size(15, 15);
             this.lblCPU0.TabIndex = 8;
             this.lblCPU0.Text = "--";
             // 
             // lblCPU1
             // 
             this.lblCPU1.AutoSize = true;
+            this.lblCPU1.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU1.Location = new System.Drawing.Point(501, 52);
             this.lblCPU1.Name = "lblCPU1";
-            this.lblCPU1.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU1.Size = new System.Drawing.Size(15, 15);
             this.lblCPU1.TabIndex = 11;
             this.lblCPU1.Text = "--";
             // 
@@ -246,9 +248,10 @@
             // lblCPU2
             // 
             this.lblCPU2.AutoSize = true;
+            this.lblCPU2.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU2.Location = new System.Drawing.Point(227, 92);
             this.lblCPU2.Name = "lblCPU2";
-            this.lblCPU2.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU2.Size = new System.Drawing.Size(15, 15);
             this.lblCPU2.TabIndex = 14;
             this.lblCPU2.Text = "--";
             // 
@@ -273,9 +276,10 @@
             // lblCPU4
             // 
             this.lblCPU4.AutoSize = true;
+            this.lblCPU4.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU4.Location = new System.Drawing.Point(227, 136);
             this.lblCPU4.Name = "lblCPU4";
-            this.lblCPU4.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU4.Size = new System.Drawing.Size(15, 15);
             this.lblCPU4.TabIndex = 17;
             this.lblCPU4.Text = "--";
             // 
@@ -301,9 +305,10 @@
             // lblCPU6
             // 
             this.lblCPU6.AutoSize = true;
+            this.lblCPU6.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU6.Location = new System.Drawing.Point(227, 179);
             this.lblCPU6.Name = "lblCPU6";
-            this.lblCPU6.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU6.Size = new System.Drawing.Size(15, 15);
             this.lblCPU6.TabIndex = 20;
             this.lblCPU6.Text = "--";
             // 
@@ -328,9 +333,10 @@
             // lblCPU8
             // 
             this.lblCPU8.AutoSize = true;
+            this.lblCPU8.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU8.Location = new System.Drawing.Point(227, 222);
             this.lblCPU8.Name = "lblCPU8";
-            this.lblCPU8.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU8.Size = new System.Drawing.Size(15, 15);
             this.lblCPU8.TabIndex = 23;
             this.lblCPU8.Text = "--";
             // 
@@ -356,9 +362,10 @@
             // lblCPU10
             // 
             this.lblCPU10.AutoSize = true;
+            this.lblCPU10.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU10.Location = new System.Drawing.Point(227, 263);
             this.lblCPU10.Name = "lblCPU10";
-            this.lblCPU10.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU10.Size = new System.Drawing.Size(15, 15);
             this.lblCPU10.TabIndex = 26;
             this.lblCPU10.Text = "--";
             // 
@@ -384,9 +391,10 @@
             // lblCPU12
             // 
             this.lblCPU12.AutoSize = true;
+            this.lblCPU12.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU12.Location = new System.Drawing.Point(227, 308);
             this.lblCPU12.Name = "lblCPU12";
-            this.lblCPU12.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU12.Size = new System.Drawing.Size(15, 15);
             this.lblCPU12.TabIndex = 29;
             this.lblCPU12.Text = "--";
             // 
@@ -411,9 +419,10 @@
             // lblCPU14
             // 
             this.lblCPU14.AutoSize = true;
+            this.lblCPU14.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU14.Location = new System.Drawing.Point(227, 352);
             this.lblCPU14.Name = "lblCPU14";
-            this.lblCPU14.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU14.Size = new System.Drawing.Size(15, 15);
             this.lblCPU14.TabIndex = 32;
             this.lblCPU14.Text = "--";
             // 
@@ -438,9 +447,10 @@
             // lblCPU3
             // 
             this.lblCPU3.AutoSize = true;
+            this.lblCPU3.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU3.Location = new System.Drawing.Point(501, 92);
             this.lblCPU3.Name = "lblCPU3";
-            this.lblCPU3.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU3.Size = new System.Drawing.Size(15, 15);
             this.lblCPU3.TabIndex = 35;
             this.lblCPU3.Text = "--";
             // 
@@ -465,9 +475,10 @@
             // lblCPU5
             // 
             this.lblCPU5.AutoSize = true;
+            this.lblCPU5.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU5.Location = new System.Drawing.Point(501, 136);
             this.lblCPU5.Name = "lblCPU5";
-            this.lblCPU5.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU5.Size = new System.Drawing.Size(15, 15);
             this.lblCPU5.TabIndex = 38;
             this.lblCPU5.Text = "--";
             // 
@@ -492,9 +503,10 @@
             // lblCPU7
             // 
             this.lblCPU7.AutoSize = true;
+            this.lblCPU7.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU7.Location = new System.Drawing.Point(501, 179);
             this.lblCPU7.Name = "lblCPU7";
-            this.lblCPU7.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU7.Size = new System.Drawing.Size(15, 15);
             this.lblCPU7.TabIndex = 41;
             this.lblCPU7.Text = "--";
             // 
@@ -519,9 +531,10 @@
             // lblCPU9
             // 
             this.lblCPU9.AutoSize = true;
+            this.lblCPU9.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU9.Location = new System.Drawing.Point(501, 222);
             this.lblCPU9.Name = "lblCPU9";
-            this.lblCPU9.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU9.Size = new System.Drawing.Size(15, 15);
             this.lblCPU9.TabIndex = 44;
             this.lblCPU9.Text = "--";
             // 
@@ -546,9 +559,10 @@
             // lblCPU11
             // 
             this.lblCPU11.AutoSize = true;
+            this.lblCPU11.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU11.Location = new System.Drawing.Point(501, 263);
             this.lblCPU11.Name = "lblCPU11";
-            this.lblCPU11.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU11.Size = new System.Drawing.Size(15, 15);
             this.lblCPU11.TabIndex = 47;
             this.lblCPU11.Text = "--";
             // 
@@ -573,9 +587,10 @@
             // lblCPU13
             // 
             this.lblCPU13.AutoSize = true;
+            this.lblCPU13.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU13.Location = new System.Drawing.Point(501, 308);
             this.lblCPU13.Name = "lblCPU13";
-            this.lblCPU13.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU13.Size = new System.Drawing.Size(15, 15);
             this.lblCPU13.TabIndex = 50;
             this.lblCPU13.Text = "--";
             // 
@@ -600,9 +615,10 @@
             // lblCPU15
             // 
             this.lblCPU15.AutoSize = true;
+            this.lblCPU15.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU15.Location = new System.Drawing.Point(501, 352);
             this.lblCPU15.Name = "lblCPU15";
-            this.lblCPU15.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU15.Size = new System.Drawing.Size(15, 15);
             this.lblCPU15.TabIndex = 53;
             this.lblCPU15.Text = "--";
             // 
@@ -627,9 +643,10 @@
             // lblCPU16
             // 
             this.lblCPU16.AutoSize = true;
+            this.lblCPU16.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU16.Location = new System.Drawing.Point(789, 52);
             this.lblCPU16.Name = "lblCPU16";
-            this.lblCPU16.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU16.Size = new System.Drawing.Size(15, 15);
             this.lblCPU16.TabIndex = 56;
             this.lblCPU16.Text = "--";
             // 
@@ -654,9 +671,10 @@
             // lblCPU17
             // 
             this.lblCPU17.AutoSize = true;
+            this.lblCPU17.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU17.Location = new System.Drawing.Point(789, 92);
             this.lblCPU17.Name = "lblCPU17";
-            this.lblCPU17.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU17.Size = new System.Drawing.Size(15, 15);
             this.lblCPU17.TabIndex = 59;
             this.lblCPU17.Text = "--";
             // 
@@ -681,9 +699,10 @@
             // lblCPU18
             // 
             this.lblCPU18.AutoSize = true;
+            this.lblCPU18.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU18.Location = new System.Drawing.Point(789, 136);
             this.lblCPU18.Name = "lblCPU18";
-            this.lblCPU18.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU18.Size = new System.Drawing.Size(15, 15);
             this.lblCPU18.TabIndex = 62;
             this.lblCPU18.Text = "--";
             // 
@@ -708,9 +727,10 @@
             // lblCPU19
             // 
             this.lblCPU19.AutoSize = true;
+            this.lblCPU19.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU19.Location = new System.Drawing.Point(789, 179);
             this.lblCPU19.Name = "lblCPU19";
-            this.lblCPU19.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU19.Size = new System.Drawing.Size(15, 15);
             this.lblCPU19.TabIndex = 65;
             this.lblCPU19.Text = "--";
             // 
@@ -735,9 +755,10 @@
             // lblGPU0
             // 
             this.lblGPU0.AutoSize = true;
+            this.lblGPU0.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblGPU0.Location = new System.Drawing.Point(789, 224);
             this.lblGPU0.Name = "lblGPU0";
-            this.lblGPU0.Size = new System.Drawing.Size(13, 13);
+            this.lblGPU0.Size = new System.Drawing.Size(15, 15);
             this.lblGPU0.TabIndex = 66;
             this.lblGPU0.Text = "--";
             // 
@@ -943,6 +964,7 @@
             // 
             this.lblLP.AutoSize = true;
             this.lblLP.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.lblLP.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.lblLP.Location = new System.Drawing.Point(311, 390);
             this.lblLP.Name = "lblLP";
             this.lblLP.Size = new System.Drawing.Size(83, 13);
@@ -963,7 +985,7 @@
             // 
             // btnResetMaxCounters
             // 
-            this.btnResetMaxCounters.Location = new System.Drawing.Point(472, 8);
+            this.btnResetMaxCounters.Location = new System.Drawing.Point(477, 9);
             this.btnResetMaxCounters.Name = "btnResetMaxCounters";
             this.btnResetMaxCounters.Size = new System.Drawing.Size(75, 23);
             this.btnResetMaxCounters.TabIndex = 89;
@@ -977,7 +999,7 @@
             this.txtCategory.Name = "txtCategory";
             this.txtCategory.Size = new System.Drawing.Size(74, 20);
             this.txtCategory.TabIndex = 90;
-            this.txtCategory.Text = "GPU SM Clock (MHz)";
+            this.txtCategory.Text = "GPU Temperature (in degrees C)";
             this.txtCategory.Visible = false;
             // 
             // txtCounterName
@@ -1022,9 +1044,10 @@
             // lblGPUFanSpeed
             // 
             this.lblGPUFanSpeed.AutoSize = true;
+            this.lblGPUFanSpeed.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblGPUFanSpeed.Location = new System.Drawing.Point(789, 265);
             this.lblGPUFanSpeed.Name = "lblGPUFanSpeed";
-            this.lblGPUFanSpeed.Size = new System.Drawing.Size(13, 13);
+            this.lblGPUFanSpeed.Size = new System.Drawing.Size(15, 15);
             this.lblGPUFanSpeed.TabIndex = 97;
             this.lblGPUFanSpeed.Text = "--";
             // 
