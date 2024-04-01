@@ -115,7 +115,7 @@
             this.label29 = new System.Windows.Forms.Label();
             this.lblMaxLoopTime = new System.Windows.Forms.Label();
             this.label33 = new System.Windows.Forms.Label();
-            this.label35 = new System.Windows.Forms.Label();
+            this.lblLP = new System.Windows.Forms.Label();
             this.lblCurrentProcessor = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.txtCategory = new System.Windows.Forms.TextBox();
@@ -129,6 +129,10 @@
             this.chkAutoMoveTop = new System.Windows.Forms.CheckBox();
             this.chkAlwaysOnTop = new System.Windows.Forms.CheckBox();
             this.lblTop = new System.Windows.Forms.Label();
+            this.lblShowLastThread = new System.Windows.Forms.Label();
+            this.lblLastThread = new System.Windows.Forms.Label();
+            this.picCPUDetails = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.picCPUDetails)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -136,7 +140,7 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Century Gothic", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
-            this.label1.Location = new System.Drawing.Point(12, 9);
+            this.label1.Location = new System.Drawing.Point(12, 4);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(104, 24);
             this.label1.TabIndex = 0;
@@ -152,7 +156,7 @@
             this.chkEnabled.AutoSize = true;
             this.chkEnabled.Checked = true;
             this.chkEnabled.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkEnabled.Location = new System.Drawing.Point(127, 16);
+            this.chkEnabled.Location = new System.Drawing.Point(127, 11);
             this.chkEnabled.Name = "chkEnabled";
             this.chkEnabled.Size = new System.Drawing.Size(97, 17);
             this.chkEnabled.TabIndex = 1;
@@ -165,7 +169,7 @@
             this.lblCPU.AutoSize = true;
             this.lblCPU.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.lblCPU.Location = new System.Drawing.Point(15, 57);
+            this.lblCPU.Location = new System.Drawing.Point(15, 52);
             this.lblCPU.Name = "lblCPU";
             this.lblCPU.Size = new System.Drawing.Size(47, 13);
             this.lblCPU.TabIndex = 2;
@@ -174,7 +178,7 @@
             // pbCPU0
             // 
             this.pbCPU0.BackColor = System.Drawing.SystemColors.Control;
-            this.pbCPU0.Location = new System.Drawing.Point(65, 53);
+            this.pbCPU0.Location = new System.Drawing.Point(65, 48);
             this.pbCPU0.Name = "pbCPU0";
             this.pbCPU0.Size = new System.Drawing.Size(156, 23);
             this.pbCPU0.TabIndex = 3;
@@ -182,7 +186,7 @@
             // pbGPU0
             // 
             this.pbGPU0.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pbGPU0.Location = new System.Drawing.Point(627, 223);
+            this.pbGPU0.Location = new System.Drawing.Point(627, 218);
             this.pbGPU0.Name = "pbGPU0";
             this.pbGPU0.Size = new System.Drawing.Size(156, 23);
             this.pbGPU0.TabIndex = 7;
@@ -194,7 +198,7 @@
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Arial Rounded MT Bold", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label4.ForeColor = System.Drawing.Color.YellowGreen;
-            this.label4.Location = new System.Drawing.Point(560, 228);
+            this.label4.Location = new System.Drawing.Point(560, 223);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(66, 12);
             this.label4.TabIndex = 6;
@@ -204,7 +208,7 @@
             // lblCPU0
             // 
             this.lblCPU0.AutoSize = true;
-            this.lblCPU0.Location = new System.Drawing.Point(227, 57);
+            this.lblCPU0.Location = new System.Drawing.Point(227, 52);
             this.lblCPU0.Name = "lblCPU0";
             this.lblCPU0.Size = new System.Drawing.Size(13, 13);
             this.lblCPU0.TabIndex = 8;
@@ -213,7 +217,7 @@
             // lblCPU1
             // 
             this.lblCPU1.AutoSize = true;
-            this.lblCPU1.Location = new System.Drawing.Point(501, 57);
+            this.lblCPU1.Location = new System.Drawing.Point(501, 52);
             this.lblCPU1.Name = "lblCPU1";
             this.lblCPU1.Size = new System.Drawing.Size(13, 13);
             this.lblCPU1.TabIndex = 11;
@@ -221,7 +225,7 @@
             // 
             // pbCPU1
             // 
-            this.pbCPU1.Location = new System.Drawing.Point(339, 53);
+            this.pbCPU1.Location = new System.Drawing.Point(339, 48);
             this.pbCPU1.Name = "pbCPU1";
             this.pbCPU1.Size = new System.Drawing.Size(156, 23);
             this.pbCPU1.TabIndex = 10;
@@ -231,7 +235,7 @@
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label6.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.label6.Location = new System.Drawing.Point(276, 57);
+            this.label6.Location = new System.Drawing.Point(276, 52);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(62, 13);
             this.label6.TabIndex = 9;
@@ -240,7 +244,7 @@
             // lblCPU2
             // 
             this.lblCPU2.AutoSize = true;
-            this.lblCPU2.Location = new System.Drawing.Point(227, 97);
+            this.lblCPU2.Location = new System.Drawing.Point(227, 92);
             this.lblCPU2.Name = "lblCPU2";
             this.lblCPU2.Size = new System.Drawing.Size(13, 13);
             this.lblCPU2.TabIndex = 14;
@@ -248,7 +252,7 @@
             // 
             // pbCPU2
             // 
-            this.pbCPU2.Location = new System.Drawing.Point(65, 93);
+            this.pbCPU2.Location = new System.Drawing.Point(65, 88);
             this.pbCPU2.Name = "pbCPU2";
             this.pbCPU2.Size = new System.Drawing.Size(156, 23);
             this.pbCPU2.TabIndex = 13;
@@ -258,7 +262,7 @@
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label7.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label7.Location = new System.Drawing.Point(15, 97);
+            this.label7.Location = new System.Drawing.Point(15, 92);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(47, 13);
             this.label7.TabIndex = 12;
@@ -267,7 +271,7 @@
             // lblCPU4
             // 
             this.lblCPU4.AutoSize = true;
-            this.lblCPU4.Location = new System.Drawing.Point(227, 141);
+            this.lblCPU4.Location = new System.Drawing.Point(227, 136);
             this.lblCPU4.Name = "lblCPU4";
             this.lblCPU4.Size = new System.Drawing.Size(13, 13);
             this.lblCPU4.TabIndex = 17;
@@ -275,7 +279,7 @@
             // 
             // pbCPU4
             // 
-            this.pbCPU4.Location = new System.Drawing.Point(65, 137);
+            this.pbCPU4.Location = new System.Drawing.Point(65, 132);
             this.pbCPU4.Name = "pbCPU4";
             this.pbCPU4.Size = new System.Drawing.Size(156, 23);
             this.pbCPU4.TabIndex = 16;
@@ -286,7 +290,7 @@
             this.label8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label8.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label8.Location = new System.Drawing.Point(15, 141);
+            this.label8.Location = new System.Drawing.Point(15, 136);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(49, 15);
             this.label8.TabIndex = 15;
@@ -295,7 +299,7 @@
             // lblCPU6
             // 
             this.lblCPU6.AutoSize = true;
-            this.lblCPU6.Location = new System.Drawing.Point(227, 184);
+            this.lblCPU6.Location = new System.Drawing.Point(227, 179);
             this.lblCPU6.Name = "lblCPU6";
             this.lblCPU6.Size = new System.Drawing.Size(13, 13);
             this.lblCPU6.TabIndex = 20;
@@ -303,7 +307,7 @@
             // 
             // pbCPU6
             // 
-            this.pbCPU6.Location = new System.Drawing.Point(65, 180);
+            this.pbCPU6.Location = new System.Drawing.Point(65, 175);
             this.pbCPU6.Name = "pbCPU6";
             this.pbCPU6.Size = new System.Drawing.Size(156, 23);
             this.pbCPU6.TabIndex = 19;
@@ -313,7 +317,7 @@
             this.label10.AutoSize = true;
             this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label10.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label10.Location = new System.Drawing.Point(15, 184);
+            this.label10.Location = new System.Drawing.Point(15, 179);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(47, 13);
             this.label10.TabIndex = 18;
@@ -322,7 +326,7 @@
             // lblCPU8
             // 
             this.lblCPU8.AutoSize = true;
-            this.lblCPU8.Location = new System.Drawing.Point(227, 227);
+            this.lblCPU8.Location = new System.Drawing.Point(227, 222);
             this.lblCPU8.Name = "lblCPU8";
             this.lblCPU8.Size = new System.Drawing.Size(13, 13);
             this.lblCPU8.TabIndex = 23;
@@ -330,7 +334,7 @@
             // 
             // pbCPU8
             // 
-            this.pbCPU8.Location = new System.Drawing.Point(65, 223);
+            this.pbCPU8.Location = new System.Drawing.Point(65, 218);
             this.pbCPU8.Name = "pbCPU8";
             this.pbCPU8.Size = new System.Drawing.Size(156, 23);
             this.pbCPU8.TabIndex = 22;
@@ -341,7 +345,7 @@
             this.label12.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label12.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label12.Location = new System.Drawing.Point(15, 227);
+            this.label12.Location = new System.Drawing.Point(15, 222);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(49, 15);
             this.label12.TabIndex = 21;
@@ -350,7 +354,7 @@
             // lblCPU10
             // 
             this.lblCPU10.AutoSize = true;
-            this.lblCPU10.Location = new System.Drawing.Point(227, 268);
+            this.lblCPU10.Location = new System.Drawing.Point(227, 263);
             this.lblCPU10.Name = "lblCPU10";
             this.lblCPU10.Size = new System.Drawing.Size(13, 13);
             this.lblCPU10.TabIndex = 26;
@@ -358,7 +362,7 @@
             // 
             // pbCPU10
             // 
-            this.pbCPU10.Location = new System.Drawing.Point(65, 264);
+            this.pbCPU10.Location = new System.Drawing.Point(65, 259);
             this.pbCPU10.Name = "pbCPU10";
             this.pbCPU10.Size = new System.Drawing.Size(156, 23);
             this.pbCPU10.TabIndex = 25;
@@ -369,7 +373,7 @@
             this.label14.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label14.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label14.Location = new System.Drawing.Point(8, 269);
+            this.label14.Location = new System.Drawing.Point(8, 264);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(56, 15);
             this.label14.TabIndex = 24;
@@ -378,7 +382,7 @@
             // lblCPU12
             // 
             this.lblCPU12.AutoSize = true;
-            this.lblCPU12.Location = new System.Drawing.Point(227, 313);
+            this.lblCPU12.Location = new System.Drawing.Point(227, 308);
             this.lblCPU12.Name = "lblCPU12";
             this.lblCPU12.Size = new System.Drawing.Size(13, 13);
             this.lblCPU12.TabIndex = 29;
@@ -386,7 +390,7 @@
             // 
             // pbCPU12
             // 
-            this.pbCPU12.Location = new System.Drawing.Point(65, 309);
+            this.pbCPU12.Location = new System.Drawing.Point(65, 304);
             this.pbCPU12.Name = "pbCPU12";
             this.pbCPU12.Size = new System.Drawing.Size(156, 23);
             this.pbCPU12.TabIndex = 28;
@@ -396,7 +400,7 @@
             this.label16.AutoSize = true;
             this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label16.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label16.Location = new System.Drawing.Point(8, 313);
+            this.label16.Location = new System.Drawing.Point(8, 308);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(54, 13);
             this.label16.TabIndex = 27;
@@ -405,7 +409,7 @@
             // lblCPU14
             // 
             this.lblCPU14.AutoSize = true;
-            this.lblCPU14.Location = new System.Drawing.Point(227, 357);
+            this.lblCPU14.Location = new System.Drawing.Point(227, 352);
             this.lblCPU14.Name = "lblCPU14";
             this.lblCPU14.Size = new System.Drawing.Size(13, 13);
             this.lblCPU14.TabIndex = 32;
@@ -413,7 +417,7 @@
             // 
             // pbCPU14
             // 
-            this.pbCPU14.Location = new System.Drawing.Point(65, 353);
+            this.pbCPU14.Location = new System.Drawing.Point(65, 348);
             this.pbCPU14.Name = "pbCPU14";
             this.pbCPU14.Size = new System.Drawing.Size(156, 23);
             this.pbCPU14.TabIndex = 31;
@@ -423,7 +427,7 @@
             this.label18.AutoSize = true;
             this.label18.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label18.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label18.Location = new System.Drawing.Point(8, 358);
+            this.label18.Location = new System.Drawing.Point(8, 353);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(54, 13);
             this.label18.TabIndex = 30;
@@ -432,7 +436,7 @@
             // lblCPU3
             // 
             this.lblCPU3.AutoSize = true;
-            this.lblCPU3.Location = new System.Drawing.Point(501, 97);
+            this.lblCPU3.Location = new System.Drawing.Point(501, 92);
             this.lblCPU3.Name = "lblCPU3";
             this.lblCPU3.Size = new System.Drawing.Size(13, 13);
             this.lblCPU3.TabIndex = 35;
@@ -440,7 +444,7 @@
             // 
             // pbCPU3
             // 
-            this.pbCPU3.Location = new System.Drawing.Point(339, 93);
+            this.pbCPU3.Location = new System.Drawing.Point(339, 88);
             this.pbCPU3.Name = "pbCPU3";
             this.pbCPU3.Size = new System.Drawing.Size(156, 23);
             this.pbCPU3.TabIndex = 34;
@@ -450,7 +454,7 @@
             this.label20.AutoSize = true;
             this.label20.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label20.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.label20.Location = new System.Drawing.Point(276, 97);
+            this.label20.Location = new System.Drawing.Point(276, 92);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(62, 13);
             this.label20.TabIndex = 33;
@@ -459,7 +463,7 @@
             // lblCPU5
             // 
             this.lblCPU5.AutoSize = true;
-            this.lblCPU5.Location = new System.Drawing.Point(501, 141);
+            this.lblCPU5.Location = new System.Drawing.Point(501, 136);
             this.lblCPU5.Name = "lblCPU5";
             this.lblCPU5.Size = new System.Drawing.Size(13, 13);
             this.lblCPU5.TabIndex = 38;
@@ -467,7 +471,7 @@
             // 
             // pbCPU5
             // 
-            this.pbCPU5.Location = new System.Drawing.Point(339, 137);
+            this.pbCPU5.Location = new System.Drawing.Point(339, 132);
             this.pbCPU5.Name = "pbCPU5";
             this.pbCPU5.Size = new System.Drawing.Size(156, 23);
             this.pbCPU5.TabIndex = 37;
@@ -477,7 +481,7 @@
             this.label9.AutoSize = true;
             this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label9.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.label9.Location = new System.Drawing.Point(276, 141);
+            this.label9.Location = new System.Drawing.Point(276, 136);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(62, 13);
             this.label9.TabIndex = 36;
@@ -486,7 +490,7 @@
             // lblCPU7
             // 
             this.lblCPU7.AutoSize = true;
-            this.lblCPU7.Location = new System.Drawing.Point(501, 184);
+            this.lblCPU7.Location = new System.Drawing.Point(501, 179);
             this.lblCPU7.Name = "lblCPU7";
             this.lblCPU7.Size = new System.Drawing.Size(13, 13);
             this.lblCPU7.TabIndex = 41;
@@ -494,7 +498,7 @@
             // 
             // pbCPU7
             // 
-            this.pbCPU7.Location = new System.Drawing.Point(339, 180);
+            this.pbCPU7.Location = new System.Drawing.Point(339, 175);
             this.pbCPU7.Name = "pbCPU7";
             this.pbCPU7.Size = new System.Drawing.Size(156, 23);
             this.pbCPU7.TabIndex = 40;
@@ -504,7 +508,7 @@
             this.label13.AutoSize = true;
             this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label13.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.label13.Location = new System.Drawing.Point(276, 184);
+            this.label13.Location = new System.Drawing.Point(276, 179);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(62, 13);
             this.label13.TabIndex = 39;
@@ -513,7 +517,7 @@
             // lblCPU9
             // 
             this.lblCPU9.AutoSize = true;
-            this.lblCPU9.Location = new System.Drawing.Point(501, 227);
+            this.lblCPU9.Location = new System.Drawing.Point(501, 222);
             this.lblCPU9.Name = "lblCPU9";
             this.lblCPU9.Size = new System.Drawing.Size(13, 13);
             this.lblCPU9.TabIndex = 44;
@@ -521,7 +525,7 @@
             // 
             // pbCPU9
             // 
-            this.pbCPU9.Location = new System.Drawing.Point(339, 223);
+            this.pbCPU9.Location = new System.Drawing.Point(339, 218);
             this.pbCPU9.Name = "pbCPU9";
             this.pbCPU9.Size = new System.Drawing.Size(156, 23);
             this.pbCPU9.TabIndex = 43;
@@ -531,7 +535,7 @@
             this.label17.AutoSize = true;
             this.label17.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label17.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.label17.Location = new System.Drawing.Point(276, 227);
+            this.label17.Location = new System.Drawing.Point(276, 222);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(62, 13);
             this.label17.TabIndex = 42;
@@ -540,7 +544,7 @@
             // lblCPU11
             // 
             this.lblCPU11.AutoSize = true;
-            this.lblCPU11.Location = new System.Drawing.Point(501, 268);
+            this.lblCPU11.Location = new System.Drawing.Point(501, 263);
             this.lblCPU11.Name = "lblCPU11";
             this.lblCPU11.Size = new System.Drawing.Size(13, 13);
             this.lblCPU11.TabIndex = 47;
@@ -548,7 +552,7 @@
             // 
             // pbCPU11
             // 
-            this.pbCPU11.Location = new System.Drawing.Point(339, 264);
+            this.pbCPU11.Location = new System.Drawing.Point(339, 259);
             this.pbCPU11.Name = "pbCPU11";
             this.pbCPU11.Size = new System.Drawing.Size(156, 23);
             this.pbCPU11.TabIndex = 46;
@@ -558,7 +562,7 @@
             this.label21.AutoSize = true;
             this.label21.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label21.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.label21.Location = new System.Drawing.Point(269, 268);
+            this.label21.Location = new System.Drawing.Point(269, 263);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(69, 13);
             this.label21.TabIndex = 45;
@@ -567,7 +571,7 @@
             // lblCPU13
             // 
             this.lblCPU13.AutoSize = true;
-            this.lblCPU13.Location = new System.Drawing.Point(501, 313);
+            this.lblCPU13.Location = new System.Drawing.Point(501, 308);
             this.lblCPU13.Name = "lblCPU13";
             this.lblCPU13.Size = new System.Drawing.Size(13, 13);
             this.lblCPU13.TabIndex = 50;
@@ -575,7 +579,7 @@
             // 
             // pbCPU13
             // 
-            this.pbCPU13.Location = new System.Drawing.Point(339, 309);
+            this.pbCPU13.Location = new System.Drawing.Point(339, 304);
             this.pbCPU13.Name = "pbCPU13";
             this.pbCPU13.Size = new System.Drawing.Size(156, 23);
             this.pbCPU13.TabIndex = 49;
@@ -585,7 +589,7 @@
             this.label23.AutoSize = true;
             this.label23.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label23.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.label23.Location = new System.Drawing.Point(269, 313);
+            this.label23.Location = new System.Drawing.Point(269, 308);
             this.label23.Name = "label23";
             this.label23.Size = new System.Drawing.Size(69, 13);
             this.label23.TabIndex = 48;
@@ -594,7 +598,7 @@
             // lblCPU15
             // 
             this.lblCPU15.AutoSize = true;
-            this.lblCPU15.Location = new System.Drawing.Point(501, 357);
+            this.lblCPU15.Location = new System.Drawing.Point(501, 352);
             this.lblCPU15.Name = "lblCPU15";
             this.lblCPU15.Size = new System.Drawing.Size(13, 13);
             this.lblCPU15.TabIndex = 53;
@@ -602,7 +606,7 @@
             // 
             // pbCPU15
             // 
-            this.pbCPU15.Location = new System.Drawing.Point(339, 353);
+            this.pbCPU15.Location = new System.Drawing.Point(339, 348);
             this.pbCPU15.Name = "pbCPU15";
             this.pbCPU15.Size = new System.Drawing.Size(156, 23);
             this.pbCPU15.TabIndex = 52;
@@ -612,7 +616,7 @@
             this.label25.AutoSize = true;
             this.label25.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label25.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.label25.Location = new System.Drawing.Point(269, 357);
+            this.label25.Location = new System.Drawing.Point(269, 352);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(69, 13);
             this.label25.TabIndex = 51;
@@ -621,7 +625,7 @@
             // lblCPU16
             // 
             this.lblCPU16.AutoSize = true;
-            this.lblCPU16.Location = new System.Drawing.Point(789, 57);
+            this.lblCPU16.Location = new System.Drawing.Point(789, 52);
             this.lblCPU16.Name = "lblCPU16";
             this.lblCPU16.Size = new System.Drawing.Size(13, 13);
             this.lblCPU16.TabIndex = 56;
@@ -629,7 +633,7 @@
             // 
             // pbCPU16
             // 
-            this.pbCPU16.Location = new System.Drawing.Point(627, 53);
+            this.pbCPU16.Location = new System.Drawing.Point(627, 48);
             this.pbCPU16.Name = "pbCPU16";
             this.pbCPU16.Size = new System.Drawing.Size(156, 23);
             this.pbCPU16.TabIndex = 55;
@@ -639,7 +643,7 @@
             this.label11.AutoSize = true;
             this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label11.ForeColor = System.Drawing.Color.Blue;
-            this.label11.Location = new System.Drawing.Point(557, 57);
+            this.label11.Location = new System.Drawing.Point(557, 52);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(69, 13);
             this.label11.TabIndex = 54;
@@ -648,7 +652,7 @@
             // lblCPU17
             // 
             this.lblCPU17.AutoSize = true;
-            this.lblCPU17.Location = new System.Drawing.Point(789, 97);
+            this.lblCPU17.Location = new System.Drawing.Point(789, 92);
             this.lblCPU17.Name = "lblCPU17";
             this.lblCPU17.Size = new System.Drawing.Size(13, 13);
             this.lblCPU17.TabIndex = 59;
@@ -656,7 +660,7 @@
             // 
             // pbCPU17
             // 
-            this.pbCPU17.Location = new System.Drawing.Point(627, 93);
+            this.pbCPU17.Location = new System.Drawing.Point(627, 88);
             this.pbCPU17.Name = "pbCPU17";
             this.pbCPU17.Size = new System.Drawing.Size(156, 23);
             this.pbCPU17.TabIndex = 58;
@@ -666,7 +670,7 @@
             this.label15.AutoSize = true;
             this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label15.ForeColor = System.Drawing.Color.Blue;
-            this.label15.Location = new System.Drawing.Point(557, 97);
+            this.label15.Location = new System.Drawing.Point(557, 92);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(69, 13);
             this.label15.TabIndex = 57;
@@ -675,7 +679,7 @@
             // lblCPU18
             // 
             this.lblCPU18.AutoSize = true;
-            this.lblCPU18.Location = new System.Drawing.Point(789, 141);
+            this.lblCPU18.Location = new System.Drawing.Point(789, 136);
             this.lblCPU18.Name = "lblCPU18";
             this.lblCPU18.Size = new System.Drawing.Size(13, 13);
             this.lblCPU18.TabIndex = 62;
@@ -683,7 +687,7 @@
             // 
             // pbCPU18
             // 
-            this.pbCPU18.Location = new System.Drawing.Point(627, 137);
+            this.pbCPU18.Location = new System.Drawing.Point(627, 132);
             this.pbCPU18.Name = "pbCPU18";
             this.pbCPU18.Size = new System.Drawing.Size(156, 23);
             this.pbCPU18.TabIndex = 61;
@@ -693,7 +697,7 @@
             this.label22.AutoSize = true;
             this.label22.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label22.ForeColor = System.Drawing.Color.Blue;
-            this.label22.Location = new System.Drawing.Point(557, 141);
+            this.label22.Location = new System.Drawing.Point(557, 136);
             this.label22.Name = "label22";
             this.label22.Size = new System.Drawing.Size(69, 13);
             this.label22.TabIndex = 60;
@@ -702,7 +706,7 @@
             // lblCPU19
             // 
             this.lblCPU19.AutoSize = true;
-            this.lblCPU19.Location = new System.Drawing.Point(789, 184);
+            this.lblCPU19.Location = new System.Drawing.Point(789, 179);
             this.lblCPU19.Name = "lblCPU19";
             this.lblCPU19.Size = new System.Drawing.Size(13, 13);
             this.lblCPU19.TabIndex = 65;
@@ -710,7 +714,7 @@
             // 
             // pbCPU19
             // 
-            this.pbCPU19.Location = new System.Drawing.Point(627, 180);
+            this.pbCPU19.Location = new System.Drawing.Point(627, 175);
             this.pbCPU19.Name = "pbCPU19";
             this.pbCPU19.Size = new System.Drawing.Size(156, 23);
             this.pbCPU19.TabIndex = 64;
@@ -720,7 +724,7 @@
             this.label26.AutoSize = true;
             this.label26.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label26.ForeColor = System.Drawing.Color.Blue;
-            this.label26.Location = new System.Drawing.Point(557, 184);
+            this.label26.Location = new System.Drawing.Point(557, 179);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(69, 13);
             this.label26.TabIndex = 63;
@@ -729,7 +733,7 @@
             // lblGPU0
             // 
             this.lblGPU0.AutoSize = true;
-            this.lblGPU0.Location = new System.Drawing.Point(789, 229);
+            this.lblGPU0.Location = new System.Drawing.Point(789, 224);
             this.lblGPU0.Name = "lblGPU0";
             this.lblGPU0.Size = new System.Drawing.Size(13, 13);
             this.lblGPU0.TabIndex = 66;
@@ -739,7 +743,7 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(569, 313);
+            this.label5.Location = new System.Drawing.Point(569, 308);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(54, 11);
             this.label5.TabIndex = 67;
@@ -749,7 +753,7 @@
             // 
             this.lblDiskC.AutoSize = true;
             this.lblDiskC.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDiskC.Location = new System.Drawing.Point(626, 313);
+            this.lblDiskC.Location = new System.Drawing.Point(626, 308);
             this.lblDiskC.Name = "lblDiskC";
             this.lblDiskC.Size = new System.Drawing.Size(33, 11);
             this.lblDiskC.TabIndex = 68;
@@ -759,7 +763,7 @@
             // 
             this.lblMaxDiskC.AutoSize = true;
             this.lblMaxDiskC.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMaxDiskC.Location = new System.Drawing.Point(709, 313);
+            this.lblMaxDiskC.Location = new System.Drawing.Point(709, 308);
             this.lblMaxDiskC.Name = "lblMaxDiskC";
             this.lblMaxDiskC.Size = new System.Drawing.Size(33, 11);
             this.lblMaxDiskC.TabIndex = 70;
@@ -770,7 +774,7 @@
             // 
             this.label24.AutoSize = true;
             this.label24.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label24.Location = new System.Drawing.Point(673, 313);
+            this.label24.Location = new System.Drawing.Point(673, 308);
             this.label24.Name = "label24";
             this.label24.Size = new System.Drawing.Size(33, 11);
             this.label24.TabIndex = 69;
@@ -780,7 +784,7 @@
             // 
             this.label27.AutoSize = true;
             this.label27.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label27.Location = new System.Drawing.Point(754, 313);
+            this.label27.Location = new System.Drawing.Point(754, 308);
             this.label27.Name = "label27";
             this.label27.Size = new System.Drawing.Size(33, 11);
             this.label27.TabIndex = 71;
@@ -790,7 +794,7 @@
             // 
             this.label28.AutoSize = true;
             this.label28.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label28.Location = new System.Drawing.Point(754, 339);
+            this.label28.Location = new System.Drawing.Point(754, 334);
             this.label28.Name = "label28";
             this.label28.Size = new System.Drawing.Size(33, 11);
             this.label28.TabIndex = 76;
@@ -800,7 +804,7 @@
             // 
             this.lblMaxDiskN.AutoSize = true;
             this.lblMaxDiskN.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMaxDiskN.Location = new System.Drawing.Point(709, 339);
+            this.lblMaxDiskN.Location = new System.Drawing.Point(709, 334);
             this.lblMaxDiskN.Name = "lblMaxDiskN";
             this.lblMaxDiskN.Size = new System.Drawing.Size(33, 11);
             this.lblMaxDiskN.TabIndex = 75;
@@ -811,7 +815,7 @@
             // 
             this.label30.AutoSize = true;
             this.label30.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label30.Location = new System.Drawing.Point(673, 339);
+            this.label30.Location = new System.Drawing.Point(673, 334);
             this.label30.Name = "label30";
             this.label30.Size = new System.Drawing.Size(33, 11);
             this.label30.TabIndex = 74;
@@ -821,7 +825,7 @@
             // 
             this.lblDiskN.AutoSize = true;
             this.lblDiskN.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDiskN.Location = new System.Drawing.Point(626, 339);
+            this.lblDiskN.Location = new System.Drawing.Point(626, 334);
             this.lblDiskN.Name = "lblDiskN";
             this.lblDiskN.Size = new System.Drawing.Size(33, 11);
             this.lblDiskN.TabIndex = 73;
@@ -831,7 +835,7 @@
             // 
             this.label32.AutoSize = true;
             this.label32.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label32.Location = new System.Drawing.Point(569, 339);
+            this.label32.Location = new System.Drawing.Point(569, 334);
             this.label32.Name = "label32";
             this.label32.Size = new System.Drawing.Size(54, 11);
             this.label32.TabIndex = 72;
@@ -841,7 +845,7 @@
             // 
             this.label19.AutoSize = true;
             this.label19.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label19.Location = new System.Drawing.Point(754, 365);
+            this.label19.Location = new System.Drawing.Point(754, 360);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(33, 11);
             this.label19.TabIndex = 81;
@@ -851,7 +855,7 @@
             // 
             this.lblMaxDiskR.AutoSize = true;
             this.lblMaxDiskR.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMaxDiskR.Location = new System.Drawing.Point(709, 365);
+            this.lblMaxDiskR.Location = new System.Drawing.Point(709, 360);
             this.lblMaxDiskR.Name = "lblMaxDiskR";
             this.lblMaxDiskR.Size = new System.Drawing.Size(33, 11);
             this.lblMaxDiskR.TabIndex = 80;
@@ -862,7 +866,7 @@
             // 
             this.label31.AutoSize = true;
             this.label31.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label31.Location = new System.Drawing.Point(673, 365);
+            this.label31.Location = new System.Drawing.Point(673, 360);
             this.label31.Name = "label31";
             this.label31.Size = new System.Drawing.Size(33, 11);
             this.label31.TabIndex = 79;
@@ -872,7 +876,7 @@
             // 
             this.lblDiskR.AutoSize = true;
             this.lblDiskR.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDiskR.Location = new System.Drawing.Point(626, 365);
+            this.lblDiskR.Location = new System.Drawing.Point(626, 360);
             this.lblDiskR.Name = "lblDiskR";
             this.lblDiskR.Size = new System.Drawing.Size(33, 11);
             this.lblDiskR.TabIndex = 78;
@@ -882,7 +886,7 @@
             // 
             this.label34.AutoSize = true;
             this.label34.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label34.Location = new System.Drawing.Point(569, 365);
+            this.label34.Location = new System.Drawing.Point(569, 360);
             this.label34.Name = "label34";
             this.label34.Size = new System.Drawing.Size(54, 11);
             this.label34.TabIndex = 77;
@@ -891,7 +895,7 @@
             // lblLT
             // 
             this.lblLT.AutoSize = true;
-            this.lblLT.Location = new System.Drawing.Point(8, 409);
+            this.lblLT.Location = new System.Drawing.Point(13, 390);
             this.lblLT.Name = "lblLT";
             this.lblLT.Size = new System.Drawing.Size(57, 13);
             this.lblLT.TabIndex = 82;
@@ -900,16 +904,16 @@
             // lblLoopTime
             // 
             this.lblLoopTime.AutoSize = true;
-            this.lblLoopTime.Location = new System.Drawing.Point(69, 408);
+            this.lblLoopTime.Location = new System.Drawing.Point(69, 390);
             this.lblLoopTime.Name = "lblLoopTime";
-            this.lblLoopTime.Size = new System.Drawing.Size(16, 13);
+            this.lblLoopTime.Size = new System.Drawing.Size(19, 13);
             this.lblLoopTime.TabIndex = 83;
-            this.lblLoopTime.Text = "---";
+            this.lblLoopTime.Text = "----";
             // 
             // label29
             // 
             this.label29.AutoSize = true;
-            this.label29.Location = new System.Drawing.Point(113, 409);
+            this.label29.Location = new System.Drawing.Point(106, 390);
             this.label29.Name = "label29";
             this.label29.Size = new System.Drawing.Size(30, 13);
             this.label29.TabIndex = 84;
@@ -918,42 +922,46 @@
             // lblMaxLoopTime
             // 
             this.lblMaxLoopTime.AutoSize = true;
-            this.lblMaxLoopTime.Location = new System.Drawing.Point(149, 409);
+            this.lblMaxLoopTime.Location = new System.Drawing.Point(133, 390);
             this.lblMaxLoopTime.Name = "lblMaxLoopTime";
-            this.lblMaxLoopTime.Size = new System.Drawing.Size(16, 13);
+            this.lblMaxLoopTime.Size = new System.Drawing.Size(19, 13);
             this.lblMaxLoopTime.TabIndex = 85;
-            this.lblMaxLoopTime.Text = "---";
+            this.lblMaxLoopTime.Text = "----";
             // 
             // label33
             // 
             this.label33.AutoSize = true;
-            this.label33.Location = new System.Drawing.Point(191, 409);
+            this.label33.Location = new System.Drawing.Point(167, 390);
             this.label33.Name = "label33";
             this.label33.Size = new System.Drawing.Size(63, 13);
             this.label33.TabIndex = 86;
             this.label33.Text = "milliseconds";
             // 
-            // label35
+            // lblLP
             // 
-            this.label35.AutoSize = true;
-            this.label35.Location = new System.Drawing.Point(336, 407);
-            this.label35.Name = "label35";
-            this.label35.Size = new System.Drawing.Size(111, 13);
-            this.label35.TabIndex = 87;
-            this.label35.Text = "Last Processor Used: ";
+            this.lblLP.AutoSize = true;
+            this.lblLP.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.lblLP.Location = new System.Drawing.Point(311, 390);
+            this.lblLP.Name = "lblLP";
+            this.lblLP.Size = new System.Drawing.Size(83, 13);
+            this.lblLP.TabIndex = 87;
+            this.lblLP.Text = "Last Processor: ";
+            this.lblLP.Visible = false;
+            this.lblLP.Click += new System.EventHandler(this.lblLP_Click);
             // 
             // lblCurrentProcessor
             // 
             this.lblCurrentProcessor.AutoSize = true;
-            this.lblCurrentProcessor.Location = new System.Drawing.Point(444, 406);
+            this.lblCurrentProcessor.Location = new System.Drawing.Point(393, 390);
             this.lblCurrentProcessor.Name = "lblCurrentProcessor";
-            this.lblCurrentProcessor.Size = new System.Drawing.Size(13, 13);
+            this.lblCurrentProcessor.Size = new System.Drawing.Size(19, 13);
             this.lblCurrentProcessor.TabIndex = 88;
-            this.lblCurrentProcessor.Text = "--";
+            this.lblCurrentProcessor.Text = "----";
+            this.lblCurrentProcessor.Visible = false;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(472, 13);
+            this.button1.Location = new System.Drawing.Point(472, 8);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 89;
@@ -963,7 +971,7 @@
             // 
             // txtCategory
             // 
-            this.txtCategory.Location = new System.Drawing.Point(564, 16);
+            this.txtCategory.Location = new System.Drawing.Point(564, 11);
             this.txtCategory.Name = "txtCategory";
             this.txtCategory.Size = new System.Drawing.Size(74, 20);
             this.txtCategory.TabIndex = 90;
@@ -972,7 +980,7 @@
             // 
             // txtCounterName
             // 
-            this.txtCounterName.Location = new System.Drawing.Point(643, 16);
+            this.txtCounterName.Location = new System.Drawing.Point(643, 11);
             this.txtCounterName.Name = "txtCounterName";
             this.txtCounterName.Size = new System.Drawing.Size(120, 20);
             this.txtCounterName.TabIndex = 91;
@@ -981,7 +989,7 @@
             // 
             // btnGPU
             // 
-            this.btnGPU.Location = new System.Drawing.Point(769, 16);
+            this.btnGPU.Location = new System.Drawing.Point(769, 11);
             this.btnGPU.Name = "btnGPU";
             this.btnGPU.Size = new System.Drawing.Size(35, 20);
             this.btnGPU.TabIndex = 92;
@@ -993,7 +1001,7 @@
             // label36
             // 
             this.label36.AutoSize = true;
-            this.label36.Location = new System.Drawing.Point(568, 409);
+            this.label36.Location = new System.Drawing.Point(568, 390);
             this.label36.Name = "label36";
             this.label36.Size = new System.Drawing.Size(65, 13);
             this.label36.TabIndex = 93;
@@ -1002,7 +1010,7 @@
             // lblExceptions
             // 
             this.lblExceptions.AutoSize = true;
-            this.lblExceptions.Location = new System.Drawing.Point(627, 408);
+            this.lblExceptions.Location = new System.Drawing.Point(627, 390);
             this.lblExceptions.Name = "lblExceptions";
             this.lblExceptions.Size = new System.Drawing.Size(16, 13);
             this.lblExceptions.TabIndex = 94;
@@ -1012,7 +1020,7 @@
             // lblGPUFanSpeed
             // 
             this.lblGPUFanSpeed.AutoSize = true;
-            this.lblGPUFanSpeed.Location = new System.Drawing.Point(789, 270);
+            this.lblGPUFanSpeed.Location = new System.Drawing.Point(789, 265);
             this.lblGPUFanSpeed.Name = "lblGPUFanSpeed";
             this.lblGPUFanSpeed.Size = new System.Drawing.Size(13, 13);
             this.lblGPUFanSpeed.TabIndex = 97;
@@ -1020,7 +1028,7 @@
             // 
             // pbGPUFanSpeed
             // 
-            this.pbGPUFanSpeed.Location = new System.Drawing.Point(627, 264);
+            this.pbGPUFanSpeed.Location = new System.Drawing.Point(627, 259);
             this.pbGPUFanSpeed.Name = "pbGPUFanSpeed";
             this.pbGPUFanSpeed.Size = new System.Drawing.Size(156, 23);
             this.pbGPUFanSpeed.TabIndex = 96;
@@ -1031,7 +1039,7 @@
             this.label38.AutoSize = true;
             this.label38.Font = new System.Drawing.Font("Arial Rounded MT Bold", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label38.ForeColor = System.Drawing.Color.YellowGreen;
-            this.label38.Location = new System.Drawing.Point(583, 268);
+            this.label38.Location = new System.Drawing.Point(583, 263);
             this.label38.Name = "label38";
             this.label38.Size = new System.Drawing.Size(43, 12);
             this.label38.TabIndex = 95;
@@ -1041,7 +1049,7 @@
             // chkAutoMoveTop
             // 
             this.chkAutoMoveTop.AutoSize = true;
-            this.chkAutoMoveTop.Location = new System.Drawing.Point(230, 16);
+            this.chkAutoMoveTop.Location = new System.Drawing.Point(230, 11);
             this.chkAutoMoveTop.Name = "chkAutoMoveTop";
             this.chkAutoMoveTop.Size = new System.Drawing.Size(100, 17);
             this.chkAutoMoveTop.TabIndex = 98;
@@ -1054,7 +1062,7 @@
             this.chkAlwaysOnTop.AutoSize = true;
             this.chkAlwaysOnTop.Checked = true;
             this.chkAlwaysOnTop.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkAlwaysOnTop.Location = new System.Drawing.Point(365, 17);
+            this.chkAlwaysOnTop.Location = new System.Drawing.Point(365, 12);
             this.chkAlwaysOnTop.Name = "chkAlwaysOnTop";
             this.chkAlwaysOnTop.Size = new System.Drawing.Size(98, 17);
             this.chkAlwaysOnTop.TabIndex = 99;
@@ -1064,18 +1072,56 @@
             // lblTop
             // 
             this.lblTop.AutoSize = true;
-            this.lblTop.Location = new System.Drawing.Point(756, 407);
+            this.lblTop.Location = new System.Drawing.Point(756, 390);
             this.lblTop.Name = "lblTop";
-            this.lblTop.Size = new System.Drawing.Size(16, 13);
+            this.lblTop.Size = new System.Drawing.Size(22, 13);
             this.lblTop.TabIndex = 100;
             this.lblTop.Tag = "0";
-            this.lblTop.Text = "---";
+            this.lblTop.Text = "-----";
+            // 
+            // lblShowLastThread
+            // 
+            this.lblShowLastThread.AutoSize = true;
+            this.lblShowLastThread.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.lblShowLastThread.Location = new System.Drawing.Point(434, 390);
+            this.lblShowLastThread.Name = "lblShowLastThread";
+            this.lblShowLastThread.Size = new System.Drawing.Size(67, 13);
+            this.lblShowLastThread.TabIndex = 101;
+            this.lblShowLastThread.Tag = "0";
+            this.lblShowLastThread.Text = "Last Thread:";
+            this.lblShowLastThread.Visible = false;
+            // 
+            // lblLastThread
+            // 
+            this.lblLastThread.AutoSize = true;
+            this.lblLastThread.Location = new System.Drawing.Point(499, 390);
+            this.lblLastThread.Name = "lblLastThread";
+            this.lblLastThread.Size = new System.Drawing.Size(25, 13);
+            this.lblLastThread.TabIndex = 102;
+            this.lblLastThread.Tag = "0";
+            this.lblLastThread.Text = "------";
+            this.lblLastThread.Visible = false;
+            // 
+            // picCPUDetails
+            // 
+            this.picCPUDetails.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.picCPUDetails.Image = global::PerformanceMonitor.Properties.Resources.cpu;
+            this.picCPUDetails.Location = new System.Drawing.Point(273, 382);
+            this.picCPUDetails.Name = "picCPUDetails";
+            this.picCPUDetails.Size = new System.Drawing.Size(34, 30);
+            this.picCPUDetails.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.picCPUDetails.TabIndex = 103;
+            this.picCPUDetails.TabStop = false;
+            this.picCPUDetails.Click += new System.EventHandler(this.picCPUDetails_Click);
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(825, 445);
+            this.ClientSize = new System.Drawing.Size(825, 417);
+            this.Controls.Add(this.picCPUDetails);
+            this.Controls.Add(this.lblLastThread);
+            this.Controls.Add(this.lblShowLastThread);
             this.Controls.Add(this.lblTop);
             this.Controls.Add(this.chkAlwaysOnTop);
             this.Controls.Add(this.chkAutoMoveTop);
@@ -1089,7 +1135,7 @@
             this.Controls.Add(this.txtCategory);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.lblCurrentProcessor);
-            this.Controls.Add(this.label35);
+            this.Controls.Add(this.lblLP);
             this.Controls.Add(this.label33);
             this.Controls.Add(this.lblMaxLoopTime);
             this.Controls.Add(this.label29);
@@ -1175,6 +1221,7 @@
             this.Controls.Add(this.chkEnabled);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.label4);
+            this.Cursor = System.Windows.Forms.Cursors.Default;
             this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.MaximizeBox = false;
@@ -1183,6 +1230,7 @@
             this.Text = "Performance Monitor Light";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
             this.Load += new System.EventHandler(this.frmMain_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.picCPUDetails)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1276,7 +1324,7 @@
         private System.Windows.Forms.Label label29;
         private System.Windows.Forms.Label lblMaxLoopTime;
         private System.Windows.Forms.Label label33;
-        private System.Windows.Forms.Label label35;
+        private System.Windows.Forms.Label lblLP;
         private System.Windows.Forms.Label lblCurrentProcessor;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.TextBox txtCategory;
@@ -1290,6 +1338,9 @@
         private System.Windows.Forms.CheckBox chkAutoMoveTop;
         private System.Windows.Forms.CheckBox chkAlwaysOnTop;
         private System.Windows.Forms.Label lblTop;
+        private System.Windows.Forms.Label lblShowLastThread;
+        private System.Windows.Forms.Label lblLastThread;
+        private System.Windows.Forms.PictureBox picCPUDetails;
     }
 }
 

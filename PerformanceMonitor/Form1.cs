@@ -23,6 +23,35 @@ namespace PerformanceMonitor
 
         private PerformanceCounter diskCounterC, diskCounterN, diskCounterR;
 
+        private void picCPUDetails_Click(object sender, EventArgs e)
+        {
+            if (lblCurrentProcessor.Visible) // make sure we turn off ShowLastThread just in case
+            {
+                lblShowLastThread.Visible = false;
+                lblLastThread.Visible = false;
+            }
+
+            lblCurrentProcessor.Visible = !lblCurrentProcessor.Visible;
+            lblLP.Visible = lblCurrentProcessor.Visible;
+
+         }
+
+        private void lblLP_Click(object sender, EventArgs e)
+        {
+            lblShowLastThread.Visible = !lblShowLastThread.Visible;
+            lblLastThread.Visible = lblShowLastThread.Visible;
+        }
+
+        private void pbGPU0_Click(object sender, EventArgs e)
+        {
+            timer1.Enabled = false;
+            chkEnabled.Checked = false;
+
+            btnGPU.Visible = true;
+            txtCategory.Visible = true;
+            txtCounterName.Visible = true;
+        }
+
         private void chkAutoMoveTop_CheckedChanged(object sender, EventArgs e)
         {
             if (chkAutoMoveTop.Checked)
@@ -46,6 +75,9 @@ namespace PerformanceMonitor
         [DllImport("kernel32.dll")]
         public static extern uint SetThreadIdealProcessor(IntPtr hThread, uint dwIdealProcessor);
 
+        [DllImport("kernel32.dll")]
+        public static extern uint GetCurrentThreadId();
+
 
         private void btnGPU_Click(object sender, EventArgs e)
         {
@@ -54,16 +86,6 @@ namespace PerformanceMonitor
             btnGPU.Visible = false;
 
             gpuUtilizationCounter = new PerformanceCounter("GPU", txtCategory.Text, txtCounterName.Text, true);
-        }
-
-        private void pbGPU0_Click(object sender, EventArgs e)
-        {
-            timer1.Enabled = false;
-            chkEnabled.Checked = false;
-
-            btnGPU.Visible = true;
-            txtCategory.Visible = true;
-            txtCounterName.Visible = true;
         }
 
 
@@ -102,6 +124,8 @@ namespace PerformanceMonitor
 
             lblLT.Tag = false; // used to ignore the first LoopTime Max calculation in timer1
             lblLoopTime.Tag = 0L; // used to keep track of the last one to avoid update in timer1
+
+            lblLastThread.Tag = 0; // used to keep track of the last thread used to avoid update in timer1
 
             StartService("GpuPerfCounters");
             InitializeCounterTags();
@@ -267,12 +291,25 @@ namespace PerformanceMonitor
                 timer1.Tag = true;  // flag for one-time control in timer1_Tick()
             }
 
-
-            int processorNumber = (int)GetCurrentProcessorNumber();
-            if ((int)lblCurrentProcessor.Tag != processorNumber)
+            if (lblShowLastThread.Visible)
             {
-                lblCurrentProcessor.Tag = processorNumber;
-                lblCurrentProcessor.Text = processorNumber.ToString();
+                int th = (int)GetCurrentThreadId(); 
+                if ((int)lblLastThread.Tag != th)
+                {                    
+                    lblLastThread.Tag = th;
+                    lblLastThread.Text = th.ToString();
+                }
+                
+            }
+
+            if (lblCurrentProcessor.Visible)
+            {
+                int processorNumber = (int)GetCurrentProcessorNumber();
+                if ((int)lblCurrentProcessor.Tag != processorNumber)
+                {
+                    lblCurrentProcessor.Tag = processorNumber;
+                    lblCurrentProcessor.Text = processorNumber.ToString();
+                }
             }
 
             UpdateCounter(gpuUtilizationCounter, pbGPU0, lblGPU0);
