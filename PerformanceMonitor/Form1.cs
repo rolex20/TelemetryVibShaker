@@ -7,6 +7,7 @@ using System.Threading;
 using System.ServiceProcess;
 using System.Linq;
 using System.CodeDom.Compiler;
+using System.Linq.Expressions;
 
 
 namespace PerformanceMonitor
@@ -267,8 +268,8 @@ namespace PerformanceMonitor
             }
 
 
-            uint processorNumber = GetCurrentProcessorNumber();
-            if ((uint)lblCurrentProcessor.Tag != processorNumber)
+            int processorNumber = (int)GetCurrentProcessorNumber();
+            if ((int)lblCurrentProcessor.Tag != processorNumber)
             {
                 lblCurrentProcessor.Tag = processorNumber;
                 lblCurrentProcessor.Text = processorNumber.ToString();
@@ -363,25 +364,39 @@ namespace PerformanceMonitor
 
         private void StartService(string serviceName)
         {
-            // Create an instance of ServiceController
-            ServiceController serviceController = new ServiceController(serviceName);
+            try
+            {
+                // Create an instance of ServiceController
+                ServiceController serviceController = new ServiceController(serviceName);
 
-            // Check if the service is already running or in the process of starting
-            if (serviceController.Status != ServiceControllerStatus.Running &&
-                serviceController.Status != ServiceControllerStatus.StartPending)
-                // Start the service
-                serviceController.Start();
+                // Check if the service is already running or in the process of starting
+                if (serviceController.Status != ServiceControllerStatus.Running &&
+                    serviceController.Status != ServiceControllerStatus.StartPending)
+                    // Start the service
+                    serviceController.Start();
+            }
+            catch (Exception ex)
+            {
+                // continue
+            }
         }
 
         private void StopService(string serviceName)
         {
-            // Create an instance of ServiceController
-            ServiceController serviceController = new ServiceController(serviceName);
+            try
+            {
+                // Create an instance of ServiceController
+                ServiceController serviceController = new ServiceController(serviceName);
 
-            // Check if the service is already running or in the process of starting
-            if (serviceController.Status == ServiceControllerStatus.Running )
-                // Stop the service
-                serviceController.Stop();
+                // Check if the service is already running or in the process of starting
+                if (serviceController.Status == ServiceControllerStatus.Running)
+                    // Stop the service
+                    serviceController.Stop();
+            }
+            catch (Exception ex)
+            {
+                // continue
+            }
         }
 
     }
