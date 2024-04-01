@@ -117,7 +117,7 @@
             this.label33 = new System.Windows.Forms.Label();
             this.lblLP = new System.Windows.Forms.Label();
             this.lblCurrentProcessor = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnResetMaxCounters = new System.Windows.Forms.Button();
             this.txtCategory = new System.Windows.Forms.TextBox();
             this.txtCounterName = new System.Windows.Forms.TextBox();
             this.btnGPU = new System.Windows.Forms.Button();
@@ -959,15 +959,15 @@
             this.lblCurrentProcessor.Text = "----";
             this.lblCurrentProcessor.Visible = false;
             // 
-            // button1
+            // btnResetMaxCounters
             // 
-            this.button1.Location = new System.Drawing.Point(472, 8);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 89;
-            this.button1.Text = "Reset Max";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.btnResetMaxCounters.Location = new System.Drawing.Point(472, 8);
+            this.btnResetMaxCounters.Name = "btnResetMaxCounters";
+            this.btnResetMaxCounters.Size = new System.Drawing.Size(75, 23);
+            this.btnResetMaxCounters.TabIndex = 89;
+            this.btnResetMaxCounters.Text = "Reset Max";
+            this.btnResetMaxCounters.UseVisualStyleBackColor = true;
+            this.btnResetMaxCounters.Click += new System.EventHandler(this.button1_Click);
             // 
             // txtCategory
             // 
@@ -1133,7 +1133,7 @@
             this.Controls.Add(this.btnGPU);
             this.Controls.Add(this.txtCounterName);
             this.Controls.Add(this.txtCategory);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btnResetMaxCounters);
             this.Controls.Add(this.lblCurrentProcessor);
             this.Controls.Add(this.lblLP);
             this.Controls.Add(this.label33);
@@ -1326,7 +1326,7 @@
         private System.Windows.Forms.Label label33;
         private System.Windows.Forms.Label lblLP;
         private System.Windows.Forms.Label lblCurrentProcessor;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnResetMaxCounters;
         private System.Windows.Forms.TextBox txtCategory;
         private System.Windows.Forms.TextBox txtCounterName;
         private System.Windows.Forms.Button btnGPU;
