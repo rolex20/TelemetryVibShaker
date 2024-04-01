@@ -110,7 +110,7 @@
             this.label31 = new System.Windows.Forms.Label();
             this.lblDiskR = new System.Windows.Forms.Label();
             this.label34 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
+            this.lblLT = new System.Windows.Forms.Label();
             this.lblLoopTime = new System.Windows.Forms.Label();
             this.label29 = new System.Windows.Forms.Label();
             this.lblMaxLoopTime = new System.Windows.Forms.Label();
@@ -165,7 +165,7 @@
             this.lblCPU.AutoSize = true;
             this.lblCPU.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.lblCPU.Location = new System.Drawing.Point(16, 57);
+            this.lblCPU.Location = new System.Drawing.Point(15, 57);
             this.lblCPU.Name = "lblCPU";
             this.lblCPU.Size = new System.Drawing.Size(47, 13);
             this.lblCPU.TabIndex = 2;
@@ -258,7 +258,7 @@
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label7.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label7.Location = new System.Drawing.Point(16, 97);
+            this.label7.Location = new System.Drawing.Point(15, 97);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(47, 13);
             this.label7.TabIndex = 12;
@@ -283,11 +283,12 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label8.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label8.Location = new System.Drawing.Point(16, 141);
+            this.label8.Location = new System.Drawing.Point(15, 141);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(47, 13);
+            this.label8.Size = new System.Drawing.Size(49, 15);
             this.label8.TabIndex = 15;
             this.label8.Text = "CPU[4]";
             // 
@@ -312,7 +313,7 @@
             this.label10.AutoSize = true;
             this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label10.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label10.Location = new System.Drawing.Point(16, 184);
+            this.label10.Location = new System.Drawing.Point(15, 184);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(47, 13);
             this.label10.TabIndex = 18;
@@ -337,11 +338,12 @@
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label12.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label12.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label12.Location = new System.Drawing.Point(16, 227);
+            this.label12.Location = new System.Drawing.Point(15, 227);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(47, 13);
+            this.label12.Size = new System.Drawing.Size(49, 15);
             this.label12.TabIndex = 21;
             this.label12.Text = "CPU[8]";
             // 
@@ -364,11 +366,12 @@
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label14.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label14.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label14.Location = new System.Drawing.Point(9, 269);
+            this.label14.Location = new System.Drawing.Point(8, 269);
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(54, 13);
+            this.label14.Size = new System.Drawing.Size(56, 15);
             this.label14.TabIndex = 24;
             this.label14.Text = "CPU[10]";
             // 
@@ -393,7 +396,7 @@
             this.label16.AutoSize = true;
             this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label16.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label16.Location = new System.Drawing.Point(9, 313);
+            this.label16.Location = new System.Drawing.Point(8, 313);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(54, 13);
             this.label16.TabIndex = 27;
@@ -420,7 +423,7 @@
             this.label18.AutoSize = true;
             this.label18.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label18.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label18.Location = new System.Drawing.Point(9, 358);
+            this.label18.Location = new System.Drawing.Point(8, 358);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(54, 13);
             this.label18.TabIndex = 30;
@@ -885,14 +888,14 @@
             this.label34.TabIndex = 77;
             this.label34.Text = "Disk R:";
             // 
-            // label3
+            // lblLT
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(8, 409);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(57, 13);
-            this.label3.TabIndex = 82;
-            this.label3.Text = "LoopTime:";
+            this.lblLT.AutoSize = true;
+            this.lblLT.Location = new System.Drawing.Point(8, 409);
+            this.lblLT.Name = "lblLT";
+            this.lblLT.Size = new System.Drawing.Size(57, 13);
+            this.lblLT.TabIndex = 82;
+            this.lblLT.Text = "LoopTime:";
             // 
             // lblLoopTime
             // 
@@ -1051,7 +1054,7 @@
             this.chkAlwaysOnTop.AutoSize = true;
             this.chkAlwaysOnTop.Checked = true;
             this.chkAlwaysOnTop.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkAlwaysOnTop.Location = new System.Drawing.Point(340, 17);
+            this.chkAlwaysOnTop.Location = new System.Drawing.Point(365, 17);
             this.chkAlwaysOnTop.Name = "chkAlwaysOnTop";
             this.chkAlwaysOnTop.Size = new System.Drawing.Size(98, 17);
             this.chkAlwaysOnTop.TabIndex = 99;
@@ -1091,7 +1094,7 @@
             this.Controls.Add(this.lblMaxLoopTime);
             this.Controls.Add(this.label29);
             this.Controls.Add(this.lblLoopTime);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.lblLT);
             this.Controls.Add(this.label19);
             this.Controls.Add(this.lblMaxDiskR);
             this.Controls.Add(this.label31);
@@ -1268,7 +1271,7 @@
         private System.Windows.Forms.Label label31;
         private System.Windows.Forms.Label lblDiskR;
         private System.Windows.Forms.Label label34;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label lblLT;
         private System.Windows.Forms.Label lblLoopTime;
         private System.Windows.Forms.Label label29;
         private System.Windows.Forms.Label lblMaxLoopTime;

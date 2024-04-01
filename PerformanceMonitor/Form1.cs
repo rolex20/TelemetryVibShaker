@@ -6,6 +6,7 @@ using Microsoft.Win32;
 using System.Threading;
 using System.ServiceProcess;
 using System.Linq;
+using System.CodeDom.Compiler;
 
 
 namespace PerformanceMonitor
@@ -26,7 +27,10 @@ namespace PerformanceMonitor
             if (chkAutoMoveTop.Checked)
             {
                 chkAutoMoveTop.Tag = lblTop.Tag;
+                chkAutoMoveTop.Text = "Auto Move Top: " + lblTop.Text;
             }
+            else
+                chkAutoMoveTop.Text = "Auto Move Top";
         }
 
         private PerformanceCounter gpuUtilizationCounter, gpuFanCounter;
@@ -93,8 +97,10 @@ namespace PerformanceMonitor
 
             lblTop.Tag = 0;  // used to store frmMain.Top
             chkAutoMoveTop.Tag = 10; // give some 10 pixels of top margin
-            lblCurrentProcessor.Tag = 255; // unrealistic processor assigment to force update in timer
+            lblCurrentProcessor.Tag = 255; // unrealistic processor assigment to force update in timer1
 
+            lblLT.Tag = false; // used to ignore the first LoopTime Max calculation in timer1
+            lblLoopTime.Tag = 0L; // used to keep track of the last one to avoid update in timer1
 
             StartService("GpuPerfCounters");
             InitializeCounterTags();
@@ -229,7 +235,10 @@ namespace PerformanceMonitor
             // update frmMain.Top position in the label only when required
             int t = this.Top;
             if ((int)lblTop.Tag != t)
+            {
+                lblTop.Tag = t;
                 lblTop.Text = t.ToString();
+            }
 
             // move frmMain.Top position to the stored position if required by the user
             if (chkAutoMoveTop.Checked)
@@ -259,8 +268,11 @@ namespace PerformanceMonitor
 
 
             uint processorNumber = GetCurrentProcessorNumber();
-            if ((uint)lblCurrentProcessor.Tag != processorNumber) 
+            if ((uint)lblCurrentProcessor.Tag != processorNumber)
+            {
+                lblCurrentProcessor.Tag = processorNumber;
                 lblCurrentProcessor.Text = processorNumber.ToString();
+            }
 
             UpdateCounter(gpuUtilizationCounter, pbGPU0, lblGPU0);
             UpdateCounter(gpuFanCounter, pbGPUFanSpeed, lblGPUFanSpeed);
@@ -299,11 +311,20 @@ namespace PerformanceMonitor
             stopwatch.Stop();
 
             long elapsed_ms = stopwatch.ElapsedMilliseconds;
-            lblLoopTime.Text = elapsed_ms.ToString();
+            if ((long)lblLoopTime.Tag != elapsed_ms)
+            {
+                lblLoopTime.Tag = elapsed_ms;
+                lblLoopTime.Text = elapsed_ms.ToString();
+            }
+
             if (elapsed_ms > (long)lblMaxLoopTime.Tag)
             {
-                lblMaxLoopTime.Tag = elapsed_ms;
-                lblMaxLoopTime.Text = lblLoopTime.Text;
+                if ((bool)lblLT.Tag) // ignore the first Max
+                    lblMaxLoopTime.Tag = elapsed_ms; 
+                else
+                    lblLT.Tag = true;
+
+                lblMaxLoopTime.Text = lblLoopTime.Text;  // update regardless of the first-time-ignore for information purposes
             }
 
         }
