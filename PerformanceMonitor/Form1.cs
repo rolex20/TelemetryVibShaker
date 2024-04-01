@@ -412,7 +412,7 @@ namespace PerformanceMonitor
                     // Start the service
                     serviceController.Start();
             }
-            catch (Exception ex)
+            catch 
             {
                 // continue
             }
@@ -430,7 +430,7 @@ namespace PerformanceMonitor
                     // Stop the service
                     serviceController.Stop();
             }
-            catch (Exception ex)
+            catch
             {
                 // continue
             }
