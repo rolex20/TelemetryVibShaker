@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.label1 = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.chkEnabled = new System.Windows.Forms.CheckBox();
@@ -132,6 +133,7 @@
             this.lblShowLastThread = new System.Windows.Forms.Label();
             this.lblLastThread = new System.Windows.Forms.Label();
             this.picCPUDetails = new System.Windows.Forms.PictureBox();
+            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.picCPUDetails)).BeginInit();
             this.SuspendLayout();
             // 
@@ -1114,6 +1116,12 @@
             this.picCPUDetails.TabStop = false;
             this.picCPUDetails.Click += new System.EventHandler(this.picCPUDetails_Click);
             // 
+            // imageList1
+            // 
+            this.imageList1.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.imageList1.ImageSize = new System.Drawing.Size(16, 16);
+            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1224,6 +1232,7 @@
             this.Cursor = System.Windows.Forms.Cursors.Default;
             this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "frmMain";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
@@ -1341,6 +1350,7 @@
         private System.Windows.Forms.Label lblShowLastThread;
         private System.Windows.Forms.Label lblLastThread;
         private System.Windows.Forms.PictureBox picCPUDetails;
+        private System.Windows.Forms.ImageList imageList1;
     }
 }
 
