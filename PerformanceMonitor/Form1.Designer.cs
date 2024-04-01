@@ -127,6 +127,8 @@
             this.pbGPUFanSpeed = new System.Windows.Forms.ProgressBar();
             this.label38 = new System.Windows.Forms.Label();
             this.chkAutoMoveTop = new System.Windows.Forms.CheckBox();
+            this.chkAlwaysOnTop = new System.Windows.Forms.CheckBox();
+            this.lblTop = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -136,9 +138,9 @@
             this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
             this.label1.Location = new System.Drawing.Point(12, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(211, 24);
+            this.label1.Size = new System.Drawing.Size(104, 24);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Intel Core i7-12700K";
+            this.label1.Text = "i7-12700K";
             // 
             // timer1
             // 
@@ -150,7 +152,7 @@
             this.chkEnabled.AutoSize = true;
             this.chkEnabled.Checked = true;
             this.chkEnabled.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkEnabled.Location = new System.Drawing.Point(241, 16);
+            this.chkEnabled.Location = new System.Drawing.Point(127, 16);
             this.chkEnabled.Name = "chkEnabled";
             this.chkEnabled.Size = new System.Drawing.Size(97, 17);
             this.chkEnabled.TabIndex = 1;
@@ -760,7 +762,6 @@
             this.lblMaxDiskC.TabIndex = 70;
             this.lblMaxDiskC.Tag = "0";
             this.lblMaxDiskC.Text = "----";
-            this.lblMaxDiskC.Click += new System.EventHandler(this.lblMaxDiskC_Click);
             // 
             // label24
             // 
@@ -932,7 +933,7 @@
             // label35
             // 
             this.label35.AutoSize = true;
-            this.label35.Location = new System.Drawing.Point(392, 409);
+            this.label35.Location = new System.Drawing.Point(336, 407);
             this.label35.Name = "label35";
             this.label35.Size = new System.Drawing.Size(111, 13);
             this.label35.TabIndex = 87;
@@ -941,7 +942,7 @@
             // lblCurrentProcessor
             // 
             this.lblCurrentProcessor.AutoSize = true;
-            this.lblCurrentProcessor.Location = new System.Drawing.Point(502, 408);
+            this.lblCurrentProcessor.Location = new System.Drawing.Point(444, 406);
             this.lblCurrentProcessor.Name = "lblCurrentProcessor";
             this.lblCurrentProcessor.Size = new System.Drawing.Size(13, 13);
             this.lblCurrentProcessor.TabIndex = 88;
@@ -989,7 +990,7 @@
             // label36
             // 
             this.label36.AutoSize = true;
-            this.label36.Location = new System.Drawing.Point(640, 408);
+            this.label36.Location = new System.Drawing.Point(568, 409);
             this.label36.Name = "label36";
             this.label36.Size = new System.Drawing.Size(65, 13);
             this.label36.TabIndex = 93;
@@ -998,7 +999,7 @@
             // lblExceptions
             // 
             this.lblExceptions.AutoSize = true;
-            this.lblExceptions.Location = new System.Drawing.Point(710, 407);
+            this.lblExceptions.Location = new System.Drawing.Point(627, 408);
             this.lblExceptions.Name = "lblExceptions";
             this.lblExceptions.Size = new System.Drawing.Size(16, 13);
             this.lblExceptions.TabIndex = 94;
@@ -1037,20 +1038,43 @@
             // chkAutoMoveTop
             // 
             this.chkAutoMoveTop.AutoSize = true;
-            this.chkAutoMoveTop.Checked = true;
-            this.chkAutoMoveTop.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkAutoMoveTop.Location = new System.Drawing.Point(345, 15);
+            this.chkAutoMoveTop.Location = new System.Drawing.Point(230, 16);
             this.chkAutoMoveTop.Name = "chkAutoMoveTop";
             this.chkAutoMoveTop.Size = new System.Drawing.Size(100, 17);
             this.chkAutoMoveTop.TabIndex = 98;
             this.chkAutoMoveTop.Text = "Auto Move Top";
             this.chkAutoMoveTop.UseVisualStyleBackColor = true;
+            this.chkAutoMoveTop.CheckedChanged += new System.EventHandler(this.chkAutoMoveTop_CheckedChanged);
+            // 
+            // chkAlwaysOnTop
+            // 
+            this.chkAlwaysOnTop.AutoSize = true;
+            this.chkAlwaysOnTop.Checked = true;
+            this.chkAlwaysOnTop.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkAlwaysOnTop.Location = new System.Drawing.Point(340, 17);
+            this.chkAlwaysOnTop.Name = "chkAlwaysOnTop";
+            this.chkAlwaysOnTop.Size = new System.Drawing.Size(98, 17);
+            this.chkAlwaysOnTop.TabIndex = 99;
+            this.chkAlwaysOnTop.Text = "Always On Top";
+            this.chkAlwaysOnTop.UseVisualStyleBackColor = true;
+            // 
+            // lblTop
+            // 
+            this.lblTop.AutoSize = true;
+            this.lblTop.Location = new System.Drawing.Point(756, 407);
+            this.lblTop.Name = "lblTop";
+            this.lblTop.Size = new System.Drawing.Size(16, 13);
+            this.lblTop.TabIndex = 100;
+            this.lblTop.Tag = "0";
+            this.lblTop.Text = "---";
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(825, 445);
+            this.Controls.Add(this.lblTop);
+            this.Controls.Add(this.chkAlwaysOnTop);
             this.Controls.Add(this.chkAutoMoveTop);
             this.Controls.Add(this.lblGPUFanSpeed);
             this.Controls.Add(this.pbGPUFanSpeed);
@@ -1261,6 +1285,8 @@
         private System.Windows.Forms.ProgressBar pbGPUFanSpeed;
         private System.Windows.Forms.Label label38;
         private System.Windows.Forms.CheckBox chkAutoMoveTop;
+        private System.Windows.Forms.CheckBox chkAlwaysOnTop;
+        private System.Windows.Forms.Label lblTop;
     }
 }
 

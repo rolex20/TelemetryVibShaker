@@ -21,9 +21,12 @@ namespace PerformanceMonitor
 
         private PerformanceCounter diskCounterC, diskCounterN, diskCounterR;
 
-        private void lblMaxDiskC_Click(object sender, EventArgs e)
+        private void chkAutoMoveTop_CheckedChanged(object sender, EventArgs e)
         {
-
+            if (chkAutoMoveTop.Checked)
+            {
+                chkAutoMoveTop.Tag = lblTop.Tag;
+            }
         }
 
         private PerformanceCounter gpuUtilizationCounter, gpuFanCounter;
@@ -87,8 +90,14 @@ namespace PerformanceMonitor
         {
             timer1.Enabled = false;
             timer1.Tag = false; // flag for one-time control in timer1_Tick()
+
+            lblTop.Tag = 0;  // used to store frmMain.Top
+            chkAutoMoveTop.Tag = 10; // give some 10 pixels of top margin
+            lblCurrentProcessor.Tag = 255; // unrealistic processor assigment to force update in timer
+
+
             StartService("GpuPerfCounters");
-            InitializeTags();
+            InitializeCounterTags();
             ResetMaxCounters();
 
 
@@ -217,11 +226,21 @@ namespace PerformanceMonitor
         {
             stopwatch.Restart();
 
+            // update frmMain.Top position in the label only when required
+            int t = this.Top;
+            if ((int)lblTop.Tag != t)
+                lblTop.Text = t.ToString();
+
+            // move frmMain.Top position to the stored position if required by the user
             if (chkAutoMoveTop.Checked)
             {
-                if (this.Top != 10) this.Top = 10;
-                this.TopMost = true;
+                int a = (int)chkAutoMoveTop.Tag;
+                if (this.Top != a) this.Top =a;                
             }
+
+            // make the form to be always on top if required by the user
+            if (chkAlwaysOnTop.Checked != this.TopMost) 
+                this.TopMost = chkAlwaysOnTop.Checked;
 
 
             if (!(bool)timer1.Tag) // only do this once
@@ -240,7 +259,8 @@ namespace PerformanceMonitor
 
 
             uint processorNumber = GetCurrentProcessorNumber();
-            lblCurrentProcessor.Text = processorNumber.ToString();
+            if ((uint)lblCurrentProcessor.Tag != processorNumber) 
+                lblCurrentProcessor.Text = processorNumber.ToString();
 
             UpdateCounter(gpuUtilizationCounter, pbGPU0, lblGPU0);
             UpdateCounter(gpuFanCounter, pbGPUFanSpeed, lblGPUFanSpeed);
@@ -299,7 +319,7 @@ namespace PerformanceMonitor
 
         }
 
-        private void InitializeTags()
+        private void InitializeCounterTags()
         {
             var labels = this.Controls.OfType<Label>()
                             .Where(c => (c.Name.StartsWith("lblCPU")) || (c.Name.StartsWith("lblGPU")))
