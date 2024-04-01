@@ -744,30 +744,30 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(569, 308);
+            this.label5.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(569, 304);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(54, 11);
+            this.label5.Size = new System.Drawing.Size(44, 15);
             this.label5.TabIndex = 67;
             this.label5.Text = "Disk C:";
             // 
             // lblDiskC
             // 
             this.lblDiskC.AutoSize = true;
-            this.lblDiskC.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDiskC.Location = new System.Drawing.Point(626, 308);
+            this.lblDiskC.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDiskC.Location = new System.Drawing.Point(626, 304);
             this.lblDiskC.Name = "lblDiskC";
-            this.lblDiskC.Size = new System.Drawing.Size(33, 11);
+            this.lblDiskC.Size = new System.Drawing.Size(23, 15);
             this.lblDiskC.TabIndex = 68;
             this.lblDiskC.Text = "----";
             // 
             // lblMaxDiskC
             // 
             this.lblMaxDiskC.AutoSize = true;
-            this.lblMaxDiskC.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMaxDiskC.Location = new System.Drawing.Point(709, 308);
+            this.lblMaxDiskC.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblMaxDiskC.Location = new System.Drawing.Point(709, 304);
             this.lblMaxDiskC.Name = "lblMaxDiskC";
-            this.lblMaxDiskC.Size = new System.Drawing.Size(33, 11);
+            this.lblMaxDiskC.Size = new System.Drawing.Size(23, 15);
             this.lblMaxDiskC.TabIndex = 70;
             this.lblMaxDiskC.Tag = "0";
             this.lblMaxDiskC.Text = "----";
@@ -775,40 +775,40 @@
             // label24
             // 
             this.label24.AutoSize = true;
-            this.label24.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label24.Location = new System.Drawing.Point(673, 308);
+            this.label24.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label24.Location = new System.Drawing.Point(673, 304);
             this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(33, 11);
+            this.label24.Size = new System.Drawing.Size(34, 15);
             this.label24.TabIndex = 69;
             this.label24.Text = "Max:";
             // 
             // label27
             // 
             this.label27.AutoSize = true;
-            this.label27.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label27.Location = new System.Drawing.Point(754, 308);
+            this.label27.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label27.Location = new System.Drawing.Point(754, 304);
             this.label27.Name = "label27";
-            this.label27.Size = new System.Drawing.Size(33, 11);
+            this.label27.Size = new System.Drawing.Size(36, 15);
             this.label27.TabIndex = 71;
             this.label27.Text = "MB/s";
             // 
             // label28
             // 
             this.label28.AutoSize = true;
-            this.label28.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label28.Location = new System.Drawing.Point(754, 334);
+            this.label28.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label28.Location = new System.Drawing.Point(754, 330);
             this.label28.Name = "label28";
-            this.label28.Size = new System.Drawing.Size(33, 11);
+            this.label28.Size = new System.Drawing.Size(36, 15);
             this.label28.TabIndex = 76;
             this.label28.Text = "MB/s";
             // 
             // lblMaxDiskN
             // 
             this.lblMaxDiskN.AutoSize = true;
-            this.lblMaxDiskN.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMaxDiskN.Location = new System.Drawing.Point(709, 334);
+            this.lblMaxDiskN.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblMaxDiskN.Location = new System.Drawing.Point(709, 330);
             this.lblMaxDiskN.Name = "lblMaxDiskN";
-            this.lblMaxDiskN.Size = new System.Drawing.Size(33, 11);
+            this.lblMaxDiskN.Size = new System.Drawing.Size(23, 15);
             this.lblMaxDiskN.TabIndex = 75;
             this.lblMaxDiskN.Tag = "0";
             this.lblMaxDiskN.Text = "----";
@@ -816,50 +816,50 @@
             // label30
             // 
             this.label30.AutoSize = true;
-            this.label30.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label30.Location = new System.Drawing.Point(673, 334);
+            this.label30.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label30.Location = new System.Drawing.Point(673, 330);
             this.label30.Name = "label30";
-            this.label30.Size = new System.Drawing.Size(33, 11);
+            this.label30.Size = new System.Drawing.Size(34, 15);
             this.label30.TabIndex = 74;
             this.label30.Text = "Max:";
             // 
             // lblDiskN
             // 
             this.lblDiskN.AutoSize = true;
-            this.lblDiskN.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDiskN.Location = new System.Drawing.Point(626, 334);
+            this.lblDiskN.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDiskN.Location = new System.Drawing.Point(626, 330);
             this.lblDiskN.Name = "lblDiskN";
-            this.lblDiskN.Size = new System.Drawing.Size(33, 11);
+            this.lblDiskN.Size = new System.Drawing.Size(23, 15);
             this.lblDiskN.TabIndex = 73;
             this.lblDiskN.Text = "----";
             // 
             // label32
             // 
             this.label32.AutoSize = true;
-            this.label32.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label32.Location = new System.Drawing.Point(569, 334);
+            this.label32.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label32.Location = new System.Drawing.Point(569, 330);
             this.label32.Name = "label32";
-            this.label32.Size = new System.Drawing.Size(54, 11);
+            this.label32.Size = new System.Drawing.Size(45, 15);
             this.label32.TabIndex = 72;
             this.label32.Text = "Disk N:";
             // 
             // label19
             // 
             this.label19.AutoSize = true;
-            this.label19.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label19.Location = new System.Drawing.Point(754, 360);
+            this.label19.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label19.Location = new System.Drawing.Point(754, 356);
             this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(33, 11);
+            this.label19.Size = new System.Drawing.Size(36, 15);
             this.label19.TabIndex = 81;
             this.label19.Text = "MB/s";
             // 
             // lblMaxDiskR
             // 
             this.lblMaxDiskR.AutoSize = true;
-            this.lblMaxDiskR.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMaxDiskR.Location = new System.Drawing.Point(709, 360);
+            this.lblMaxDiskR.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblMaxDiskR.Location = new System.Drawing.Point(709, 356);
             this.lblMaxDiskR.Name = "lblMaxDiskR";
-            this.lblMaxDiskR.Size = new System.Drawing.Size(33, 11);
+            this.lblMaxDiskR.Size = new System.Drawing.Size(23, 15);
             this.lblMaxDiskR.TabIndex = 80;
             this.lblMaxDiskR.Tag = "0";
             this.lblMaxDiskR.Text = "----";
@@ -867,30 +867,30 @@
             // label31
             // 
             this.label31.AutoSize = true;
-            this.label31.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label31.Location = new System.Drawing.Point(673, 360);
+            this.label31.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label31.Location = new System.Drawing.Point(673, 356);
             this.label31.Name = "label31";
-            this.label31.Size = new System.Drawing.Size(33, 11);
+            this.label31.Size = new System.Drawing.Size(34, 15);
             this.label31.TabIndex = 79;
             this.label31.Text = "Max:";
             // 
             // lblDiskR
             // 
             this.lblDiskR.AutoSize = true;
-            this.lblDiskR.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDiskR.Location = new System.Drawing.Point(626, 360);
+            this.lblDiskR.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDiskR.Location = new System.Drawing.Point(626, 356);
             this.lblDiskR.Name = "lblDiskR";
-            this.lblDiskR.Size = new System.Drawing.Size(33, 11);
+            this.lblDiskR.Size = new System.Drawing.Size(23, 15);
             this.lblDiskR.TabIndex = 78;
             this.lblDiskR.Text = "----";
             // 
             // label34
             // 
             this.label34.AutoSize = true;
-            this.label34.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label34.Location = new System.Drawing.Point(569, 360);
+            this.label34.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label34.Location = new System.Drawing.Point(569, 356);
             this.label34.Name = "label34";
-            this.label34.Size = new System.Drawing.Size(54, 11);
+            this.label34.Size = new System.Drawing.Size(44, 15);
             this.label34.TabIndex = 77;
             this.label34.Text = "Disk R:";
             // 
@@ -1074,9 +1074,10 @@
             // lblTop
             // 
             this.lblTop.AutoSize = true;
-            this.lblTop.Location = new System.Drawing.Point(756, 390);
+            this.lblTop.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTop.Location = new System.Drawing.Point(756, 389);
             this.lblTop.Name = "lblTop";
-            this.lblTop.Size = new System.Drawing.Size(22, 13);
+            this.lblTop.Size = new System.Drawing.Size(27, 15);
             this.lblTop.TabIndex = 100;
             this.lblTop.Tag = "0";
             this.lblTop.Text = "-----";
