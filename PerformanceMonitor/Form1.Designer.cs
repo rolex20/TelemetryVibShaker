@@ -1027,8 +1027,8 @@
             this.tschkAutoReadY.Image = ((System.Drawing.Image)(resources.GetObject("tschkAutoReadY.Image")));
             this.tschkAutoReadY.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tschkAutoReadY.Name = "tschkAutoReadY";
-            this.tschkAutoReadY.Size = new System.Drawing.Size(76, 24);
-            this.tschkAutoReadY.Text = "Auto Read Y";
+            this.tschkAutoReadY.Size = new System.Drawing.Size(69, 24);
+            this.tschkAutoReadY.Text = "Auto Set Y ";
             this.tschkAutoReadY.ToolTipText = "Auto read current Y coordinates";
             // 
             // tschkAlwaysOnTop
