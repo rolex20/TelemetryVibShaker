@@ -139,7 +139,7 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.tstxtAutoMoveY = new System.Windows.Forms.ToolStripTextBox();
             this.tschkAutoMoveTop = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
+            this.tschkAutoReadY = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripTextBox2 = new System.Windows.Forms.ToolStripTextBox();
@@ -1144,7 +1144,7 @@
             this.toolStripSeparator1,
             this.tstxtAutoMoveY,
             this.tschkAutoMoveTop,
-            this.toolStripButton4,
+            this.tschkAutoReadY,
             this.toolStripSeparator2,
             this.toolStripLabel2,
             this.toolStripTextBox2,
@@ -1200,6 +1200,7 @@
             this.tstxtAutoMoveY.Name = "tstxtAutoMoveY";
             this.tstxtAutoMoveY.Size = new System.Drawing.Size(50, 27);
             this.tstxtAutoMoveY.Text = "10";
+            this.tstxtAutoMoveY.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tstxtAutoMoveY_KeyPress);
             // 
             // tschkAutoMoveTop
             // 
@@ -1212,17 +1213,15 @@
             this.tschkAutoMoveTop.Text = "Auto Move Y";
             this.tschkAutoMoveTop.Click += new System.EventHandler(this.tschkAutoMoveTop_Click);
             // 
-            // toolStripButton4
+            // tschkAutoReadY
             // 
-            this.toolStripButton4.Checked = true;
-            this.toolStripButton4.CheckOnClick = true;
-            this.toolStripButton4.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.toolStripButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton4.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton4.Image")));
-            this.toolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton4.Name = "toolStripButton4";
-            this.toolStripButton4.Size = new System.Drawing.Size(76, 24);
-            this.toolStripButton4.Text = "Auto Read Y";
+            this.tschkAutoReadY.CheckOnClick = true;
+            this.tschkAutoReadY.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.tschkAutoReadY.Image = ((System.Drawing.Image)(resources.GetObject("tschkAutoReadY.Image")));
+            this.tschkAutoReadY.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tschkAutoReadY.Name = "tschkAutoReadY";
+            this.tschkAutoReadY.Size = new System.Drawing.Size(76, 24);
+            this.tschkAutoReadY.Text = "Auto Read Y";
             // 
             // toolStripSeparator2
             // 
@@ -1495,7 +1494,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripTextBox tstxtAutoMoveY;
         private System.Windows.Forms.ToolStripButton tschkAutoMoveTop;
-        private System.Windows.Forms.ToolStripButton toolStripButton4;
+        private System.Windows.Forms.ToolStripButton tschkAutoReadY;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripLabel toolStripLabel2;
         private System.Windows.Forms.ToolStripTextBox toolStripTextBox2;

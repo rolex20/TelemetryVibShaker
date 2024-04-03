@@ -52,6 +52,14 @@ namespace PerformanceMonitor
 
         }
 
+        private void tstxtAutoMoveY_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true; // Prevent non-numeric characters
+            }
+        }
+
         private void tschkEnabled_Click(object sender, EventArgs e)
         {
             //timer1.Enabled = chkEnabled.Checked;
@@ -284,17 +292,17 @@ namespace PerformanceMonitor
             }
 
             // move frmMain.Top position to the stored position if required by the user
-            if (chkAutoMoveTop.Checked)
-            {
-                int a = (int)chkAutoMoveTop.Tag;
-                if (this.Top != a) this.Top =a;                
-            }
+            //if (chkAutoMoveTop.Checked)
+            //{
+            //    int a = (int)chkAutoMoveTop.Tag;
+            //    if (this.Top != a) this.Top =a;                
+            //}
 
-            if (tschkAutoMoveTop.Checked)
-            {
-                int a = (int)chkAutoMoveTop.Tag;
-                if (this.Top != a) this.Top = a;
-            }
+            if (tschkAutoReadY.Checked)
+                tstxtAutoMoveY.Text = lblTop.Text;
+            
+            if (tschkAutoMoveTop.Checked && (int.TryParse(tstxtAutoMoveY.Text, out t)) && (this.Top!=t))          
+                this.Top = t;
 
             // make the form to be always on top if required by the user
             if (chkAlwaysOnTop.Checked != this.TopMost) 
