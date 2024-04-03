@@ -44,14 +44,14 @@ namespace PerformanceMonitor
 
         private void tschkEnabled_Click(object sender, EventArgs e)
         {
-            timer1.Enabled = chkEnabled.Checked;
+            //timer1.Enabled = chkEnabled.Checked;
             timer1.Enabled = tschkEnabled.Checked;
         }
 
         private void pbGPU0_Click(object sender, EventArgs e)
         {
             timer1.Enabled = false;
-            chkEnabled.Checked = false;
+            //chkEnabled.Checked = false;
             tschkEnabled.Checked = false;
 
             btnGPU.Visible = true;
@@ -201,7 +201,7 @@ namespace PerformanceMonitor
             cpuCounter19 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,19", true);
 
             stopwatch = new Stopwatch();
-            timer1.Enabled = chkEnabled.Checked;
+            //timer1.Enabled = chkEnabled.Checked;
             timer1.Enabled = tschkEnabled.Checked;
         }
 
@@ -373,12 +373,6 @@ namespace PerformanceMonitor
                 lblMaxLoopTime.Text = lblLoopTime.Text;  // update regardless of the first-time-ignore for information purposes
             }
 
-        }
-
-        private void chkEnabled_CheckedChanged(object sender, EventArgs e)
-        {
-            timer1.Enabled = chkEnabled.Checked;
-            timer1.Enabled = tschkEnabled.Checked;
         }
 
         private void button1_Click(object sender, EventArgs e)

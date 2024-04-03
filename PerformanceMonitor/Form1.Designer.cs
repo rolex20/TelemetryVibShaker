@@ -32,7 +32,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.label1 = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.chkEnabled = new System.Windows.Forms.CheckBox();
             this.lblCPU = new System.Windows.Forms.Label();
             this.pbCPU0 = new System.Windows.Forms.ProgressBar();
             this.pbGPU0 = new System.Windows.Forms.ProgressBar();
@@ -166,19 +165,6 @@
             // 
             this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
-            // chkEnabled
-            // 
-            this.chkEnabled.AutoSize = true;
-            this.chkEnabled.Checked = true;
-            this.chkEnabled.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkEnabled.Location = new System.Drawing.Point(127, 433);
-            this.chkEnabled.Name = "chkEnabled";
-            this.chkEnabled.Size = new System.Drawing.Size(97, 17);
-            this.chkEnabled.TabIndex = 1;
-            this.chkEnabled.Text = "Enable Monitor";
-            this.chkEnabled.UseVisualStyleBackColor = true;
-            this.chkEnabled.CheckedChanged += new System.EventHandler(this.chkEnabled_CheckedChanged);
             // 
             // lblCPU
             // 
@@ -1387,7 +1373,6 @@
             this.Controls.Add(this.pbGPU0);
             this.Controls.Add(this.pbCPU0);
             this.Controls.Add(this.lblCPU);
-            this.Controls.Add(this.chkEnabled);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.label4);
             this.Cursor = System.Windows.Forms.Cursors.Default;
@@ -1412,7 +1397,6 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Timer timer1;
-        private System.Windows.Forms.CheckBox chkEnabled;
         private System.Windows.Forms.Label lblCPU;
         private System.Windows.Forms.ProgressBar pbCPU0;
         private System.Windows.Forms.ProgressBar pbGPU0;
