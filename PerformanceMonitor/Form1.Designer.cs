@@ -1228,6 +1228,7 @@
             this.tschkShowLastThread.Name = "tschkShowLastThread";
             this.tschkShowLastThread.Size = new System.Drawing.Size(23, 22);
             this.tschkShowLastThread.Text = "Show last processor used by the main monitor loop";
+            this.tschkShowLastThread.ToolTipText = "Show last thread used by the main monitor loop";
             this.tschkShowLastThread.Click += new System.EventHandler(this.tschkShowLastThread_Click);
             // 
             // toolStripSeparator7
