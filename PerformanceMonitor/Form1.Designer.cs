@@ -137,8 +137,8 @@
             this.tschkEnabled = new System.Windows.Forms.ToolStripButton();
             this.tsbtnResetMaxCounters = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripTextBox1 = new System.Windows.Forms.ToolStripTextBox();
-            this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
+            this.tstxtAutoMoveY = new System.Windows.Forms.ToolStripTextBox();
+            this.tschkAutoMoveTop = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
@@ -1142,8 +1142,8 @@
             this.tschkEnabled,
             this.tsbtnResetMaxCounters,
             this.toolStripSeparator1,
-            this.toolStripTextBox1,
-            this.toolStripButton3,
+            this.tstxtAutoMoveY,
+            this.tschkAutoMoveTop,
             this.toolStripButton4,
             this.toolStripSeparator2,
             this.toolStripLabel2,
@@ -1194,21 +1194,23 @@
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
             // 
-            // toolStripTextBox1
+            // tstxtAutoMoveY
             // 
-            this.toolStripTextBox1.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.toolStripTextBox1.Name = "toolStripTextBox1";
-            this.toolStripTextBox1.Size = new System.Drawing.Size(50, 27);
+            this.tstxtAutoMoveY.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.tstxtAutoMoveY.Name = "tstxtAutoMoveY";
+            this.tstxtAutoMoveY.Size = new System.Drawing.Size(50, 27);
+            this.tstxtAutoMoveY.Text = "10";
             // 
-            // toolStripButton3
+            // tschkAutoMoveTop
             // 
-            this.toolStripButton3.CheckOnClick = true;
-            this.toolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton3.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton3.Image")));
-            this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton3.Name = "toolStripButton3";
-            this.toolStripButton3.Size = new System.Drawing.Size(80, 24);
-            this.toolStripButton3.Text = "Auto Move Y";
+            this.tschkAutoMoveTop.CheckOnClick = true;
+            this.tschkAutoMoveTop.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.tschkAutoMoveTop.Image = ((System.Drawing.Image)(resources.GetObject("tschkAutoMoveTop.Image")));
+            this.tschkAutoMoveTop.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tschkAutoMoveTop.Name = "tschkAutoMoveTop";
+            this.tschkAutoMoveTop.Size = new System.Drawing.Size(80, 24);
+            this.tschkAutoMoveTop.Text = "Auto Move Y";
+            this.tschkAutoMoveTop.Click += new System.EventHandler(this.tschkAutoMoveTop_Click);
             // 
             // toolStripButton4
             // 
@@ -1491,8 +1493,8 @@
         private System.Windows.Forms.ToolStripButton tschkEnabled;
         private System.Windows.Forms.ToolStripButton tsbtnResetMaxCounters;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripTextBox toolStripTextBox1;
-        private System.Windows.Forms.ToolStripButton toolStripButton3;
+        private System.Windows.Forms.ToolStripTextBox tstxtAutoMoveY;
+        private System.Windows.Forms.ToolStripButton tschkAutoMoveTop;
         private System.Windows.Forms.ToolStripButton toolStripButton4;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripLabel toolStripLabel2;

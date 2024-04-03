@@ -47,6 +47,11 @@ namespace PerformanceMonitor
             ResetMaxCounters();
         }
 
+        private void tschkAutoMoveTop_Click(object sender, EventArgs e)
+        {
+
+        }
+
         private void tschkEnabled_Click(object sender, EventArgs e)
         {
             //timer1.Enabled = chkEnabled.Checked;
@@ -283,6 +288,12 @@ namespace PerformanceMonitor
             {
                 int a = (int)chkAutoMoveTop.Tag;
                 if (this.Top != a) this.Top =a;                
+            }
+
+            if (tschkAutoMoveTop.Checked)
+            {
+                int a = (int)chkAutoMoveTop.Tag;
+                if (this.Top != a) this.Top = a;
             }
 
             // make the form to be always on top if required by the user
