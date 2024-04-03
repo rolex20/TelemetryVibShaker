@@ -1137,6 +1137,7 @@
             this.tslblMaxLoopTime.Name = "tslblMaxLoopTime";
             this.tslblMaxLoopTime.Size = new System.Drawing.Size(32, 22);
             this.tslblMaxLoopTime.Text = "-----";
+            this.tslblMaxLoopTime.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.tslblMaxLoopTime.ToolTipText = "milliseconds";
             // 
             // toolStripLabel3
@@ -1162,6 +1163,7 @@
             this.tslblExceptions.Name = "tslblExceptions";
             this.tslblExceptions.Size = new System.Drawing.Size(27, 22);
             this.tslblExceptions.Text = "----";
+            this.tslblExceptions.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // toolStripSeparator5
             // 
@@ -1191,6 +1193,7 @@
             this.tslblCurrentProcessor.Name = "tslblCurrentProcessor";
             this.tslblCurrentProcessor.Size = new System.Drawing.Size(32, 22);
             this.tslblCurrentProcessor.Text = "-----";
+            this.tslblCurrentProcessor.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // toolStripSeparator6
             // 
@@ -1209,6 +1212,7 @@
             this.tslblLastThread.Name = "tslblLastThread";
             this.tslblLastThread.Size = new System.Drawing.Size(37, 22);
             this.tslblLastThread.Text = "------";
+            this.tslblLastThread.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // tschkShowLastThread
             // 
@@ -1242,6 +1246,7 @@
             this.tslblTop.Size = new System.Drawing.Size(42, 22);
             this.tslblTop.Tag = "0";
             this.tslblTop.Text = "-------";
+            this.tslblTop.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.tslblTop.ToolTipText = "Current Y coordinate of this app";
             // 
             // frmMain
