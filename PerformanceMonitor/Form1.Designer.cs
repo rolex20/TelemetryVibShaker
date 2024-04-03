@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
-            this.label1 = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.lblCPU = new System.Windows.Forms.Label();
             this.pbCPU0 = new System.Windows.Forms.ProgressBar();
@@ -117,16 +116,11 @@
             this.label33 = new System.Windows.Forms.Label();
             this.lblLP = new System.Windows.Forms.Label();
             this.lblCurrentProcessor = new System.Windows.Forms.Label();
-            this.txtCategory = new System.Windows.Forms.TextBox();
-            this.txtCounterName = new System.Windows.Forms.TextBox();
-            this.btnGPU = new System.Windows.Forms.Button();
             this.label36 = new System.Windows.Forms.Label();
             this.lblExceptions = new System.Windows.Forms.Label();
             this.lblGPUFanSpeed = new System.Windows.Forms.Label();
             this.pbGPUFanSpeed = new System.Windows.Forms.ProgressBar();
             this.label38 = new System.Windows.Forms.Label();
-            this.chkAutoMoveTop = new System.Windows.Forms.CheckBox();
-            this.chkAlwaysOnTop = new System.Windows.Forms.CheckBox();
             this.lblTop = new System.Windows.Forms.Label();
             this.lblShowLastThread = new System.Windows.Forms.Label();
             this.lblLastThread = new System.Windows.Forms.Label();
@@ -142,23 +136,12 @@
             this.tschkAutoReadY = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
-            this.toolStripTextBox2 = new System.Windows.Forms.ToolStripTextBox();
-            this.toolStripTextBox3 = new System.Windows.Forms.ToolStripTextBox();
-            this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
+            this.tsbtnChangeGPUCategory = new System.Windows.Forms.ToolStripButton();
+            this.tschkAlwaysOnTop = new System.Windows.Forms.ToolStripButton();
+            this.tscmbCategory = new System.Windows.Forms.ToolStripComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.picCPUDetails)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Century Gothic", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
-            this.label1.Location = new System.Drawing.Point(12, 426);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(104, 24);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "i7-12700K";
             // 
             // timer1
             // 
@@ -170,7 +153,7 @@
             this.lblCPU.AutoSize = true;
             this.lblCPU.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.lblCPU.Location = new System.Drawing.Point(15, 52);
+            this.lblCPU.Location = new System.Drawing.Point(14, 52);
             this.lblCPU.Name = "lblCPU";
             this.lblCPU.Size = new System.Drawing.Size(47, 13);
             this.lblCPU.TabIndex = 2;
@@ -186,13 +169,12 @@
             // 
             // pbGPU0
             // 
-            this.pbGPU0.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.pbGPU0.Cursor = System.Windows.Forms.Cursors.Default;
             this.pbGPU0.Location = new System.Drawing.Point(627, 218);
             this.pbGPU0.Name = "pbGPU0";
             this.pbGPU0.Size = new System.Drawing.Size(156, 23);
             this.pbGPU0.TabIndex = 7;
             this.pbGPU0.Tag = "Utilization Percentage";
-            this.pbGPU0.Click += new System.EventHandler(this.pbGPU0_Click);
             // 
             // label4
             // 
@@ -204,7 +186,7 @@
             this.label4.Size = new System.Drawing.Size(66, 12);
             this.label4.TabIndex = 6;
             this.label4.Tag = "GPU Engine";
-            this.label4.Text = "RTX 4080";
+            this.label4.Text = "RTX 4090";
             // 
             // lblCPU0
             // 
@@ -266,7 +248,7 @@
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label7.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label7.Location = new System.Drawing.Point(15, 92);
+            this.label7.Location = new System.Drawing.Point(14, 92);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(47, 13);
             this.label7.TabIndex = 12;
@@ -295,7 +277,7 @@
             this.label8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label8.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label8.Location = new System.Drawing.Point(15, 136);
+            this.label8.Location = new System.Drawing.Point(14, 136);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(49, 15);
             this.label8.TabIndex = 15;
@@ -323,7 +305,7 @@
             this.label10.AutoSize = true;
             this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label10.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label10.Location = new System.Drawing.Point(15, 179);
+            this.label10.Location = new System.Drawing.Point(14, 179);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(47, 13);
             this.label10.TabIndex = 18;
@@ -352,7 +334,7 @@
             this.label12.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label12.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label12.Location = new System.Drawing.Point(15, 222);
+            this.label12.Location = new System.Drawing.Point(14, 222);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(49, 15);
             this.label12.TabIndex = 21;
@@ -381,7 +363,7 @@
             this.label14.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label14.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label14.Location = new System.Drawing.Point(8, 264);
+            this.label14.Location = new System.Drawing.Point(7, 264);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(56, 15);
             this.label14.TabIndex = 24;
@@ -409,7 +391,7 @@
             this.label16.AutoSize = true;
             this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label16.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label16.Location = new System.Drawing.Point(8, 308);
+            this.label16.Location = new System.Drawing.Point(7, 308);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(54, 13);
             this.label16.TabIndex = 27;
@@ -437,7 +419,7 @@
             this.label18.AutoSize = true;
             this.label18.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label18.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label18.Location = new System.Drawing.Point(8, 353);
+            this.label18.Location = new System.Drawing.Point(7, 353);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(54, 13);
             this.label18.TabIndex = 30;
@@ -982,35 +964,6 @@
             this.lblCurrentProcessor.Text = "----";
             this.lblCurrentProcessor.Visible = false;
             // 
-            // txtCategory
-            // 
-            this.txtCategory.Location = new System.Drawing.Point(564, 433);
-            this.txtCategory.Name = "txtCategory";
-            this.txtCategory.Size = new System.Drawing.Size(74, 20);
-            this.txtCategory.TabIndex = 90;
-            this.txtCategory.Text = "GPU Temperature (in degrees C)";
-            this.txtCategory.Visible = false;
-            // 
-            // txtCounterName
-            // 
-            this.txtCounterName.Location = new System.Drawing.Point(643, 433);
-            this.txtCounterName.Name = "txtCounterName";
-            this.txtCounterName.Size = new System.Drawing.Size(120, 20);
-            this.txtCounterName.TabIndex = 91;
-            this.txtCounterName.Text = "nvidia geforce rtx 4090(01:00)";
-            this.txtCounterName.Visible = false;
-            // 
-            // btnGPU
-            // 
-            this.btnGPU.Location = new System.Drawing.Point(769, 433);
-            this.btnGPU.Name = "btnGPU";
-            this.btnGPU.Size = new System.Drawing.Size(35, 20);
-            this.btnGPU.TabIndex = 92;
-            this.btnGPU.Text = "→";
-            this.btnGPU.UseVisualStyleBackColor = true;
-            this.btnGPU.Visible = false;
-            this.btnGPU.Click += new System.EventHandler(this.btnGPU_Click);
-            // 
             // label36
             // 
             this.label36.AutoSize = true;
@@ -1059,29 +1012,6 @@
             this.label38.TabIndex = 95;
             this.label38.Tag = "GPU Engine";
             this.label38.Text = "Fan %";
-            // 
-            // chkAutoMoveTop
-            // 
-            this.chkAutoMoveTop.AutoSize = true;
-            this.chkAutoMoveTop.Location = new System.Drawing.Point(230, 433);
-            this.chkAutoMoveTop.Name = "chkAutoMoveTop";
-            this.chkAutoMoveTop.Size = new System.Drawing.Size(100, 17);
-            this.chkAutoMoveTop.TabIndex = 98;
-            this.chkAutoMoveTop.Text = "Auto Move Top";
-            this.chkAutoMoveTop.UseVisualStyleBackColor = true;
-            this.chkAutoMoveTop.CheckedChanged += new System.EventHandler(this.chkAutoMoveTop_CheckedChanged);
-            // 
-            // chkAlwaysOnTop
-            // 
-            this.chkAlwaysOnTop.AutoSize = true;
-            this.chkAlwaysOnTop.Checked = true;
-            this.chkAlwaysOnTop.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkAlwaysOnTop.Location = new System.Drawing.Point(365, 434);
-            this.chkAlwaysOnTop.Name = "chkAlwaysOnTop";
-            this.chkAlwaysOnTop.Size = new System.Drawing.Size(98, 17);
-            this.chkAlwaysOnTop.TabIndex = 99;
-            this.chkAlwaysOnTop.Text = "Always On Top";
-            this.chkAlwaysOnTop.UseVisualStyleBackColor = true;
             // 
             // lblTop
             // 
@@ -1145,14 +1075,14 @@
             this.tstxtAutoMoveY,
             this.tschkAutoMoveTop,
             this.tschkAutoReadY,
+            this.tschkAlwaysOnTop,
             this.toolStripSeparator2,
             this.toolStripLabel2,
-            this.toolStripTextBox2,
-            this.toolStripTextBox3,
-            this.toolStripButton5});
+            this.tscmbCategory,
+            this.tsbtnChangeGPUCategory});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(825, 27);
+            this.toolStrip1.Size = new System.Drawing.Size(816, 27);
             this.toolStrip1.TabIndex = 104;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -1200,6 +1130,7 @@
             this.tstxtAutoMoveY.Name = "tstxtAutoMoveY";
             this.tstxtAutoMoveY.Size = new System.Drawing.Size(50, 27);
             this.tstxtAutoMoveY.Text = "10";
+            this.tstxtAutoMoveY.ToolTipText = "Enter Y coordinates for [Auto Move Y]";
             this.tstxtAutoMoveY.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tstxtAutoMoveY_KeyPress);
             // 
             // tschkAutoMoveTop
@@ -1211,7 +1142,7 @@
             this.tschkAutoMoveTop.Name = "tschkAutoMoveTop";
             this.tschkAutoMoveTop.Size = new System.Drawing.Size(80, 24);
             this.tschkAutoMoveTop.Text = "Auto Move Y";
-            this.tschkAutoMoveTop.Click += new System.EventHandler(this.tschkAutoMoveTop_Click);
+            this.tschkAutoMoveTop.ToolTipText = "Auto Move to the requested Y coordinates";
             // 
             // tschkAutoReadY
             // 
@@ -1222,6 +1153,7 @@
             this.tschkAutoReadY.Name = "tschkAutoReadY";
             this.tschkAutoReadY.Size = new System.Drawing.Size(76, 24);
             this.tschkAutoReadY.Text = "Auto Read Y";
+            this.tschkAutoReadY.ToolTipText = "Auto read current Y coordinates";
             // 
             // toolStripSeparator2
             // 
@@ -1234,51 +1166,54 @@
             this.toolStripLabel2.ForeColor = System.Drawing.Color.YellowGreen;
             this.toolStripLabel2.Name = "toolStripLabel2";
             this.toolStripLabel2.Size = new System.Drawing.Size(62, 24);
-            this.toolStripLabel2.Text = "RTX 4080";
+            this.toolStripLabel2.Text = "RTX 4090";
+            this.toolStripLabel2.ToolTipText = "nvidia geforce rtx 4090(01:00)";
             // 
-            // toolStripTextBox2
+            // tsbtnChangeGPUCategory
             // 
-            this.toolStripTextBox2.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.toolStripTextBox2.Name = "toolStripTextBox2";
-            this.toolStripTextBox2.Size = new System.Drawing.Size(100, 27);
-            this.toolStripTextBox2.Text = "GPU Temperature (in degrees C)";
+            this.tsbtnChangeGPUCategory.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsbtnChangeGPUCategory.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnChangeGPUCategory.Image")));
+            this.tsbtnChangeGPUCategory.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbtnChangeGPUCategory.Name = "tsbtnChangeGPUCategory";
+            this.tsbtnChangeGPUCategory.Size = new System.Drawing.Size(23, 24);
+            this.tsbtnChangeGPUCategory.Text = "→";
+            this.tsbtnChangeGPUCategory.Click += new System.EventHandler(this.tsbtnChangeGPUCategory_Click);
             // 
-            // toolStripTextBox3
+            // tschkAlwaysOnTop
             // 
-            this.toolStripTextBox3.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.toolStripTextBox3.Name = "toolStripTextBox3";
-            this.toolStripTextBox3.Size = new System.Drawing.Size(100, 27);
-            this.toolStripTextBox3.Text = "nvidia geforce rtx 4090(01:00)";
+            this.tschkAlwaysOnTop.CheckOnClick = true;
+            this.tschkAlwaysOnTop.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tschkAlwaysOnTop.Image = ((System.Drawing.Image)(resources.GetObject("tschkAlwaysOnTop.Image")));
+            this.tschkAlwaysOnTop.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tschkAlwaysOnTop.Name = "tschkAlwaysOnTop";
+            this.tschkAlwaysOnTop.Size = new System.Drawing.Size(23, 24);
+            this.tschkAlwaysOnTop.Text = "toolStripButton1";
+            this.tschkAlwaysOnTop.ToolTipText = "Make App Always On Top";
             // 
-            // toolStripButton5
+            // tscmbCategory
             // 
-            this.toolStripButton5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton5.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton5.Image")));
-            this.toolStripButton5.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton5.Name = "toolStripButton5";
-            this.toolStripButton5.Size = new System.Drawing.Size(23, 24);
-            this.toolStripButton5.Text = "→";
+            this.tscmbCategory.Items.AddRange(new object[] {
+            "% GPU Time",
+            "GPU Temperature (in degrees C)"});
+            this.tscmbCategory.Name = "tscmbCategory";
+            this.tscmbCategory.Size = new System.Drawing.Size(121, 27);
+            this.tscmbCategory.ToolTipText = "Select the item to monitor for RTX 4090";
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(825, 494);
+            this.ClientSize = new System.Drawing.Size(816, 421);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.picCPUDetails);
             this.Controls.Add(this.lblLastThread);
             this.Controls.Add(this.lblShowLastThread);
             this.Controls.Add(this.lblTop);
-            this.Controls.Add(this.chkAlwaysOnTop);
-            this.Controls.Add(this.chkAutoMoveTop);
             this.Controls.Add(this.lblGPUFanSpeed);
             this.Controls.Add(this.pbGPUFanSpeed);
             this.Controls.Add(this.label38);
             this.Controls.Add(this.lblExceptions);
             this.Controls.Add(this.label36);
-            this.Controls.Add(this.btnGPU);
-            this.Controls.Add(this.txtCounterName);
-            this.Controls.Add(this.txtCategory);
             this.Controls.Add(this.lblCurrentProcessor);
             this.Controls.Add(this.lblLP);
             this.Controls.Add(this.label33);
@@ -1363,7 +1298,6 @@
             this.Controls.Add(this.pbGPU0);
             this.Controls.Add(this.pbCPU0);
             this.Controls.Add(this.lblCPU);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.label4);
             this.Cursor = System.Windows.Forms.Cursors.Default;
             this.ForeColor = System.Drawing.SystemColors.ControlText;
@@ -1372,7 +1306,7 @@
             this.MaximizeBox = false;
             this.Name = "frmMain";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
-            this.Text = "Performance Monitor Light";
+            this.Text = "Performance Monitor Light for 12700K @ Galvatron";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
             this.Load += new System.EventHandler(this.frmMain_Load);
             ((System.ComponentModel.ISupportInitialize)(this.picCPUDetails)).EndInit();
@@ -1384,8 +1318,6 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Label lblCPU;
         private System.Windows.Forms.ProgressBar pbCPU0;
@@ -1472,16 +1404,11 @@
         private System.Windows.Forms.Label label33;
         private System.Windows.Forms.Label lblLP;
         private System.Windows.Forms.Label lblCurrentProcessor;
-        private System.Windows.Forms.TextBox txtCategory;
-        private System.Windows.Forms.TextBox txtCounterName;
-        private System.Windows.Forms.Button btnGPU;
         private System.Windows.Forms.Label label36;
         private System.Windows.Forms.Label lblExceptions;
         private System.Windows.Forms.Label lblGPUFanSpeed;
         private System.Windows.Forms.ProgressBar pbGPUFanSpeed;
         private System.Windows.Forms.Label label38;
-        private System.Windows.Forms.CheckBox chkAutoMoveTop;
-        private System.Windows.Forms.CheckBox chkAlwaysOnTop;
         private System.Windows.Forms.Label lblTop;
         private System.Windows.Forms.Label lblShowLastThread;
         private System.Windows.Forms.Label lblLastThread;
@@ -1497,9 +1424,9 @@
         private System.Windows.Forms.ToolStripButton tschkAutoReadY;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripLabel toolStripLabel2;
-        private System.Windows.Forms.ToolStripTextBox toolStripTextBox2;
-        private System.Windows.Forms.ToolStripTextBox toolStripTextBox3;
-        private System.Windows.Forms.ToolStripButton toolStripButton5;
+        private System.Windows.Forms.ToolStripButton tsbtnChangeGPUCategory;
+        private System.Windows.Forms.ToolStripButton tschkAlwaysOnTop;
+        private System.Windows.Forms.ToolStripComboBox tscmbCategory;
     }
 }
 

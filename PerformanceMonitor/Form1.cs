@@ -47,7 +47,7 @@ namespace PerformanceMonitor
             ResetMaxCounters();
         }
 
-        private void tschkAutoMoveTop_Click(object sender, EventArgs e)
+        private void btnAceptar_Click(object sender, EventArgs e)
         {
 
         }
@@ -60,33 +60,19 @@ namespace PerformanceMonitor
             }
         }
 
+
+
+        private void tsbtnChangeGPUCategory_Click(object sender, EventArgs e)
+        {
+            gpuUtilizationCounter = new PerformanceCounter("GPU", tscmbCategory.Text, "nvidia geforce rtx 4090(01:00)", true);
+        }
+
         private void tschkEnabled_Click(object sender, EventArgs e)
         {
             //timer1.Enabled = chkEnabled.Checked;
             timer1.Enabled = tschkEnabled.Checked;
         }
 
-        private void pbGPU0_Click(object sender, EventArgs e)
-        {
-            timer1.Enabled = false;
-            //chkEnabled.Checked = false;
-            tschkEnabled.Checked = false;
-
-            btnGPU.Visible = true;
-            txtCategory.Visible = true;
-            txtCounterName.Visible = true;
-        }
-
-        private void chkAutoMoveTop_CheckedChanged(object sender, EventArgs e)
-        {
-            if (chkAutoMoveTop.Checked)
-            {
-                chkAutoMoveTop.Tag = lblTop.Tag;
-                chkAutoMoveTop.Text = "Auto Move Top: " + lblTop.Text;
-            }
-            else
-                chkAutoMoveTop.Text = "Auto Move Top";
-        }
 
         private PerformanceCounter gpuUtilizationCounter, gpuFanCounter;
         private Stopwatch stopwatch;
@@ -103,15 +89,6 @@ namespace PerformanceMonitor
         [DllImport("kernel32.dll")]
         public static extern uint GetCurrentThreadId();
 
-
-        private void btnGPU_Click(object sender, EventArgs e)
-        {
-            txtCounterName.Visible = false;
-            txtCategory.Visible = false;
-            btnGPU.Visible = false;
-
-            gpuUtilizationCounter = new PerformanceCounter("GPU", txtCategory.Text, txtCounterName.Text, true);
-        }
 
 
 
@@ -143,8 +120,9 @@ namespace PerformanceMonitor
             timer1.Enabled = false;
             timer1.Tag = false; // flag for one-time control in timer1_Tick()
 
+            tscmbCategory.SelectedIndex = 0;
+
             lblTop.Tag = 0;  // used to store frmMain.Top
-            chkAutoMoveTop.Tag = 10; // give some 10 pixels of top margin
             lblCurrentProcessor.Tag = 255; // unrealistic processor assigment to force update in timer1
 
             lblLT.Tag = false; // used to ignore the first LoopTime Max calculation in timer1
@@ -230,7 +208,7 @@ namespace PerformanceMonitor
             {
                 f = cpuCounter.NextValue();
             }
-            catch (Exception ex)
+            catch
             {
                 f = 0.0f;
                 ExCounter++;
@@ -260,7 +238,7 @@ namespace PerformanceMonitor
             {
                 result = diskCounter.NextValue() / (1048576.0f); // show value in MB/s
             }
-            catch (Exception ex)
+            catch
             {
                 result = 0.0f;
                 ExCounter++;
@@ -305,8 +283,9 @@ namespace PerformanceMonitor
                 this.Top = t;
 
             // make the form to be always on top if required by the user
-            if (chkAlwaysOnTop.Checked != this.TopMost) 
-                this.TopMost = chkAlwaysOnTop.Checked;
+            if (tschkAlwaysOnTop.Checked != this.TopMost) 
+                this.TopMost = tschkAlwaysOnTop.Checked;
+
 
 
             if (!(bool)timer1.Tag) // only do this once
