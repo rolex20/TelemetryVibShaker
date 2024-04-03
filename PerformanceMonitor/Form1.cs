@@ -42,10 +42,17 @@ namespace PerformanceMonitor
             lblLastThread.Visible = lblShowLastThread.Visible;
         }
 
+        private void tschkEnabled_Click(object sender, EventArgs e)
+        {
+            timer1.Enabled = chkEnabled.Checked;
+            timer1.Enabled = tschkEnabled.Checked;
+        }
+
         private void pbGPU0_Click(object sender, EventArgs e)
         {
             timer1.Enabled = false;
             chkEnabled.Checked = false;
+            tschkEnabled.Checked = false;
 
             btnGPU.Visible = true;
             txtCategory.Visible = true;
@@ -195,6 +202,7 @@ namespace PerformanceMonitor
 
             stopwatch = new Stopwatch();
             timer1.Enabled = chkEnabled.Checked;
+            timer1.Enabled = tschkEnabled.Checked;
         }
 
         private void UpdateCounter(PerformanceCounter cpuCounter, ProgressBar pb, Label lbl)
@@ -370,6 +378,7 @@ namespace PerformanceMonitor
         private void chkEnabled_CheckedChanged(object sender, EventArgs e)
         {
             timer1.Enabled = chkEnabled.Checked;
+            timer1.Enabled = tschkEnabled.Checked;
         }
 
         private void button1_Click(object sender, EventArgs e)

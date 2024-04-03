@@ -134,7 +134,21 @@
             this.lblLastThread = new System.Windows.Forms.Label();
             this.picCPUDetails = new System.Windows.Forms.PictureBox();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.lblIntelModel = new System.Windows.Forms.ToolStripLabel();
+            this.tschkEnabled = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripTextBox1 = new System.Windows.Forms.ToolStripTextBox();
+            this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripTextBox2 = new System.Windows.Forms.ToolStripTextBox();
+            this.toolStripTextBox3 = new System.Windows.Forms.ToolStripTextBox();
+            this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.picCPUDetails)).BeginInit();
+            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -142,7 +156,7 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Century Gothic", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
-            this.label1.Location = new System.Drawing.Point(12, 4);
+            this.label1.Location = new System.Drawing.Point(12, 426);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(104, 24);
             this.label1.TabIndex = 0;
@@ -158,7 +172,7 @@
             this.chkEnabled.AutoSize = true;
             this.chkEnabled.Checked = true;
             this.chkEnabled.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkEnabled.Location = new System.Drawing.Point(127, 11);
+            this.chkEnabled.Location = new System.Drawing.Point(127, 433);
             this.chkEnabled.Name = "chkEnabled";
             this.chkEnabled.Size = new System.Drawing.Size(97, 17);
             this.chkEnabled.TabIndex = 1;
@@ -985,7 +999,7 @@
             // 
             // btnResetMaxCounters
             // 
-            this.btnResetMaxCounters.Location = new System.Drawing.Point(477, 9);
+            this.btnResetMaxCounters.Location = new System.Drawing.Point(477, 431);
             this.btnResetMaxCounters.Name = "btnResetMaxCounters";
             this.btnResetMaxCounters.Size = new System.Drawing.Size(75, 23);
             this.btnResetMaxCounters.TabIndex = 89;
@@ -995,7 +1009,7 @@
             // 
             // txtCategory
             // 
-            this.txtCategory.Location = new System.Drawing.Point(564, 11);
+            this.txtCategory.Location = new System.Drawing.Point(564, 433);
             this.txtCategory.Name = "txtCategory";
             this.txtCategory.Size = new System.Drawing.Size(74, 20);
             this.txtCategory.TabIndex = 90;
@@ -1004,7 +1018,7 @@
             // 
             // txtCounterName
             // 
-            this.txtCounterName.Location = new System.Drawing.Point(643, 11);
+            this.txtCounterName.Location = new System.Drawing.Point(643, 433);
             this.txtCounterName.Name = "txtCounterName";
             this.txtCounterName.Size = new System.Drawing.Size(120, 20);
             this.txtCounterName.TabIndex = 91;
@@ -1013,7 +1027,7 @@
             // 
             // btnGPU
             // 
-            this.btnGPU.Location = new System.Drawing.Point(769, 11);
+            this.btnGPU.Location = new System.Drawing.Point(769, 433);
             this.btnGPU.Name = "btnGPU";
             this.btnGPU.Size = new System.Drawing.Size(35, 20);
             this.btnGPU.TabIndex = 92;
@@ -1074,7 +1088,7 @@
             // chkAutoMoveTop
             // 
             this.chkAutoMoveTop.AutoSize = true;
-            this.chkAutoMoveTop.Location = new System.Drawing.Point(230, 11);
+            this.chkAutoMoveTop.Location = new System.Drawing.Point(230, 433);
             this.chkAutoMoveTop.Name = "chkAutoMoveTop";
             this.chkAutoMoveTop.Size = new System.Drawing.Size(100, 17);
             this.chkAutoMoveTop.TabIndex = 98;
@@ -1087,7 +1101,7 @@
             this.chkAlwaysOnTop.AutoSize = true;
             this.chkAlwaysOnTop.Checked = true;
             this.chkAlwaysOnTop.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkAlwaysOnTop.Location = new System.Drawing.Point(365, 12);
+            this.chkAlwaysOnTop.Location = new System.Drawing.Point(365, 434);
             this.chkAlwaysOnTop.Name = "chkAlwaysOnTop";
             this.chkAlwaysOnTop.Size = new System.Drawing.Size(98, 17);
             this.chkAlwaysOnTop.TabIndex = 99;
@@ -1146,11 +1160,134 @@
             this.imageList1.ImageSize = new System.Drawing.Size(16, 16);
             this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
             // 
+            // toolStrip1
+            // 
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lblIntelModel,
+            this.tschkEnabled,
+            this.toolStripButton2,
+            this.toolStripSeparator1,
+            this.toolStripTextBox1,
+            this.toolStripButton3,
+            this.toolStripButton4,
+            this.toolStripSeparator2,
+            this.toolStripLabel2,
+            this.toolStripTextBox2,
+            this.toolStripTextBox3,
+            this.toolStripButton5});
+            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(825, 27);
+            this.toolStrip1.TabIndex = 104;
+            this.toolStrip1.Text = "toolStrip1";
+            // 
+            // lblIntelModel
+            // 
+            this.lblIntelModel.Font = new System.Drawing.Font("Century Gothic", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblIntelModel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.lblIntelModel.Name = "lblIntelModel";
+            this.lblIntelModel.Size = new System.Drawing.Size(104, 24);
+            this.lblIntelModel.Text = "i7-12700K";
+            this.lblIntelModel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // tschkEnabled
+            // 
+            this.tschkEnabled.Checked = true;
+            this.tschkEnabled.CheckOnClick = true;
+            this.tschkEnabled.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.tschkEnabled.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.tschkEnabled.Image = ((System.Drawing.Image)(resources.GetObject("tschkEnabled.Image")));
+            this.tschkEnabled.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tschkEnabled.Name = "tschkEnabled";
+            this.tschkEnabled.Size = new System.Drawing.Size(92, 24);
+            this.tschkEnabled.Text = "Enable Monitor";
+            this.tschkEnabled.ToolTipText = "Activate/Deactivate monitoring";
+            this.tschkEnabled.Click += new System.EventHandler(this.tschkEnabled_Click);
+            // 
+            // toolStripButton2
+            // 
+            this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton2.Image")));
+            this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton2.Name = "toolStripButton2";
+            this.toolStripButton2.Size = new System.Drawing.Size(65, 24);
+            this.toolStripButton2.Text = "Reset Max";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
+            // 
+            // toolStripTextBox1
+            // 
+            this.toolStripTextBox1.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.toolStripTextBox1.Name = "toolStripTextBox1";
+            this.toolStripTextBox1.Size = new System.Drawing.Size(50, 27);
+            // 
+            // toolStripButton3
+            // 
+            this.toolStripButton3.CheckOnClick = true;
+            this.toolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripButton3.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton3.Image")));
+            this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton3.Name = "toolStripButton3";
+            this.toolStripButton3.Size = new System.Drawing.Size(80, 24);
+            this.toolStripButton3.Text = "Auto Move Y";
+            // 
+            // toolStripButton4
+            // 
+            this.toolStripButton4.Checked = true;
+            this.toolStripButton4.CheckOnClick = true;
+            this.toolStripButton4.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripButton4.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton4.Image")));
+            this.toolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton4.Name = "toolStripButton4";
+            this.toolStripButton4.Size = new System.Drawing.Size(76, 24);
+            this.toolStripButton4.Text = "Auto Read Y";
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 27);
+            // 
+            // toolStripLabel2
+            // 
+            this.toolStripLabel2.Font = new System.Drawing.Font("Arial Rounded MT Bold", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.toolStripLabel2.ForeColor = System.Drawing.Color.YellowGreen;
+            this.toolStripLabel2.Name = "toolStripLabel2";
+            this.toolStripLabel2.Size = new System.Drawing.Size(62, 24);
+            this.toolStripLabel2.Text = "RTX 4080";
+            // 
+            // toolStripTextBox2
+            // 
+            this.toolStripTextBox2.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.toolStripTextBox2.Name = "toolStripTextBox2";
+            this.toolStripTextBox2.Size = new System.Drawing.Size(100, 27);
+            this.toolStripTextBox2.Text = "GPU Temperature (in degrees C)";
+            // 
+            // toolStripTextBox3
+            // 
+            this.toolStripTextBox3.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.toolStripTextBox3.Name = "toolStripTextBox3";
+            this.toolStripTextBox3.Size = new System.Drawing.Size(100, 27);
+            this.toolStripTextBox3.Text = "nvidia geforce rtx 4090(01:00)";
+            // 
+            // toolStripButton5
+            // 
+            this.toolStripButton5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripButton5.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton5.Image")));
+            this.toolStripButton5.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton5.Name = "toolStripButton5";
+            this.toolStripButton5.Size = new System.Drawing.Size(23, 24);
+            this.toolStripButton5.Text = "→";
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(825, 417);
+            this.ClientSize = new System.Drawing.Size(825, 494);
+            this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.picCPUDetails);
             this.Controls.Add(this.lblLastThread);
             this.Controls.Add(this.lblShowLastThread);
@@ -1264,6 +1401,8 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
             this.Load += new System.EventHandler(this.frmMain_Load);
             ((System.ComponentModel.ISupportInitialize)(this.picCPUDetails)).EndInit();
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1375,6 +1514,19 @@
         private System.Windows.Forms.Label lblLastThread;
         private System.Windows.Forms.PictureBox picCPUDetails;
         private System.Windows.Forms.ImageList imageList1;
+        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStripLabel lblIntelModel;
+        private System.Windows.Forms.ToolStripButton tschkEnabled;
+        private System.Windows.Forms.ToolStripButton toolStripButton2;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripTextBox toolStripTextBox1;
+        private System.Windows.Forms.ToolStripButton toolStripButton3;
+        private System.Windows.Forms.ToolStripButton toolStripButton4;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel2;
+        private System.Windows.Forms.ToolStripTextBox toolStripTextBox2;
+        private System.Windows.Forms.ToolStripTextBox toolStripTextBox3;
+        private System.Windows.Forms.ToolStripButton toolStripButton5;
     }
 }
 
