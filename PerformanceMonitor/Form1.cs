@@ -42,6 +42,11 @@ namespace PerformanceMonitor
             lblLastThread.Visible = lblShowLastThread.Visible;
         }
 
+        private void tsbtnResetMaxCounters_Click(object sender, EventArgs e)
+        {
+            ResetMaxCounters();
+        }
+
         private void tschkEnabled_Click(object sender, EventArgs e)
         {
             //timer1.Enabled = chkEnabled.Checked;

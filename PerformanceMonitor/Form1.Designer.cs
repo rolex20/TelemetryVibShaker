@@ -117,7 +117,6 @@
             this.label33 = new System.Windows.Forms.Label();
             this.lblLP = new System.Windows.Forms.Label();
             this.lblCurrentProcessor = new System.Windows.Forms.Label();
-            this.btnResetMaxCounters = new System.Windows.Forms.Button();
             this.txtCategory = new System.Windows.Forms.TextBox();
             this.txtCounterName = new System.Windows.Forms.TextBox();
             this.btnGPU = new System.Windows.Forms.Button();
@@ -136,7 +135,7 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.lblIntelModel = new System.Windows.Forms.ToolStripLabel();
             this.tschkEnabled = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
+            this.tsbtnResetMaxCounters = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripTextBox1 = new System.Windows.Forms.ToolStripTextBox();
             this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
@@ -983,16 +982,6 @@
             this.lblCurrentProcessor.Text = "----";
             this.lblCurrentProcessor.Visible = false;
             // 
-            // btnResetMaxCounters
-            // 
-            this.btnResetMaxCounters.Location = new System.Drawing.Point(477, 431);
-            this.btnResetMaxCounters.Name = "btnResetMaxCounters";
-            this.btnResetMaxCounters.Size = new System.Drawing.Size(75, 23);
-            this.btnResetMaxCounters.TabIndex = 89;
-            this.btnResetMaxCounters.Text = "Reset Max";
-            this.btnResetMaxCounters.UseVisualStyleBackColor = true;
-            this.btnResetMaxCounters.Click += new System.EventHandler(this.button1_Click);
-            // 
             // txtCategory
             // 
             this.txtCategory.Location = new System.Drawing.Point(564, 433);
@@ -1151,7 +1140,7 @@
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.lblIntelModel,
             this.tschkEnabled,
-            this.toolStripButton2,
+            this.tsbtnResetMaxCounters,
             this.toolStripSeparator1,
             this.toolStripTextBox1,
             this.toolStripButton3,
@@ -1190,14 +1179,15 @@
             this.tschkEnabled.ToolTipText = "Activate/Deactivate monitoring";
             this.tschkEnabled.Click += new System.EventHandler(this.tschkEnabled_Click);
             // 
-            // toolStripButton2
+            // tsbtnResetMaxCounters
             // 
-            this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton2.Image")));
-            this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton2.Name = "toolStripButton2";
-            this.toolStripButton2.Size = new System.Drawing.Size(65, 24);
-            this.toolStripButton2.Text = "Reset Max";
+            this.tsbtnResetMaxCounters.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.tsbtnResetMaxCounters.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnResetMaxCounters.Image")));
+            this.tsbtnResetMaxCounters.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbtnResetMaxCounters.Name = "tsbtnResetMaxCounters";
+            this.tsbtnResetMaxCounters.Size = new System.Drawing.Size(65, 24);
+            this.tsbtnResetMaxCounters.Text = "Reset Max";
+            this.tsbtnResetMaxCounters.Click += new System.EventHandler(this.tsbtnResetMaxCounters_Click);
             // 
             // toolStripSeparator1
             // 
@@ -1288,7 +1278,6 @@
             this.Controls.Add(this.btnGPU);
             this.Controls.Add(this.txtCounterName);
             this.Controls.Add(this.txtCategory);
-            this.Controls.Add(this.btnResetMaxCounters);
             this.Controls.Add(this.lblCurrentProcessor);
             this.Controls.Add(this.lblLP);
             this.Controls.Add(this.label33);
@@ -1482,7 +1471,6 @@
         private System.Windows.Forms.Label label33;
         private System.Windows.Forms.Label lblLP;
         private System.Windows.Forms.Label lblCurrentProcessor;
-        private System.Windows.Forms.Button btnResetMaxCounters;
         private System.Windows.Forms.TextBox txtCategory;
         private System.Windows.Forms.TextBox txtCounterName;
         private System.Windows.Forms.Button btnGPU;
@@ -1501,7 +1489,7 @@
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripLabel lblIntelModel;
         private System.Windows.Forms.ToolStripButton tschkEnabled;
-        private System.Windows.Forms.ToolStripButton toolStripButton2;
+        private System.Windows.Forms.ToolStripButton tsbtnResetMaxCounters;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripTextBox toolStripTextBox1;
         private System.Windows.Forms.ToolStripButton toolStripButton3;
