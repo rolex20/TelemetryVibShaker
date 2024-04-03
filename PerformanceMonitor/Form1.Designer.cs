@@ -1115,6 +1115,7 @@
             this.tslblLT.Name = "tslblLT";
             this.tslblLT.Size = new System.Drawing.Size(66, 22);
             this.tslblLT.Text = "Loop Time:";
+            this.tslblLT.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // tslblLoopTime
             // 
@@ -1130,6 +1131,7 @@
             this.toolStripLabel1.Name = "toolStripLabel1";
             this.toolStripLabel1.Size = new System.Drawing.Size(33, 22);
             this.toolStripLabel1.Text = "Max:";
+            this.toolStripLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // tslblMaxLoopTime
             // 
@@ -1156,6 +1158,7 @@
             this.toolStripLabel4.Name = "toolStripLabel4";
             this.toolStripLabel4.Size = new System.Drawing.Size(67, 22);
             this.toolStripLabel4.Text = "Exceptions:";
+            this.toolStripLabel4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // tslblExceptions
             // 
@@ -1186,6 +1189,7 @@
             this.tslblLP.Name = "tslblLP";
             this.tslblLP.Size = new System.Drawing.Size(85, 22);
             this.tslblLP.Text = "Last Processor:";
+            this.tslblLP.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // tslblCurrentProcessor
             // 
@@ -1205,6 +1209,7 @@
             this.tslblShowLastThread.Name = "tslblShowLastThread";
             this.tslblShowLastThread.Size = new System.Drawing.Size(70, 22);
             this.tslblShowLastThread.Text = "Last Thread:";
+            this.tslblShowLastThread.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // tslblLastThread
             // 
@@ -1237,6 +1242,7 @@
             this.tsYCoordLabel.Name = "tsYCoordLabel";
             this.tsYCoordLabel.Size = new System.Drawing.Size(53, 22);
             this.tsYCoordLabel.Text = "Y Coord:";
+            this.tsYCoordLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // tslblTop
             // 
