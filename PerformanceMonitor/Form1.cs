@@ -25,32 +25,27 @@ namespace PerformanceMonitor
 
         private void picCPUDetails_Click(object sender, EventArgs e)
         {
-            if (lblCurrentProcessor.Visible) // make sure we turn off ShowLastThread just in case
-            {
-                lblShowLastThread.Visible = false;
-                lblLastThread.Visible = false;
-            }
 
-            lblCurrentProcessor.Visible = !lblCurrentProcessor.Visible;
-            lblLP.Visible = lblCurrentProcessor.Visible;
-
-         }
-
-        private void lblLP_Click(object sender, EventArgs e)
-        {
-            lblShowLastThread.Visible = !lblShowLastThread.Visible;
-            lblLastThread.Visible = lblShowLastThread.Visible;
         }
+
 
         private void tsbtnResetMaxCounters_Click(object sender, EventArgs e)
         {
             ResetMaxCounters();
         }
 
-        private void btnAceptar_Click(object sender, EventArgs e)
+        private void tschkShowLastThread_Click(object sender, EventArgs e)
         {
-
+            if (!tschkShowLastThread.Checked)
+                tslblLastThread.Text = "---";
         }
+
+        private void tschkShowLastProcessor_Click(object sender, EventArgs e)
+        {
+            if (!tschkShowLastProcessor.Checked)
+                tslblCurrentProcessor.Text = "----";
+        }
+
 
         private void tstxtAutoMoveY_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -110,9 +105,9 @@ namespace PerformanceMonitor
             lblMaxDiskN.Tag = 0.0f;
             lblMaxDiskR.Tag = 0.0f;
 
-            lblMaxLoopTime.Tag = 0L;
+            tslblMaxLoopTime.Tag = 0L;
 
-            lblExceptions.Tag = 0L;
+            tslblExceptions.Tag = 0L;
             ExCounter = 0L;
         }
         private void frmMain_Load(object sender, EventArgs e)
@@ -122,13 +117,13 @@ namespace PerformanceMonitor
 
             tscmbCategory.SelectedIndex = 0;
 
-            lblTop.Tag = 0;  // used to store frmMain.Top
-            lblCurrentProcessor.Tag = 255; // unrealistic processor assigment to force update in timer1
+            tslblTop.Tag = 0;  // used to store frmMain.Top
+            tslblCurrentProcessor.Tag = 255; // unrealistic processor assigment to force update in timer1
 
-            lblLT.Tag = false; // used to ignore the first LoopTime Max calculation in timer1
-            lblLoopTime.Tag = 0L; // used to keep track of the last one to avoid update in timer1
+            tslblLT.Tag = false; // used to ignore the first LoopTime Max calculation in timer1
+            tslblLoopTime.Tag = 0L; // used to keep track of the last one to avoid update in timer1
 
-            lblLastThread.Tag = 0; // used to keep track of the last thread used to avoid update in timer1
+            tslblLastThread.Tag = 0; // used to keep track of the last thread used to avoid update in timer1
 
             StartService("GpuPerfCounters");
             InitializeCounterTags();
@@ -263,10 +258,10 @@ namespace PerformanceMonitor
 
             // update frmMain.Top position in the label only when required
             int t = this.Top;
-            if ((int)lblTop.Tag != t)
+            if ((int)tslblTop.Tag != t)
             {
-                lblTop.Tag = t;
-                lblTop.Text = t.ToString();
+                tslblTop.Tag = t;
+                tslblTop.Text = t.ToString();
             }
 
             // move frmMain.Top position to the stored position if required by the user
@@ -277,7 +272,7 @@ namespace PerformanceMonitor
             //}
 
             if (tschkAutoReadY.Checked)
-                tstxtAutoMoveY.Text = lblTop.Text;
+                tstxtAutoMoveY.Text = tslblTop.Text;
             
             if (tschkAutoMoveTop.Checked && (int.TryParse(tstxtAutoMoveY.Text, out t)) && (this.Top!=t))          
                 this.Top = t;
@@ -302,24 +297,24 @@ namespace PerformanceMonitor
                 timer1.Tag = true;  // flag for one-time control in timer1_Tick()
             }
 
-            if (lblShowLastThread.Visible)
+            if (tschkShowLastThread.Checked)
             {
                 int th = (int)GetCurrentThreadId(); 
-                if ((int)lblLastThread.Tag != th)
+                if ((int)tslblLastThread.Tag != th)
                 {                    
-                    lblLastThread.Tag = th;
-                    lblLastThread.Text = th.ToString();
+                    tslblLastThread.Tag = th;
+                    tslblLastThread.Text = th.ToString();
                 }
                 
             }
 
-            if (lblCurrentProcessor.Visible)
+            if (tschkShowLastProcessor.Checked)
             {
                 int processorNumber = (int)GetCurrentProcessorNumber();
-                if ((int)lblCurrentProcessor.Tag != processorNumber)
+                if ((int)tslblCurrentProcessor.Tag != processorNumber)
                 {
-                    lblCurrentProcessor.Tag = processorNumber;
-                    lblCurrentProcessor.Text = processorNumber.ToString();
+                    tslblCurrentProcessor.Tag = processorNumber;
+                    tslblCurrentProcessor.Text = processorNumber.ToString();
                 }
             }
 
@@ -351,29 +346,29 @@ namespace PerformanceMonitor
             UpdateDisk(diskCounterN, lblDiskN, lblMaxDiskN);
             UpdateDisk(diskCounterR, lblDiskR, lblMaxDiskR);
 
-            if (ExCounter != (long)lblExceptions.Tag)
+            if (ExCounter != (long)tslblExceptions.Tag)
             {
-                lblExceptions.Tag = ExCounter;
-                lblExceptions.Text = ExCounter.ToString();
+                tslblExceptions.Tag = ExCounter;
+                tslblExceptions.Text = ExCounter.ToString();
             }
 
             stopwatch.Stop();
 
             long elapsed_ms = stopwatch.ElapsedMilliseconds;
-            if ((long)lblLoopTime.Tag != elapsed_ms)
+            if ((long)tslblLoopTime.Tag != elapsed_ms)
             {
-                lblLoopTime.Tag = elapsed_ms;
-                lblLoopTime.Text = elapsed_ms.ToString();
+                tslblLoopTime.Tag = elapsed_ms;
+                tslblLoopTime.Text = elapsed_ms.ToString();
             }
 
-            if (elapsed_ms > (long)lblMaxLoopTime.Tag)
+            if (elapsed_ms > (long)tslblMaxLoopTime.Tag)
             {
-                if ((bool)lblLT.Tag) // ignore the first Max
-                    lblMaxLoopTime.Tag = elapsed_ms; 
+                if ((bool)tslblLT.Tag) // ignore the first Max
+                    tslblMaxLoopTime.Tag = elapsed_ms; 
                 else
-                    lblLT.Tag = true;
+                    tslblLT.Tag = true;
 
-                lblMaxLoopTime.Text = lblLoopTime.Text;  // update regardless of the first-time-ignore for information purposes
+                tslblMaxLoopTime.Text = tslblLoopTime.Text;  // update regardless of the first-time-ignore for information purposes
             }
 
         }

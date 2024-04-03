@@ -109,22 +109,9 @@
             this.label31 = new System.Windows.Forms.Label();
             this.lblDiskR = new System.Windows.Forms.Label();
             this.label34 = new System.Windows.Forms.Label();
-            this.lblLT = new System.Windows.Forms.Label();
-            this.lblLoopTime = new System.Windows.Forms.Label();
-            this.label29 = new System.Windows.Forms.Label();
-            this.lblMaxLoopTime = new System.Windows.Forms.Label();
-            this.label33 = new System.Windows.Forms.Label();
-            this.lblLP = new System.Windows.Forms.Label();
-            this.lblCurrentProcessor = new System.Windows.Forms.Label();
-            this.label36 = new System.Windows.Forms.Label();
-            this.lblExceptions = new System.Windows.Forms.Label();
             this.lblGPUFanSpeed = new System.Windows.Forms.Label();
             this.pbGPUFanSpeed = new System.Windows.Forms.ProgressBar();
             this.label38 = new System.Windows.Forms.Label();
-            this.lblTop = new System.Windows.Forms.Label();
-            this.lblShowLastThread = new System.Windows.Forms.Label();
-            this.lblLastThread = new System.Windows.Forms.Label();
-            this.picCPUDetails = new System.Windows.Forms.PictureBox();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.lblIntelModel = new System.Windows.Forms.ToolStripLabel();
@@ -134,13 +121,34 @@
             this.tstxtAutoMoveY = new System.Windows.Forms.ToolStripTextBox();
             this.tschkAutoMoveTop = new System.Windows.Forms.ToolStripButton();
             this.tschkAutoReadY = new System.Windows.Forms.ToolStripButton();
+            this.tschkAlwaysOnTop = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
-            this.tsbtnChangeGPUCategory = new System.Windows.Forms.ToolStripButton();
-            this.tschkAlwaysOnTop = new System.Windows.Forms.ToolStripButton();
             this.tscmbCategory = new System.Windows.Forms.ToolStripComboBox();
-            ((System.ComponentModel.ISupportInitialize)(this.picCPUDetails)).BeginInit();
+            this.tsbtnChangeGPUCategory = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStrip2 = new System.Windows.Forms.ToolStrip();
+            this.tslblLT = new System.Windows.Forms.ToolStripLabel();
+            this.tslblLoopTime = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
+            this.tslblMaxLoopTime = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripLabel3 = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripLabel4 = new System.Windows.Forms.ToolStripLabel();
+            this.tslblExceptions = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.tschkShowLastProcessor = new System.Windows.Forms.ToolStripButton();
+            this.tslblLP = new System.Windows.Forms.ToolStripLabel();
+            this.tslblCurrentProcessor = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.tslblShowLastThread = new System.Windows.Forms.ToolStripLabel();
+            this.tslblLastThread = new System.Windows.Forms.ToolStripLabel();
+            this.tschkShowLastThread = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsYCoordLabel = new System.Windows.Forms.ToolStripLabel();
+            this.tslblTop = new System.Windows.Forms.ToolStripLabel();
             this.toolStrip1.SuspendLayout();
+            this.toolStrip2.SuspendLayout();
             this.SuspendLayout();
             // 
             // timer1
@@ -896,93 +904,6 @@
             this.label34.TabIndex = 77;
             this.label34.Text = "Disk R:";
             // 
-            // lblLT
-            // 
-            this.lblLT.AutoSize = true;
-            this.lblLT.Location = new System.Drawing.Point(13, 390);
-            this.lblLT.Name = "lblLT";
-            this.lblLT.Size = new System.Drawing.Size(57, 13);
-            this.lblLT.TabIndex = 82;
-            this.lblLT.Text = "LoopTime:";
-            // 
-            // lblLoopTime
-            // 
-            this.lblLoopTime.AutoSize = true;
-            this.lblLoopTime.Location = new System.Drawing.Point(69, 390);
-            this.lblLoopTime.Name = "lblLoopTime";
-            this.lblLoopTime.Size = new System.Drawing.Size(19, 13);
-            this.lblLoopTime.TabIndex = 83;
-            this.lblLoopTime.Text = "----";
-            // 
-            // label29
-            // 
-            this.label29.AutoSize = true;
-            this.label29.Location = new System.Drawing.Point(106, 390);
-            this.label29.Name = "label29";
-            this.label29.Size = new System.Drawing.Size(30, 13);
-            this.label29.TabIndex = 84;
-            this.label29.Text = "Max:";
-            // 
-            // lblMaxLoopTime
-            // 
-            this.lblMaxLoopTime.AutoSize = true;
-            this.lblMaxLoopTime.Location = new System.Drawing.Point(133, 390);
-            this.lblMaxLoopTime.Name = "lblMaxLoopTime";
-            this.lblMaxLoopTime.Size = new System.Drawing.Size(19, 13);
-            this.lblMaxLoopTime.TabIndex = 85;
-            this.lblMaxLoopTime.Text = "----";
-            // 
-            // label33
-            // 
-            this.label33.AutoSize = true;
-            this.label33.Location = new System.Drawing.Point(167, 390);
-            this.label33.Name = "label33";
-            this.label33.Size = new System.Drawing.Size(63, 13);
-            this.label33.TabIndex = 86;
-            this.label33.Text = "milliseconds";
-            // 
-            // lblLP
-            // 
-            this.lblLP.AutoSize = true;
-            this.lblLP.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.lblLP.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.lblLP.Location = new System.Drawing.Point(311, 390);
-            this.lblLP.Name = "lblLP";
-            this.lblLP.Size = new System.Drawing.Size(83, 13);
-            this.lblLP.TabIndex = 87;
-            this.lblLP.Text = "Last Processor: ";
-            this.lblLP.Visible = false;
-            this.lblLP.Click += new System.EventHandler(this.lblLP_Click);
-            // 
-            // lblCurrentProcessor
-            // 
-            this.lblCurrentProcessor.AutoSize = true;
-            this.lblCurrentProcessor.Location = new System.Drawing.Point(393, 390);
-            this.lblCurrentProcessor.Name = "lblCurrentProcessor";
-            this.lblCurrentProcessor.Size = new System.Drawing.Size(19, 13);
-            this.lblCurrentProcessor.TabIndex = 88;
-            this.lblCurrentProcessor.Text = "----";
-            this.lblCurrentProcessor.Visible = false;
-            // 
-            // label36
-            // 
-            this.label36.AutoSize = true;
-            this.label36.Location = new System.Drawing.Point(568, 390);
-            this.label36.Name = "label36";
-            this.label36.Size = new System.Drawing.Size(65, 13);
-            this.label36.TabIndex = 93;
-            this.label36.Text = "Exceptions: ";
-            // 
-            // lblExceptions
-            // 
-            this.lblExceptions.AutoSize = true;
-            this.lblExceptions.Location = new System.Drawing.Point(627, 390);
-            this.lblExceptions.Name = "lblExceptions";
-            this.lblExceptions.Size = new System.Drawing.Size(16, 13);
-            this.lblExceptions.TabIndex = 94;
-            this.lblExceptions.Tag = "0";
-            this.lblExceptions.Text = "---";
-            // 
             // lblGPUFanSpeed
             // 
             this.lblGPUFanSpeed.AutoSize = true;
@@ -1013,52 +934,6 @@
             this.label38.Tag = "GPU Engine";
             this.label38.Text = "Fan %";
             // 
-            // lblTop
-            // 
-            this.lblTop.AutoSize = true;
-            this.lblTop.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTop.Location = new System.Drawing.Point(756, 389);
-            this.lblTop.Name = "lblTop";
-            this.lblTop.Size = new System.Drawing.Size(27, 15);
-            this.lblTop.TabIndex = 100;
-            this.lblTop.Tag = "0";
-            this.lblTop.Text = "-----";
-            // 
-            // lblShowLastThread
-            // 
-            this.lblShowLastThread.AutoSize = true;
-            this.lblShowLastThread.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.lblShowLastThread.Location = new System.Drawing.Point(434, 390);
-            this.lblShowLastThread.Name = "lblShowLastThread";
-            this.lblShowLastThread.Size = new System.Drawing.Size(67, 13);
-            this.lblShowLastThread.TabIndex = 101;
-            this.lblShowLastThread.Tag = "0";
-            this.lblShowLastThread.Text = "Last Thread:";
-            this.lblShowLastThread.Visible = false;
-            // 
-            // lblLastThread
-            // 
-            this.lblLastThread.AutoSize = true;
-            this.lblLastThread.Location = new System.Drawing.Point(499, 390);
-            this.lblLastThread.Name = "lblLastThread";
-            this.lblLastThread.Size = new System.Drawing.Size(25, 13);
-            this.lblLastThread.TabIndex = 102;
-            this.lblLastThread.Tag = "0";
-            this.lblLastThread.Text = "------";
-            this.lblLastThread.Visible = false;
-            // 
-            // picCPUDetails
-            // 
-            this.picCPUDetails.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.picCPUDetails.Image = global::PerformanceMonitor.Properties.Resources.cpu;
-            this.picCPUDetails.Location = new System.Drawing.Point(273, 382);
-            this.picCPUDetails.Name = "picCPUDetails";
-            this.picCPUDetails.Size = new System.Drawing.Size(34, 30);
-            this.picCPUDetails.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.picCPUDetails.TabIndex = 103;
-            this.picCPUDetails.TabStop = false;
-            this.picCPUDetails.Click += new System.EventHandler(this.picCPUDetails_Click);
-            // 
             // imageList1
             // 
             this.imageList1.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
@@ -1079,7 +954,8 @@
             this.toolStripSeparator2,
             this.toolStripLabel2,
             this.tscmbCategory,
-            this.tsbtnChangeGPUCategory});
+            this.tsbtnChangeGPUCategory,
+            this.toolStripSeparator3});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(816, 27);
@@ -1155,6 +1031,17 @@
             this.tschkAutoReadY.Text = "Auto Read Y";
             this.tschkAutoReadY.ToolTipText = "Auto read current Y coordinates";
             // 
+            // tschkAlwaysOnTop
+            // 
+            this.tschkAlwaysOnTop.CheckOnClick = true;
+            this.tschkAlwaysOnTop.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tschkAlwaysOnTop.Image = ((System.Drawing.Image)(resources.GetObject("tschkAlwaysOnTop.Image")));
+            this.tschkAlwaysOnTop.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tschkAlwaysOnTop.Name = "tschkAlwaysOnTop";
+            this.tschkAlwaysOnTop.Size = new System.Drawing.Size(23, 24);
+            this.tschkAlwaysOnTop.Text = "toolStripButton1";
+            this.tschkAlwaysOnTop.ToolTipText = "Make App Always On Top";
+            // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
@@ -1169,6 +1056,15 @@
             this.toolStripLabel2.Text = "RTX 4090";
             this.toolStripLabel2.ToolTipText = "nvidia geforce rtx 4090(01:00)";
             // 
+            // tscmbCategory
+            // 
+            this.tscmbCategory.Items.AddRange(new object[] {
+            "% GPU Time",
+            "GPU Temperature (in degrees C)"});
+            this.tscmbCategory.Name = "tscmbCategory";
+            this.tscmbCategory.Size = new System.Drawing.Size(121, 27);
+            this.tscmbCategory.ToolTipText = "Select the item to monitor for RTX 4090";
+            // 
             // tsbtnChangeGPUCategory
             // 
             this.tsbtnChangeGPUCategory.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -1179,48 +1075,185 @@
             this.tsbtnChangeGPUCategory.Text = "→";
             this.tsbtnChangeGPUCategory.Click += new System.EventHandler(this.tsbtnChangeGPUCategory_Click);
             // 
-            // tschkAlwaysOnTop
+            // toolStripSeparator3
             // 
-            this.tschkAlwaysOnTop.CheckOnClick = true;
-            this.tschkAlwaysOnTop.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tschkAlwaysOnTop.Image = ((System.Drawing.Image)(resources.GetObject("tschkAlwaysOnTop.Image")));
-            this.tschkAlwaysOnTop.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tschkAlwaysOnTop.Name = "tschkAlwaysOnTop";
-            this.tschkAlwaysOnTop.Size = new System.Drawing.Size(23, 24);
-            this.tschkAlwaysOnTop.Text = "toolStripButton1";
-            this.tschkAlwaysOnTop.ToolTipText = "Make App Always On Top";
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 27);
             // 
-            // tscmbCategory
+            // toolStrip2
             // 
-            this.tscmbCategory.Items.AddRange(new object[] {
-            "% GPU Time",
-            "GPU Temperature (in degrees C)"});
-            this.tscmbCategory.Name = "tscmbCategory";
-            this.tscmbCategory.Size = new System.Drawing.Size(121, 27);
-            this.tscmbCategory.ToolTipText = "Select the item to monitor for RTX 4090";
+            this.toolStrip2.BackColor = System.Drawing.SystemColors.Control;
+            this.toolStrip2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tslblLT,
+            this.tslblLoopTime,
+            this.toolStripLabel1,
+            this.tslblMaxLoopTime,
+            this.toolStripLabel3,
+            this.toolStripSeparator4,
+            this.toolStripLabel4,
+            this.tslblExceptions,
+            this.toolStripSeparator5,
+            this.tschkShowLastProcessor,
+            this.tslblLP,
+            this.tslblCurrentProcessor,
+            this.toolStripSeparator6,
+            this.tschkShowLastThread,
+            this.tslblShowLastThread,
+            this.tslblLastThread,
+            this.tslblTop,
+            this.tsYCoordLabel,
+            this.toolStripSeparator7});
+            this.toolStrip2.Location = new System.Drawing.Point(0, 393);
+            this.toolStrip2.Name = "toolStrip2";
+            this.toolStrip2.Size = new System.Drawing.Size(816, 25);
+            this.toolStrip2.TabIndex = 108;
+            this.toolStrip2.Text = "toolStrip2";
+            // 
+            // tslblLT
+            // 
+            this.tslblLT.Name = "tslblLT";
+            this.tslblLT.Size = new System.Drawing.Size(66, 22);
+            this.tslblLT.Text = "Loop Time:";
+            // 
+            // tslblLoopTime
+            // 
+            this.tslblLoopTime.AutoSize = false;
+            this.tslblLoopTime.Name = "tslblLoopTime";
+            this.tslblLoopTime.Size = new System.Drawing.Size(32, 22);
+            this.tslblLoopTime.Text = "-----";
+            this.tslblLoopTime.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.tslblLoopTime.ToolTipText = "milliseconds";
+            // 
+            // toolStripLabel1
+            // 
+            this.toolStripLabel1.Name = "toolStripLabel1";
+            this.toolStripLabel1.Size = new System.Drawing.Size(33, 22);
+            this.toolStripLabel1.Text = "Max:";
+            // 
+            // tslblMaxLoopTime
+            // 
+            this.tslblMaxLoopTime.AutoSize = false;
+            this.tslblMaxLoopTime.Name = "tslblMaxLoopTime";
+            this.tslblMaxLoopTime.Size = new System.Drawing.Size(32, 22);
+            this.tslblMaxLoopTime.Text = "-----";
+            this.tslblMaxLoopTime.ToolTipText = "milliseconds";
+            // 
+            // toolStripLabel3
+            // 
+            this.toolStripLabel3.Name = "toolStripLabel3";
+            this.toolStripLabel3.Size = new System.Drawing.Size(79, 22);
+            this.toolStripLabel3.Text = " milliseconds ";
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 25);
+            // 
+            // toolStripLabel4
+            // 
+            this.toolStripLabel4.Name = "toolStripLabel4";
+            this.toolStripLabel4.Size = new System.Drawing.Size(67, 22);
+            this.toolStripLabel4.Text = "Exceptions:";
+            // 
+            // tslblExceptions
+            // 
+            this.tslblExceptions.AutoSize = false;
+            this.tslblExceptions.Name = "tslblExceptions";
+            this.tslblExceptions.Size = new System.Drawing.Size(27, 22);
+            this.tslblExceptions.Text = "----";
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(6, 25);
+            // 
+            // tschkShowLastProcessor
+            // 
+            this.tschkShowLastProcessor.CheckOnClick = true;
+            this.tschkShowLastProcessor.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tschkShowLastProcessor.Image = ((System.Drawing.Image)(resources.GetObject("tschkShowLastProcessor.Image")));
+            this.tschkShowLastProcessor.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tschkShowLastProcessor.Name = "tschkShowLastProcessor";
+            this.tschkShowLastProcessor.Size = new System.Drawing.Size(23, 22);
+            this.tschkShowLastProcessor.Text = "Show last processor used by the main monitor loop";
+            this.tschkShowLastProcessor.Click += new System.EventHandler(this.tschkShowLastProcessor_Click);
+            // 
+            // tslblLP
+            // 
+            this.tslblLP.Name = "tslblLP";
+            this.tslblLP.Size = new System.Drawing.Size(85, 22);
+            this.tslblLP.Text = "Last Processor:";
+            // 
+            // tslblCurrentProcessor
+            // 
+            this.tslblCurrentProcessor.AutoSize = false;
+            this.tslblCurrentProcessor.Name = "tslblCurrentProcessor";
+            this.tslblCurrentProcessor.Size = new System.Drawing.Size(32, 22);
+            this.tslblCurrentProcessor.Text = "-----";
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(6, 25);
+            // 
+            // tslblShowLastThread
+            // 
+            this.tslblShowLastThread.Name = "tslblShowLastThread";
+            this.tslblShowLastThread.Size = new System.Drawing.Size(70, 22);
+            this.tslblShowLastThread.Text = "Last Thread:";
+            // 
+            // tslblLastThread
+            // 
+            this.tslblLastThread.AutoSize = false;
+            this.tslblLastThread.Name = "tslblLastThread";
+            this.tslblLastThread.Size = new System.Drawing.Size(37, 22);
+            this.tslblLastThread.Text = "------";
+            // 
+            // tschkShowLastThread
+            // 
+            this.tschkShowLastThread.CheckOnClick = true;
+            this.tschkShowLastThread.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tschkShowLastThread.Image = ((System.Drawing.Image)(resources.GetObject("tschkShowLastThread.Image")));
+            this.tschkShowLastThread.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tschkShowLastThread.Name = "tschkShowLastThread";
+            this.tschkShowLastThread.Size = new System.Drawing.Size(23, 22);
+            this.tschkShowLastThread.Text = "Show last processor used by the main monitor loop";
+            this.tschkShowLastThread.Click += new System.EventHandler(this.tschkShowLastThread_Click);
+            // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(6, 25);
+            // 
+            // tsYCoordLabel
+            // 
+            this.tsYCoordLabel.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.tsYCoordLabel.Name = "tsYCoordLabel";
+            this.tsYCoordLabel.Size = new System.Drawing.Size(53, 22);
+            this.tsYCoordLabel.Text = "Y Coord:";
+            // 
+            // tslblTop
+            // 
+            this.tslblTop.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.tslblTop.AutoSize = false;
+            this.tslblTop.Name = "tslblTop";
+            this.tslblTop.Size = new System.Drawing.Size(42, 22);
+            this.tslblTop.Tag = "0";
+            this.tslblTop.Text = "-------";
+            this.tslblTop.ToolTipText = "Current Y coordinate of this app";
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(816, 421);
+            this.ClientSize = new System.Drawing.Size(816, 418);
+            this.Controls.Add(this.toolStrip2);
             this.Controls.Add(this.toolStrip1);
-            this.Controls.Add(this.picCPUDetails);
-            this.Controls.Add(this.lblLastThread);
-            this.Controls.Add(this.lblShowLastThread);
-            this.Controls.Add(this.lblTop);
             this.Controls.Add(this.lblGPUFanSpeed);
             this.Controls.Add(this.pbGPUFanSpeed);
             this.Controls.Add(this.label38);
-            this.Controls.Add(this.lblExceptions);
-            this.Controls.Add(this.label36);
-            this.Controls.Add(this.lblCurrentProcessor);
-            this.Controls.Add(this.lblLP);
-            this.Controls.Add(this.label33);
-            this.Controls.Add(this.lblMaxLoopTime);
-            this.Controls.Add(this.label29);
-            this.Controls.Add(this.lblLoopTime);
-            this.Controls.Add(this.lblLT);
             this.Controls.Add(this.label19);
             this.Controls.Add(this.lblMaxDiskR);
             this.Controls.Add(this.label31);
@@ -1309,9 +1342,10 @@
             this.Text = "Performance Monitor Light for 12700K @ Galvatron";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
             this.Load += new System.EventHandler(this.frmMain_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.picCPUDetails)).EndInit();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            this.toolStrip2.ResumeLayout(false);
+            this.toolStrip2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1397,22 +1431,9 @@
         private System.Windows.Forms.Label label31;
         private System.Windows.Forms.Label lblDiskR;
         private System.Windows.Forms.Label label34;
-        private System.Windows.Forms.Label lblLT;
-        private System.Windows.Forms.Label lblLoopTime;
-        private System.Windows.Forms.Label label29;
-        private System.Windows.Forms.Label lblMaxLoopTime;
-        private System.Windows.Forms.Label label33;
-        private System.Windows.Forms.Label lblLP;
-        private System.Windows.Forms.Label lblCurrentProcessor;
-        private System.Windows.Forms.Label label36;
-        private System.Windows.Forms.Label lblExceptions;
         private System.Windows.Forms.Label lblGPUFanSpeed;
         private System.Windows.Forms.ProgressBar pbGPUFanSpeed;
         private System.Windows.Forms.Label label38;
-        private System.Windows.Forms.Label lblTop;
-        private System.Windows.Forms.Label lblShowLastThread;
-        private System.Windows.Forms.Label lblLastThread;
-        private System.Windows.Forms.PictureBox picCPUDetails;
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripLabel lblIntelModel;
@@ -1427,6 +1448,27 @@
         private System.Windows.Forms.ToolStripButton tsbtnChangeGPUCategory;
         private System.Windows.Forms.ToolStripButton tschkAlwaysOnTop;
         private System.Windows.Forms.ToolStripComboBox tscmbCategory;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStrip toolStrip2;
+        private System.Windows.Forms.ToolStripLabel tslblLT;
+        private System.Windows.Forms.ToolStripLabel tslblLoopTime;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel1;
+        private System.Windows.Forms.ToolStripLabel tslblMaxLoopTime;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel3;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel4;
+        private System.Windows.Forms.ToolStripLabel tslblExceptions;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.ToolStripButton tschkShowLastProcessor;
+        private System.Windows.Forms.ToolStripLabel tslblLP;
+        private System.Windows.Forms.ToolStripLabel tslblCurrentProcessor;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+        private System.Windows.Forms.ToolStripLabel tslblShowLastThread;
+        private System.Windows.Forms.ToolStripLabel tslblLastThread;
+        private System.Windows.Forms.ToolStripButton tschkShowLastThread;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
+        private System.Windows.Forms.ToolStripLabel tsYCoordLabel;
+        private System.Windows.Forms.ToolStripLabel tslblTop;
     }
 }
 
