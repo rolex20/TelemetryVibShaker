@@ -15,18 +15,17 @@ namespace PerformanceMonitor
     public partial class frmMain : Form
     {
         private PerformanceCounter cpuCounter0, cpuCounter1, cpuCounter2, cpuCounter3, cpuCounter4, cpuCounter5, cpuCounter6, cpuCounter7, cpuCounter8, cpuCounter9, cpuCounter10, cpuCounter11, cpuCounter12, cpuCounter13, cpuCounter14, cpuCounter15, cpuCounter16, cpuCounter17, cpuCounter18, cpuCounter19;
+        private PerformanceCounter gpuUtilizationCounter, gpuFanCounter;
+        private Stopwatch stopwatch;
+        private long ExCounter;  // Exceptions Counter
+        private PerformanceCounter diskCounterC, diskCounterN, diskCounterR;
+        private NvidiaGpu myRTX4090;
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             StopService("GpuPerfCounters");
         }
 
-        private PerformanceCounter diskCounterC, diskCounterN, diskCounterR;
-
-        private void picCPUDetails_Click(object sender, EventArgs e)
-        {
-
-        }
 
 
         private void tsbtnResetMaxCounters_Click(object sender, EventArgs e)
@@ -78,10 +77,6 @@ namespace PerformanceMonitor
             timer1.Enabled = tschkEnabled.Checked;
         }
 
-
-        private PerformanceCounter gpuUtilizationCounter, gpuFanCounter;
-        private Stopwatch stopwatch;
-        private long ExCounter;  // Exceptions Counter
 
         // Import the GetCurrentThread API
         [DllImport("kernel32.dll")]
@@ -135,6 +130,8 @@ namespace PerformanceMonitor
             tslblLoopTime.Tag = 0L; // used to keep track of the last one to avoid update in timer1
 
             tslblLastThread.Tag = 0; // used to keep track of the last thread used to avoid update in timer1
+
+            myRTX4090 = new NvidiaGpu(0);
 
             StartService("GpuPerfCounters");
             InitializeCounterTags();
@@ -207,6 +204,26 @@ namespace PerformanceMonitor
             timer1.Enabled = tschkEnabled.Checked;
         }
 
+        // I prefer to repeat code in this case instead of passing all parameters to the similar function
+        private void UpdateGpuCounter(int counter, ProgressBar pb, Label lbl, string dimensional = "%")
+        {
+            if ((int)lbl.Tag != counter)
+            {
+                lbl.Tag = counter;
+
+                System.Drawing.Color color = counter <= 100.0f ? (System.Drawing.Color)pb.Tag : System.Drawing.Color.Red;
+                if (pb.ForeColor != color) pb.ForeColor = color;
+                pb.Value = counter <= 100 ? counter : 100;
+
+
+                color = counter <= 100.0f ? System.Drawing.Color.Black : System.Drawing.Color.Red;
+                if (lbl.ForeColor != color) lbl.ForeColor = color;
+                lbl.Text = $"{counter:F1}{dimensional}";
+            }
+
+        }
+
+        // I prefer to repeat code in this case instead of passing all parameters to the similar function
         private void UpdateCounter(PerformanceCounter cpuCounter, ProgressBar pb, Label lbl, string dimensional = "%")
         {
             float f;
@@ -261,6 +278,24 @@ namespace PerformanceMonitor
                 }
             }
 
+        }
+
+        private void UpdateGPUInfo()
+        {
+
+            // update the GPU-Utilization or the GPU-Temperature
+            switch (tscmbCategory.SelectedIndex)
+            {
+                case 0: // %GPU Time
+                    UpdateGpuCounter(myRTX4090.Utilization, pbGPU0, lblGPU0, "%");
+                    break;
+                default: // GPU Temperature (in degrees C)
+                    UpdateGpuCounter(myRTX4090.TemperatureC, pbGPU0, lblGPU0, "°C");
+                    break;
+            }
+
+            // update Fan-Speed
+            UpdateGpuCounter(myRTX4090.FanSpeed, pbGPUFanSpeed, lblGPUFanSpeed);
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -329,9 +364,10 @@ namespace PerformanceMonitor
                 }
             }
 
-            string dimensional = (tscmbCategory.SelectedIndex == 0) ? "%": "°C";
-            UpdateCounter(gpuUtilizationCounter, pbGPU0, lblGPU0, dimensional);
-            UpdateCounter(gpuFanCounter, pbGPUFanSpeed, lblGPUFanSpeed);
+            //string dimensional = (tscmbCategory.SelectedIndex == 0) ? "%": "°C";
+            //UpdateCounter(gpuUtilizationCounter, pbGPU0, lblGPU0, dimensional);
+            //UpdateCounter(gpuFanCounter, pbGPUFanSpeed, lblGPUFanSpeed);
+            UpdateGPUInfo();
 
             UpdateCounter(cpuCounter0, pbCPU0, lblCPU0);
             UpdateCounter(cpuCounter1, pbCPU1, lblCPU1);

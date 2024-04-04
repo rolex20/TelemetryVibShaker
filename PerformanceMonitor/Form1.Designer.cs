@@ -143,10 +143,11 @@
             this.tschkShowLastThread = new System.Windows.Forms.ToolStripButton();
             this.tslblShowLastThread = new System.Windows.Forms.ToolStripLabel();
             this.tslblLastThread = new System.Windows.Forms.ToolStripLabel();
+            this.tsbtnRecenter = new System.Windows.Forms.ToolStripButton();
             this.tslblTop = new System.Windows.Forms.ToolStripLabel();
             this.tsYCoordLabel = new System.Windows.Forms.ToolStripLabel();
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
-            this.tsbtnRecenter = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.SuspendLayout();
@@ -747,9 +748,9 @@
             this.lblGPU0.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblGPU0.Location = new System.Drawing.Point(789, 224);
             this.lblGPU0.Name = "lblGPU0";
-            this.lblGPU0.Size = new System.Drawing.Size(13, 13);
+            this.lblGPU0.Size = new System.Drawing.Size(22, 13);
             this.lblGPU0.TabIndex = 66;
-            this.lblGPU0.Text = "--";
+            this.lblGPU0.Text = "-----";
             // 
             // label5
             // 
@@ -954,7 +955,8 @@
             this.toolStripSeparator2,
             this.toolStripLabel2,
             this.tscmbCategory,
-            this.toolStripSeparator3});
+            this.toolStripSeparator3,
+            this.toolStripButton1});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(821, 27);
@@ -1222,6 +1224,18 @@
             this.tslblLastThread.Text = "------";
             this.tslblLastThread.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
+            // tsbtnRecenter
+            // 
+            this.tsbtnRecenter.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.tsbtnRecenter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsbtnRecenter.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnRecenter.Image")));
+            this.tsbtnRecenter.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbtnRecenter.Name = "tsbtnRecenter";
+            this.tsbtnRecenter.Size = new System.Drawing.Size(23, 22);
+            this.tsbtnRecenter.Text = "Recenter";
+            this.tsbtnRecenter.ToolTipText = "Recenter this app (disables Auto Move Y)";
+            this.tsbtnRecenter.Click += new System.EventHandler(this.tsbtnRecenter_Click);
+            // 
             // tslblTop
             // 
             this.tslblTop.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
@@ -1247,17 +1261,14 @@
             this.toolStripSeparator7.Name = "toolStripSeparator7";
             this.toolStripSeparator7.Size = new System.Drawing.Size(6, 25);
             // 
-            // tsbtnRecenter
+            // toolStripButton1
             // 
-            this.tsbtnRecenter.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.tsbtnRecenter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbtnRecenter.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnRecenter.Image")));
-            this.tsbtnRecenter.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsbtnRecenter.Name = "tsbtnRecenter";
-            this.tsbtnRecenter.Size = new System.Drawing.Size(23, 22);
-            this.tsbtnRecenter.Text = "Recenter";
-            this.tsbtnRecenter.ToolTipText = "Recenter this app (disables Auto Move Y)";
-            this.tsbtnRecenter.Click += new System.EventHandler(this.tsbtnRecenter_Click);
+            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
+            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton1.Name = "toolStripButton1";
+            this.toolStripButton1.Size = new System.Drawing.Size(23, 24);
+            this.toolStripButton1.Text = "toolStripButton1";
             // 
             // frmMain
             // 
@@ -1484,6 +1495,7 @@
         private System.Windows.Forms.ToolStripLabel tsYCoordLabel;
         private System.Windows.Forms.ToolStripLabel tslblTop;
         private System.Windows.Forms.ToolStripButton tsbtnRecenter;
+        private System.Windows.Forms.ToolStripButton toolStripButton1;
     }
 }
 
