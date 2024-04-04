@@ -40,6 +40,22 @@ namespace PerformanceMonitor
                 tslblLastThread.Text = "---";
         }
 
+        private void tsbtnRecenter_Click(object sender, EventArgs e)
+        {
+            tschkAutoMoveTop.Checked = false;
+            this.CenterToScreen();
+        }
+
+        private void tscmbCategory_TextChanged(object sender, EventArgs e)
+        {
+            if ((bool)tscmbCategory.Tag)
+            { // avoid procesing the change only the first time
+                gpuUtilizationCounter = new PerformanceCounter("GPU", tscmbCategory.Text, "nvidia geforce rtx 4090(01:00)", true);
+            }
+            else
+                tscmbCategory.Tag = true;  // flag to avoid changing the GpuPerfCounter the first time
+        }
+
         private void tschkShowLastProcessor_Click(object sender, EventArgs e)
         {
             if (!tschkShowLastProcessor.Checked)
@@ -55,12 +71,6 @@ namespace PerformanceMonitor
             }
         }
 
-
-
-        private void tsbtnChangeGPUCategory_Click(object sender, EventArgs e)
-        {
-            gpuUtilizationCounter = new PerformanceCounter("GPU", tscmbCategory.Text, "nvidia geforce rtx 4090(01:00)", true);
-        }
 
         private void tschkEnabled_Click(object sender, EventArgs e)
         {
@@ -115,7 +125,8 @@ namespace PerformanceMonitor
             timer1.Enabled = false;
             timer1.Tag = false; // flag for one-time control in timer1_Tick()
 
-            tscmbCategory.SelectedIndex = 0;
+            tscmbCategory.Tag = false;  // flag to avoid changing the GpuPerfCounter the first time
+            tscmbCategory.SelectedIndex = 0;  // otherwise, the combo will appear empty
 
             tslblTop.Tag = 0;  // used to store frmMain.Top
             tslblCurrentProcessor.Tag = 255; // unrealistic processor assigment to force update in timer1
@@ -196,7 +207,7 @@ namespace PerformanceMonitor
             timer1.Enabled = tschkEnabled.Checked;
         }
 
-        private void UpdateCounter(PerformanceCounter cpuCounter, ProgressBar pb, Label lbl)
+        private void UpdateCounter(PerformanceCounter cpuCounter, ProgressBar pb, Label lbl, string dimensional = "%")
         {
             float f;
             try
@@ -222,7 +233,7 @@ namespace PerformanceMonitor
 
                 color = f <= 100.0f ? System.Drawing.Color.Black : System.Drawing.Color.Red;
                 if (lbl.ForeColor != color) lbl.ForeColor = color;
-                lbl.Text = $"{f:F1}%";
+                lbl.Text = $"{f:F1}{dimensional}";
             }
         }
 
@@ -318,7 +329,8 @@ namespace PerformanceMonitor
                 }
             }
 
-            UpdateCounter(gpuUtilizationCounter, pbGPU0, lblGPU0);
+            string dimensional = (tscmbCategory.SelectedIndex == 0) ? "%": "°C";
+            UpdateCounter(gpuUtilizationCounter, pbGPU0, lblGPU0, dimensional);
             UpdateCounter(gpuFanCounter, pbGPUFanSpeed, lblGPUFanSpeed);
 
             UpdateCounter(cpuCounter0, pbCPU0, lblCPU0);

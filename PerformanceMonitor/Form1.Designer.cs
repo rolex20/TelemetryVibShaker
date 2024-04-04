@@ -125,7 +125,6 @@
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
             this.tscmbCategory = new System.Windows.Forms.ToolStripComboBox();
-            this.tsbtnChangeGPUCategory = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.tslblLT = new System.Windows.Forms.ToolStripLabel();
@@ -141,12 +140,13 @@
             this.tslblLP = new System.Windows.Forms.ToolStripLabel();
             this.tslblCurrentProcessor = new System.Windows.Forms.ToolStripLabel();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.tschkShowLastThread = new System.Windows.Forms.ToolStripButton();
             this.tslblShowLastThread = new System.Windows.Forms.ToolStripLabel();
             this.tslblLastThread = new System.Windows.Forms.ToolStripLabel();
-            this.tschkShowLastThread = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
-            this.tsYCoordLabel = new System.Windows.Forms.ToolStripLabel();
             this.tslblTop = new System.Windows.Forms.ToolStripLabel();
+            this.tsYCoordLabel = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsbtnRecenter = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.SuspendLayout();
@@ -954,11 +954,10 @@
             this.toolStripSeparator2,
             this.toolStripLabel2,
             this.tscmbCategory,
-            this.tsbtnChangeGPUCategory,
             this.toolStripSeparator3});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(816, 27);
+            this.toolStrip1.Size = new System.Drawing.Size(821, 27);
             this.toolStrip1.TabIndex = 104;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -1005,7 +1004,7 @@
             this.tstxtAutoMoveY.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.tstxtAutoMoveY.Name = "tstxtAutoMoveY";
             this.tstxtAutoMoveY.Size = new System.Drawing.Size(50, 27);
-            this.tstxtAutoMoveY.Text = "10";
+            this.tstxtAutoMoveY.Text = "1100";
             this.tstxtAutoMoveY.ToolTipText = "Enter Y coordinates for [Auto Move Y]";
             this.tstxtAutoMoveY.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tstxtAutoMoveY_KeyPress);
             // 
@@ -1064,16 +1063,7 @@
             this.tscmbCategory.Name = "tscmbCategory";
             this.tscmbCategory.Size = new System.Drawing.Size(121, 27);
             this.tscmbCategory.ToolTipText = "Select the item to monitor for RTX 4090";
-            // 
-            // tsbtnChangeGPUCategory
-            // 
-            this.tsbtnChangeGPUCategory.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbtnChangeGPUCategory.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnChangeGPUCategory.Image")));
-            this.tsbtnChangeGPUCategory.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsbtnChangeGPUCategory.Name = "tsbtnChangeGPUCategory";
-            this.tsbtnChangeGPUCategory.Size = new System.Drawing.Size(23, 24);
-            this.tsbtnChangeGPUCategory.Text = "→";
-            this.tsbtnChangeGPUCategory.Click += new System.EventHandler(this.tsbtnChangeGPUCategory_Click);
+            this.tscmbCategory.TextChanged += new System.EventHandler(this.tscmbCategory_TextChanged);
             // 
             // toolStripSeparator3
             // 
@@ -1101,12 +1091,13 @@
             this.tschkShowLastThread,
             this.tslblShowLastThread,
             this.tslblLastThread,
+            this.tsbtnRecenter,
             this.tslblTop,
             this.tsYCoordLabel,
             this.toolStripSeparator7});
             this.toolStrip2.Location = new System.Drawing.Point(0, 393);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(816, 25);
+            this.toolStrip2.Size = new System.Drawing.Size(821, 25);
             this.toolStrip2.TabIndex = 108;
             this.toolStrip2.Text = "toolStrip2";
             // 
@@ -1204,6 +1195,18 @@
             this.toolStripSeparator6.Name = "toolStripSeparator6";
             this.toolStripSeparator6.Size = new System.Drawing.Size(6, 25);
             // 
+            // tschkShowLastThread
+            // 
+            this.tschkShowLastThread.CheckOnClick = true;
+            this.tschkShowLastThread.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tschkShowLastThread.Image = ((System.Drawing.Image)(resources.GetObject("tschkShowLastThread.Image")));
+            this.tschkShowLastThread.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tschkShowLastThread.Name = "tschkShowLastThread";
+            this.tschkShowLastThread.Size = new System.Drawing.Size(23, 22);
+            this.tschkShowLastThread.Text = "Show last processor used by the main monitor loop";
+            this.tschkShowLastThread.ToolTipText = "Show last thread used by the main monitor loop";
+            this.tschkShowLastThread.Click += new System.EventHandler(this.tschkShowLastThread_Click);
+            // 
             // tslblShowLastThread
             // 
             this.tslblShowLastThread.Name = "tslblShowLastThread";
@@ -1219,32 +1222,6 @@
             this.tslblLastThread.Text = "------";
             this.tslblLastThread.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // tschkShowLastThread
-            // 
-            this.tschkShowLastThread.CheckOnClick = true;
-            this.tschkShowLastThread.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tschkShowLastThread.Image = ((System.Drawing.Image)(resources.GetObject("tschkShowLastThread.Image")));
-            this.tschkShowLastThread.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tschkShowLastThread.Name = "tschkShowLastThread";
-            this.tschkShowLastThread.Size = new System.Drawing.Size(23, 22);
-            this.tschkShowLastThread.Text = "Show last processor used by the main monitor loop";
-            this.tschkShowLastThread.ToolTipText = "Show last thread used by the main monitor loop";
-            this.tschkShowLastThread.Click += new System.EventHandler(this.tschkShowLastThread_Click);
-            // 
-            // toolStripSeparator7
-            // 
-            this.toolStripSeparator7.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(6, 25);
-            // 
-            // tsYCoordLabel
-            // 
-            this.tsYCoordLabel.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.tsYCoordLabel.Name = "tsYCoordLabel";
-            this.tsYCoordLabel.Size = new System.Drawing.Size(53, 22);
-            this.tsYCoordLabel.Text = "Y Coord:";
-            this.tsYCoordLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
             // tslblTop
             // 
             this.tslblTop.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
@@ -1256,11 +1233,37 @@
             this.tslblTop.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.tslblTop.ToolTipText = "Current Y coordinate of this app";
             // 
+            // tsYCoordLabel
+            // 
+            this.tsYCoordLabel.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.tsYCoordLabel.Name = "tsYCoordLabel";
+            this.tsYCoordLabel.Size = new System.Drawing.Size(53, 22);
+            this.tsYCoordLabel.Text = "Y Coord:";
+            this.tsYCoordLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(6, 25);
+            // 
+            // tsbtnRecenter
+            // 
+            this.tsbtnRecenter.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.tsbtnRecenter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsbtnRecenter.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnRecenter.Image")));
+            this.tsbtnRecenter.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbtnRecenter.Name = "tsbtnRecenter";
+            this.tsbtnRecenter.Size = new System.Drawing.Size(23, 22);
+            this.tsbtnRecenter.Text = "Recenter";
+            this.tsbtnRecenter.ToolTipText = "Recenter this app (disables Auto Move Y)";
+            this.tsbtnRecenter.Click += new System.EventHandler(this.tsbtnRecenter_Click);
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(816, 418);
+            this.ClientSize = new System.Drawing.Size(821, 418);
             this.Controls.Add(this.toolStrip2);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.lblGPUFanSpeed);
@@ -1457,7 +1460,6 @@
         private System.Windows.Forms.ToolStripButton tschkAutoReadY;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripLabel toolStripLabel2;
-        private System.Windows.Forms.ToolStripButton tsbtnChangeGPUCategory;
         private System.Windows.Forms.ToolStripButton tschkAlwaysOnTop;
         private System.Windows.Forms.ToolStripComboBox tscmbCategory;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
@@ -1481,6 +1483,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
         private System.Windows.Forms.ToolStripLabel tsYCoordLabel;
         private System.Windows.Forms.ToolStripLabel tslblTop;
+        private System.Windows.Forms.ToolStripButton tsbtnRecenter;
     }
 }
 
