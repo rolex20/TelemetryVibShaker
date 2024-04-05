@@ -3,6 +3,7 @@
 using System;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Linq.Expressions;
 
 public class NvidiaGpu
 {
@@ -18,26 +19,41 @@ public class NvidiaGpu
     public readonly string Name;
     public readonly string Uuid;
 
+    private int lastExceptionsCounter;
+    public int ReadResetExceptionsCounter { get
+        {
+            int result = lastExceptionsCounter;
+            lastExceptionsCounter = 0;
+            return result;
+        } }
+
 
     public NvidiaGpu(int deviceNumber = 0)
 	{
-        DeviceId = deviceNumber;
-        var err = Nvml.nvmlInit_v2();
-        if (err == Nvml.nvmlReturn.NVML_SUCCESS)
+        try
         {
-            err = Nvml.nvmlDeviceGetHandleByIndex((uint)deviceNumber, out _device);
+            var err = Nvml.nvmlInit_v2();
             if (err == Nvml.nvmlReturn.NVML_SUCCESS)
             {
-                var name = new StringBuilder(250);
-                var uuid = new StringBuilder(250);
-                if (Nvml.nvmlDeviceGetName(_device, name, (uint)name.Capacity) == Nvml.nvmlReturn.NVML_SUCCESS &&
-                    Nvml.nvmlDeviceGetUUID(_device, uuid, (uint)uuid.Capacity) == Nvml.nvmlReturn.NVML_SUCCESS)
+                DeviceId = deviceNumber;
+
+                err = Nvml.nvmlDeviceGetHandleByIndex((uint)deviceNumber, out _device);
+                if (err == Nvml.nvmlReturn.NVML_SUCCESS)
                 {
-                    Name = name.ToString();
-                    Uuid = uuid.ToString();
-                    return;
+                    var name = new StringBuilder(250);
+                    var uuid = new StringBuilder(250);
+                    if (Nvml.nvmlDeviceGetName(_device, name, (uint)name.Capacity) == Nvml.nvmlReturn.NVML_SUCCESS &&
+                        Nvml.nvmlDeviceGetUUID(_device, uuid, (uint)uuid.Capacity) == Nvml.nvmlReturn.NVML_SUCCESS)
+                    {
+                        Name = name.ToString();
+                        Uuid = uuid.ToString();
+                        return;
+                    }
                 }
             }
+        } catch
+        {
+            lastExceptionsCounter++;
         }
 
         Name = "<FailedToInitialize>";
@@ -47,47 +63,84 @@ public class NvidiaGpu
 
     //Percent of time over the past sample period during which one or more kernels was executing on the GPU
     public int Utilization { get {
-            var err = Nvml.nvmlDeviceGetUtilizationRates(_device, out _utilization);
-            _utilization = (err == Nvml.nvmlReturn.NVML_SUCCESS) ? _utilization : default(Nvml.NvmlUtilization);
+            try {
 
-            return (int)_utilization.gpu; 
-            } 
+                var err = Nvml.nvmlDeviceGetUtilizationRates(_device, out _utilization);
+                _utilization = (err == Nvml.nvmlReturn.NVML_SUCCESS) ? _utilization : default(Nvml.NvmlUtilization);
+
+                return (int)_utilization.gpu;
+            } catch
+            {
+                lastExceptionsCounter++;
+                return 0;
+            }
+            }
+
     }
 
     public int FanSpeed { 
         get {
-            var err = Nvml.nvmlDeviceGetTemperature(_device, Nvml.nvmlTemperatureSensors.NVML_TEMPERATURE_GPU, out _temperature);
-            _temperature = (err == Nvml.nvmlReturn.NVML_SUCCESS) ? _temperature : 0;
+            try
+            {
+                var err = Nvml.nvmlDeviceGetTemperature(_device, Nvml.nvmlTemperatureSensors.NVML_TEMPERATURE_GPU, out _temperature);
+                _temperature = (err == Nvml.nvmlReturn.NVML_SUCCESS) ? _temperature : 0;
 
-            return (int)_fanSpeed; 
+                return (int)_fanSpeed;
+            } catch
+            {
+                lastExceptionsCounter++;
+                return 0;
+            }
         } 
     }
 
     //Power usage for this GPU in Watts and its associated circuitry
     public int PowerW { 
         get {
-            var err = Nvml.nvmlDeviceGetPowerUsage(_device, out _power);
-            _power = (err == Nvml.nvmlReturn.NVML_SUCCESS) ? _power : 0;
+            try
+            {
+                var err = Nvml.nvmlDeviceGetPowerUsage(_device, out _power);
+                _power = (err == Nvml.nvmlReturn.NVML_SUCCESS) ? _power : 0;
 
-            return (int)(_power / 1000); 
+                return (int)(_power / 1000);
+            }
+            catch { 
+                lastExceptionsCounter++;
+                return 0;
+            }
         } 
     }
 
     //The current SM clock speed for the device, in MHz"
     public int SMClockMhz { get {
-    var err = Nvml.nvmlDeviceGetClockInfo(_device, Nvml.nvmlClockType.NVML_CLOCK_SM, out _smClock);
-            _smClock = (err == Nvml.nvmlReturn.NVML_SUCCESS) ? _smClock : 0;
+            try
+            {
+                var err = Nvml.nvmlDeviceGetClockInfo(_device, Nvml.nvmlClockType.NVML_CLOCK_SM, out _smClock);
+                _smClock = (err == Nvml.nvmlReturn.NVML_SUCCESS) ? _smClock : 0;
 
-            return (int)_smClock; 
+                return (int)_smClock;
+            }
+            catch
+            {
+                lastExceptionsCounter++;
+                return 0;
+            }
         } 
     }
 
     //The current temperature readings for the device, in degrees C
     public int TemperatureC { get {
-            var err = Nvml.nvmlDeviceGetFanSpeed(_device, out _fanSpeed);
-            _fanSpeed = (err == Nvml.nvmlReturn.NVML_SUCCESS) ? _fanSpeed : 0;
+            try
+            {
+                var err = Nvml.nvmlDeviceGetFanSpeed(_device, out _fanSpeed);
+                _fanSpeed = (err == Nvml.nvmlReturn.NVML_SUCCESS) ? _fanSpeed : 0;
 
-            return (int)_temperature; 
+                return (int)_temperature;
+            } catch
+            {
+                lastExceptionsCounter++;
+                return 0;
+            }
     } }
 
 }

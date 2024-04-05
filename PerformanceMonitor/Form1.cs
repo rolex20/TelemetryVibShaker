@@ -6,8 +6,7 @@ using Microsoft.Win32;
 using System.Threading;
 using System.ServiceProcess;
 using System.Linq;
-using System.CodeDom.Compiler;
-using System.Linq.Expressions;
+
 
 
 namespace PerformanceMonitor
@@ -15,7 +14,7 @@ namespace PerformanceMonitor
     public partial class frmMain : Form
     {
         private PerformanceCounter cpuCounter0, cpuCounter1, cpuCounter2, cpuCounter3, cpuCounter4, cpuCounter5, cpuCounter6, cpuCounter7, cpuCounter8, cpuCounter9, cpuCounter10, cpuCounter11, cpuCounter12, cpuCounter13, cpuCounter14, cpuCounter15, cpuCounter16, cpuCounter17, cpuCounter18, cpuCounter19;
-        private PerformanceCounter gpuUtilizationCounter, gpuFanCounter;
+        //private PerformanceCounter gpuUtilizationCounter, gpuFanCounter;
         private Stopwatch stopwatch;
         private long ExCounter;  // Exceptions Counter
         private PerformanceCounter diskCounterC, diskCounterN, diskCounterR;
@@ -45,15 +44,6 @@ namespace PerformanceMonitor
             this.CenterToScreen();
         }
 
-        private void tscmbCategory_TextChanged(object sender, EventArgs e)
-        {
-            if ((bool)tscmbCategory.Tag)
-            { // avoid procesing the change only the first time
-                gpuUtilizationCounter = new PerformanceCounter("GPU", tscmbCategory.Text, "nvidia geforce rtx 4090(01:00)", true);
-            }
-            else
-                tscmbCategory.Tag = true;  // flag to avoid changing the GpuPerfCounter the first time
-        }
 
         private void tschkShowLastProcessor_Click(object sender, EventArgs e)
         {
@@ -133,7 +123,7 @@ namespace PerformanceMonitor
 
             myRTX4090 = new NvidiaGpu(0);
 
-            StartService("GpuPerfCounters");
+            //StartService("GpuPerfCounters");
             InitializeCounterTags();
             ResetMaxCounters();
 
@@ -158,15 +148,15 @@ namespace PerformanceMonitor
                 // Set the CPU affinity
                 currentProcess.ProcessorAffinity = affinityMask;
 
-                gpuUtilizationCounter = new PerformanceCounter("GPU", "% GPU Time", "nvidia geforce rtx 4090(01:00)");
-                gpuFanCounter = new PerformanceCounter("GPU", "% GPU Fan Speed", "nvidia geforce rtx 4090(01:00)");
+                //gpuUtilizationCounter = new PerformanceCounter("GPU", "% GPU Time", "nvidia geforce rtx 4090(01:00)");
+                //gpuFanCounter = new PerformanceCounter("GPU", "% GPU Fan Speed", "nvidia geforce rtx 4090(01:00)");
 
-                lblCPU.Tag = true;  // special tag to indicate that this is a 12700K
+                tslbl12700K.Tag = true;  // special tag to indicate that this is a 12700K
             }
             else
             {
-                gpuUtilizationCounter = new PerformanceCounter("GPU Engine", "Utilization Percentage", true);  //Generic for debugging
-                lblCPU.Tag = false; // special tag to indicate that this is a 12700K
+                //gpuUtilizationCounter = new PerformanceCounter("GPU Engine", "Utilization Percentage", true);  //Generic for debugging
+                tslbl12700K.Tag = false; // special tag to indicate that this is not a 12700K
             }
 
             regKey.Close();
@@ -200,12 +190,12 @@ namespace PerformanceMonitor
             cpuCounter19 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,19", true);
 
             stopwatch = new Stopwatch();
-            //timer1.Enabled = chkEnabled.Checked;
+
             timer1.Enabled = tschkEnabled.Checked;
         }
 
-        // I prefer to repeat code in this case instead of passing all parameters to the similar function
-        private void UpdateGpuCounter(int counter, ProgressBar pb, Label lbl, string dimensional = "%")
+        // Function Inlining: I prefer to repeat code in this case instead of passing all parameters to the similar function
+        private void UpdateCounter(int counter, ProgressBar pb, Label lbl, string dimensional = "%")
         {
             if ((int)lbl.Tag != counter)
             {
@@ -215,21 +205,21 @@ namespace PerformanceMonitor
                 if (pb.ForeColor != color) pb.ForeColor = color;
                 pb.Value = counter <= 100 ? counter : 100;
 
-
-                color = counter <= 100.0f ? System.Drawing.Color.Black : System.Drawing.Color.Red;
+                // Let's notify with red when counter >= 80 to denote possible bottleneck
+                color = counter <= 80.0f ? System.Drawing.Color.Black : System.Drawing.Color.Red;
                 if (lbl.ForeColor != color) lbl.ForeColor = color;
                 lbl.Text = $"{counter:F1}{dimensional}";
             }
 
         }
 
-        // I prefer to repeat code in this case instead of passing all parameters to the similar function
-        private void UpdateCounter(PerformanceCounter cpuCounter, ProgressBar pb, Label lbl, string dimensional = "%")
+        // Function Inlining: I prefer to repeat code in this case instead of passing all parameters to the similar function
+        private void UpdateCounter(PerformanceCounter counter, ProgressBar pb, Label lbl, string dimensional = "%")
         {
             float f;
             try
             {
-                f = cpuCounter.NextValue();
+                f = counter.NextValue();
             }
             catch
             {
@@ -243,7 +233,8 @@ namespace PerformanceMonitor
             {
                 lbl.Tag = v;
 
-                System.Drawing.Color color = f <= 100.0f ? (System.Drawing.Color)pb.Tag : System.Drawing.Color.Red;
+                // Let's notify with red when counter >= 80 to denote possible bottleneck
+                System.Drawing.Color color = f <= 80.0f ? (System.Drawing.Color)pb.Tag : System.Drawing.Color.Red;
                 if (pb.ForeColor != color) pb.ForeColor = color;
                 pb.Value = v <= 100 ? v : 100;
 
@@ -282,20 +273,25 @@ namespace PerformanceMonitor
 
         private void UpdateGPUInfo()
         {
+            // Need to read temp too to get the fan speed
+            int util = myRTX4090.Utilization;
+            int temp = myRTX4090.TemperatureC;
+            int fanSpeed = myRTX4090.FanSpeed;
+            ExCounter += myRTX4090.ReadResetExceptionsCounter;
 
             // update the GPU-Utilization or the GPU-Temperature
             switch (tscmbCategory.SelectedIndex)
             {
                 case 0: // %GPU Time
-                    UpdateGpuCounter(myRTX4090.Utilization, pbGPU0, lblGPU0, "%");
+                    UpdateCounter(util, pbGPU0, lblGPU0, "%");
                     break;
                 default: // GPU Temperature (in degrees C)
-                    UpdateGpuCounter(myRTX4090.TemperatureC, pbGPU0, lblGPU0, "°C");
+                    UpdateCounter(temp, pbGPU0, lblGPU0, "°C");
                     break;
             }
 
             // update Fan-Speed
-            UpdateGpuCounter(myRTX4090.FanSpeed, pbGPUFanSpeed, lblGPUFanSpeed);
+            UpdateCounter(fanSpeed, pbGPUFanSpeed, lblGPUFanSpeed);
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -310,12 +306,6 @@ namespace PerformanceMonitor
                 tslblTop.Text = t.ToString();
             }
 
-            // move frmMain.Top position to the stored position if required by the user
-            //if (chkAutoMoveTop.Checked)
-            //{
-            //    int a = (int)chkAutoMoveTop.Tag;
-            //    if (this.Top != a) this.Top =a;                
-            //}
 
             if (tschkAutoReadY.Checked)
                 tstxtAutoMoveY.Text = tslblTop.Text;
@@ -332,7 +322,7 @@ namespace PerformanceMonitor
             if (!(bool)timer1.Tag) // only do this once
             {
                 Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
-                if ((bool)lblCPU.Tag) // special flag equals True when this processor is a 12700K
+                if ((bool)tslbl12700K.Tag) // special flag equals True when this processor is a 12700K
                 {
                     // Get the pseudo handle for the current thread
                     IntPtr currentThreadHandle = GetCurrentThread();
@@ -364,9 +354,7 @@ namespace PerformanceMonitor
                 }
             }
 
-            //string dimensional = (tscmbCategory.SelectedIndex == 0) ? "%": "°C";
-            //UpdateCounter(gpuUtilizationCounter, pbGPU0, lblGPU0, dimensional);
-            //UpdateCounter(gpuFanCounter, pbGPUFanSpeed, lblGPUFanSpeed);
+
             UpdateGPUInfo();
 
             UpdateCounter(cpuCounter0, pbCPU0, lblCPU0);
@@ -388,7 +376,7 @@ namespace PerformanceMonitor
             UpdateCounter(cpuCounter16, pbCPU16, lblCPU16);
             UpdateCounter(cpuCounter17, pbCPU17, lblCPU17);
             UpdateCounter(cpuCounter18, pbCPU18, lblCPU18);
-            UpdateCounter(cpuCounter19, pbCPU18, lblCPU19);
+            UpdateCounter(cpuCounter19, pbCPU19, lblCPU19);
 
             UpdateDisk(diskCounterC, lblDiskC, lblMaxDiskC);
             UpdateDisk(diskCounterN, lblDiskN, lblMaxDiskN);

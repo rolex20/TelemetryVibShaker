@@ -114,7 +114,7 @@
             this.label38 = new System.Windows.Forms.Label();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.lblIntelModel = new System.Windows.Forms.ToolStripLabel();
+            this.tslbl12700K = new System.Windows.Forms.ToolStripLabel();
             this.tschkEnabled = new System.Windows.Forms.ToolStripButton();
             this.tsbtnResetMaxCounters = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -126,6 +126,7 @@
             this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
             this.tscmbCategory = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.tslblLT = new System.Windows.Forms.ToolStripLabel();
             this.tslblLoopTime = new System.Windows.Forms.ToolStripLabel();
@@ -147,7 +148,6 @@
             this.tslblTop = new System.Windows.Forms.ToolStripLabel();
             this.tsYCoordLabel = new System.Windows.Forms.ToolStripLabel();
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.SuspendLayout();
@@ -275,6 +275,7 @@
             // 
             // pbCPU4
             // 
+            this.pbCPU4.ForeColor = System.Drawing.Color.Lime;
             this.pbCPU4.Location = new System.Drawing.Point(65, 132);
             this.pbCPU4.Name = "pbCPU4";
             this.pbCPU4.Size = new System.Drawing.Size(156, 23);
@@ -332,6 +333,7 @@
             // 
             // pbCPU8
             // 
+            this.pbCPU8.ForeColor = System.Drawing.Color.Lime;
             this.pbCPU8.Location = new System.Drawing.Point(65, 218);
             this.pbCPU8.Name = "pbCPU8";
             this.pbCPU8.Size = new System.Drawing.Size(156, 23);
@@ -361,6 +363,7 @@
             // 
             // pbCPU10
             // 
+            this.pbCPU10.ForeColor = System.Drawing.Color.Lime;
             this.pbCPU10.Location = new System.Drawing.Point(65, 259);
             this.pbCPU10.Name = "pbCPU10";
             this.pbCPU10.Size = new System.Drawing.Size(156, 23);
@@ -944,7 +947,7 @@
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.lblIntelModel,
+            this.tslbl12700K,
             this.tschkEnabled,
             this.tsbtnResetMaxCounters,
             this.toolStripSeparator1,
@@ -959,18 +962,18 @@
             this.toolStripButton1});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(821, 27);
+            this.toolStrip1.Size = new System.Drawing.Size(832, 27);
             this.toolStrip1.TabIndex = 104;
             this.toolStrip1.Text = "toolStrip1";
             // 
-            // lblIntelModel
+            // tslbl12700K
             // 
-            this.lblIntelModel.Font = new System.Drawing.Font("Century Gothic", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblIntelModel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
-            this.lblIntelModel.Name = "lblIntelModel";
-            this.lblIntelModel.Size = new System.Drawing.Size(104, 24);
-            this.lblIntelModel.Text = "i7-12700K";
-            this.lblIntelModel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.tslbl12700K.Font = new System.Drawing.Font("Century Gothic", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tslbl12700K.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.tslbl12700K.Name = "tslbl12700K";
+            this.tslbl12700K.Size = new System.Drawing.Size(104, 24);
+            this.tslbl12700K.Text = "i7-12700K";
+            this.tslbl12700K.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // tschkEnabled
             // 
@@ -1065,12 +1068,20 @@
             this.tscmbCategory.Name = "tscmbCategory";
             this.tscmbCategory.Size = new System.Drawing.Size(121, 27);
             this.tscmbCategory.ToolTipText = "Select the item to monitor for RTX 4090";
-            this.tscmbCategory.TextChanged += new System.EventHandler(this.tscmbCategory_TextChanged);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
             this.toolStripSeparator3.Size = new System.Drawing.Size(6, 27);
+            // 
+            // toolStripButton1
+            // 
+            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
+            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton1.Name = "toolStripButton1";
+            this.toolStripButton1.Size = new System.Drawing.Size(23, 24);
+            this.toolStripButton1.Text = "toolStripButton1";
             // 
             // toolStrip2
             // 
@@ -1099,7 +1110,7 @@
             this.toolStripSeparator7});
             this.toolStrip2.Location = new System.Drawing.Point(0, 393);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(821, 25);
+            this.toolStrip2.Size = new System.Drawing.Size(832, 25);
             this.toolStrip2.TabIndex = 108;
             this.toolStrip2.Text = "toolStrip2";
             // 
@@ -1261,20 +1272,11 @@
             this.toolStripSeparator7.Name = "toolStripSeparator7";
             this.toolStripSeparator7.Size = new System.Drawing.Size(6, 25);
             // 
-            // toolStripButton1
-            // 
-            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
-            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(23, 24);
-            this.toolStripButton1.Text = "toolStripButton1";
-            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(821, 418);
+            this.ClientSize = new System.Drawing.Size(832, 418);
             this.Controls.Add(this.toolStrip2);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.lblGPUFanSpeed);
@@ -1462,7 +1464,7 @@
         private System.Windows.Forms.Label label38;
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.ToolStripLabel lblIntelModel;
+        private System.Windows.Forms.ToolStripLabel tslbl12700K;
         private System.Windows.Forms.ToolStripButton tschkEnabled;
         private System.Windows.Forms.ToolStripButton tsbtnResetMaxCounters;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
