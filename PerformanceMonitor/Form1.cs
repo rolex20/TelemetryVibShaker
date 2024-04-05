@@ -7,6 +7,10 @@ using System.Threading;
 using System.ServiceProcess;
 using System.Linq;
 
+using System.IO;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
 
 
 namespace PerformanceMonitor
@@ -19,6 +23,10 @@ namespace PerformanceMonitor
         private long ExCounter;  // Exceptions Counter
         private PerformanceCounter diskCounterC, diskCounterN, diskCounterR;
         private NvidiaGpu myRTX4090;
+
+        private HttpListener listener; // Web Server for remote control location and focus commands
+        private int webServerThreadId, dispatcherUIThread;
+
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -36,6 +44,8 @@ namespace PerformanceMonitor
         {
             if (!tschkShowLastThread.Checked)
                 tslblLastThread.Text = "---";
+            else
+                tslblLastThread.Text = String.Empty;
         }
 
         private void tsbtnRecenter_Click(object sender, EventArgs e)
@@ -49,6 +59,8 @@ namespace PerformanceMonitor
         {
             if (!tschkShowLastProcessor.Checked)
                 tslblCurrentProcessor.Text = "----";
+            else 
+                tslblCurrentProcessor.Text = String.Empty;
         }
 
 
@@ -107,6 +119,9 @@ namespace PerformanceMonitor
         }
         private void frmMain_Load(object sender, EventArgs e)
         {
+            webServerThreadId = -1;
+            dispatcherUIThread = -1;
+
             timer1.Enabled = false;
             timer1.Tag = false; // flag for one-time control in timer1_Tick()
 
@@ -188,6 +203,8 @@ namespace PerformanceMonitor
             cpuCounter17 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,17", true);
             cpuCounter18 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,18", true);
             cpuCounter19 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,19", true);
+
+            StartWebServer();
 
             stopwatch = new Stopwatch();
 
@@ -391,6 +408,7 @@ namespace PerformanceMonitor
             stopwatch.Stop();
 
             long elapsed_ms = stopwatch.ElapsedMilliseconds;
+
             if ((long)tslblLoopTime.Tag != elapsed_ms)
             {
                 tslblLoopTime.Tag = elapsed_ms;
@@ -451,7 +469,7 @@ namespace PerformanceMonitor
             }
             catch 
             {
-                // continue
+                // ignore
             }
         }
 
@@ -469,9 +487,119 @@ namespace PerformanceMonitor
             }
             catch
             {
-                // continue
+                // ignore
             }
         }
+
+        private void StartWebServer()
+        {
+            listener = new HttpListener();
+            listener.Prefixes.Add("http://localhost:8080/");
+            listener.Start();
+            Task.Run(() => ProcessRequest());
+        }
+
+        private async Task ProcessRequest()
+        {
+            while (true)
+            {
+                var context = await listener.GetContextAsync();
+                var request = context.Request;
+                var response = context.Response;
+
+                webServerThreadId = (int)GetCurrentThreadId();
+                if (request.HttpMethod == "POST")
+                {
+                    using (var reader = new StreamReader(request.InputStream, Encoding.UTF8))
+                    {
+                        string formData = await reader.ReadToEndAsync();
+
+                        var parameters = formData.Split('&')
+                                                .Select(param => param.Split('='))
+                                                .ToDictionary(param => param[0], param => WebUtility.UrlDecode(param[1]));
+
+                        string sx, sy;
+                        int x = -1;
+                        int y = -1;
+                        if (parameters.TryGetValue("x", out sx) && parameters.TryGetValue("y", out sy))
+                        {
+                            x = int.Parse(sx);
+                            y = int.Parse(sy);
+                        }
+
+                        string topMost = String.Empty;
+                        string focus = String.Empty;
+
+                        parameters.TryGetValue("topmost", out topMost);
+                        parameters.TryGetValue("focus", out focus);
+
+                        MakeFormChanges(x, y, topMost, focus);
+
+                        SendResponse(response, $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Successfully requested coordinates change to X: {x}, Y: {y}");
+                    }
+                }
+                else
+                {
+                    string timestamp = DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]");
+                    SendResponse(response, "Welcome! Please submit new X and Y coordinates.");
+                }
+            }
+        }
+
+        private void MakeFormChanges(int x, int y, string topMost, string focus)
+        {
+            this.Invoke(new Action(() => {
+                dispatcherUIThread = (int)GetCurrentThreadId();
+
+                if (x >= 0 && y >= 0)
+                    this.Location = new System.Drawing.Point(x, y);
+
+                // If the user submitted the form with topMost empty, this means the user might want to set this property to false
+                this.TopMost = topMost != null;
+
+                if (focus != null) this.Activate();
+
+            }));
+        }
+
+        private void SendResponse(HttpListenerResponse response, string message)
+        {
+
+            string marked = (this.TopMost ? "checked" : String.Empty);
+            string responseString = $@"
+                <html>
+                <head><title>Performance Monitor Light - Web Server</title>
+                <link rel=""stylesheet"" href=""https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/styles/24b6bbbc.site-ltr.css "">
+                </head>
+                <body>
+                    <h1>{message}</h1>
+                    <form method='post'>
+                        <br><br><label for='x'>X:</label>
+                        <input type='number' name='x' value='{this.Location.X}' min='0' required placeholder='type new X coordinate'/><br><br>
+                        <label for='y'>Y:</label>
+                        <input type='number' name='y' value='{this.Location.Y}' min='0' required placeholder='type new Y coordinate' autofocus/><br><br>
+
+                        <input type='checkbox' id='topmost' name='topmost' value='always_on_top' {marked}>
+                        <label for='topmost'> Always on top</label><br>
+                        <input type='checkbox' id='focus' name='focus' value='focus'>
+                        <label for='focus'>Focus</label><br>
+                        
+
+                        <input type='submit' value='Submit' />
+                    </form>
+                    <hr>{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Web Server ThreadID: {webServerThreadId.ToString()} Dispatcher ThreadID: {dispatcherUIThread}
+                </body>
+                </html>";
+
+            byte[] buffer = Encoding.UTF8.GetBytes(responseString);
+            response.ContentLength64 = buffer.Length;
+            using (var output = response.OutputStream)
+            {
+                output.Write(buffer, 0, buffer.Length);
+            }
+            response.Close();
+        }
+
 
     }
 }

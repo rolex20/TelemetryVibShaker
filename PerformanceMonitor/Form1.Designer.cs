@@ -148,6 +148,8 @@
             this.tslblTop = new System.Windows.Forms.ToolStripLabel();
             this.tsYCoordLabel = new System.Windows.Forms.ToolStripLabel();
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
+            this.tslblWebServer = new System.Windows.Forms.ToolStripLabel();
             this.toolStrip1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.SuspendLayout();
@@ -1107,7 +1109,9 @@
             this.tsbtnRecenter,
             this.tslblTop,
             this.tsYCoordLabel,
-            this.toolStripSeparator7});
+            this.toolStripSeparator7,
+            this.toolStripSeparator8,
+            this.tslblWebServer});
             this.toolStrip2.Location = new System.Drawing.Point(0, 393);
             this.toolStrip2.Name = "toolStrip2";
             this.toolStrip2.Size = new System.Drawing.Size(832, 25);
@@ -1271,6 +1275,18 @@
             this.toolStripSeparator7.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.toolStripSeparator7.Name = "toolStripSeparator7";
             this.toolStripSeparator7.Size = new System.Drawing.Size(6, 25);
+            // 
+            // toolStripSeparator8
+            // 
+            this.toolStripSeparator8.Name = "toolStripSeparator8";
+            this.toolStripSeparator8.Size = new System.Drawing.Size(6, 25);
+            // 
+            // tslblWebServer
+            // 
+            this.tslblWebServer.Name = "tslblWebServer";
+            this.tslblWebServer.Size = new System.Drawing.Size(51, 22);
+            this.tslblWebServer.Text = "WS:8080";
+            this.tslblWebServer.ToolTipText = "Port where the web server is listening for remote control commands";
             // 
             // frmMain
             // 
@@ -1498,6 +1514,8 @@
         private System.Windows.Forms.ToolStripLabel tslblTop;
         private System.Windows.Forms.ToolStripButton tsbtnRecenter;
         private System.Windows.Forms.ToolStripButton toolStripButton1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
+        private System.Windows.Forms.ToolStripLabel tslblWebServer;
     }
 }
 
