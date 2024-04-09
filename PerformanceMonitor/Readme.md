@@ -2,8 +2,9 @@ Monitors CPU Utilization to compare Performance, Efficiency and HyperThreading (
 
 Observations used to decide between Power Mode=Balance, Power Mode=High Performance or PowerMode=High Performance + "Processor performance core parking min cores" & "Processor performance core parking min cores for Processor Power Efficiency Class 1".
 
-Those configurations were necessary to fix the stuttering with DCS World 2.9 according to
-[Disabling Core Parking in windows fixed my stuttering in menu and game - Multi-Threading Bug Reports (Temp) - ED Forums (dcs.world)](https://forum.dcs.world/topic/335866-disabling-core-parking-in-windows-fixed-my-stuttering-in-menu-and-game/?_fromLogin=1)
+Those configurations were necessary to fix the stuttering with DCS World 2.9 according to:
+
+[Disabling Core Parking in windows fixed my stuttering in menu and game - Multi-Threading Bug Reports (Temp) - ED Forums (dcs.world)](https://forum.dcs.world/topic/335866-disabling-core-parking-in-windows-fixed-my-stuttering-in-menu-and-game/?_fromLogin=1) and
 
 [MT freezes even in main menu - Page 19 - Multi-Threading Bug Reports (Temp) - ED Forums (dcs.world)](https://forum.dcs.world/topic/328792-mt-freezes-even-in-main-menu/page/19/#comment-5318289)
 
