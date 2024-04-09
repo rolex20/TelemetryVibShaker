@@ -19,7 +19,9 @@ This is how it looks, notice how you can easily compare Core vs HT assignment an
 
 ![image](https://github.com/rolex20/TelemetryVibShaker/assets/62082564/c4fab194-d1ff-4aa3-b43a-ae6b8de9f2fb)
 
+CPU 4, 8 and 10 are the best cores in my particular case.  While gaming in Balanced mode, I can see how Windows, most of the time, tries to run the game threads on those cores.   When in High Peformance mode, the thread assignment is distributed more equally between all cores even HT but almost nothing to the Efficiency cores.  This made me create a script to have background programs to run exclusively from the Efficiency cores: ASUS Armoury Crate*, Corsair iCue*, Windows Search, ASUS GPU Tweak III, my Performance Monitor, my Fanatec Monitor, and many other items, otherwise Windows might run them on the Performance cores which I want dedicated exclusively to the game.
 
+Bad news is that now DCS World uses all Efficiency cores to read disk files but with this program, I was able to see how much load I was transferring to the Efficiency cores.
 
 It includes a light web server on port 8080 to move the program to a different location in the screen.  I use this from my smartphone when I am in VR and it is difficult to move the program when the resolution change in my second monitor.
 
