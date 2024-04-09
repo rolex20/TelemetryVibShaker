@@ -6,11 +6,12 @@ using Microsoft.Win32;
 using System.Threading;
 using System.ServiceProcess;
 using System.Linq;
-
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+
+
 
 
 namespace PerformanceMonitor
@@ -26,11 +27,14 @@ namespace PerformanceMonitor
 
         private HttpListener listener; // Web Server for remote control location and focus commands
         private int webServerThreadId, dispatcherUIThread;
+        private Process currentProcess;
 
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            StopService("GpuPerfCounters");
+            Properties.Settings.Default.TimerInterval = (int)nudPollingInterval.Value;
+            Properties.Settings.Default.PriorityClassSelectedIndex = cmbPriorityClass.SelectedIndex;
+            Properties.Settings.Default.Save();
         }
 
 
@@ -63,6 +67,31 @@ namespace PerformanceMonitor
                 tslblCurrentProcessor.Text = String.Empty;
         }
 
+        private void cmbPriorityClass_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cmbPriorityClass.Tag!=null && (bool)cmbPriorityClass.Tag) // Ignore first change during InitializeComponent()
+            {
+                switch (cmbPriorityClass.SelectedIndex)
+                {
+                    case 0: //NORMAL
+                        currentProcess.PriorityClass = ProcessPriorityClass.Normal;
+                        break;
+                    case 1: // BELOW NORMAL
+                        currentProcess.PriorityClass = ProcessPriorityClass.BelowNormal;
+                        break;
+                    case 2: //IDLE
+                        currentProcess.PriorityClass = ProcessPriorityClass.Idle;
+                        break;
+                }
+            }
+
+            cmbPriorityClass.Tag = true;
+        }
+
+        private void nudPollingInterval_ValueChanged(object sender, EventArgs e)
+        {
+            timer1.Interval = (int)nudPollingInterval.Value;
+        }
 
         private void tstxtAutoMoveY_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -138,7 +167,7 @@ namespace PerformanceMonitor
 
             myRTX4090 = new NvidiaGpu(0);
 
-            //StartService("GpuPerfCounters");
+
             InitializeCounterTags();
             ResetMaxCounters();
 
@@ -151,7 +180,7 @@ namespace PerformanceMonitor
             string processorName = regKey.GetValue("ProcessorNameString").ToString();
 
             // Get the current process
-            Process currentProcess = Process.GetCurrentProcess();
+            currentProcess = Process.GetCurrentProcess();
 
             // Check if the processor name contains "Intel 12700K"
             if (processorName.Contains("12700K"))
@@ -176,8 +205,14 @@ namespace PerformanceMonitor
 
             regKey.Close();
 
-            // Change the priority class to BelowNormal
-            currentProcess.PriorityClass = ProcessPriorityClass.BelowNormal;
+            // Change the priority class to the previous setting selected (NORMAL, BELOW_NORMAL or IDLE)
+            cmbPriorityClass.SelectedIndex = Properties.Settings.Default.PriorityClassSelectedIndex;
+            cmbPriorityClass_SelectedIndexChanged(null, null);
+
+
+            cmbPriorityClass.Tag = false; // Flag to ignore cmbPriorityClass.OnChange() once
+            cmbPriorityClass.SelectedIndex = 1;  // BELOW NORMAL
+
 
             diskCounterC = new PerformanceCounter("PhysicalDisk", "Disk Bytes/sec", "0 C:", true);
             diskCounterN = new PerformanceCounter("PhysicalDisk", "Disk Bytes/sec", "1 N:", true);
@@ -208,6 +243,8 @@ namespace PerformanceMonitor
 
             stopwatch = new Stopwatch();
 
+            nudPollingInterval.Value = Properties.Settings.Default.TimerInterval;
+            timer1.Interval = (int)nudPollingInterval.Value;
             timer1.Enabled = tschkEnabled.Checked;
         }
 
@@ -238,10 +275,11 @@ namespace PerformanceMonitor
             {
                 f = counter.NextValue();
             }
-            catch
+            catch (Exception ex)
             {
                 f = 0.0f;
                 ExCounter++;
+                LogError(ex.Message, $"UpdateCounter({pb.Name})");
             }
 
             int v = (int)f;
@@ -269,10 +307,11 @@ namespace PerformanceMonitor
             {
                 result = diskCounter.NextValue() / (1048576.0f); // show value in MB/s
             }
-            catch
+            catch (Exception ex)
             {
                 result = 0.0f;
                 ExCounter++;
+                LogError(ex.Message, $"UpdateDisk({diskLabel.Name})");
             }
 
             if ((float)diskLabel.Tag != result)
@@ -435,7 +474,8 @@ namespace PerformanceMonitor
 
         private void InitializeCounterTags()
         {
-            var labels = this.Controls.OfType<Label>()
+
+            var labels = tbMonitor.Controls.OfType<Label>()
                             .Where(c => (c.Name.StartsWith("lblCPU")) || (c.Name.StartsWith("lblGPU")))
                             .ToList();
             foreach (var label in labels)
@@ -445,7 +485,7 @@ namespace PerformanceMonitor
 
 
 
-            var progressbars = this.Controls.OfType<ProgressBar>()
+            var progressbars = tbMonitor.Controls.OfType<ProgressBar>()
                             .Where(c => (c.Name.StartsWith("pbCPU")) || (c.Name.StartsWith("pbGPU")))
                             .ToList();
             foreach (var progressbar in progressbars)
@@ -467,9 +507,10 @@ namespace PerformanceMonitor
                     // Start the service
                     serviceController.Start();
             }
-            catch 
+            catch (Exception ex)
             {
-                // ignore
+                ExCounter++;
+                LogError(ex.Message, $"StartService({serviceName})");
             }
         }
 
@@ -485,17 +526,28 @@ namespace PerformanceMonitor
                     // Stop the service
                     serviceController.Stop();
             }
-            catch
+            catch (Exception ex)
             {
-                // ignore
+                ExCounter++;
+                LogError(ex.Message, $"StopService({serviceName})");
+                
             }
         }
 
         private void StartWebServer()
         {
             listener = new HttpListener();
+            listener.Prefixes.Add("http://perfmon:8080/");
+            listener.Prefixes.Add("http://192.168.1.5:8080/"); // remove this line when debugging
             listener.Prefixes.Add("http://localhost:8080/");
-            listener.Start();
+            try
+            {
+                listener.Start();
+            }
+            catch (Exception ex) {
+                ExCounter++;
+                LogError(ex.Message, "StartWebServer{ listener.Start(); }");
+            }
             Task.Run(() => ProcessRequest());
         }
 
@@ -507,12 +559,13 @@ namespace PerformanceMonitor
                 var request = context.Request;
                 var response = context.Response;
 
-                webServerThreadId = (int)GetCurrentThreadId();
+                
                 if (request.HttpMethod == "POST")
                 {
                     using (var reader = new StreamReader(request.InputStream, Encoding.UTF8))
                     {
                         string formData = await reader.ReadToEndAsync();
+                        webServerThreadId = (int)GetCurrentThreadId();
 
                         var parameters = formData.Split('&')
                                                 .Select(param => param.Split('='))
@@ -571,9 +624,9 @@ namespace PerformanceMonitor
                 <head><title>Performance Monitor Light - Web Server</title>
                 <link rel=""stylesheet"" href=""https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/styles/24b6bbbc.site-ltr.css "">
                 </head>
-                <body>
+                <body leftmargin='10' topmargin='10'>
                     <h1>{message}</h1>
-                    <form method='post'>
+                    <form method='post' border='1'>
                         <br><br><label for='x'>X:</label>
                         <input type='number' name='x' value='{this.Location.X}' min='0' required placeholder='type new X coordinate'/><br><br>
                         <label for='y'>Y:</label>
@@ -598,6 +651,28 @@ namespace PerformanceMonitor
                 output.Write(buffer, 0, buffer.Length);
             }
             response.Close();
+        }
+
+        private void LogError(string message, string function)
+        {
+            if (ExCounter <= 100) // Only log the first 100 errors
+            {
+                // Get the current timestamp
+                string timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
+
+                // Format the error message with the timestamp
+                string errorMessage = $"[{timestamp}] [{function}] {message}{Environment.NewLine}";
+
+                // Check if the action is being called from a thread other than the UI thread
+                if (txtErrors.InvokeRequired)
+                {
+                    txtErrors.Invoke(new Action(() => txtErrors.AppendText(errorMessage)));
+                }
+                else
+                {
+                    txtErrors.AppendText(errorMessage);
+                }
+            }
         }
 
 
