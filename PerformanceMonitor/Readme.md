@@ -20,5 +20,6 @@ This is how it looks, notice how you can easily compare Core vs HT assignment an
 ![image](https://github.com/rolex20/TelemetryVibShaker/assets/62082564/c4fab194-d1ff-4aa3-b43a-ae6b8de9f2fb)
 
 
+
 It includes a light web server on port 8080 to move the program to a different location in the screen.  I use this from my smartphone when I am in VR and it is difficult to move the program when the resolution change in my second monitor.
 
