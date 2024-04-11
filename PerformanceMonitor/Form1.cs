@@ -580,13 +580,15 @@ namespace PerformanceMonitor
                             y = int.Parse(sy);
                         }
 
-                        string topMost = String.Empty;
-                        string focus = String.Empty;
+                        string topMost;// = String.Empty;
+                        string focus;// = String.Empty;
+                        string reset;// = String.Empty;
 
                         parameters.TryGetValue("topmost", out topMost);
                         parameters.TryGetValue("focus", out focus);
+                        parameters.TryGetValue("reset", out reset);
 
-                        MakeFormChanges(x, y, topMost, focus);
+                        MakeFormChanges(x, y, topMost, focus, reset);
 
                         SendResponse(response, $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Successfully requested coordinates change to X: {x}, Y: {y}");
                     }
@@ -599,7 +601,7 @@ namespace PerformanceMonitor
             }
         }
 
-        private void MakeFormChanges(int x, int y, string topMost, string focus)
+        private void MakeFormChanges(int x, int y, string topMost, string focus, string reset)
         {
             this.Invoke(new Action(() => {
                 dispatcherUIThread = (int)GetCurrentThreadId();
@@ -611,6 +613,8 @@ namespace PerformanceMonitor
                 this.TopMost = topMost != null;
 
                 if (focus != null) this.Activate();
+
+                if (reset != null) ResetMaxCounters();
 
             }));
         }
@@ -634,8 +638,13 @@ namespace PerformanceMonitor
 
                         <input type='checkbox' id='topmost' name='topmost' value='always_on_top' {marked}>
                         <label for='topmost'> Always on top</label><br>
+
                         <input type='checkbox' id='focus' name='focus' value='focus'>
                         <label for='focus'>Focus</label><br>
+
+                        
+                        <input type='checkbox' id='reset' name='reset' value='Reset'>
+                        <label for='reset'>Reset All Max Values</label><br>
                         
 
                         <input type='submit' value='Submit' />
