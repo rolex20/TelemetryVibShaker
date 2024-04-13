@@ -418,6 +418,7 @@ namespace TelemetryVibShaker
 
             telemetry = new TelemetryServer(soundManager, motorControllers, chkShowStatistics.Checked, Int32.Parse(txtListeningPort.Text));
             telemetry.SetJSON(txtJSON.Text);
+            telemetry.MinSpeed = (int)nudMinSpeed.Value;
         }
 
 
@@ -541,7 +542,7 @@ namespace TelemetryVibShaker
 
                 // Report the last AoA received
                 UpdateValue(lblLastAoA, telemetry.LastData.AoA);
-                lblLastAoA.Text.Append('°');
+                //lblLastAoA.Text.Append('°');
 
                 // Report datagrams per second
                 UpdateValue(lblDatagramsPerSecond, telemetry.DPS);
@@ -709,5 +710,14 @@ namespace TelemetryVibShaker
             }
         }
 
+        private void btnResetMax_Click(object sender, EventArgs e)
+        {
+            if (telemetry != null) telemetry.MaxProcessingTime = -1; // Reset Max requested by user
+        }
+
+        private void nudMinSpeed_ValueChanged(object sender, EventArgs e)
+        {
+            if (telemetry!= null) telemetry.MinSpeed = (int) nudMinSpeed.Value;
+        }
     }
 }

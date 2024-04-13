@@ -74,6 +74,9 @@
             label14 = new Label();
             label12 = new Label();
             tabSettings = new TabPage();
+            nudMinSpeed = new NumericUpDown();
+            label26 = new Label();
+            label22 = new Label();
             btnJSONFile = new Button();
             txtJSON = new TextBox();
             label17 = new Label();
@@ -84,6 +87,9 @@
             label15 = new Label();
             tabMonitor = new TabPage();
             panel1 = new Panel();
+            lblSpeed = new Label();
+            label20 = new Label();
+            lblAoAUnits = new Label();
             lblServerThread = new Label();
             label18 = new Label();
             lblLastFlaps = new Label();
@@ -110,6 +116,7 @@
             timer1 = new System.Windows.Forms.Timer(components);
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
+            btnResetMax = new Button();
             tabs.SuspendLayout();
             tabNormalSoundEffects.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier2).BeginInit();
@@ -121,6 +128,7 @@
             ((System.ComponentModel.ISupportInitialize)numMinIntensitySpeedBrakes).BeginInit();
             tabTTGO20V3.SuspendLayout();
             tabSettings.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)nudMinSpeed).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trkEffectTimeout).BeginInit();
             tabMonitor.SuspendLayout();
             panel1.SuspendLayout();
@@ -606,6 +614,9 @@
             // 
             // tabSettings
             // 
+            tabSettings.Controls.Add(nudMinSpeed);
+            tabSettings.Controls.Add(label26);
+            tabSettings.Controls.Add(label22);
             tabSettings.Controls.Add(btnJSONFile);
             tabSettings.Controls.Add(txtJSON);
             tabSettings.Controls.Add(label17);
@@ -621,9 +632,38 @@
             tabSettings.Text = "General Settings";
             tabSettings.UseVisualStyleBackColor = true;
             // 
+            // nudMinSpeed
+            // 
+            nudMinSpeed.Increment = new decimal(new int[] { 20, 0, 0, 0 });
+            nudMinSpeed.Location = new Point(106, 128);
+            nudMinSpeed.Maximum = new decimal(new int[] { 2000, 0, 0, 0 });
+            nudMinSpeed.Name = "nudMinSpeed";
+            nudMinSpeed.Size = new Size(116, 23);
+            nudMinSpeed.TabIndex = 13;
+            toolTip1.SetToolTip(nudMinSpeed, "Effects won't be active until your aircraft is above this speed");
+            nudMinSpeed.ValueChanged += nudMinSpeed_ValueChanged;
+            // 
+            // label26
+            // 
+            label26.AutoSize = true;
+            label26.Location = new Point(228, 130);
+            label26.Name = "label26";
+            label26.Size = new Size(36, 15);
+            label26.TabIndex = 12;
+            label26.Text = "km/h";
+            // 
+            // label22
+            // 
+            label22.AutoSize = true;
+            label22.Location = new Point(2, 130);
+            label22.Name = "label22";
+            label22.Size = new Size(98, 15);
+            label22.TabIndex = 11;
+            label22.Text = "Minimum Speed:";
+            // 
             // btnJSONFile
             // 
-            btnJSONFile.Location = new Point(455, 151);
+            btnJSONFile.Location = new Point(455, 197);
             btnJSONFile.Name = "btnJSONFile";
             btnJSONFile.Size = new Size(37, 23);
             btnJSONFile.TabIndex = 10;
@@ -634,7 +674,7 @@
             // 
             // txtJSON
             // 
-            txtJSON.Location = new Point(16, 151);
+            txtJSON.Location = new Point(16, 197);
             txtJSON.Name = "txtJSON";
             txtJSON.Size = new Size(429, 23);
             txtJSON.TabIndex = 9;
@@ -644,7 +684,7 @@
             // label17
             // 
             label17.AutoSize = true;
-            label17.Location = new Point(16, 133);
+            label17.Location = new Point(16, 179);
             label17.Name = "label17";
             label17.Size = new Size(59, 15);
             label17.TabIndex = 8;
@@ -653,7 +693,7 @@
             // lblEffectTimeout
             // 
             lblEffectTimeout.AutoSize = true;
-            lblEffectTimeout.Location = new Point(234, 66);
+            lblEffectTimeout.Location = new Point(234, 71);
             lblEffectTimeout.Name = "lblEffectTimeout";
             lblEffectTimeout.Size = new Size(94, 15);
             lblEffectTimeout.TabIndex = 4;
@@ -661,7 +701,7 @@
             // 
             // trkEffectTimeout
             // 
-            trkEffectTimeout.Location = new Point(106, 57);
+            trkEffectTimeout.Location = new Point(106, 62);
             trkEffectTimeout.Minimum = 1;
             trkEffectTimeout.Name = "trkEffectTimeout";
             trkEffectTimeout.Size = new Size(116, 45);
@@ -673,7 +713,7 @@
             // label16
             // 
             label16.AutoSize = true;
-            label16.Location = new Point(13, 66);
+            label16.Location = new Point(13, 71);
             label16.Name = "label16";
             label16.Size = new Size(87, 15);
             label16.TabIndex = 2;
@@ -681,7 +721,7 @@
             // 
             // txtListeningPort
             // 
-            txtListeningPort.Location = new Point(106, 12);
+            txtListeningPort.Location = new Point(106, 17);
             txtListeningPort.Name = "txtListeningPort";
             txtListeningPort.Size = new Size(116, 23);
             txtListeningPort.TabIndex = 1;
@@ -692,7 +732,7 @@
             // label15
             // 
             label15.AutoSize = true;
-            label15.Location = new Point(17, 15);
+            label15.Location = new Point(17, 20);
             label15.Name = "label15";
             label15.Size = new Size(83, 15);
             label15.TabIndex = 0;
@@ -712,6 +752,9 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(lblSpeed);
+            panel1.Controls.Add(label20);
+            panel1.Controls.Add(lblAoAUnits);
             panel1.Controls.Add(lblServerThread);
             panel1.Controls.Add(label18);
             panel1.Controls.Add(lblLastFlaps);
@@ -733,6 +776,34 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(492, 249);
             panel1.TabIndex = 10;
+            // 
+            // lblSpeed
+            // 
+            lblSpeed.AutoSize = true;
+            lblSpeed.Location = new Point(102, 159);
+            lblSpeed.Name = "lblSpeed";
+            lblSpeed.Size = new Size(34, 15);
+            lblSpeed.TabIndex = 21;
+            lblSpeed.Text = "none";
+            // 
+            // label20
+            // 
+            label20.AutoSize = true;
+            label20.Location = new Point(52, 159);
+            label20.Name = "label20";
+            label20.Size = new Size(42, 15);
+            label20.TabIndex = 20;
+            label20.Text = "Speed:";
+            // 
+            // lblAoAUnits
+            // 
+            lblAoAUnits.AutoSize = true;
+            lblAoAUnits.Location = new Point(133, 132);
+            lblAoAUnits.Name = "lblAoAUnits";
+            lblAoAUnits.Size = new Size(12, 15);
+            lblAoAUnits.TabIndex = 19;
+            lblAoAUnits.Tag = "0";
+            lblAoAUnits.Text = "°";
             // 
             // lblServerThread
             // 
@@ -774,7 +845,7 @@
             // lblDatagramsPerSecond
             // 
             lblDatagramsPerSecond.AutoSize = true;
-            lblDatagramsPerSecond.Location = new Point(420, 190);
+            lblDatagramsPerSecond.Location = new Point(420, 197);
             lblDatagramsPerSecond.Name = "lblDatagramsPerSecond";
             lblDatagramsPerSecond.Size = new Size(49, 15);
             lblDatagramsPerSecond.TabIndex = 14;
@@ -784,7 +855,7 @@
             // label29
             // 
             label29.AutoSize = true;
-            label29.Location = new Point(239, 190);
+            label29.Location = new Point(239, 197);
             label29.Name = "label29";
             label29.Size = new Size(175, 15);
             label29.TabIndex = 13;
@@ -793,7 +864,7 @@
             // lblProcessingTime
             // 
             lblProcessingTime.AutoSize = true;
-            lblProcessingTime.Location = new Point(164, 189);
+            lblProcessingTime.Location = new Point(164, 196);
             lblProcessingTime.Name = "lblProcessingTime";
             lblProcessingTime.Size = new Size(31, 15);
             lblProcessingTime.TabIndex = 12;
@@ -804,7 +875,7 @@
             // label27
             // 
             label27.AutoSize = true;
-            label27.Location = new Point(13, 189);
+            label27.Location = new Point(13, 196);
             label27.Name = "label27";
             label27.Size = new Size(149, 15);
             label27.TabIndex = 11;
@@ -967,6 +1038,16 @@
             toolStripStatusLabel1.Size = new Size(29, 17);
             toolStripStatusLabel1.Text = "Idle.";
             // 
+            // btnResetMax
+            // 
+            btnResetMax.Location = new Point(24, 457);
+            btnResetMax.Name = "btnResetMax";
+            btnResetMax.Size = new Size(75, 23);
+            btnResetMax.TabIndex = 4;
+            btnResetMax.Text = "Reset Max";
+            btnResetMax.UseVisualStyleBackColor = true;
+            btnResetMax.Click += btnResetMax_Click;
+            // 
             // frmMain
             // 
             AcceptButton = btnStartListening;
@@ -974,6 +1055,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnStop;
             ClientSize = new Size(566, 518);
+            Controls.Add(btnResetMax);
             Controls.Add(statusStrip1);
             Controls.Add(btnStop);
             Controls.Add(btnStartListening);
@@ -998,6 +1080,7 @@
             tabTTGO20V3.PerformLayout();
             tabSettings.ResumeLayout(false);
             tabSettings.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)nudMinSpeed).EndInit();
             ((System.ComponentModel.ISupportInitialize)trkEffectTimeout).EndInit();
             tabMonitor.ResumeLayout(false);
             tabMonitor.PerformLayout();
@@ -1091,5 +1174,12 @@
         private ToolStripStatusLabel toolStripStatusLabel1;
         private Label label18;
         private Label lblServerThread;
+        private Label lblAoAUnits;
+        private Label lblSpeed;
+        private Label label20;
+        private Button btnResetMax;
+        private Label label22;
+        private NumericUpDown nudMinSpeed;
+        private Label label26;
     }
 }

@@ -22,6 +22,7 @@ namespace TelemetryVibShaker
         private bool Statistics;
         private int listeningPort;
         private UdpClient listenerUdp;
+        public int MinSpeed; // km/h (below this speed, effects won't be active)
 
         public string CurrentUnitInfo { 
             get 
@@ -63,6 +64,7 @@ namespace TelemetryVibShaker
             cancelationToken = false;
             LastData = new TelemetryData();
             listenerUdp = null;
+            MinSpeed = 0;
         }
 
         public bool SetJSON(string FilePath)
@@ -157,21 +159,33 @@ namespace TelemetryVibShaker
                 // AoA possible values: 0-255
                 // SpeedBreaks possible values: 0-100
                 // Flaps possible values: 0-100
+                // Speed (optional): 0-255.  Units in 10th's of Km, so 10 is 100Km
 
-                if (receiveData.Length == 3)
+                if ( (receiveData.Length == 3) || (receiveData.Length == 4))
                 {
                     // Obtain telemetry data
                     LastData.AoA = receiveData[0];
                     LastData.SpeedBrakes = receiveData[1];
                     LastData.Flaps = receiveData[2];
 
-                    // Update the sound effects
-                    soundManager.UpdateEffect(LastData.AoA);
+                    /* Speed Conversion
+                     * receivedData[3] is in decameters/s
+                     * This unit was selected to make it fit in 8 bits (1 byte)
+                     * Since it is received obviously without decimals, some resolution is lost but not needed in this program.
+                     * To convert decameters/s -> km/h we use 
+                     * km/h = decameters per second x 36
+                     */
+                    if (receiveData.Length == 4)
+                        LastData.Speed = receiveData[3] * 36;// Speed now is in km/h
 
-                    // Update vibration-motors effects
-                    for (int i = 0; i < vibMotor.Length; i++)
-                        vibMotor[i].ProcessEffect(LastData);
+                    if (LastData.Speed >= MinSpeed) { 
+                        // Update the sound effects
+                        soundManager.UpdateEffect(LastData.AoA);
 
+                        // Update vibration-motors effects
+                        for (int i = 0; i < vibMotor.Length; i++)
+                            vibMotor[i].ProcessEffect(LastData);
+                    }
 
                 }
                 else  // If not numeric, then datagram received must be an aircraft type name
@@ -180,8 +194,13 @@ namespace TelemetryVibShaker
                     var unit = jsonRoot.units.unit.FirstOrDefault(u => u.typeName == datagram);
                     string lastUnitType = datagram;
 
-                    LastData.AoA = -1; // Signal that we haven't received yet new AoA telemetry
-                    MaxProcessingTime = 0; // Reset MaxProcessingTime with each new airplane
+                    // Signal that we haven't received yet new AoA telemetry
+                    LastData.AoA = -1; 
+                    LastData.Speed = 0;
+                    LastData.SpeedBrakes = -1;
+                    LastData.Flaps = -1;
+
+                    MaxProcessingTime = -1; // Reset MaxProcessingTime with each new airplane
 
                     if (unit != null)  // If found, use the limits defined in the JSON file
                     {

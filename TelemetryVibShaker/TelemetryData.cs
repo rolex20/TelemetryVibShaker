@@ -11,6 +11,7 @@ namespace TelemetryVibShaker
         public int AoA; // 0 to 255
         public int SpeedBrakes; // 0 to 100 percent
         public int Flaps; // 0 to 100 percent
+        public int Speed; // true AirSpeed, km/h
 
         public TelemetryData()
         {
@@ -18,7 +19,7 @@ namespace TelemetryVibShaker
             AoA = -1;
             SpeedBrakes = -1;
             Flaps = -1;
-
+            Speed = 0;
         }
     }
 }
