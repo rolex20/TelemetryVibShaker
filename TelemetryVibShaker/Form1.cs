@@ -556,6 +556,9 @@ namespace TelemetryVibShaker
                 // Report max processing time
                 UpdateValue(lblProcessingTime, telemetry.MaxProcessingTime);
 
+                // Report speed
+                UpdateValue(lblSpeed, telemetry.LastData.Speed);
+
             }
 
         }
