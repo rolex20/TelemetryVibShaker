@@ -4,13 +4,13 @@ How this can help you be a better sim pilot?  A real F-16 pilot knows when the a
 
 Most important/needed components:
 
-Export.Lua: This is the export.lua script with code that sends telemetry info to the C# program TelemetryVibShaker.
+**Export.Lua:** This is the export.lua script with code that sends telemetry info to the C# program TelemetryVibShaker.
 
-TelemetryVibShaker: C# Windows program.  From here you can customize the sound effects and vibration effects to send to the Arduino Vibration Motors or to the Speakers.
+**TelemetryVibShaker:** C# Windows program.  From here you can customize the sound effects and vibration effects to send to the Arduino Vibration Motors or to the Speakers.
 
-TelemetryVib_WiFi: Arduino R4 program (WiFi).  Uses the WiFi network to listen for UDP packets containing the vibration intensity for two small cellphone vibration motors.
+**TelemetryVib_WiFi:** Arduino R4 program (WiFi).  Uses the WiFi network to listen for UDP packets containing the vibration intensity for two small cellphone vibration motors.
 
-TelemetryVib_Ethernet: Arduino R4 Ethernet program (Ethernet).  Uses the Ethernet network to listen for UDP packets containing the vibration intensity for two small cellphone vibration motors.  Using the LocalNetworkDelay programs I discovered that the WiFi component of the Arduino R4 board, adds 20ms latency internally.  I could also verify that my WiFi network was not the problem by measuring network delay between two programs running in my PC instead of one in the PC and the other in the ArduinoR4WiFi.  This is eliminated when using Ethernet so I rewrote it to eliminate that 20ms.  This was only for fun since I couldn't feel that delay when flying in DCS World.  
+**TelemetryVib_Ethernet:** Arduino R4 Ethernet program (Ethernet).  Uses the Ethernet network to listen for UDP packets containing the vibration intensity for two small cellphone vibration motors.  Using the LocalNetworkDelay programs I discovered that the WiFi component of the Arduino R4 board, adds 20ms latency internally.  I could also verify that my WiFi network was not the problem by measuring network delay between two programs running in my PC instead of one in the PC and the other in the ArduinoR4WiFi.  This is eliminated when using Ethernet so I rewrote it to eliminate that 20ms.  This was only for fun since I couldn't feel that delay when flying in DCS World.  
 
 
 ToDo1: Complete readme, add diagrams
