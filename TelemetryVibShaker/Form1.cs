@@ -34,12 +34,12 @@ namespace TelemetryVibShaker
         }
 
 
-        private bool CheckFileExists(TextBox tb)
+        private bool CheckFileExists(TextBox tb, string file)
         {
             bool exist = File.Exists(tb.Text);
             if (!exist)
             {
-                MessageBox.Show("The file does not exist.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("The file does not exist.", file, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 tb.SelectAll();
                 tb.Focus();
             }
@@ -448,9 +448,9 @@ namespace TelemetryVibShaker
             lastSecond = 0; // reset tracker
 
             // Check if files exist
-            if (!CheckFileExists(txtSoundEffect1)) return;
-            if (!CheckFileExists(txtSoundEffect2)) return;
-            if (!CheckFileExists(txtJSON)) return;
+            if (!CheckFileExists(txtSoundEffect1, "Sound Effect 1")) return;
+            if (!CheckFileExists(txtSoundEffect2, "Sound Effect 2")) return;
+            if (!CheckFileExists(txtJSON, "JSON File")) return;
 
 
 
