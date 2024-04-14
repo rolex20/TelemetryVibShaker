@@ -88,17 +88,23 @@
             label15 = new Label();
             tabMonitor = new TabPage();
             panel1 = new Panel();
+            lblUIThreadID = new Label();
+            label27 = new Label();
+            lblLastProcessorUsedUI = new Label();
+            lblProcessingTimeUI = new Label();
+            lblLastProcessorUsedUDP = new Label();
+            label28 = new Label();
             lblSpeed = new Label();
             label20 = new Label();
             lblAoAUnits = new Label();
-            lblServerThread = new Label();
+            lblUDPServerThread = new Label();
             label18 = new Label();
             lblLastFlaps = new Label();
             label32 = new Label();
             lblDatagramsPerSecond = new Label();
             label29 = new Label();
-            lblProcessingTime = new Label();
-            label27 = new Label();
+            lblProcessingTimeUDP = new Label();
+            lblMaxProcessingTimeTitle = new Label();
             lblLastSpeedBrakes = new Label();
             lblCurrentUnitType = new Label();
             lblSoundStatus = new Label();
@@ -118,7 +124,6 @@
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             btnResetMax = new Button();
-            label28 = new Label();
             tabs.SuspendLayout();
             tabNormalSoundEffects.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier2).BeginInit();
@@ -763,18 +768,23 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(lblUIThreadID);
+            panel1.Controls.Add(label27);
+            panel1.Controls.Add(lblLastProcessorUsedUI);
+            panel1.Controls.Add(lblProcessingTimeUI);
+            panel1.Controls.Add(lblLastProcessorUsedUDP);
             panel1.Controls.Add(label28);
             panel1.Controls.Add(lblSpeed);
             panel1.Controls.Add(label20);
             panel1.Controls.Add(lblAoAUnits);
-            panel1.Controls.Add(lblServerThread);
+            panel1.Controls.Add(lblUDPServerThread);
             panel1.Controls.Add(label18);
             panel1.Controls.Add(lblLastFlaps);
             panel1.Controls.Add(label32);
             panel1.Controls.Add(lblDatagramsPerSecond);
             panel1.Controls.Add(label29);
-            panel1.Controls.Add(lblProcessingTime);
-            panel1.Controls.Add(label27);
+            panel1.Controls.Add(lblProcessingTimeUDP);
+            panel1.Controls.Add(lblMaxProcessingTimeTitle);
             panel1.Controls.Add(lblLastSpeedBrakes);
             panel1.Controls.Add(lblCurrentUnitType);
             panel1.Controls.Add(lblSoundStatus);
@@ -788,6 +798,63 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(492, 249);
             panel1.TabIndex = 10;
+            // 
+            // lblUIThreadID
+            // 
+            lblUIThreadID.AutoSize = true;
+            lblUIThreadID.Location = new Point(324, 11);
+            lblUIThreadID.Name = "lblUIThreadID";
+            lblUIThreadID.Size = new Size(27, 15);
+            lblUIThreadID.TabIndex = 27;
+            lblUIThreadID.Text = "----";
+            // 
+            // label27
+            // 
+            label27.AutoSize = true;
+            label27.Location = new Point(244, 11);
+            label27.Name = "label27";
+            label27.Size = new Size(74, 15);
+            label27.TabIndex = 26;
+            label27.Text = "UI Thread ID:";
+            // 
+            // lblLastProcessorUsedUI
+            // 
+            lblLastProcessorUsedUI.AutoSize = true;
+            lblLastProcessorUsedUI.Location = new Point(244, 223);
+            lblLastProcessorUsedUI.Name = "lblLastProcessorUsedUI";
+            lblLastProcessorUsedUI.Size = new Size(18, 15);
+            lblLastProcessorUsedUI.TabIndex = 25;
+            lblLastProcessorUsedUI.Text = "UI";
+            toolTip1.SetToolTip(lblLastProcessorUsedUI, "Processor used to update the UI (monitor)");
+            // 
+            // lblProcessingTimeUI
+            // 
+            lblProcessingTimeUI.AutoSize = true;
+            lblProcessingTimeUI.Location = new Point(244, 196);
+            lblProcessingTimeUI.Name = "lblProcessingTimeUI";
+            lblProcessingTimeUI.Size = new Size(45, 15);
+            lblProcessingTimeUI.TabIndex = 24;
+            lblProcessingTimeUI.Text = "UI time";
+            toolTip1.SetToolTip(lblProcessingTimeUI, "Max UI processing time (monitor).  Ignores the first one.");
+            // 
+            // lblLastProcessorUsedUDP
+            // 
+            lblLastProcessorUsedUDP.AutoSize = true;
+            lblLastProcessorUsedUDP.Location = new Point(164, 223);
+            lblLastProcessorUsedUDP.Name = "lblLastProcessorUsedUDP";
+            lblLastProcessorUsedUDP.Size = new Size(30, 15);
+            lblLastProcessorUsedUDP.TabIndex = 23;
+            lblLastProcessorUsedUDP.Text = "UDP";
+            toolTip1.SetToolTip(lblLastProcessorUsedUDP, "Processor used to serve the last UDP packet received");
+            // 
+            // label28
+            // 
+            label28.AutoSize = true;
+            label28.Location = new Point(48, 223);
+            label28.Name = "label28";
+            label28.Size = new Size(114, 15);
+            label28.TabIndex = 22;
+            label28.Text = "Last Processor Used:";
             // 
             // lblSpeed
             // 
@@ -817,14 +884,14 @@
             lblAoAUnits.Tag = "0";
             lblAoAUnits.Text = "°";
             // 
-            // lblServerThread
+            // lblUDPServerThread
             // 
-            lblServerThread.AutoSize = true;
-            lblServerThread.Location = new Point(148, 11);
-            lblServerThread.Name = "lblServerThread";
-            lblServerThread.Size = new Size(17, 15);
-            lblServerThread.TabIndex = 18;
-            lblServerThread.Text = "id";
+            lblUDPServerThread.AutoSize = true;
+            lblUDPServerThread.Location = new Point(148, 11);
+            lblUDPServerThread.Name = "lblUDPServerThread";
+            lblUDPServerThread.Size = new Size(22, 15);
+            lblUDPServerThread.TabIndex = 18;
+            lblUDPServerThread.Text = "---";
             // 
             // label18
             // 
@@ -857,7 +924,7 @@
             // lblDatagramsPerSecond
             // 
             lblDatagramsPerSecond.AutoSize = true;
-            lblDatagramsPerSecond.Location = new Point(420, 197);
+            lblDatagramsPerSecond.Location = new Point(425, 40);
             lblDatagramsPerSecond.Name = "lblDatagramsPerSecond";
             lblDatagramsPerSecond.Size = new Size(49, 15);
             lblDatagramsPerSecond.TabIndex = 14;
@@ -868,31 +935,32 @@
             // label29
             // 
             label29.AutoSize = true;
-            label29.Location = new Point(239, 197);
+            label29.Location = new Point(244, 40);
             label29.Name = "label29";
             label29.Size = new Size(175, 15);
             label29.TabIndex = 13;
             label29.Text = "Datagrams received per second:";
             // 
-            // lblProcessingTime
+            // lblProcessingTimeUDP
             // 
-            lblProcessingTime.AutoSize = true;
-            lblProcessingTime.Location = new Point(164, 196);
-            lblProcessingTime.Name = "lblProcessingTime";
-            lblProcessingTime.Size = new Size(31, 15);
-            lblProcessingTime.TabIndex = 12;
-            lblProcessingTime.Tag = "0";
-            lblProcessingTime.Text = "time";
-            toolTip1.SetToolTip(lblProcessingTime, "This value is tracked for each different UnitType (aircraft).");
+            lblProcessingTimeUDP.AutoSize = true;
+            lblProcessingTimeUDP.Location = new Point(164, 196);
+            lblProcessingTimeUDP.Name = "lblProcessingTimeUDP";
+            lblProcessingTimeUDP.Size = new Size(57, 15);
+            lblProcessingTimeUDP.TabIndex = 12;
+            lblProcessingTimeUDP.Tag = "0";
+            lblProcessingTimeUDP.Text = "UDP time";
+            toolTip1.SetToolTip(lblProcessingTimeUDP, "Max UDP Packet processing time.  This value is tracked for each different UnitType (aircraft).");
             // 
-            // label27
+            // lblMaxProcessingTimeTitle
             // 
-            label27.AutoSize = true;
-            label27.Location = new Point(13, 196);
-            label27.Name = "label27";
-            label27.Size = new Size(149, 15);
-            label27.TabIndex = 11;
-            label27.Text = "Max Processing Time (ms):";
+            lblMaxProcessingTimeTitle.AutoSize = true;
+            lblMaxProcessingTimeTitle.Location = new Point(13, 196);
+            lblMaxProcessingTimeTitle.Name = "lblMaxProcessingTimeTitle";
+            lblMaxProcessingTimeTitle.Size = new Size(149, 15);
+            lblMaxProcessingTimeTitle.TabIndex = 11;
+            lblMaxProcessingTimeTitle.Text = "Max Processing Time (ms):";
+            toolTip1.SetToolTip(lblMaxProcessingTimeTitle, "This is for the UDP packet processing");
             // 
             // lblLastSpeedBrakes
             // 
@@ -1061,15 +1129,6 @@
             btnResetMax.UseVisualStyleBackColor = true;
             btnResetMax.Click += btnResetMax_Click;
             // 
-            // label28
-            // 
-            label28.AutoSize = true;
-            label28.Location = new Point(268, 11);
-            label28.Name = "label28";
-            label28.Size = new Size(114, 15);
-            label28.TabIndex = 22;
-            label28.Text = "Last Processor Used:";
-            // 
             // frmMain
             // 
             AcceptButton = btnStartListening;
@@ -1180,8 +1239,8 @@
         private Label lblCurrentUnitType;
         private Label lblLastSpeedBrakes;
         private Label label29;
-        private Label lblProcessingTime;
-        private Label label27;
+        private Label lblProcessingTimeUDP;
+        private Label lblMaxProcessingTimeTitle;
         private Label lblDatagramsPerSecond;
         private Label lblLastFlaps;
         private Label label32;
@@ -1195,7 +1254,7 @@
         private StatusStrip statusStrip1;
         private ToolStripStatusLabel toolStripStatusLabel1;
         private Label label18;
-        private Label lblServerThread;
+        private Label lblUDPServerThread;
         private Label lblAoAUnits;
         private Label lblSpeed;
         private Label label20;
@@ -1205,5 +1264,10 @@
         private Label label26;
         private ComboBox comboBox1;
         private Label label28;
+        private Label lblLastProcessorUsedUDP;
+        private Label lblProcessingTimeUI;
+        private Label lblLastProcessorUsedUI;
+        private Label lblUIThreadID;
+        private Label label27;
     }
 }

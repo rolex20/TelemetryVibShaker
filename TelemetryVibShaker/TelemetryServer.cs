@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Text.Json;
 using System.Text;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 
 namespace TelemetryVibShaker
@@ -13,6 +14,8 @@ namespace TelemetryVibShaker
         public TelemetryData LastData; // last telemetry datagram received
         public int DPS; // datagrams received per second
         public int MaxProcessingTime; // time of the datagram that took longer to process
+        public int LastProcessorUsed; // processor used in the last udp packet received
+        public int ThreadId; // OS Thread ID for the UDP Telemetry Server
         public string CurrentUnitType; // current type of aircraft used by the player
 
         private AoA_SoundManager soundManager;
@@ -23,6 +26,13 @@ namespace TelemetryVibShaker
         private int listeningPort;
         private UdpClient listenerUdp;
         public int MinSpeed; // km/h (below this speed, effects won't be active)
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern uint GetCurrentProcessorNumber();
+
+        [DllImport("kernel32.dll")]
+        public static extern uint GetCurrentThreadId();
+
 
         public string CurrentUnitInfo { 
             get 
@@ -93,6 +103,7 @@ namespace TelemetryVibShaker
             CurrentUnitType = "none";
             lastErrorMsg = string.Empty;
             MaxProcessingTime = -1;
+            LastProcessorUsed = -1;
             DPS = 0;
             int iDPS = 0; // intermediate DPS
 
@@ -115,7 +126,10 @@ namespace TelemetryVibShaker
             {
                 try
                 {
+                    ThreadId = (int)GetCurrentThreadId(); // Let's see if it changes on receiving packets
+                    LastProcessorUsed = -1;
                     receiveData = listenerUdp.Receive(ref sender); // Wait here until a new datagram is received
+                    LastProcessorUsed = (int)GetCurrentProcessorNumber();
                 }
                 catch (Exception ex)
                 {
@@ -128,7 +142,7 @@ namespace TelemetryVibShaker
                 }
 
 
-                // Process the datagram received
+                /* Process the datagram received */
 
 
                 if (Statistics) stopwatch.Restart();  // Track the time to process this datagram
@@ -161,7 +175,7 @@ namespace TelemetryVibShaker
                 // Flaps possible values: 0-100
                 // Speed (optional): 0-255.  Units in 10th's of Km, so 10 is 100Km
 
-                if ( (receiveData.Length == 3) || (receiveData.Length == 4))
+                if ( receiveData.Length == 4)
                 {
                     // Obtain telemetry data
                     LastData.AoA = receiveData[0];

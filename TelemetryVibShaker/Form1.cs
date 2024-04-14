@@ -18,9 +18,15 @@ namespace TelemetryVibShaker
         private TelemetryServer telemetry;      // controls all telemetry logic
         private Thread threadTelemetry; // this thread runs the telemetry
         private long lastSecond; // second of the last udp datagram processed
+        private int maxUIProcessingTime;  // milliseconds elapsed in processing the monitor-update-cycle in Timer1
+        private Stopwatch stopWatchUI;  // used to measure processing time in Timer1 (updating the UI)
 
         [DllImport("kernel32.dll")]
         public static extern uint GetCurrentThreadId();
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern uint GetCurrentProcessorNumber();
+
 
         public frmMain()
         {
@@ -261,6 +267,14 @@ namespace TelemetryVibShaker
 
         private void frmMain_Load(object sender, EventArgs e)
         {
+            // Initialize max timers
+            btnResetMax_Click(null, null);
+
+            // Flag to skip the initial max UI processing time
+            lblMaxProcessingTimeTitle.Tag = false;
+
+            stopWatchUI = new Stopwatch();
+
             // The TextChanged event is not exposed in the Designer:
             numMinIntensitySpeedBrakes.TextChanged += numMinIntensitySpeedBrakes_ValueChanged;
             numMaxIntensitySpeedBrakes.TextChanged += numMaxIntensitySpeedBrakes_ValueChanged;
@@ -296,9 +310,6 @@ namespace TelemetryVibShaker
             lblLastAoA.Tag = (float)0.0;
 
             lblDatagramsPerSecond.Text = string.Empty;
-            lblProcessingTime.Text = string.Empty;
-            lblServerThread.Text = string.Empty;
-
 
 
             btnStop.Tag = false;
@@ -474,15 +485,17 @@ namespace TelemetryVibShaker
 
 
 
+            // Reset max timers
+            btnResetMax_Click(null, null);
 
 
-            // Reset max processing time tracker
-            lblProcessingTime.Tag = -1;
-            lblProcessingTime.Text = String.Empty;
             // Start a new thread to act as the UDP Server
             threadTelemetry = new Thread(DoTelemetry);
             threadTelemetry.Start();
-            lblServerThread.Text = ((int)GetCurrentThreadId()).ToString();
+            lblUDPServerThread.Text = "---";
+            lblUIThreadID.Text = lblUDPServerThread.Text;
+            lblUDPServerThread.Tag = -1;
+            lblUIThreadID.Tag = -1;
 
 
             // Disable some controls
@@ -509,12 +522,33 @@ namespace TelemetryVibShaker
             if (Convert.ToInt32(L.Tag) != value)
             {
                 L.Tag = value;
-                L.Text = value.ToString();
+                L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
             }
+        }
+
+        private void UpdateMaxUIProcessingTime()
+        {
+            UpdateValue(lblProcessingTimeUI, maxUIProcessingTime); // this might be delayed by one cycle, but it's ok
+
+            stopWatchUI.Stop();
+            int elapsed = stopWatchUI.Elapsed.Milliseconds;
+
+            // discard the first UI processing
+            if ((bool)lblMaxProcessingTimeTitle.Tag)
+            {
+                if (maxUIProcessingTime < elapsed)
+                    maxUIProcessingTime = elapsed;
+            }
+            else
+                lblMaxProcessingTimeTitle.Tag = true;
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
+            stopWatchUI.Restart();
+            int processorUsedForUI = (int)GetCurrentProcessorNumber();
+
+
             if (telemetry != null) lastSecond = telemetry.LastSecond;
 
             // check if we haven't received more telemetry so we should mute all effects
@@ -532,7 +566,7 @@ namespace TelemetryVibShaker
                 // Report sound effectType
                 UpdateSoundEffectStatus(soundManager.Status);
 
-                if (telemetry.LastData.AoA <= 0) // new aircraft type?
+                if (telemetry.LastData.AoA < 0) // new aircraft type?
                 {
                     // Report unit type
                     if (!telemetry.CurrentUnitType.Equals(lblCurrentUnitType.Tag))
@@ -541,11 +575,11 @@ namespace TelemetryVibShaker
                         lblCurrentUnitType.Text = telemetry.CurrentUnitType + " (" + soundManager.AoA1.ToString() + ", " + soundManager.AoA2.ToString() + ")";
                     }
 
-                    // Update max processing time, it should have been reseted to zero
-                    UpdateValue(lblProcessingTime, telemetry.MaxProcessingTime);
+                    // Report max UDP processing time, it should have been reseted to zero
+                    //UpdateValue(lblProcessingTimeUDP, telemetry.MaxProcessingTime);
 
-
-                    return; // if no value has been received yet, don't update nothing else
+                    // UI Reporting takes so little time when there are no updates, let's continue and report
+                    //return; // if no value has been received yet, don't update nothing else
                 }
 
                 // Report the last AoA received
@@ -560,11 +594,26 @@ namespace TelemetryVibShaker
                 // Report flaps
                 UpdateValue(lblLastFlaps, telemetry.LastData.Flaps);
 
-                // Report max processing time
-                UpdateValue(lblProcessingTime, telemetry.MaxProcessingTime);
-
                 // Report speed
                 UpdateValue(lblSpeed, telemetry.LastData.Speed);
+
+                // Report max UDP processing time
+                UpdateValue(lblProcessingTimeUDP, telemetry.MaxProcessingTime);
+
+                // Report last processor used for UDP processing
+                UpdateValue(lblLastProcessorUsedUDP, telemetry.LastProcessorUsed);
+
+                // Report last procesor used for UI (monitor) this function
+                UpdateValue(lblLastProcessorUsedUI, processorUsedForUI);
+
+                // Report UI ThreadID
+                UpdateValue(lblUIThreadID, (int)GetCurrentThreadId());
+
+                // Report UDP ThreadID
+                UpdateValue(lblUDPServerThread, telemetry.ThreadId);
+
+                // Report max UI processing time (monitor)
+                UpdateMaxUIProcessingTime(); // the stopwatch is stopped here
 
             }
 
@@ -720,9 +769,20 @@ namespace TelemetryVibShaker
             }
         }
 
+        // Reset max timers, UI and UDP
         private void btnResetMax_Click(object sender, EventArgs e)
         {
-            if (telemetry != null) telemetry.MaxProcessingTime = -1; // Reset Max requested by user
+            lblProcessingTimeUDP.Tag = null;
+            lblProcessingTimeUI.Tag = null;
+
+            if (telemetry != null)
+            {
+                telemetry.MaxProcessingTime = -1;
+                UpdateValue(lblProcessingTimeUDP, telemetry.MaxProcessingTime);
+            }
+
+            maxUIProcessingTime = -1;
+            UpdateValue(lblProcessingTimeUI, maxUIProcessingTime);
         }
 
         private void nudMinSpeed_ValueChanged(object sender, EventArgs e)
