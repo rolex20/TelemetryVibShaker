@@ -1,7 +1,7 @@
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using System.Diagnostics;
-
+using System.Runtime.InteropServices;
 
 
 namespace TelemetryVibShaker
@@ -19,7 +19,8 @@ namespace TelemetryVibShaker
         private Thread threadTelemetry; // this thread runs the telemetry
         private long lastSecond; // second of the last udp datagram processed
 
-
+        [DllImport("kernel32.dll")]
+        public static extern uint GetCurrentThreadId();
 
         public frmMain()
         {
@@ -116,6 +117,12 @@ namespace TelemetryVibShaker
                 var device = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)[i];
 
                 cmbAudioDevice1.Items.Add(device.FriendlyName);
+            }
+
+            for (int n = -1; n < WaveOut.DeviceCount; n++)
+            {
+                var capabilities = WaveOut.GetCapabilities(n);
+                comboBox1.Items.Add($"{n}: {capabilities.ProductName}");
             }
         }
 
@@ -475,7 +482,8 @@ namespace TelemetryVibShaker
             // Start a new thread to act as the UDP Server
             threadTelemetry = new Thread(DoTelemetry);
             threadTelemetry.Start();
-            lblServerThread.Text = threadTelemetry.ManagedThreadId.ToString();
+            lblServerThread.Text = ((int)GetCurrentThreadId()).ToString();
+
 
             // Disable some controls
             ChangeStatus(txtSoundEffect1, false);
@@ -524,7 +532,7 @@ namespace TelemetryVibShaker
                 // Report sound effectType
                 UpdateSoundEffectStatus(soundManager.Status);
 
-                if (telemetry.LastData.AoA <= 0)
+                if (telemetry.LastData.AoA <= 0) // new aircraft type?
                 {
                     // Report unit type
                     if (!telemetry.CurrentUnitType.Equals(lblCurrentUnitType.Tag))
@@ -542,7 +550,6 @@ namespace TelemetryVibShaker
 
                 // Report the last AoA received
                 UpdateValue(lblLastAoA, telemetry.LastData.AoA);
-                //lblLastAoA.Text.Append('°');
 
                 // Report datagrams per second
                 UpdateValue(lblDatagramsPerSecond, telemetry.DPS);
@@ -720,7 +727,7 @@ namespace TelemetryVibShaker
 
         private void nudMinSpeed_ValueChanged(object sender, EventArgs e)
         {
-            if (telemetry!= null) telemetry.MinSpeed = (int) nudMinSpeed.Value;
+            if (telemetry != null) telemetry.MinSpeed = (int)nudMinSpeed.Value;
         }
     }
 }

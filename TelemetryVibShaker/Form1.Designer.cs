@@ -32,6 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             tabs = new TabControl();
             tabNormalSoundEffects = new TabPage();
+            comboBox1 = new ComboBox();
             cmbAudioDevice1 = new ComboBox();
             label33 = new Label();
             chkEnableAoASoundEffects2 = new CheckBox();
@@ -117,6 +118,7 @@
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             btnResetMax = new Button();
+            label28 = new Label();
             tabs.SuspendLayout();
             tabNormalSoundEffects.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier2).BeginInit();
@@ -150,6 +152,7 @@
             // 
             // tabNormalSoundEffects
             // 
+            tabNormalSoundEffects.Controls.Add(comboBox1);
             tabNormalSoundEffects.Controls.Add(cmbAudioDevice1);
             tabNormalSoundEffects.Controls.Add(label33);
             tabNormalSoundEffects.Controls.Add(chkEnableAoASoundEffects2);
@@ -174,6 +177,14 @@
             tabNormalSoundEffects.TabIndex = 0;
             tabNormalSoundEffects.Text = "Sound Effects";
             tabNormalSoundEffects.UseVisualStyleBackColor = true;
+            // 
+            // comboBox1
+            // 
+            comboBox1.FormattingEnabled = true;
+            comboBox1.Location = new Point(103, 24);
+            comboBox1.Name = "comboBox1";
+            comboBox1.Size = new Size(343, 23);
+            comboBox1.TabIndex = 17;
             // 
             // cmbAudioDevice1
             // 
@@ -752,6 +763,7 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(label28);
             panel1.Controls.Add(lblSpeed);
             panel1.Controls.Add(label20);
             panel1.Controls.Add(lblAoAUnits);
@@ -798,7 +810,7 @@
             // lblAoAUnits
             // 
             lblAoAUnits.AutoSize = true;
-            lblAoAUnits.Location = new Point(133, 132);
+            lblAoAUnits.Location = new Point(135, 132);
             lblAoAUnits.Name = "lblAoAUnits";
             lblAoAUnits.Size = new Size(12, 15);
             lblAoAUnits.TabIndex = 19;
@@ -851,6 +863,7 @@
             lblDatagramsPerSecond.TabIndex = 14;
             lblDatagramsPerSecond.Tag = "0";
             lblDatagramsPerSecond.Text = "number";
+            toolTip1.SetToolTip(lblDatagramsPerSecond, "Designed for ~10 per second.");
             // 
             // label29
             // 
@@ -870,7 +883,7 @@
             lblProcessingTime.TabIndex = 12;
             lblProcessingTime.Tag = "0";
             lblProcessingTime.Text = "time";
-            toolTip1.SetToolTip(lblProcessingTime, "This value is tracked for each different UnitType");
+            toolTip1.SetToolTip(lblProcessingTime, "This value is tracked for each different UnitType (aircraft).");
             // 
             // label27
             // 
@@ -994,7 +1007,7 @@
             // 
             // btnStartListening
             // 
-            btnStartListening.Location = new Point(346, 457);
+            btnStartListening.Location = new Point(346, 455);
             btnStartListening.Name = "btnStartListening";
             btnStartListening.Size = new Size(100, 23);
             btnStartListening.TabIndex = 0;
@@ -1005,7 +1018,7 @@
             // btnStop
             // 
             btnStop.Enabled = false;
-            btnStop.Location = new Point(462, 457);
+            btnStop.Location = new Point(462, 455);
             btnStop.Name = "btnStop";
             btnStop.Size = new Size(75, 23);
             btnStop.TabIndex = 2;
@@ -1026,7 +1039,7 @@
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
-            statusStrip1.Location = new Point(0, 496);
+            statusStrip1.Location = new Point(0, 484);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(566, 22);
             statusStrip1.TabIndex = 3;
@@ -1040,7 +1053,7 @@
             // 
             // btnResetMax
             // 
-            btnResetMax.Location = new Point(24, 457);
+            btnResetMax.Location = new Point(24, 455);
             btnResetMax.Name = "btnResetMax";
             btnResetMax.Size = new Size(75, 23);
             btnResetMax.TabIndex = 4;
@@ -1048,13 +1061,22 @@
             btnResetMax.UseVisualStyleBackColor = true;
             btnResetMax.Click += btnResetMax_Click;
             // 
+            // label28
+            // 
+            label28.AutoSize = true;
+            label28.Location = new Point(268, 11);
+            label28.Name = "label28";
+            label28.Size = new Size(114, 15);
+            label28.TabIndex = 22;
+            label28.Text = "Last Processor Used:";
+            // 
             // frmMain
             // 
             AcceptButton = btnStartListening;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnStop;
-            ClientSize = new Size(566, 518);
+            ClientSize = new Size(566, 506);
             Controls.Add(btnResetMax);
             Controls.Add(statusStrip1);
             Controls.Add(btnStop);
@@ -1181,5 +1203,7 @@
         private Label label22;
         private NumericUpDown nudMinSpeed;
         private Label label26;
+        private ComboBox comboBox1;
+        private Label label28;
     }
 }
