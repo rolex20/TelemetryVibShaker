@@ -10,7 +10,7 @@ namespace TelemetryVibShaker
         private int serverPort;
         public bool Enabled;
         public string Name;
-        private bool connected;
+        //private bool connected;
         public MotorController(string Name, string IP, int Port, EffectDefinition[] Effect, bool Enabled)
         {
             effect = Effect;
@@ -20,14 +20,14 @@ namespace TelemetryVibShaker
             serverPort = Port;
             datagram = new byte[effect.Length];
             this.Enabled = Enabled;
-            connected = false;
+            //connected = false;
         }
 
         public void Connect()
         {
             udpSender = new UdpClient();
             udpSender.Connect(serverIP, serverPort);
-            connected = true;
+            //connected = true;
         }
 
         /// <summary>
