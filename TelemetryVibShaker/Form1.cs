@@ -538,6 +538,15 @@ namespace TelemetryVibShaker
             }
         }
 
+        private void UpdateValue(Label L, long value)
+        {
+            if (Convert.ToInt64(L.Tag) != value)
+            {
+                L.Tag = value;
+                L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
+            }
+        }
+
         private void UpdateValue(Label L, string value)
         {
             if (!L.Tag.Equals(value))
@@ -585,7 +594,7 @@ namespace TelemetryVibShaker
             if (chkShowStatistics.Checked && telemetry.IsRunning() && tabs.SelectedIndex == 5)
             {
                 // Report last datagram timestamp
-                if (telemetry.TimeStamp>0) UpdateValue(lblTimestamp, telemetry.TimeStamp.ToString());
+                UpdateValue(lblTimestamp, telemetry.TimeStamp);
 
                 // Report sound effectType
                 UpdateSoundEffectStatus(soundManager.Status);

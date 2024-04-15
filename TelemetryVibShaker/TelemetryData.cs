@@ -12,6 +12,7 @@ namespace TelemetryVibShaker
         public int SpeedBrakes; // 0 to 100 percent
         public int Flaps; // 0 to 100 percent
         public int Speed; // true AirSpeed, km/h
+        public int DatagramLength; 
 
         public TelemetryData()
         {
@@ -20,6 +21,7 @@ namespace TelemetryVibShaker
             SpeedBrakes = -1;
             Flaps = -1;
             Speed = 0;
+            DatagramLength = 0;
         }
     }
 }

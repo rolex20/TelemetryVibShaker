@@ -97,6 +97,17 @@ namespace TelemetryVibShaker
             return result;
         }
 
+        private void LogToTemp(string message)
+        {
+            string tempPath = Path.GetTempPath();
+            string logFilePath = Path.Combine(tempPath, "log.txt");
+
+            // Including milliseconds in the timestamp
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+            string logEntry = $"[{timestamp}] {message}{Environment.NewLine}";
+
+            File.AppendAllText(logFilePath, logEntry);
+        }
 
         public void Run()
         {
@@ -137,7 +148,7 @@ namespace TelemetryVibShaker
                     if (cancelationToken) // The user requested to stop in another thread (UI Thread)
                         return; // Abort listenning
 
-                    // Some error did happened
+                    // Some error did happen
                     lastErrorMsg = ex.Message;
                     return; // Abort listening
                 }
@@ -151,20 +162,23 @@ namespace TelemetryVibShaker
                 TimeStamp = Environment.TickCount;
                 long newSecond = TimeStamp / 1000;
                 if (Statistics)
-                    if (LastSecond != newSecond )
+                {
+                    if (LastSecond != newSecond)
                     {
                         //lblDatagramsPerSecond.Text = DPS.ToString();  // update datagrams per second
                         //BeginInvoke(new Action(() => { lblDatagramsPerSecond.Text = DPS.ToString();  /* update datagrams per second  */ }));
                         DPS = iDPS; // Only update when the last DPS per second has been calculated which is now
                         iDPS = 1; // reset the counter
                         LastSecond = newSecond;
-                        //needs_update = true;  // Update required for Statistics, but only if the user wants to see them
+                        //needs_update = true;  // Update required for Statistics, but only if the user wants to see them                        
                     }
                     else
                     {
                         //needs_update = false;
                         iDPS++;
                     }
+                    LogToTemp(receiveData.Length.ToString());
+                }
 
                 // Always process each datagram received
                 // datagram is composed of: AoA, SpeedBrakes, Flaps (each one in one byte)
@@ -172,7 +186,6 @@ namespace TelemetryVibShaker
                 // SpeedBreaks possible values: 0-100
                 // Flaps possible values: 0-100
                 // Speed (optional): 0-255.  Units in 10th's of Km, so 10 is 100Km
-
                 if ( receiveData.Length <= 4)
                 {
                     // Obtain telemetry data

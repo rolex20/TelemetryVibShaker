@@ -929,7 +929,7 @@
             panel1.Controls.Add(label23);
             panel1.Location = new Point(3, 97);
             panel1.Name = "panel1";
-            panel1.Size = new Size(492, 249);
+            panel1.Size = new Size(503, 249);
             panel1.TabIndex = 10;
             // 
             // lblTimestamp
@@ -939,7 +939,7 @@
             lblTimestamp.Name = "lblTimestamp";
             lblTimestamp.Size = new Size(64, 15);
             lblTimestamp.TabIndex = 29;
-            lblTimestamp.Tag = "none";
+            lblTimestamp.Tag = "-1";
             lblTimestamp.Text = "timestamp";
             toolTip1.SetToolTip(lblTimestamp, "Timestamp in milliseconds of the last datagram received");
             // 
