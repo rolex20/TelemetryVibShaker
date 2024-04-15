@@ -386,12 +386,36 @@ namespace TelemetryVibShaker.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int comboBox1 {
+        public int cmbPriorityClass {
             get {
-                return ((int)(this["comboBox1"]));
+                return ((int)(this["cmbPriorityClass"]));
             }
             set {
-                this["comboBox1"] = value;
+                this["cmbPriorityClass"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool chkUseEfficiencyCoresOnly {
+            get {
+                return ((bool)(this["chkUseEfficiencyCoresOnly"]));
+            }
+            set {
+                this["chkUseEfficiencyCoresOnly"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool chkUseBackgroundProcessing {
+            get {
+                return ((bool)(this["chkUseBackgroundProcessing"]));
+            }
+            set {
+                this["chkUseBackgroundProcessing"] = value;
             }
         }
     }

@@ -74,6 +74,10 @@
             label14 = new Label();
             label12 = new Label();
             tabSettings = new TabPage();
+            chkUseEfficiencyCoresOnly = new CheckBox();
+            chkUseBackgroundProcessing = new CheckBox();
+            cmbPriorityClass = new ComboBox();
+            label30 = new Label();
             nudMinSpeed = new NumericUpDown();
             label26 = new Label();
             label22 = new Label();
@@ -630,6 +634,10 @@
             // 
             // tabSettings
             // 
+            tabSettings.Controls.Add(chkUseEfficiencyCoresOnly);
+            tabSettings.Controls.Add(chkUseBackgroundProcessing);
+            tabSettings.Controls.Add(cmbPriorityClass);
+            tabSettings.Controls.Add(label30);
             tabSettings.Controls.Add(nudMinSpeed);
             tabSettings.Controls.Add(label26);
             tabSettings.Controls.Add(label22);
@@ -647,6 +655,51 @@
             tabSettings.TabIndex = 4;
             tabSettings.Text = "General Settings";
             tabSettings.UseVisualStyleBackColor = true;
+            // 
+            // chkUseEfficiencyCoresOnly
+            // 
+            chkUseEfficiencyCoresOnly.AutoSize = true;
+            chkUseEfficiencyCoresOnly.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            chkUseEfficiencyCoresOnly.ForeColor = Color.FromArgb(91, 155, 213);
+            chkUseEfficiencyCoresOnly.Location = new Point(17, 305);
+            chkUseEfficiencyCoresOnly.Name = "chkUseEfficiencyCoresOnly";
+            chkUseEfficiencyCoresOnly.Size = new Size(290, 19);
+            chkUseEfficiencyCoresOnly.TabIndex = 18;
+            chkUseEfficiencyCoresOnly.Text = "Use Efficiency cores only on Intel 12700K";
+            chkUseEfficiencyCoresOnly.UseVisualStyleBackColor = true;
+            chkUseEfficiencyCoresOnly.Visible = false;
+            chkUseEfficiencyCoresOnly.CheckedChanged += chkUseEfficiencyCoresOnly_CheckedChanged;
+            // 
+            // chkUseBackgroundProcessing
+            // 
+            chkUseBackgroundProcessing.AutoSize = true;
+            chkUseBackgroundProcessing.Location = new Point(17, 278);
+            chkUseBackgroundProcessing.Name = "chkUseBackgroundProcessing";
+            chkUseBackgroundProcessing.Size = new Size(206, 19);
+            chkUseBackgroundProcessing.TabIndex = 17;
+            chkUseBackgroundProcessing.Text = "Use background processing mode";
+            chkUseBackgroundProcessing.UseVisualStyleBackColor = true;
+            chkUseBackgroundProcessing.CheckedChanged += chkUseBackgroundProcessing_CheckedChanged;
+            // 
+            // cmbPriorityClass
+            // 
+            cmbPriorityClass.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbPriorityClass.FormattingEnabled = true;
+            cmbPriorityClass.Items.AddRange(new object[] { "NORMAL", "BELOW NORMAL", "IDLE" });
+            cmbPriorityClass.Location = new Point(144, 241);
+            cmbPriorityClass.Name = "cmbPriorityClass";
+            cmbPriorityClass.Size = new Size(121, 23);
+            cmbPriorityClass.TabIndex = 15;
+            cmbPriorityClass.SelectedIndexChanged += cmbPriorityClass_SelectedIndexChanged;
+            // 
+            // label30
+            // 
+            label30.AutoSize = true;
+            label30.Location = new Point(17, 244);
+            label30.Name = "label30";
+            label30.Size = new Size(121, 15);
+            label30.TabIndex = 14;
+            label30.Text = "Process Priority Class:";
             // 
             // nudMinSpeed
             // 
@@ -1358,5 +1411,9 @@
         private Button btnTestTWatchDisplay;
         private Button btnTestTWatchMotor;
         private Label lblTestErrMsg;
+        private Label label30;
+        private ComboBox cmbPriorityClass;
+        private CheckBox chkUseBackgroundProcessing;
+        private CheckBox chkUseEfficiencyCoresOnly;
     }
 }
