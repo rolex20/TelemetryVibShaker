@@ -134,6 +134,8 @@
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             btnResetMax = new Button();
+            label31 = new Label();
+            lblTimestamp = new Label();
             tabs.SuspendLayout();
             tabNormalSoundEffects.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier2).BeginInit();
@@ -897,6 +899,8 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(lblTimestamp);
+            panel1.Controls.Add(label31);
             panel1.Controls.Add(lblUIThreadID);
             panel1.Controls.Add(label27);
             panel1.Controls.Add(lblLastProcessorUsedUI);
@@ -1035,7 +1039,7 @@
             // lblLastFlaps
             // 
             lblLastFlaps.AutoSize = true;
-            lblLastFlaps.Location = new Point(318, 159);
+            lblLastFlaps.Location = new Point(264, 159);
             lblLastFlaps.Name = "lblLastFlaps";
             lblLastFlaps.Size = new Size(34, 15);
             lblLastFlaps.TabIndex = 16;
@@ -1045,7 +1049,7 @@
             // label32
             // 
             label32.AutoSize = true;
-            label32.Location = new Point(272, 159);
+            label32.Location = new Point(218, 159);
             label32.Name = "label32";
             label32.Size = new Size(37, 15);
             label32.TabIndex = 15;
@@ -1066,11 +1070,11 @@
             // label29
             // 
             label29.AutoSize = true;
-            label29.Location = new Point(274, 40);
+            label29.Location = new Point(270, 40);
             label29.Name = "label29";
-            label29.Size = new Size(32, 15);
+            label29.Size = new Size(35, 15);
             label29.TabIndex = 13;
-            label29.Text = "Dg/s";
+            label29.Text = "Dg/s:";
             label29.TextAlign = ContentAlignment.TopRight;
             toolTip1.SetToolTip(label29, "Datagrams received per second.");
             // 
@@ -1098,7 +1102,7 @@
             // lblLastSpeedBrakes
             // 
             lblLastSpeedBrakes.AutoSize = true;
-            lblLastSpeedBrakes.Location = new Point(318, 132);
+            lblLastSpeedBrakes.Location = new Point(264, 132);
             lblLastSpeedBrakes.Name = "lblLastSpeedBrakes";
             lblLastSpeedBrakes.Size = new Size(34, 15);
             lblLastSpeedBrakes.TabIndex = 10;
@@ -1148,7 +1152,7 @@
             // label24
             // 
             label24.AutoSize = true;
-            label24.Location = new Point(233, 132);
+            label24.Location = new Point(179, 132);
             label24.Name = "label24";
             label24.Size = new Size(79, 15);
             label24.TabIndex = 7;
@@ -1263,6 +1267,25 @@
             btnResetMax.Text = "Reset Max";
             btnResetMax.UseVisualStyleBackColor = true;
             btnResetMax.Click += btnResetMax_Click;
+            // 
+            // label31
+            // 
+            label31.AutoSize = true;
+            label31.Location = new Point(315, 132);
+            label31.Name = "label31";
+            label31.Size = new Size(69, 15);
+            label31.TabIndex = 28;
+            label31.Text = "Timestamp:";
+            // 
+            // lblTimestamp
+            // 
+            lblTimestamp.AutoSize = true;
+            lblTimestamp.Location = new Point(390, 132);
+            lblTimestamp.Name = "lblTimestamp";
+            lblTimestamp.Size = new Size(64, 15);
+            lblTimestamp.TabIndex = 29;
+            lblTimestamp.Text = "timestamp";
+            toolTip1.SetToolTip(lblTimestamp, "Timestamp in milliseconds of the last datagram received");
             // 
             // frmMain
             // 
@@ -1415,5 +1438,7 @@
         private ComboBox cmbPriorityClass;
         private CheckBox chkUseBackgroundProcessing;
         private CheckBox chkUseEfficiencyCoresOnly;
+        private Label label31;
+        private Label lblTimestamp;
     }
 }

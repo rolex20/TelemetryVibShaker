@@ -522,7 +522,7 @@ namespace TelemetryVibShaker
             toolStripStatusLabel1.Text = "Listening...";
 
             // Display stats if required
-            if (chkChangeToMonitor.Checked) tabs.SelectTab(4);
+            if (chkChangeToMonitor.Checked) tabs.SelectTab(5);
 
             // Start monitoring in UI
             timer1.Enabled = true;
@@ -581,8 +581,11 @@ namespace TelemetryVibShaker
             }
 
             // Statistics are updated once per second
-            if (chkShowStatistics.Checked && telemetry.IsRunning() && tabs.SelectedIndex == 4)
+            if (chkShowStatistics.Checked && telemetry.IsRunning() && tabs.SelectedIndex == 5)
             {
+                // Report last datagram timestamp
+                UpdateValue(lblTimestamp, telemetry.TimeStamp.ToString());
+
                 // Report sound effectType
                 UpdateSoundEffectStatus(soundManager.Status);
 

@@ -11,6 +11,7 @@ namespace TelemetryVibShaker
     internal class TelemetryServer
     {
         public long LastSecond; // second of the last received datagram
+        public long TimeStamp; // timestamp of the last datagram received
         public TelemetryData LastData; // last telemetry datagram received
         public int DPS; // datagrams received per second
         public int MaxProcessingTime; // time of the datagram that took longer to process
@@ -147,7 +148,8 @@ namespace TelemetryVibShaker
 
 
                 // Update Statistics and UI status controls
-                long newSecond = Environment.TickCount64 / 1000;
+                TimeStamp = Environment.TickCount;
+                long newSecond = TimeStamp / 1000;
                 if (Statistics)
                     if (LastSecond != newSecond )
                     {
