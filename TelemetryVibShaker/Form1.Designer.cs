@@ -98,6 +98,8 @@
             btnTestArduinoMotors = new Button();
             tabMonitor = new TabPage();
             panel1 = new Panel();
+            lblTimestamp = new Label();
+            label31 = new Label();
             lblUIThreadID = new Label();
             label27 = new Label();
             lblLastProcessorUsedUI = new Label();
@@ -134,8 +136,6 @@
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             btnResetMax = new Button();
-            label31 = new Label();
-            lblTimestamp = new Label();
             tabs.SuspendLayout();
             tabNormalSoundEffects.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier2).BeginInit();
@@ -932,6 +932,26 @@
             panel1.Size = new Size(492, 249);
             panel1.TabIndex = 10;
             // 
+            // lblTimestamp
+            // 
+            lblTimestamp.AutoSize = true;
+            lblTimestamp.Location = new Point(390, 132);
+            lblTimestamp.Name = "lblTimestamp";
+            lblTimestamp.Size = new Size(64, 15);
+            lblTimestamp.TabIndex = 29;
+            lblTimestamp.Tag = "none";
+            lblTimestamp.Text = "timestamp";
+            toolTip1.SetToolTip(lblTimestamp, "Timestamp in milliseconds of the last datagram received");
+            // 
+            // label31
+            // 
+            label31.AutoSize = true;
+            label31.Location = new Point(315, 132);
+            label31.Name = "label31";
+            label31.Size = new Size(69, 15);
+            label31.TabIndex = 28;
+            label31.Text = "Timestamp:";
+            // 
             // lblUIThreadID
             // 
             lblUIThreadID.AutoSize = true;
@@ -1267,25 +1287,6 @@
             btnResetMax.Text = "Reset Max";
             btnResetMax.UseVisualStyleBackColor = true;
             btnResetMax.Click += btnResetMax_Click;
-            // 
-            // label31
-            // 
-            label31.AutoSize = true;
-            label31.Location = new Point(315, 132);
-            label31.Name = "label31";
-            label31.Size = new Size(69, 15);
-            label31.TabIndex = 28;
-            label31.Text = "Timestamp:";
-            // 
-            // lblTimestamp
-            // 
-            lblTimestamp.AutoSize = true;
-            lblTimestamp.Location = new Point(390, 132);
-            lblTimestamp.Name = "lblTimestamp";
-            lblTimestamp.Size = new Size(64, 15);
-            lblTimestamp.TabIndex = 29;
-            lblTimestamp.Text = "timestamp";
-            toolTip1.SetToolTip(lblTimestamp, "Timestamp in milliseconds of the last datagram received");
             // 
             // frmMain
             // 

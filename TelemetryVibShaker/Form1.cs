@@ -501,6 +501,7 @@ namespace TelemetryVibShaker
             threadTelemetry.Start();
             lblUDPServerThread.Text = "---";
             lblUIThreadID.Text = lblUDPServerThread.Text;
+            lblTimestamp.Text = lblUDPServerThread.Text;
             lblUDPServerThread.Tag = -1;
             lblUIThreadID.Tag = -1;
 
@@ -584,7 +585,7 @@ namespace TelemetryVibShaker
             if (chkShowStatistics.Checked && telemetry.IsRunning() && tabs.SelectedIndex == 5)
             {
                 // Report last datagram timestamp
-                UpdateValue(lblTimestamp, telemetry.TimeStamp.ToString());
+                if (telemetry.TimeStamp>0) UpdateValue(lblTimestamp, telemetry.TimeStamp.ToString());
 
                 // Report sound effectType
                 UpdateSoundEffectStatus(soundManager.Status);
