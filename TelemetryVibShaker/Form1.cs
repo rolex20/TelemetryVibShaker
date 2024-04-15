@@ -1,6 +1,8 @@
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using System.Diagnostics;
+using System.Net.Sockets;
+using System.Net;
 using System.Runtime.InteropServices;
 
 
@@ -301,6 +303,7 @@ namespace TelemetryVibShaker
             lblLastAoA.Tag = (float)0.0;
 
             lblDatagramsPerSecond.Text = string.Empty;
+            lblTestErrMsg.Text = string.Empty;
 
 
             btnStop.Tag = false;
@@ -523,7 +526,7 @@ namespace TelemetryVibShaker
             {
                 L.Tag = value;
                 L.Text = value;
-            } 
+            }
         }
 
         private void UpdateMaxUIProcessingTime()
@@ -775,6 +778,63 @@ namespace TelemetryVibShaker
         private void nudMinSpeed_ValueChanged(object sender, EventArgs e)
         {
             if (telemetry != null) telemetry.MinSpeed = (int)nudMinSpeed.Value;
+        }
+
+        public void SendUdpDatagram(string ipAddress, int destinationPort, byte[] data)
+        {
+            using (UdpClient udpClient = new UdpClient())
+            {
+                try
+                {
+                    udpClient.Connect(IPAddress.Parse(ipAddress), destinationPort);
+                    udpClient.Send(data, data.Length);
+                }
+                catch (Exception ex)
+                {
+                    lblTestErrMsg.Text = ex.Message;
+                }
+            }
+        }
+
+        private async void TestTWatchMotor_Click(object sender, EventArgs e)
+        {
+            byte[] parameters = { 100, 1 }; // [0]-Motor Vibration, [1]-Screen Color
+            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
+            await Task.Delay(800);
+
+            parameters[1] = 2; // Dark Green
+            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
+            await Task.Delay(800);
+
+            parameters[2] = 3; // TFT_GREEN
+            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
+            await Task.Delay(800);
+
+            parameters[2] = 4; // TFT_RED
+            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
+            await Task.Delay(800);
+
+            parameters[2] = 0; // TFT_BLACK
+            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
+
+        }
+
+        private async void btnTestArduinoMotors_Click(object sender, EventArgs e)
+        {
+            byte[] strengthvibration = { 200, 0 };
+            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), strengthvibration);
+            await Task.Delay(800);
+
+            strengthvibration[0] = 0;
+            strengthvibration[1] = 200;
+            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), strengthvibration);
+            await Task.Delay(800);
+
+            // Turn motors off quickly
+            strengthvibration[0] = 0;
+            strengthvibration[1] = 0;
+            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), strengthvibration);
+
         }
     }
 }

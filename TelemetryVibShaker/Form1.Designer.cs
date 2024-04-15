@@ -85,6 +85,13 @@
             label16 = new Label();
             txtListeningPort = new TextBox();
             label15 = new Label();
+            Test = new TabPage();
+            lblTestErrMsg = new Label();
+            TestTWatchDisplay = new Button();
+            TestTWatchMotor = new Button();
+            TestSoundEffect2 = new Button();
+            TestSoundEffect1 = new Button();
+            btnTestArduinoMotors = new Button();
             tabMonitor = new TabPage();
             panel1 = new Panel();
             lblUIThreadID = new Label();
@@ -123,12 +130,6 @@
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             btnResetMax = new Button();
-            Test = new TabPage();
-            button1 = new Button();
-            button2 = new Button();
-            button3 = new Button();
-            button4 = new Button();
-            button5 = new Button();
             tabs.SuspendLayout();
             tabNormalSoundEffects.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier2).BeginInit();
@@ -142,10 +143,10 @@
             tabSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudMinSpeed).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trkEffectTimeout).BeginInit();
+            Test.SuspendLayout();
             tabMonitor.SuspendLayout();
             panel1.SuspendLayout();
             statusStrip1.SuspendLayout();
-            Test.SuspendLayout();
             SuspendLayout();
             // 
             // tabs
@@ -753,6 +754,79 @@
             label15.TabIndex = 0;
             label15.Text = "Listening Port:";
             // 
+            // Test
+            // 
+            Test.Controls.Add(lblTestErrMsg);
+            Test.Controls.Add(TestTWatchDisplay);
+            Test.Controls.Add(TestTWatchMotor);
+            Test.Controls.Add(TestSoundEffect2);
+            Test.Controls.Add(TestSoundEffect1);
+            Test.Controls.Add(btnTestArduinoMotors);
+            Test.Location = new Point(4, 24);
+            Test.Name = "Test";
+            Test.Size = new Size(509, 384);
+            Test.TabIndex = 5;
+            Test.Text = "Test";
+            Test.UseVisualStyleBackColor = true;
+            // 
+            // lblTestErrMsg
+            // 
+            lblTestErrMsg.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            lblTestErrMsg.ForeColor = Color.FromArgb(192, 0, 0);
+            lblTestErrMsg.Location = new Point(29, 213);
+            lblTestErrMsg.Name = "lblTestErrMsg";
+            lblTestErrMsg.Size = new Size(431, 135);
+            lblTestErrMsg.TabIndex = 5;
+            lblTestErrMsg.Text = "error msg";
+            lblTestErrMsg.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // TestTWatchDisplay
+            // 
+            TestTWatchDisplay.Location = new Point(282, 82);
+            TestTWatchDisplay.Name = "TestTWatchDisplay";
+            TestTWatchDisplay.Size = new Size(178, 23);
+            TestTWatchDisplay.TabIndex = 4;
+            TestTWatchDisplay.Text = "Test T-Watch Display";
+            TestTWatchDisplay.UseVisualStyleBackColor = true;
+            // 
+            // TestTWatchMotor
+            // 
+            TestTWatchMotor.Location = new Point(282, 30);
+            TestTWatchMotor.Name = "TestTWatchMotor";
+            TestTWatchMotor.Size = new Size(178, 23);
+            TestTWatchMotor.TabIndex = 3;
+            TestTWatchMotor.Text = "Test T-Watch Motor";
+            TestTWatchMotor.UseVisualStyleBackColor = true;
+            TestTWatchMotor.Click += TestTWatchMotor_Click;
+            // 
+            // TestSoundEffect2
+            // 
+            TestSoundEffect2.Location = new Point(29, 139);
+            TestSoundEffect2.Name = "TestSoundEffect2";
+            TestSoundEffect2.Size = new Size(178, 23);
+            TestSoundEffect2.TabIndex = 2;
+            TestSoundEffect2.Text = "Test Sound Effect 2";
+            TestSoundEffect2.UseVisualStyleBackColor = true;
+            // 
+            // TestSoundEffect1
+            // 
+            TestSoundEffect1.Location = new Point(29, 82);
+            TestSoundEffect1.Name = "TestSoundEffect1";
+            TestSoundEffect1.Size = new Size(178, 23);
+            TestSoundEffect1.TabIndex = 1;
+            TestSoundEffect1.Text = "Test Sound Effect 1";
+            TestSoundEffect1.UseVisualStyleBackColor = true;
+            // 
+            // btnTestArduinoMotors
+            // 
+            btnTestArduinoMotors.Location = new Point(29, 30);
+            btnTestArduinoMotors.Name = "btnTestArduinoMotors";
+            btnTestArduinoMotors.Size = new Size(178, 23);
+            btnTestArduinoMotors.TabIndex = 0;
+            btnTestArduinoMotors.Text = "Test Arduino Motor 1 && 2";
+            btnTestArduinoMotors.UseVisualStyleBackColor = true;
+            btnTestArduinoMotors.Click += btnTestArduinoMotors_Click;
+            // 
             // tabMonitor
             // 
             tabMonitor.Controls.Add(panel1);
@@ -1134,65 +1208,6 @@
             btnResetMax.UseVisualStyleBackColor = true;
             btnResetMax.Click += btnResetMax_Click;
             // 
-            // Test
-            // 
-            Test.Controls.Add(button5);
-            Test.Controls.Add(button4);
-            Test.Controls.Add(button3);
-            Test.Controls.Add(button2);
-            Test.Controls.Add(button1);
-            Test.Location = new Point(4, 24);
-            Test.Name = "Test";
-            Test.Size = new Size(509, 384);
-            Test.TabIndex = 5;
-            Test.Text = "Test";
-            Test.UseVisualStyleBackColor = true;
-            // 
-            // button1
-            // 
-            button1.Location = new Point(29, 30);
-            button1.Name = "button1";
-            button1.Size = new Size(178, 23);
-            button1.TabIndex = 0;
-            button1.Text = "Test Arduino Motor 1 && 2";
-            button1.UseVisualStyleBackColor = true;
-            // 
-            // button2
-            // 
-            button2.Location = new Point(29, 82);
-            button2.Name = "button2";
-            button2.Size = new Size(178, 23);
-            button2.TabIndex = 1;
-            button2.Text = "Test Sound Effect 1";
-            button2.UseVisualStyleBackColor = true;
-            // 
-            // button3
-            // 
-            button3.Location = new Point(29, 139);
-            button3.Name = "button3";
-            button3.Size = new Size(178, 23);
-            button3.TabIndex = 2;
-            button3.Text = "Test Sound Effect 2";
-            button3.UseVisualStyleBackColor = true;
-            // 
-            // button4
-            // 
-            button4.Location = new Point(282, 30);
-            button4.Name = "button4";
-            button4.Size = new Size(178, 23);
-            button4.TabIndex = 3;
-            button4.Text = "Test T-Watch Motor";
-            button4.UseVisualStyleBackColor = true;
-            // 
-            // button5
-            // 
-            button5.Location = new Point(282, 82);
-            button5.Name = "button5";
-            button5.Size = new Size(178, 23);
-            button5.TabIndex = 4;
-            button5.Text = "Test T-Watch Display";
-            button5.UseVisualStyleBackColor = true;
-            // 
             // frmMain
             // 
             AcceptButton = btnStartListening;
@@ -1227,13 +1242,13 @@
             tabSettings.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)nudMinSpeed).EndInit();
             ((System.ComponentModel.ISupportInitialize)trkEffectTimeout).EndInit();
+            Test.ResumeLayout(false);
             tabMonitor.ResumeLayout(false);
             tabMonitor.PerformLayout();
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
-            Test.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -1334,10 +1349,11 @@
         private Label lblUIThreadID;
         private Label label27;
         private TabPage Test;
-        private Button button1;
-        private Button button2;
-        private Button button3;
-        private Button button5;
-        private Button button4;
+        private Button btnTestArduinoMotors;
+        private Button TestSoundEffect1;
+        private Button TestSoundEffect2;
+        private Button TestTWatchDisplay;
+        private Button TestTWatchMotor;
+        private Label lblTestErrMsg;
     }
 }
