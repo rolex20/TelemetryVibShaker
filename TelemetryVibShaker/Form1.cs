@@ -569,11 +569,11 @@ namespace TelemetryVibShaker
                 if (telemetry.LastData.AoA < 0) // new aircraft type?
                 {
                     // Report unit type
-                    if (!telemetry.CurrentUnitType.Equals(lblCurrentUnitType.Tag))
-                    {
+                    //if (!telemetry.CurrentUnitType.Equals(lblCurrentUnitType.Tag))
+                    //{
                         lblCurrentUnitType.Tag = telemetry.CurrentUnitType;
                         lblCurrentUnitType.Text = telemetry.CurrentUnitType + " (" + soundManager.AoA1.ToString() + ", " + soundManager.AoA2.ToString() + ")";
-                    }
+                    //}
 
                     // Report max UDP processing time, it should have been reseted to zero
                     //UpdateValue(lblProcessingTimeUDP, telemetry.MaxProcessingTime);

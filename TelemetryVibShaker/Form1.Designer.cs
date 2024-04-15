@@ -149,10 +149,10 @@
             tabs.Controls.Add(tabTTGO20V3);
             tabs.Controls.Add(tabSettings);
             tabs.Controls.Add(tabMonitor);
-            tabs.Location = new Point(24, 22);
+            tabs.Location = new Point(24, 14);
             tabs.Name = "tabs";
             tabs.SelectedIndex = 0;
-            tabs.Size = new Size(517, 429);
+            tabs.Size = new Size(517, 418);
             tabs.TabIndex = 0;
             // 
             // tabNormalSoundEffects
@@ -178,7 +178,7 @@
             tabNormalSoundEffects.Location = new Point(4, 24);
             tabNormalSoundEffects.Name = "tabNormalSoundEffects";
             tabNormalSoundEffects.Padding = new Padding(3);
-            tabNormalSoundEffects.Size = new Size(509, 401);
+            tabNormalSoundEffects.Size = new Size(509, 390);
             tabNormalSoundEffects.TabIndex = 0;
             tabNormalSoundEffects.Text = "Sound Effects";
             tabNormalSoundEffects.UseVisualStyleBackColor = true;
@@ -384,7 +384,7 @@
             tabArduino.Location = new Point(4, 24);
             tabArduino.Name = "tabArduino";
             tabArduino.Padding = new Padding(3);
-            tabArduino.Size = new Size(509, 401);
+            tabArduino.Size = new Size(509, 390);
             tabArduino.TabIndex = 1;
             tabArduino.Text = "Arduino";
             tabArduino.UseVisualStyleBackColor = true;
@@ -556,7 +556,7 @@
             tabTTGO20V3.Location = new Point(4, 24);
             tabTTGO20V3.Name = "tabTTGO20V3";
             tabTTGO20V3.Padding = new Padding(3);
-            tabTTGO20V3.Size = new Size(509, 401);
+            tabTTGO20V3.Size = new Size(509, 390);
             tabTTGO20V3.TabIndex = 2;
             tabTTGO20V3.Text = "T-Watch 2020 V3";
             tabTTGO20V3.UseVisualStyleBackColor = true;
@@ -643,7 +643,7 @@
             tabSettings.Controls.Add(label15);
             tabSettings.Location = new Point(4, 24);
             tabSettings.Name = "tabSettings";
-            tabSettings.Size = new Size(509, 401);
+            tabSettings.Size = new Size(509, 390);
             tabSettings.TabIndex = 4;
             tabSettings.Text = "General Settings";
             tabSettings.UseVisualStyleBackColor = true;
@@ -761,7 +761,7 @@
             tabMonitor.Controls.Add(chkChangeToMonitor);
             tabMonitor.Location = new Point(4, 24);
             tabMonitor.Name = "tabMonitor";
-            tabMonitor.Size = new Size(509, 401);
+            tabMonitor.Size = new Size(509, 390);
             tabMonitor.TabIndex = 3;
             tabMonitor.Text = "Monitor";
             tabMonitor.UseVisualStyleBackColor = true;
@@ -905,7 +905,7 @@
             // lblLastFlaps
             // 
             lblLastFlaps.AutoSize = true;
-            lblLastFlaps.Location = new Point(318, 132);
+            lblLastFlaps.Location = new Point(318, 159);
             lblLastFlaps.Name = "lblLastFlaps";
             lblLastFlaps.Size = new Size(34, 15);
             lblLastFlaps.TabIndex = 16;
@@ -915,7 +915,7 @@
             // label32
             // 
             label32.AutoSize = true;
-            label32.Location = new Point(233, 132);
+            label32.Location = new Point(233, 159);
             label32.Name = "label32";
             label32.Size = new Size(37, 15);
             label32.TabIndex = 15;
@@ -965,7 +965,7 @@
             // lblLastSpeedBrakes
             // 
             lblLastSpeedBrakes.AutoSize = true;
-            lblLastSpeedBrakes.Location = new Point(318, 106);
+            lblLastSpeedBrakes.Location = new Point(318, 132);
             lblLastSpeedBrakes.Name = "lblLastSpeedBrakes";
             lblLastSpeedBrakes.Size = new Size(34, 15);
             lblLastSpeedBrakes.TabIndex = 10;
@@ -1014,7 +1014,7 @@
             // label24
             // 
             label24.AutoSize = true;
-            label24.Location = new Point(233, 106);
+            label24.Location = new Point(233, 132);
             label24.Name = "label24";
             label24.Size = new Size(79, 15);
             label24.TabIndex = 7;
@@ -1075,7 +1075,7 @@
             // 
             // btnStartListening
             // 
-            btnStartListening.Location = new Point(346, 455);
+            btnStartListening.Location = new Point(346, 435);
             btnStartListening.Name = "btnStartListening";
             btnStartListening.Size = new Size(100, 23);
             btnStartListening.TabIndex = 0;
@@ -1086,7 +1086,7 @@
             // btnStop
             // 
             btnStop.Enabled = false;
-            btnStop.Location = new Point(462, 455);
+            btnStop.Location = new Point(462, 435);
             btnStop.Name = "btnStop";
             btnStop.Size = new Size(75, 23);
             btnStop.TabIndex = 2;
@@ -1107,7 +1107,7 @@
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
-            statusStrip1.Location = new Point(0, 484);
+            statusStrip1.Location = new Point(0, 466);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(566, 22);
             statusStrip1.TabIndex = 3;
@@ -1121,7 +1121,7 @@
             // 
             // btnResetMax
             // 
-            btnResetMax.Location = new Point(24, 455);
+            btnResetMax.Location = new Point(24, 435);
             btnResetMax.Name = "btnResetMax";
             btnResetMax.Size = new Size(75, 23);
             btnResetMax.TabIndex = 4;
@@ -1135,7 +1135,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnStop;
-            ClientSize = new Size(566, 506);
+            ClientSize = new Size(566, 488);
             Controls.Add(btnResetMax);
             Controls.Add(statusStrip1);
             Controls.Add(btnStop);

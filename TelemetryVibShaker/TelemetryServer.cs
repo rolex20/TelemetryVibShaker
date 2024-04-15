@@ -100,7 +100,7 @@ namespace TelemetryVibShaker
         public void Run()
         {
             cancelationToken = false;
-            CurrentUnitType = "none";
+            CurrentUnitType = "[no unit information received]";
             lastErrorMsg = string.Empty;
             MaxProcessingTime = -1;
             LastProcessorUsed = -1;
@@ -127,7 +127,6 @@ namespace TelemetryVibShaker
                 try
                 {
                     ThreadId = (int)GetCurrentThreadId(); // Let's see if it changes on receiving packets
-                    LastProcessorUsed = -1;
                     receiveData = listenerUdp.Receive(ref sender); // Wait here until a new datagram is received
                     LastProcessorUsed = (int)GetCurrentProcessorNumber();
                 }
@@ -175,14 +174,16 @@ namespace TelemetryVibShaker
                 // Flaps possible values: 0-100
                 // Speed (optional): 0-255.  Units in 10th's of Km, so 10 is 100Km
 
-                if ( receiveData.Length == 4)
+                if ( receiveData.Length <= 4)
                 {
                     // Obtain telemetry data
                     LastData.AoA = receiveData[0];
                     LastData.SpeedBrakes = receiveData[1];
                     LastData.Flaps = receiveData[2];
 
-                    /* Speed Conversion
+                    
+                    
+                    /* Speed Reception and Conversion
                      * receivedData[3] is in decameters/s
                      * This unit was selected to make it fit in 8 bits (1 byte)
                      * Since it is received obviously without decimals, some resolution is lost but not needed in this program.
@@ -190,9 +191,12 @@ namespace TelemetryVibShaker
                      * km/h = decameters per second x 36
                      */
                     if (receiveData.Length == 4)
-                        LastData.Speed = receiveData[3] * 36;// Speed now is in km/h
+                        LastData.Speed = receiveData[3] * 36; // After this, Speed now is in km/h
 
+
+                    // Process the Effects only if the current plane is moving above the MinSpeed required by the user
                     if (LastData.Speed >= MinSpeed) { 
+                        
                         // Update the sound effects
                         soundManager.UpdateEffect(LastData.AoA);
 
@@ -206,7 +210,7 @@ namespace TelemetryVibShaker
                 {
                     string datagram = Encoding.ASCII.GetString(receiveData, 0, receiveData.Length);
                     var unit = jsonRoot.units.unit.FirstOrDefault(u => u.typeName == datagram);
-                    string lastUnitType = datagram;
+                    CurrentUnitType = datagram;
 
                     // Signal that we haven't received yet new AoA telemetry
                     LastData.AoA = -1; 
@@ -231,9 +235,7 @@ namespace TelemetryVibShaker
                             vibMotor[i].ChangeAoARange(360, 360);
 
                     }
-
-                    // this is not expected to change often, so I am ok with updating it as soon as possible
-                    if (CurrentUnitType != lastUnitType) CurrentUnitType = lastUnitType;
+                    
                 }
 
                 if (Statistics) 
