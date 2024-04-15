@@ -374,7 +374,7 @@
             tabArduino.Location = new Point(4, 24);
             tabArduino.Name = "tabArduino";
             tabArduino.Padding = new Padding(3);
-            tabArduino.Size = new Size(509, 390);
+            tabArduino.Size = new Size(509, 387);
             tabArduino.TabIndex = 1;
             tabArduino.Text = "Arduino";
             tabArduino.UseVisualStyleBackColor = true;
@@ -546,7 +546,7 @@
             tabTTGO20V3.Location = new Point(4, 24);
             tabTTGO20V3.Name = "tabTTGO20V3";
             tabTTGO20V3.Padding = new Padding(3);
-            tabTTGO20V3.Size = new Size(509, 390);
+            tabTTGO20V3.Size = new Size(509, 387);
             tabTTGO20V3.TabIndex = 2;
             tabTTGO20V3.Text = "T-Watch 2020 V3";
             tabTTGO20V3.UseVisualStyleBackColor = true;
@@ -633,7 +633,7 @@
             tabSettings.Controls.Add(label15);
             tabSettings.Location = new Point(4, 24);
             tabSettings.Name = "tabSettings";
-            tabSettings.Size = new Size(509, 390);
+            tabSettings.Size = new Size(509, 387);
             tabSettings.TabIndex = 4;
             tabSettings.Text = "General Settings";
             tabSettings.UseVisualStyleBackColor = true;
@@ -751,7 +751,7 @@
             tabMonitor.Controls.Add(chkChangeToMonitor);
             tabMonitor.Location = new Point(4, 24);
             tabMonitor.Name = "tabMonitor";
-            tabMonitor.Size = new Size(509, 390);
+            tabMonitor.Size = new Size(509, 387);
             tabMonitor.TabIndex = 3;
             tabMonitor.Text = "Monitor";
             tabMonitor.UseVisualStyleBackColor = true;
@@ -792,7 +792,7 @@
             // lblUIThreadID
             // 
             lblUIThreadID.AutoSize = true;
-            lblUIThreadID.Location = new Point(324, 11);
+            lblUIThreadID.Location = new Point(327, 11);
             lblUIThreadID.Name = "lblUIThreadID";
             lblUIThreadID.Size = new Size(27, 15);
             lblUIThreadID.TabIndex = 27;
@@ -830,7 +830,7 @@
             // lblLastProcessorUsedUDP
             // 
             lblLastProcessorUsedUDP.AutoSize = true;
-            lblLastProcessorUsedUDP.Location = new Point(164, 223);
+            lblLastProcessorUsedUDP.Location = new Point(169, 223);
             lblLastProcessorUsedUDP.Name = "lblLastProcessorUsedUDP";
             lblLastProcessorUsedUDP.Size = new Size(30, 15);
             lblLastProcessorUsedUDP.TabIndex = 23;
@@ -877,7 +877,7 @@
             // lblUDPServerThread
             // 
             lblUDPServerThread.AutoSize = true;
-            lblUDPServerThread.Location = new Point(148, 11);
+            lblUDPServerThread.Location = new Point(151, 11);
             lblUDPServerThread.Name = "lblUDPServerThread";
             lblUDPServerThread.Size = new Size(22, 15);
             lblUDPServerThread.TabIndex = 18;
@@ -905,7 +905,7 @@
             // label32
             // 
             label32.AutoSize = true;
-            label32.Location = new Point(233, 159);
+            label32.Location = new Point(272, 159);
             label32.Name = "label32";
             label32.Size = new Size(37, 15);
             label32.TabIndex = 15;
@@ -934,7 +934,7 @@
             // lblProcessingTimeUDP
             // 
             lblProcessingTimeUDP.AutoSize = true;
-            lblProcessingTimeUDP.Location = new Point(164, 196);
+            lblProcessingTimeUDP.Location = new Point(169, 196);
             lblProcessingTimeUDP.Name = "lblProcessingTimeUDP";
             lblProcessingTimeUDP.Size = new Size(57, 15);
             lblProcessingTimeUDP.TabIndex = 12;
