@@ -153,13 +153,14 @@
             this.tcTabControl = new System.Windows.Forms.TabControl();
             this.tbMonitor = new System.Windows.Forms.TabPage();
             this.tbSettings = new System.Windows.Forms.TabPage();
-            this.lblPollingInterval = new System.Windows.Forms.Label();
-            this.nudPollingInterval = new System.Windows.Forms.NumericUpDown();
-            this.label1 = new System.Windows.Forms.Label();
             this.cmbPriorityClass = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.nudPollingInterval = new System.Windows.Forms.NumericUpDown();
+            this.lblPollingInterval = new System.Windows.Forms.Label();
             this.tbErrors = new System.Windows.Forms.TabPage();
-            this.lblErrorsTitle = new System.Windows.Forms.Label();
             this.txtErrors = new System.Windows.Forms.TextBox();
+            this.lblErrorsTitle = new System.Windows.Forms.Label();
+            this.lbl12700KNote = new System.Windows.Forms.Label();
             this.toolStrip1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.tcTabControl.SuspendLayout();
@@ -205,11 +206,11 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Arial Rounded MT Bold", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label4.ForeColor = System.Drawing.Color.YellowGreen;
             this.label4.Location = new System.Drawing.Point(565, 194);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(66, 12);
+            this.label4.Size = new System.Drawing.Size(64, 13);
             this.label4.TabIndex = 6;
             this.label4.Tag = "GPU Engine";
             this.label4.Text = "RTX 4090";
@@ -946,11 +947,11 @@
             // label38
             // 
             this.label38.AutoSize = true;
-            this.label38.Font = new System.Drawing.Font("Arial Rounded MT Bold", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label38.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label38.ForeColor = System.Drawing.Color.YellowGreen;
             this.label38.Location = new System.Drawing.Point(588, 234);
             this.label38.Name = "label38";
-            this.label38.Size = new System.Drawing.Size(43, 12);
+            this.label38.Size = new System.Drawing.Size(41, 13);
             this.label38.TabIndex = 95;
             this.label38.Tag = "GPU Engine";
             this.label38.Text = "Fan %";
@@ -979,16 +980,16 @@
             this.toolStripButton1});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(874, 27);
+            this.toolStrip1.Size = new System.Drawing.Size(874, 28);
             this.toolStrip1.TabIndex = 104;
             this.toolStrip1.Text = "toolStrip1";
             // 
             // tslbl12700K
             // 
-            this.tslbl12700K.Font = new System.Drawing.Font("Century Gothic", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tslbl12700K.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tslbl12700K.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
             this.tslbl12700K.Name = "tslbl12700K";
-            this.tslbl12700K.Size = new System.Drawing.Size(104, 24);
+            this.tslbl12700K.Size = new System.Drawing.Size(110, 25);
             this.tslbl12700K.Text = "i7-12700K";
             this.tslbl12700K.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -1001,7 +1002,7 @@
             this.tschkEnabled.Image = ((System.Drawing.Image)(resources.GetObject("tschkEnabled.Image")));
             this.tschkEnabled.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tschkEnabled.Name = "tschkEnabled";
-            this.tschkEnabled.Size = new System.Drawing.Size(92, 24);
+            this.tschkEnabled.Size = new System.Drawing.Size(92, 25);
             this.tschkEnabled.Text = "Enable Monitor";
             this.tschkEnabled.ToolTipText = "Activate/Deactivate monitoring";
             this.tschkEnabled.Click += new System.EventHandler(this.tschkEnabled_Click);
@@ -1012,20 +1013,20 @@
             this.tsbtnResetMaxCounters.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnResetMaxCounters.Image")));
             this.tsbtnResetMaxCounters.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbtnResetMaxCounters.Name = "tsbtnResetMaxCounters";
-            this.tsbtnResetMaxCounters.Size = new System.Drawing.Size(65, 24);
+            this.tsbtnResetMaxCounters.Size = new System.Drawing.Size(65, 25);
             this.tsbtnResetMaxCounters.Text = "Reset Max";
             this.tsbtnResetMaxCounters.Click += new System.EventHandler(this.tsbtnResetMaxCounters_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 28);
             // 
             // tstxtAutoMoveY
             // 
             this.tstxtAutoMoveY.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.tstxtAutoMoveY.Name = "tstxtAutoMoveY";
-            this.tstxtAutoMoveY.Size = new System.Drawing.Size(50, 27);
+            this.tstxtAutoMoveY.Size = new System.Drawing.Size(50, 28);
             this.tstxtAutoMoveY.Text = "1100";
             this.tstxtAutoMoveY.ToolTipText = "Enter Y coordinates for [Auto Move Y]";
             this.tstxtAutoMoveY.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tstxtAutoMoveY_KeyPress);
@@ -1037,7 +1038,7 @@
             this.tschkAutoMoveTop.Image = ((System.Drawing.Image)(resources.GetObject("tschkAutoMoveTop.Image")));
             this.tschkAutoMoveTop.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tschkAutoMoveTop.Name = "tschkAutoMoveTop";
-            this.tschkAutoMoveTop.Size = new System.Drawing.Size(80, 24);
+            this.tschkAutoMoveTop.Size = new System.Drawing.Size(80, 25);
             this.tschkAutoMoveTop.Text = "Auto Move Y";
             this.tschkAutoMoveTop.ToolTipText = "Auto Move to the requested Y coordinates";
             // 
@@ -1048,7 +1049,7 @@
             this.tschkAutoReadY.Image = ((System.Drawing.Image)(resources.GetObject("tschkAutoReadY.Image")));
             this.tschkAutoReadY.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tschkAutoReadY.Name = "tschkAutoReadY";
-            this.tschkAutoReadY.Size = new System.Drawing.Size(69, 24);
+            this.tschkAutoReadY.Size = new System.Drawing.Size(69, 25);
             this.tschkAutoReadY.Text = "Auto Set Y ";
             this.tschkAutoReadY.ToolTipText = "Auto read current Y coordinates";
             // 
@@ -1059,21 +1060,21 @@
             this.tschkAlwaysOnTop.Image = ((System.Drawing.Image)(resources.GetObject("tschkAlwaysOnTop.Image")));
             this.tschkAlwaysOnTop.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tschkAlwaysOnTop.Name = "tschkAlwaysOnTop";
-            this.tschkAlwaysOnTop.Size = new System.Drawing.Size(23, 24);
+            this.tschkAlwaysOnTop.Size = new System.Drawing.Size(23, 25);
             this.tschkAlwaysOnTop.Text = "toolStripButton1";
             this.tschkAlwaysOnTop.ToolTipText = "Make App Always On Top";
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 27);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 28);
             // 
             // toolStripLabel2
             // 
-            this.toolStripLabel2.Font = new System.Drawing.Font("Arial Rounded MT Bold", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.toolStripLabel2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.toolStripLabel2.ForeColor = System.Drawing.Color.YellowGreen;
             this.toolStripLabel2.Name = "toolStripLabel2";
-            this.toolStripLabel2.Size = new System.Drawing.Size(62, 24);
+            this.toolStripLabel2.Size = new System.Drawing.Size(62, 25);
             this.toolStripLabel2.Text = "RTX 4090";
             this.toolStripLabel2.ToolTipText = "nvidia geforce rtx 4090(01:00)";
             // 
@@ -1084,13 +1085,13 @@
             "% GPU Time",
             "GPU Temperature (in degrees C)"});
             this.tscmbCategory.Name = "tscmbCategory";
-            this.tscmbCategory.Size = new System.Drawing.Size(121, 27);
+            this.tscmbCategory.Size = new System.Drawing.Size(121, 28);
             this.tscmbCategory.ToolTipText = "Select the item to monitor for RTX 4090";
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 27);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 28);
             // 
             // toolStripButton1
             // 
@@ -1098,7 +1099,7 @@
             this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
             this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(23, 24);
+            this.toolStripButton1.Size = new System.Drawing.Size(23, 25);
             this.toolStripButton1.Text = "toolStripButton1";
             // 
             // toolStrip2
@@ -1409,6 +1410,7 @@
             // 
             // tbSettings
             // 
+            this.tbSettings.Controls.Add(this.lbl12700KNote);
             this.tbSettings.Controls.Add(this.cmbPriorityClass);
             this.tbSettings.Controls.Add(this.label1);
             this.tbSettings.Controls.Add(this.nudPollingInterval);
@@ -1421,15 +1423,29 @@
             this.tbSettings.Text = "Settings";
             this.tbSettings.UseVisualStyleBackColor = true;
             // 
-            // lblPollingInterval
+            // cmbPriorityClass
             // 
-            this.lblPollingInterval.AutoSize = true;
-            this.lblPollingInterval.Location = new System.Drawing.Point(26, 38);
-            this.lblPollingInterval.Name = "lblPollingInterval";
-            this.lblPollingInterval.Size = new System.Drawing.Size(101, 13);
-            this.lblPollingInterval.TabIndex = 0;
-            this.lblPollingInterval.Text = "Polling Interval: (ms)";
-            this.lblPollingInterval.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.cmbPriorityClass.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbPriorityClass.FormattingEnabled = true;
+            this.cmbPriorityClass.Items.AddRange(new object[] {
+            "NORMAL",
+            "BELOW NORMAL",
+            "IDLE"});
+            this.cmbPriorityClass.Location = new System.Drawing.Point(134, 91);
+            this.cmbPriorityClass.Name = "cmbPriorityClass";
+            this.cmbPriorityClass.Size = new System.Drawing.Size(121, 21);
+            this.cmbPriorityClass.TabIndex = 3;
+            this.cmbPriorityClass.SelectedIndexChanged += new System.EventHandler(this.cmbPriorityClass_SelectedIndexChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(58, 94);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(69, 13);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "Priority Class:";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // nudPollingInterval
             // 
@@ -1459,29 +1475,15 @@
             0});
             this.nudPollingInterval.ValueChanged += new System.EventHandler(this.nudPollingInterval_ValueChanged);
             // 
-            // label1
+            // lblPollingInterval
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(58, 94);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(69, 13);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "Priority Class:";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // cmbPriorityClass
-            // 
-            this.cmbPriorityClass.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbPriorityClass.FormattingEnabled = true;
-            this.cmbPriorityClass.Items.AddRange(new object[] {
-            "NORMAL",
-            "BELOW NORMAL",
-            "IDLE"});
-            this.cmbPriorityClass.Location = new System.Drawing.Point(134, 91);
-            this.cmbPriorityClass.Name = "cmbPriorityClass";
-            this.cmbPriorityClass.Size = new System.Drawing.Size(121, 21);
-            this.cmbPriorityClass.TabIndex = 3;
-            this.cmbPriorityClass.SelectedIndexChanged += new System.EventHandler(this.cmbPriorityClass_SelectedIndexChanged);
+            this.lblPollingInterval.AutoSize = true;
+            this.lblPollingInterval.Location = new System.Drawing.Point(26, 38);
+            this.lblPollingInterval.Name = "lblPollingInterval";
+            this.lblPollingInterval.Size = new System.Drawing.Size(101, 13);
+            this.lblPollingInterval.TabIndex = 0;
+            this.lblPollingInterval.Text = "Polling Interval: (ms)";
+            this.lblPollingInterval.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // tbErrors
             // 
@@ -1494,15 +1496,6 @@
             this.tbErrors.Text = "Errors";
             this.tbErrors.UseVisualStyleBackColor = true;
             // 
-            // lblErrorsTitle
-            // 
-            this.lblErrorsTitle.AutoSize = true;
-            this.lblErrorsTitle.Location = new System.Drawing.Point(19, 24);
-            this.lblErrorsTitle.Name = "lblErrorsTitle";
-            this.lblErrorsTitle.Size = new System.Drawing.Size(168, 13);
-            this.lblErrorsTitle.TabIndex = 0;
-            this.lblErrorsTitle.Text = "Errors: (only the first 100 are listed)";
-            // 
             // txtErrors
             // 
             this.txtErrors.AcceptsReturn = true;
@@ -1514,6 +1507,27 @@
             this.txtErrors.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txtErrors.Size = new System.Drawing.Size(792, 296);
             this.txtErrors.TabIndex = 1;
+            // 
+            // lblErrorsTitle
+            // 
+            this.lblErrorsTitle.AutoSize = true;
+            this.lblErrorsTitle.Location = new System.Drawing.Point(19, 24);
+            this.lblErrorsTitle.Name = "lblErrorsTitle";
+            this.lblErrorsTitle.Size = new System.Drawing.Size(168, 13);
+            this.lblErrorsTitle.TabIndex = 0;
+            this.lblErrorsTitle.Text = "Errors: (only the first 100 are listed)";
+            // 
+            // lbl12700KNote
+            // 
+            this.lbl12700KNote.AutoSize = true;
+            this.lbl12700KNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbl12700KNote.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.lbl12700KNote.Location = new System.Drawing.Point(26, 149);
+            this.lbl12700KNote.Name = "lbl12700KNote";
+            this.lbl12700KNote.Size = new System.Drawing.Size(268, 13);
+            this.lbl12700KNote.TabIndex = 4;
+            this.lbl12700KNote.Text = "12700K detected:   Using only efficient cores ";
+            this.lbl12700KNote.Visible = false;
             // 
             // frmMain
             // 
@@ -1681,6 +1695,7 @@
         private System.Windows.Forms.TabPage tbErrors;
         private System.Windows.Forms.TextBox txtErrors;
         private System.Windows.Forms.Label lblErrorsTitle;
+        private System.Windows.Forms.Label lbl12700KNote;
     }
 }
 

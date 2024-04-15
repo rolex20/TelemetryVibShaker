@@ -196,6 +196,7 @@ namespace PerformanceMonitor
                 //gpuFanCounter = new PerformanceCounter("GPU", "% GPU Fan Speed", "nvidia geforce rtx 4090(01:00)");
 
                 tslbl12700K.Tag = true;  // special tag to indicate that this is a 12700K
+                lbl12700KNote.Visible = true;
             }
             else
             {
