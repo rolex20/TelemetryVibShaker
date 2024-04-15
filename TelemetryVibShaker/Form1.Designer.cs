@@ -969,7 +969,7 @@
             lblCurrentUnitType.Name = "lblCurrentUnitType";
             lblCurrentUnitType.Size = new Size(34, 15);
             lblCurrentUnitType.TabIndex = 9;
-            lblCurrentUnitType.Tag = "none";
+            lblCurrentUnitType.Tag = "none yet";
             lblCurrentUnitType.Text = "none";
             // 
             // lblSoundStatus

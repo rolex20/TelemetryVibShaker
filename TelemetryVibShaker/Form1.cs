@@ -557,24 +557,12 @@ namespace TelemetryVibShaker
                 // Report sound effectType
                 UpdateSoundEffectStatus(soundManager.Status);
 
-                if (telemetry.LastData.AoA < 0) // new aircraft type?
+                // Report Current Unit Type
+                if (!telemetry.CurrentUnitType.Equals(lblCurrentUnitType.Tag))
                 {
-                    // Report unit type
-                    //if (!telemetry.CurrentUnitType.Equals(lblCurrentUnitType.Tag))
-                    //{
-                        lblCurrentUnitType.Tag = telemetry.CurrentUnitType;
-                        lblCurrentUnitType.Text = telemetry.CurrentUnitType + " (" + soundManager.AoA1.ToString() + ", " + soundManager.AoA2.ToString() + ")";
-                    //}
-
-                    // Report max UDP processing time, it should have been reseted to zero
-                    //UpdateValue(lblProcessingTimeUDP, telemetry.MaxProcessingTime);
-
-                    // UI Reporting takes so little time when there are no updates, let's continue and report
-                    //return; // if no value has been received yet, don't update nothing else
+                    lblCurrentUnitType.Tag = telemetry.CurrentUnitType;
+                    lblCurrentUnitType.Text = telemetry.CurrentUnitType + " (" + soundManager.AoA1.ToString() + ", " + soundManager.AoA2.ToString() + ")";
                 }
-                lblCurrentUnitType.Tag = telemetry.CurrentUnitType;
-                lblCurrentUnitType.Text = telemetry.CurrentUnitType + " (" + soundManager.AoA1.ToString() + ", " + soundManager.AoA2.ToString() + ")";
-
 
                 // Report the last AoA received
                 UpdateValue(lblLastAoA, telemetry.LastData.AoA);
