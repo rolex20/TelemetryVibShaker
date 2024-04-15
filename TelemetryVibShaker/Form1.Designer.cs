@@ -994,7 +994,7 @@
             // lblLastProcessorUsedUDP
             // 
             lblLastProcessorUsedUDP.AutoSize = true;
-            lblLastProcessorUsedUDP.Location = new Point(169, 223);
+            lblLastProcessorUsedUDP.Location = new Point(177, 223);
             lblLastProcessorUsedUDP.Name = "lblLastProcessorUsedUDP";
             lblLastProcessorUsedUDP.Size = new Size(30, 15);
             lblLastProcessorUsedUDP.TabIndex = 23;
@@ -1101,7 +1101,7 @@
             // lblProcessingTimeUDP
             // 
             lblProcessingTimeUDP.AutoSize = true;
-            lblProcessingTimeUDP.Location = new Point(169, 196);
+            lblProcessingTimeUDP.Location = new Point(177, 196);
             lblProcessingTimeUDP.Name = "lblProcessingTimeUDP";
             lblProcessingTimeUDP.Size = new Size(57, 15);
             lblProcessingTimeUDP.TabIndex = 12;
