@@ -1,9 +1,10 @@
-using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Net;
 using System.Runtime.InteropServices;
+using Microsoft.Win32;
+using System;
 
 
 namespace TelemetryVibShaker
@@ -22,6 +23,13 @@ namespace TelemetryVibShaker
         private long lastSecond; // second of the last udp datagram processed
         private int maxUIProcessingTime;  // milliseconds elapsed in processing the monitor-update-cycle in Timer1
         private Stopwatch stopWatchUI;  // used to measure processing time in Timer1 (updating the UI)
+        private Process currentProcess;
+
+        private const uint PROCESS_MODE_BACKGROUND_BEGIN = 0x00100000;
+        private const uint PROCESS_MODE_BACKGROUND_END = 0x00200000;
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool SetPriorityClass(IntPtr handle, uint priorityClass);
 
         [DllImport("kernel32.dll")]
         public static extern uint GetCurrentThreadId();
@@ -258,8 +266,11 @@ namespace TelemetryVibShaker
         }
 
 
+
         private void frmMain_Load(object sender, EventArgs e)
         {
+
+
             // Initialize max timers
             btnResetMax_Click(null, null);
 
@@ -291,6 +302,9 @@ namespace TelemetryVibShaker
 
             // Load the settings for all controls in the form
             LoadSettings(this);
+
+            // Adjust affinity, priority class based on processor and previous saved settings - loaded in LoadSettings()
+            ProcessorCheck();
 
             // Restore previous location
             this.Location = new Point(Properties.Settings.Default.XCoordinate, Properties.Settings.Default.YCoordinate);
@@ -350,6 +364,7 @@ namespace TelemetryVibShaker
             ChangeStatus(btnSoundEffect2, true);
             ChangeStatus(btnJSONFile, true);
             ChangeStatus(txtListeningPort, true);
+            TestRoutines(true);
 
 
             // Adjust valid operations
@@ -436,8 +451,6 @@ namespace TelemetryVibShaker
 
         private void btnStartListening_Click(object sender, EventArgs e)
         {
-            // Display stats if required
-            if (chkChangeToMonitor.Checked) tabs.SelectTab(4);
 
             lastSecond = 0; // reset tracker
 
@@ -459,7 +472,7 @@ namespace TelemetryVibShaker
 
 
             // Check if the user has selected a valid audio device
-            if (cmbAudioDevice1.SelectedIndex == -1)
+            if (cmbAudioDevice1.SelectedIndex < 0)
             {
                 MessageBox.Show("Please select a valid audio device first.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 cmbAudioDevice1.Focus();
@@ -500,6 +513,7 @@ namespace TelemetryVibShaker
             ChangeStatus(btnSoundEffect2, false);
             ChangeStatus(btnJSONFile, false);
             ChangeStatus(txtListeningPort, false);
+            TestRoutines(false);
 
 
             // Adjust valid operations
@@ -507,8 +521,11 @@ namespace TelemetryVibShaker
             ChangeStatus(btnStop, true);
             toolStripStatusLabel1.Text = "Listening...";
 
-            timer1.Enabled = true;
+            // Display stats if required
+            if (chkChangeToMonitor.Checked) tabs.SelectTab(4);
 
+            // Start monitoring in UI
+            timer1.Enabled = true;
         }
 
         private void UpdateValue(Label L, int value)
@@ -796,44 +813,195 @@ namespace TelemetryVibShaker
             }
         }
 
-        private async void TestTWatchMotor_Click(object sender, EventArgs e)
+
+        public void PlaySound(string filePath, int audioDeviceId)
         {
-            byte[] parameters = { 100, 1 }; // [0]-Motor Vibration, [1]-Screen Color
-            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
-            await Task.Delay(800);
+            lblTestErrMsg.Text = String.Empty;
 
-            parameters[1] = 2; // Dark Green
-            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
-            await Task.Delay(800);
-
-            parameters[2] = 3; // TFT_GREEN
-            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
-            await Task.Delay(800);
-
-            parameters[2] = 4; // TFT_RED
-            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
-            await Task.Delay(800);
-
-            parameters[2] = 0; // TFT_BLACK
-            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
-
+            try
+            {
+                using (var audioFile = new AudioFileReader(filePath))
+                using (var outputDevice = new WaveOutEvent() { DeviceNumber = audioDeviceId })
+                {
+                    outputDevice.Init(audioFile);
+                    outputDevice.Play();
+                    while (outputDevice.PlaybackState == PlaybackState.Playing)
+                    {
+                        Thread.Sleep(1000);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                lblTestErrMsg.Text = ex.Message;
+            }
         }
 
-        private async void btnTestArduinoMotors_Click(object sender, EventArgs e)
+        private void TestSoundEffect1_Click(object sender, EventArgs e)
         {
+            PlaySound(txtSoundEffect1.Text, cmbAudioDevice1.SelectedIndex);
+        }
+
+        private void TestSoundEffect2_Click(object sender, EventArgs e)
+        {
+            PlaySound(txtSoundEffect2.Text, cmbAudioDevice1.SelectedIndex);
+        }
+
+        private void btnTestArduinoMotors_Click(object sender, EventArgs e)
+        {
+
+            lblTestErrMsg.Text = String.Empty;
+
             byte[] strengthvibration = { 200, 0 };
             SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), strengthvibration);
-            await Task.Delay(800);
+            Thread.Sleep(800);
 
             strengthvibration[0] = 0;
             strengthvibration[1] = 200;
             SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), strengthvibration);
-            await Task.Delay(800);
+            Thread.Sleep(800);
 
             // Turn motors off quickly
             strengthvibration[0] = 0;
             strengthvibration[1] = 0;
             SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), strengthvibration);
+
+        }
+
+        private void TestTWatchMotor_Click(object sender, EventArgs e)
+        {
+            lblTestErrMsg.Text = String.Empty;
+
+            byte[] parameters = { 100, 0 }; // [0]-Motor Vibration, [1]-Screen Color
+            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
+            Thread.Sleep(800);
+
+            parameters[0] = 0; // turn off motor vibration
+            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
+        }
+
+
+
+        private void TestTWatchDisplay_Click(object sender, EventArgs e)
+        {
+            lblTestErrMsg.Text = String.Empty;
+
+            byte[] parameters = { 0, 1 }; // [0]-Motor Vibration, [1]-Screen Color
+            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
+            Thread.Sleep(800);
+
+            parameters[1] = 2; // Dark Green
+            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters);
+            Thread.Sleep(800);
+
+            parameters[1] = 3; // TFT_GREEN
+            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters);
+            Thread.Sleep(800);
+
+            parameters[1] = 4; // TFT_RED
+            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters);
+            Thread.Sleep(800);
+
+            parameters[1] = 0; // TFT_BLACK
+            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters);
+
+        }
+
+        private void TestRoutines(bool Enabled)
+        {
+            btnTestTWatchDisplay.Enabled = Enabled;
+            btnTestTWatchMotor.Enabled = Enabled;
+
+            btnTestArduinoMotors.Enabled = Enabled;
+
+            btnTestSoundEffect1.Enabled = Enabled;
+            btnTestSoundEffect2.Enabled = Enabled;
+        }
+
+        private void cmbPriorityClass_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (currentProcess != null && cmbPriorityClass.Tag != null && (bool)cmbPriorityClass.Tag) // Ignore first change during InitializeComponent()
+            {
+                switch (cmbPriorityClass.SelectedIndex)
+                {
+                    case 0: //NORMAL
+                        currentProcess.PriorityClass = ProcessPriorityClass.Normal;
+                        break;
+                    case 1: // BELOW NORMAL
+                        currentProcess.PriorityClass = ProcessPriorityClass.BelowNormal;
+                        break;
+                    case 2: //IDLE
+                        currentProcess.PriorityClass = ProcessPriorityClass.Idle;
+                        break;
+                }
+            }
+
+            cmbPriorityClass.Tag = true;
+
+        }
+
+        private void ProcessorCheck()
+        {
+            // LoadSettings must be called before ProcessorCheck()
+
+            // Get the current process
+            currentProcess = Process.GetCurrentProcess();
+
+            // Assign only Efficiency cores if requested and CPU==12700K
+            chkUseEfficiencyCoresOnly_CheckedChanged(null, null);
+
+            
+            // Assign background mode if requested
+            if (chkUseBackgroundProcessing.Checked)
+                SetPriorityClass(currentProcess.Handle, PROCESS_MODE_BACKGROUND_BEGIN);
+
+
+            // Change the priority class to the previous setting selected (NORMAL, BELOW_NORMAL or IDLE)
+            //cmbPriorityClass.SelectedIndex = Properties.Settings.Default.PriorityClassSelectedIndex;
+            cmbPriorityClass_SelectedIndexChanged(null, null);
+
+        }
+
+        private void chkUseBackgroundProcessing_CheckedChanged(object sender, EventArgs e)
+        {
+            if (currentProcess == null) return;
+
+
+            if (chkUseBackgroundProcessing.Checked)
+                SetPriorityClass(currentProcess.Handle, PROCESS_MODE_BACKGROUND_BEGIN);
+            else
+                SetPriorityClass(currentProcess.Handle, PROCESS_MODE_BACKGROUND_END);
+
+        }
+
+        private void chkUseEfficiencyCoresOnly_CheckedChanged(object sender, EventArgs e)
+        {
+            if (currentProcess == null) return;
+
+
+            // Open the registry key for the processor
+            RegistryKey regKey = Registry.LocalMachine.OpenSubKey("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0");
+
+            // Read the processor name from the registry
+            string processorName = regKey.GetValue("ProcessorNameString").ToString();
+
+            // Check if the processor name contains "Intel 12700K"
+            if (processorName.Contains("12700K"))
+            {
+                chkUseEfficiencyCoresOnly.Visible = true;
+                if (chkUseEfficiencyCoresOnly.Checked)
+                {
+
+                    // Define the CPU affinity mask for CPUs 17 to 20
+                    // CPUs are zero-indexed, so CPU 17 is represented by bit 16, and so on.
+                    IntPtr affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
+
+                    // Set the CPU affinity
+                    currentProcess.ProcessorAffinity = affinityMask;
+                }
+            }
+
+            regKey.Close();
 
         }
     }

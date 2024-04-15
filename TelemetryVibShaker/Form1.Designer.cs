@@ -74,6 +74,10 @@
             label14 = new Label();
             label12 = new Label();
             tabSettings = new TabPage();
+            chkUseEfficiencyCoresOnly = new CheckBox();
+            chkUseBackgroundProcessing = new CheckBox();
+            cmbPriorityClass = new ComboBox();
+            label30 = new Label();
             nudMinSpeed = new NumericUpDown();
             label26 = new Label();
             label22 = new Label();
@@ -87,10 +91,10 @@
             label15 = new Label();
             Test = new TabPage();
             lblTestErrMsg = new Label();
-            TestTWatchDisplay = new Button();
-            TestTWatchMotor = new Button();
-            TestSoundEffect2 = new Button();
-            TestSoundEffect1 = new Button();
+            btnTestTWatchDisplay = new Button();
+            btnTestTWatchMotor = new Button();
+            btnTestSoundEffect2 = new Button();
+            btnTestSoundEffect1 = new Button();
             btnTestArduinoMotors = new Button();
             tabMonitor = new TabPage();
             panel1 = new Panel();
@@ -630,6 +634,10 @@
             // 
             // tabSettings
             // 
+            tabSettings.Controls.Add(chkUseEfficiencyCoresOnly);
+            tabSettings.Controls.Add(chkUseBackgroundProcessing);
+            tabSettings.Controls.Add(cmbPriorityClass);
+            tabSettings.Controls.Add(label30);
             tabSettings.Controls.Add(nudMinSpeed);
             tabSettings.Controls.Add(label26);
             tabSettings.Controls.Add(label22);
@@ -647,6 +655,51 @@
             tabSettings.TabIndex = 4;
             tabSettings.Text = "General Settings";
             tabSettings.UseVisualStyleBackColor = true;
+            // 
+            // chkUseEfficiencyCoresOnly
+            // 
+            chkUseEfficiencyCoresOnly.AutoSize = true;
+            chkUseEfficiencyCoresOnly.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            chkUseEfficiencyCoresOnly.ForeColor = Color.FromArgb(91, 155, 213);
+            chkUseEfficiencyCoresOnly.Location = new Point(17, 305);
+            chkUseEfficiencyCoresOnly.Name = "chkUseEfficiencyCoresOnly";
+            chkUseEfficiencyCoresOnly.Size = new Size(290, 19);
+            chkUseEfficiencyCoresOnly.TabIndex = 18;
+            chkUseEfficiencyCoresOnly.Text = "Use Efficiency cores only on Intel 12700K";
+            chkUseEfficiencyCoresOnly.UseVisualStyleBackColor = true;
+            chkUseEfficiencyCoresOnly.Visible = false;
+            chkUseEfficiencyCoresOnly.CheckedChanged += chkUseEfficiencyCoresOnly_CheckedChanged;
+            // 
+            // chkUseBackgroundProcessing
+            // 
+            chkUseBackgroundProcessing.AutoSize = true;
+            chkUseBackgroundProcessing.Location = new Point(17, 278);
+            chkUseBackgroundProcessing.Name = "chkUseBackgroundProcessing";
+            chkUseBackgroundProcessing.Size = new Size(206, 19);
+            chkUseBackgroundProcessing.TabIndex = 17;
+            chkUseBackgroundProcessing.Text = "Use background processing mode";
+            chkUseBackgroundProcessing.UseVisualStyleBackColor = true;
+            chkUseBackgroundProcessing.CheckedChanged += chkUseBackgroundProcessing_CheckedChanged;
+            // 
+            // cmbPriorityClass
+            // 
+            cmbPriorityClass.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbPriorityClass.FormattingEnabled = true;
+            cmbPriorityClass.Items.AddRange(new object[] { "NORMAL", "BELOW NORMAL", "IDLE" });
+            cmbPriorityClass.Location = new Point(144, 241);
+            cmbPriorityClass.Name = "cmbPriorityClass";
+            cmbPriorityClass.Size = new Size(121, 23);
+            cmbPriorityClass.TabIndex = 15;
+            cmbPriorityClass.SelectedIndexChanged += cmbPriorityClass_SelectedIndexChanged;
+            // 
+            // label30
+            // 
+            label30.AutoSize = true;
+            label30.Location = new Point(17, 244);
+            label30.Name = "label30";
+            label30.Size = new Size(121, 15);
+            label30.TabIndex = 14;
+            label30.Text = "Process Priority Class:";
             // 
             // nudMinSpeed
             // 
@@ -757,10 +810,10 @@
             // Test
             // 
             Test.Controls.Add(lblTestErrMsg);
-            Test.Controls.Add(TestTWatchDisplay);
-            Test.Controls.Add(TestTWatchMotor);
-            Test.Controls.Add(TestSoundEffect2);
-            Test.Controls.Add(TestSoundEffect1);
+            Test.Controls.Add(btnTestTWatchDisplay);
+            Test.Controls.Add(btnTestTWatchMotor);
+            Test.Controls.Add(btnTestSoundEffect2);
+            Test.Controls.Add(btnTestSoundEffect1);
             Test.Controls.Add(btnTestArduinoMotors);
             Test.Location = new Point(4, 24);
             Test.Name = "Test";
@@ -780,42 +833,45 @@
             lblTestErrMsg.Text = "error msg";
             lblTestErrMsg.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // TestTWatchDisplay
+            // btnTestTWatchDisplay
             // 
-            TestTWatchDisplay.Location = new Point(282, 82);
-            TestTWatchDisplay.Name = "TestTWatchDisplay";
-            TestTWatchDisplay.Size = new Size(178, 23);
-            TestTWatchDisplay.TabIndex = 4;
-            TestTWatchDisplay.Text = "Test T-Watch Display";
-            TestTWatchDisplay.UseVisualStyleBackColor = true;
+            btnTestTWatchDisplay.Location = new Point(282, 82);
+            btnTestTWatchDisplay.Name = "btnTestTWatchDisplay";
+            btnTestTWatchDisplay.Size = new Size(178, 23);
+            btnTestTWatchDisplay.TabIndex = 4;
+            btnTestTWatchDisplay.Text = "Test T-Watch Display";
+            btnTestTWatchDisplay.UseVisualStyleBackColor = true;
+            btnTestTWatchDisplay.Click += TestTWatchDisplay_Click;
             // 
-            // TestTWatchMotor
+            // btnTestTWatchMotor
             // 
-            TestTWatchMotor.Location = new Point(282, 30);
-            TestTWatchMotor.Name = "TestTWatchMotor";
-            TestTWatchMotor.Size = new Size(178, 23);
-            TestTWatchMotor.TabIndex = 3;
-            TestTWatchMotor.Text = "Test T-Watch Motor";
-            TestTWatchMotor.UseVisualStyleBackColor = true;
-            TestTWatchMotor.Click += TestTWatchMotor_Click;
+            btnTestTWatchMotor.Location = new Point(282, 30);
+            btnTestTWatchMotor.Name = "btnTestTWatchMotor";
+            btnTestTWatchMotor.Size = new Size(178, 23);
+            btnTestTWatchMotor.TabIndex = 3;
+            btnTestTWatchMotor.Text = "Test T-Watch Motor";
+            btnTestTWatchMotor.UseVisualStyleBackColor = true;
+            btnTestTWatchMotor.Click += TestTWatchMotor_Click;
             // 
-            // TestSoundEffect2
+            // btnTestSoundEffect2
             // 
-            TestSoundEffect2.Location = new Point(29, 139);
-            TestSoundEffect2.Name = "TestSoundEffect2";
-            TestSoundEffect2.Size = new Size(178, 23);
-            TestSoundEffect2.TabIndex = 2;
-            TestSoundEffect2.Text = "Test Sound Effect 2";
-            TestSoundEffect2.UseVisualStyleBackColor = true;
+            btnTestSoundEffect2.Location = new Point(29, 139);
+            btnTestSoundEffect2.Name = "btnTestSoundEffect2";
+            btnTestSoundEffect2.Size = new Size(178, 23);
+            btnTestSoundEffect2.TabIndex = 2;
+            btnTestSoundEffect2.Text = "Test Sound Effect 2";
+            btnTestSoundEffect2.UseVisualStyleBackColor = true;
+            btnTestSoundEffect2.Click += TestSoundEffect2_Click;
             // 
-            // TestSoundEffect1
+            // btnTestSoundEffect1
             // 
-            TestSoundEffect1.Location = new Point(29, 82);
-            TestSoundEffect1.Name = "TestSoundEffect1";
-            TestSoundEffect1.Size = new Size(178, 23);
-            TestSoundEffect1.TabIndex = 1;
-            TestSoundEffect1.Text = "Test Sound Effect 1";
-            TestSoundEffect1.UseVisualStyleBackColor = true;
+            btnTestSoundEffect1.Location = new Point(29, 82);
+            btnTestSoundEffect1.Name = "btnTestSoundEffect1";
+            btnTestSoundEffect1.Size = new Size(178, 23);
+            btnTestSoundEffect1.TabIndex = 1;
+            btnTestSoundEffect1.Text = "Test Sound Effect 1";
+            btnTestSoundEffect1.UseVisualStyleBackColor = true;
+            btnTestSoundEffect1.Click += TestSoundEffect1_Click;
             // 
             // btnTestArduinoMotors
             // 
@@ -1350,10 +1406,14 @@
         private Label label27;
         private TabPage Test;
         private Button btnTestArduinoMotors;
-        private Button TestSoundEffect1;
-        private Button TestSoundEffect2;
-        private Button TestTWatchDisplay;
-        private Button TestTWatchMotor;
+        private Button btnTestSoundEffect1;
+        private Button btnTestSoundEffect2;
+        private Button btnTestTWatchDisplay;
+        private Button btnTestTWatchMotor;
         private Label lblTestErrMsg;
+        private Label label30;
+        private ComboBox cmbPriorityClass;
+        private CheckBox chkUseBackgroundProcessing;
+        private CheckBox chkUseEfficiencyCoresOnly;
     }
 }
