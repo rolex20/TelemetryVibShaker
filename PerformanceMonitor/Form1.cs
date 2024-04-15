@@ -210,8 +210,8 @@ namespace PerformanceMonitor
             cmbPriorityClass_SelectedIndexChanged(null, null);
 
 
-            cmbPriorityClass.Tag = false; // Flag to ignore cmbPriorityClass.OnChange() once
-            cmbPriorityClass.SelectedIndex = 1;  // BELOW NORMAL
+            //cmbPriorityClass.Tag = false; // Flag to ignore cmbPriorityClass.OnChange() once
+            //cmbPriorityClass.SelectedIndex = 1;  // BELOW NORMAL
 
 
             diskCounterC = new PerformanceCounter("PhysicalDisk", "Disk Bytes/sec", "0 C:", true);
