@@ -32,7 +32,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             tabs = new TabControl();
             tabNormalSoundEffects = new TabPage();
-            comboBox1 = new ComboBox();
             cmbAudioDevice1 = new ComboBox();
             label33 = new Label();
             chkEnableAoASoundEffects2 = new CheckBox();
@@ -152,12 +151,11 @@
             tabs.Location = new Point(24, 14);
             tabs.Name = "tabs";
             tabs.SelectedIndex = 0;
-            tabs.Size = new Size(517, 418);
+            tabs.Size = new Size(517, 415);
             tabs.TabIndex = 0;
             // 
             // tabNormalSoundEffects
             // 
-            tabNormalSoundEffects.Controls.Add(comboBox1);
             tabNormalSoundEffects.Controls.Add(cmbAudioDevice1);
             tabNormalSoundEffects.Controls.Add(label33);
             tabNormalSoundEffects.Controls.Add(chkEnableAoASoundEffects2);
@@ -178,23 +176,15 @@
             tabNormalSoundEffects.Location = new Point(4, 24);
             tabNormalSoundEffects.Name = "tabNormalSoundEffects";
             tabNormalSoundEffects.Padding = new Padding(3);
-            tabNormalSoundEffects.Size = new Size(509, 390);
+            tabNormalSoundEffects.Size = new Size(509, 387);
             tabNormalSoundEffects.TabIndex = 0;
             tabNormalSoundEffects.Text = "Sound Effects";
             tabNormalSoundEffects.UseVisualStyleBackColor = true;
             // 
-            // comboBox1
-            // 
-            comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(103, 24);
-            comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(343, 23);
-            comboBox1.TabIndex = 17;
-            // 
             // cmbAudioDevice1
             // 
             cmbAudioDevice1.FormattingEnabled = true;
-            cmbAudioDevice1.Location = new Point(103, 77);
+            cmbAudioDevice1.Location = new Point(103, 76);
             cmbAudioDevice1.Name = "cmbAudioDevice1";
             cmbAudioDevice1.Size = new Size(343, 23);
             cmbAudioDevice1.TabIndex = 16;
@@ -202,7 +192,7 @@
             // label33
             // 
             label33.AutoSize = true;
-            label33.Location = new Point(17, 80);
+            label33.Location = new Point(17, 79);
             label33.Name = "label33";
             label33.Size = new Size(80, 15);
             label33.TabIndex = 15;
@@ -213,7 +203,7 @@
             chkEnableAoASoundEffects2.AutoSize = true;
             chkEnableAoASoundEffects2.Checked = true;
             chkEnableAoASoundEffects2.CheckState = CheckState.Checked;
-            chkEnableAoASoundEffects2.Location = new Point(19, 255);
+            chkEnableAoASoundEffects2.Location = new Point(19, 254);
             chkEnableAoASoundEffects2.Name = "chkEnableAoASoundEffects2";
             chkEnableAoASoundEffects2.Size = new Size(268, 19);
             chkEnableAoASoundEffects2.TabIndex = 14;
@@ -224,7 +214,7 @@
             // lblVolumeMultiplier2
             // 
             lblVolumeMultiplier2.AutoSize = true;
-            lblVolumeMultiplier2.Location = new Point(454, 343);
+            lblVolumeMultiplier2.Location = new Point(454, 342);
             lblVolumeMultiplier2.Name = "lblVolumeMultiplier2";
             lblVolumeMultiplier2.Size = new Size(111, 15);
             lblVolumeMultiplier2.TabIndex = 13;
@@ -233,7 +223,7 @@
             // trkVolumeMultiplier2
             // 
             trkVolumeMultiplier2.LargeChange = 10;
-            trkVolumeMultiplier2.Location = new Point(126, 334);
+            trkVolumeMultiplier2.Location = new Point(126, 333);
             trkVolumeMultiplier2.Maximum = 100;
             trkVolumeMultiplier2.Minimum = 1;
             trkVolumeMultiplier2.Name = "trkVolumeMultiplier2";
@@ -248,7 +238,7 @@
             // label34
             // 
             label34.AutoSize = true;
-            label34.Location = new Point(19, 343);
+            label34.Location = new Point(19, 342);
             label34.Name = "label34";
             label34.Size = new Size(101, 15);
             label34.TabIndex = 11;
@@ -256,7 +246,7 @@
             // 
             // label4
             // 
-            label4.Location = new Point(17, 15);
+            label4.Location = new Point(17, 14);
             label4.Name = "label4";
             label4.Size = new Size(476, 52);
             label4.TabIndex = 10;
@@ -267,7 +257,7 @@
             chkEnableAoASoundEffects1.AutoSize = true;
             chkEnableAoASoundEffects1.Checked = true;
             chkEnableAoASoundEffects1.CheckState = CheckState.Checked;
-            chkEnableAoASoundEffects1.Location = new Point(17, 115);
+            chkEnableAoASoundEffects1.Location = new Point(17, 114);
             chkEnableAoASoundEffects1.Name = "chkEnableAoASoundEffects1";
             chkEnableAoASoundEffects1.Size = new Size(282, 19);
             chkEnableAoASoundEffects1.TabIndex = 9;
@@ -277,7 +267,7 @@
             // 
             // btnSoundEffect2
             // 
-            btnSoundEffect2.Location = new Point(456, 303);
+            btnSoundEffect2.Location = new Point(456, 302);
             btnSoundEffect2.Name = "btnSoundEffect2";
             btnSoundEffect2.Size = new Size(37, 23);
             btnSoundEffect2.TabIndex = 8;
@@ -288,7 +278,7 @@
             // 
             // btnSoundEffect1
             // 
-            btnSoundEffect1.Location = new Point(456, 167);
+            btnSoundEffect1.Location = new Point(456, 166);
             btnSoundEffect1.Name = "btnSoundEffect1";
             btnSoundEffect1.Size = new Size(37, 23);
             btnSoundEffect1.TabIndex = 7;
@@ -300,7 +290,7 @@
             // lblVolumeMultiplier1
             // 
             lblVolumeMultiplier1.AutoSize = true;
-            lblVolumeMultiplier1.Location = new Point(456, 204);
+            lblVolumeMultiplier1.Location = new Point(456, 203);
             lblVolumeMultiplier1.Name = "lblVolumeMultiplier1";
             lblVolumeMultiplier1.Size = new Size(111, 15);
             lblVolumeMultiplier1.TabIndex = 6;
@@ -309,7 +299,7 @@
             // trkVolumeMultiplier1
             // 
             trkVolumeMultiplier1.LargeChange = 10;
-            trkVolumeMultiplier1.Location = new Point(124, 195);
+            trkVolumeMultiplier1.Location = new Point(124, 194);
             trkVolumeMultiplier1.Maximum = 100;
             trkVolumeMultiplier1.Minimum = 1;
             trkVolumeMultiplier1.Name = "trkVolumeMultiplier1";
@@ -324,7 +314,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(17, 204);
+            label3.Location = new Point(17, 203);
             label3.Name = "label3";
             label3.Size = new Size(101, 15);
             label3.TabIndex = 4;
@@ -332,7 +322,7 @@
             // 
             // txtSoundEffect2
             // 
-            txtSoundEffect2.Location = new Point(17, 304);
+            txtSoundEffect2.Location = new Point(17, 303);
             txtSoundEffect2.Name = "txtSoundEffect2";
             txtSoundEffect2.Size = new Size(429, 23);
             txtSoundEffect2.TabIndex = 3;
@@ -341,7 +331,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(17, 286);
+            label2.Location = new Point(17, 285);
             label2.Name = "label2";
             label2.Size = new Size(255, 15);
             label2.TabIndex = 2;
@@ -349,7 +339,7 @@
             // 
             // txtSoundEffect1
             // 
-            txtSoundEffect1.Location = new Point(17, 167);
+            txtSoundEffect1.Location = new Point(17, 166);
             txtSoundEffect1.Name = "txtSoundEffect1";
             txtSoundEffect1.Size = new Size(429, 23);
             txtSoundEffect1.TabIndex = 1;
@@ -358,7 +348,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(17, 149);
+            label1.Location = new Point(17, 148);
             label1.Name = "label1";
             label1.Size = new Size(225, 15);
             label1.TabIndex = 0;
@@ -1075,7 +1065,7 @@
             // 
             // btnStartListening
             // 
-            btnStartListening.Location = new Point(346, 435);
+            btnStartListening.Location = new Point(346, 432);
             btnStartListening.Name = "btnStartListening";
             btnStartListening.Size = new Size(100, 23);
             btnStartListening.TabIndex = 0;
@@ -1086,7 +1076,7 @@
             // btnStop
             // 
             btnStop.Enabled = false;
-            btnStop.Location = new Point(462, 435);
+            btnStop.Location = new Point(462, 432);
             btnStop.Name = "btnStop";
             btnStop.Size = new Size(75, 23);
             btnStop.TabIndex = 2;
@@ -1107,7 +1097,7 @@
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
-            statusStrip1.Location = new Point(0, 466);
+            statusStrip1.Location = new Point(0, 460);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(566, 22);
             statusStrip1.TabIndex = 3;
@@ -1121,7 +1111,7 @@
             // 
             // btnResetMax
             // 
-            btnResetMax.Location = new Point(24, 435);
+            btnResetMax.Location = new Point(24, 432);
             btnResetMax.Name = "btnResetMax";
             btnResetMax.Size = new Size(75, 23);
             btnResetMax.TabIndex = 4;
@@ -1135,7 +1125,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnStop;
-            ClientSize = new Size(566, 488);
+            ClientSize = new Size(566, 482);
             Controls.Add(btnResetMax);
             Controls.Add(statusStrip1);
             Controls.Add(btnStop);
@@ -1262,7 +1252,6 @@
         private Label label22;
         private NumericUpDown nudMinSpeed;
         private Label label26;
-        private ComboBox comboBox1;
         private Label label28;
         private Label lblLastProcessorUsedUDP;
         private Label lblProcessingTimeUI;

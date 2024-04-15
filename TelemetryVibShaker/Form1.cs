@@ -113,22 +113,13 @@ namespace TelemetryVibShaker
 
         }
 
-        private void fillAudioDevices()
+        private void FillAudioDevices()
         {
-            // create a device enumerator
-            var enumerator = new MMDeviceEnumerator();
-
-            for (int i = 0; i < WaveOut.DeviceCount; i++)
-            {
-                var device = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)[i];
-
-                cmbAudioDevice1.Items.Add(device.FriendlyName);
-            }
-
-            for (int n = -1; n < WaveOut.DeviceCount; n++)
+            // Skip the -1 Microsoft Audio Mapper
+            for (int n = 0; n < WaveOut.DeviceCount; n++)
             {
                 var capabilities = WaveOut.GetCapabilities(n);
-                comboBox1.Items.Add($"{n}: {capabilities.ProductName}");
+                cmbAudioDevice1.Items.Add(capabilities.ProductName);
             }
         }
 
@@ -294,7 +285,7 @@ namespace TelemetryVibShaker
             arduinoEffects = null;
 
 
-            fillAudioDevices();
+            FillAudioDevices();
 
             // Load the settings for all controls in the form
             LoadSettings(this);
