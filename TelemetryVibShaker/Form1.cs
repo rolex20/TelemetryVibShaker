@@ -517,6 +517,15 @@ namespace TelemetryVibShaker
             }
         }
 
+        private void UpdateValue(Label L, string value)
+        {
+            if (!L.Tag.Equals(value))
+            {
+                L.Tag = value;
+                L.Text = value;
+            } 
+        }
+
         private void UpdateMaxUIProcessingTime()
         {
             UpdateValue(lblProcessingTimeUI, maxUIProcessingTime); // this might be delayed by one cycle, but it's ok
@@ -558,11 +567,7 @@ namespace TelemetryVibShaker
                 UpdateSoundEffectStatus(soundManager.Status);
 
                 // Report Current Unit Type
-                if (!telemetry.CurrentUnitType.Equals(lblCurrentUnitType.Tag))
-                {
-                    lblCurrentUnitType.Tag = telemetry.CurrentUnitType;
-                    lblCurrentUnitType.Text = telemetry.CurrentUnitType + " (" + soundManager.AoA1.ToString() + ", " + soundManager.AoA2.ToString() + ")";
-                }
+                UpdateValue(lblCurrentUnitType, telemetry.CurrentUnitType);
 
                 // Report the last AoA received
                 UpdateValue(lblLastAoA, telemetry.LastData.AoA);
