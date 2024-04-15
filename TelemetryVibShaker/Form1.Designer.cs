@@ -151,7 +151,7 @@
             tabs.Location = new Point(24, 14);
             tabs.Name = "tabs";
             tabs.SelectedIndex = 0;
-            tabs.Size = new Size(517, 415);
+            tabs.Size = new Size(517, 412);
             tabs.TabIndex = 0;
             // 
             // tabNormalSoundEffects
@@ -176,7 +176,7 @@
             tabNormalSoundEffects.Location = new Point(4, 24);
             tabNormalSoundEffects.Name = "tabNormalSoundEffects";
             tabNormalSoundEffects.Padding = new Padding(3);
-            tabNormalSoundEffects.Size = new Size(509, 387);
+            tabNormalSoundEffects.Size = new Size(509, 384);
             tabNormalSoundEffects.TabIndex = 0;
             tabNormalSoundEffects.Text = "Sound Effects";
             tabNormalSoundEffects.UseVisualStyleBackColor = true;
@@ -751,7 +751,7 @@
             tabMonitor.Controls.Add(chkChangeToMonitor);
             tabMonitor.Location = new Point(4, 24);
             tabMonitor.Name = "tabMonitor";
-            tabMonitor.Size = new Size(509, 387);
+            tabMonitor.Size = new Size(509, 355);
             tabMonitor.TabIndex = 3;
             tabMonitor.Text = "Monitor";
             tabMonitor.UseVisualStyleBackColor = true;
@@ -792,7 +792,7 @@
             // lblUIThreadID
             // 
             lblUIThreadID.AutoSize = true;
-            lblUIThreadID.Location = new Point(327, 11);
+            lblUIThreadID.Location = new Point(315, 11);
             lblUIThreadID.Name = "lblUIThreadID";
             lblUIThreadID.Size = new Size(27, 15);
             lblUIThreadID.TabIndex = 27;
@@ -801,11 +801,12 @@
             // label27
             // 
             label27.AutoSize = true;
-            label27.Location = new Point(244, 11);
+            label27.Location = new Point(231, 11);
             label27.Name = "label27";
             label27.Size = new Size(74, 15);
             label27.TabIndex = 26;
             label27.Text = "UI Thread ID:";
+            label27.TextAlign = ContentAlignment.TopRight;
             // 
             // lblLastProcessorUsedUI
             // 
@@ -877,7 +878,7 @@
             // lblUDPServerThread
             // 
             lblUDPServerThread.AutoSize = true;
-            lblUDPServerThread.Location = new Point(151, 11);
+            lblUDPServerThread.Location = new Point(153, 11);
             lblUDPServerThread.Name = "lblUDPServerThread";
             lblUDPServerThread.Size = new Size(22, 15);
             lblUDPServerThread.TabIndex = 18;
@@ -910,11 +911,12 @@
             label32.Size = new Size(37, 15);
             label32.TabIndex = 15;
             label32.Text = "Flaps:";
+            label32.TextAlign = ContentAlignment.TopRight;
             // 
             // lblDatagramsPerSecond
             // 
             lblDatagramsPerSecond.AutoSize = true;
-            lblDatagramsPerSecond.Location = new Point(425, 40);
+            lblDatagramsPerSecond.Location = new Point(315, 40);
             lblDatagramsPerSecond.Name = "lblDatagramsPerSecond";
             lblDatagramsPerSecond.Size = new Size(49, 15);
             lblDatagramsPerSecond.TabIndex = 14;
@@ -925,11 +927,13 @@
             // label29
             // 
             label29.AutoSize = true;
-            label29.Location = new Point(244, 40);
+            label29.Location = new Point(274, 40);
             label29.Name = "label29";
-            label29.Size = new Size(175, 15);
+            label29.Size = new Size(32, 15);
             label29.TabIndex = 13;
-            label29.Text = "Datagrams received per second:";
+            label29.Text = "Dg/s";
+            label29.TextAlign = ContentAlignment.TopRight;
+            toolTip1.SetToolTip(label29, "Datagrams received per second.");
             // 
             // lblProcessingTimeUDP
             // 
@@ -1000,6 +1004,7 @@
             lblLastAoA.TabIndex = 5;
             lblLastAoA.Tag = "0";
             lblLastAoA.Text = "none";
+            lblLastAoA.TextAlign = ContentAlignment.TopRight;
             // 
             // label24
             // 
@@ -1009,6 +1014,7 @@
             label24.Size = new Size(79, 15);
             label24.TabIndex = 7;
             label24.Text = "Speed Brakes:";
+            label24.TextAlign = ContentAlignment.TopRight;
             // 
             // label21
             // 
@@ -1065,7 +1071,7 @@
             // 
             // btnStartListening
             // 
-            btnStartListening.Location = new Point(346, 432);
+            btnStartListening.Location = new Point(346, 428);
             btnStartListening.Name = "btnStartListening";
             btnStartListening.Size = new Size(100, 23);
             btnStartListening.TabIndex = 0;
@@ -1076,7 +1082,7 @@
             // btnStop
             // 
             btnStop.Enabled = false;
-            btnStop.Location = new Point(462, 432);
+            btnStop.Location = new Point(462, 428);
             btnStop.Name = "btnStop";
             btnStop.Size = new Size(75, 23);
             btnStop.TabIndex = 2;
@@ -1097,7 +1103,7 @@
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
-            statusStrip1.Location = new Point(0, 460);
+            statusStrip1.Location = new Point(0, 456);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(566, 22);
             statusStrip1.TabIndex = 3;
@@ -1111,7 +1117,7 @@
             // 
             // btnResetMax
             // 
-            btnResetMax.Location = new Point(24, 432);
+            btnResetMax.Location = new Point(24, 428);
             btnResetMax.Name = "btnResetMax";
             btnResetMax.Size = new Size(75, 23);
             btnResetMax.TabIndex = 4;
@@ -1125,7 +1131,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnStop;
-            ClientSize = new Size(566, 482);
+            ClientSize = new Size(566, 478);
             Controls.Add(btnResetMax);
             Controls.Add(statusStrip1);
             Controls.Add(btnStop);
