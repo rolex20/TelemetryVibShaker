@@ -183,6 +183,7 @@
             // 
             // cmbAudioDevice1
             // 
+            cmbAudioDevice1.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbAudioDevice1.FormattingEnabled = true;
             cmbAudioDevice1.Location = new Point(103, 76);
             cmbAudioDevice1.Name = "cmbAudioDevice1";
@@ -374,7 +375,7 @@
             tabArduino.Location = new Point(4, 24);
             tabArduino.Name = "tabArduino";
             tabArduino.Padding = new Padding(3);
-            tabArduino.Size = new Size(509, 387);
+            tabArduino.Size = new Size(509, 384);
             tabArduino.TabIndex = 1;
             tabArduino.Text = "Arduino";
             tabArduino.UseVisualStyleBackColor = true;
@@ -546,7 +547,7 @@
             tabTTGO20V3.Location = new Point(4, 24);
             tabTTGO20V3.Name = "tabTTGO20V3";
             tabTTGO20V3.Padding = new Padding(3);
-            tabTTGO20V3.Size = new Size(509, 387);
+            tabTTGO20V3.Size = new Size(509, 384);
             tabTTGO20V3.TabIndex = 2;
             tabTTGO20V3.Text = "T-Watch 2020 V3";
             tabTTGO20V3.UseVisualStyleBackColor = true;
@@ -633,7 +634,7 @@
             tabSettings.Controls.Add(label15);
             tabSettings.Location = new Point(4, 24);
             tabSettings.Name = "tabSettings";
-            tabSettings.Size = new Size(509, 387);
+            tabSettings.Size = new Size(509, 384);
             tabSettings.TabIndex = 4;
             tabSettings.Text = "General Settings";
             tabSettings.UseVisualStyleBackColor = true;
@@ -751,7 +752,7 @@
             tabMonitor.Controls.Add(chkChangeToMonitor);
             tabMonitor.Location = new Point(4, 24);
             tabMonitor.Name = "tabMonitor";
-            tabMonitor.Size = new Size(509, 355);
+            tabMonitor.Size = new Size(509, 384);
             tabMonitor.TabIndex = 3;
             tabMonitor.Text = "Monitor";
             tabMonitor.UseVisualStyleBackColor = true;
