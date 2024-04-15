@@ -572,6 +572,9 @@ namespace TelemetryVibShaker
                     // UI Reporting takes so little time when there are no updates, let's continue and report
                     //return; // if no value has been received yet, don't update nothing else
                 }
+                lblCurrentUnitType.Tag = telemetry.CurrentUnitType;
+                lblCurrentUnitType.Text = telemetry.CurrentUnitType + " (" + soundManager.AoA1.ToString() + ", " + soundManager.AoA2.ToString() + ")";
+
 
                 // Report the last AoA received
                 UpdateValue(lblLastAoA, telemetry.LastData.AoA);
