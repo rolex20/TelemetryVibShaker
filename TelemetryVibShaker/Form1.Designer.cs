@@ -89,8 +89,8 @@
             lblTestErrMsg = new Label();
             btnTestTWatchDisplay = new Button();
             btnTestTWatchMotor = new Button();
-            TestSoundEffect2 = new Button();
-            TestSoundEffect1 = new Button();
+            btnTestSoundEffect2 = new Button();
+            btnTestSoundEffect1 = new Button();
             btnTestArduinoMotors = new Button();
             tabMonitor = new TabPage();
             panel1 = new Panel();
@@ -759,8 +759,8 @@
             Test.Controls.Add(lblTestErrMsg);
             Test.Controls.Add(btnTestTWatchDisplay);
             Test.Controls.Add(btnTestTWatchMotor);
-            Test.Controls.Add(TestSoundEffect2);
-            Test.Controls.Add(TestSoundEffect1);
+            Test.Controls.Add(btnTestSoundEffect2);
+            Test.Controls.Add(btnTestSoundEffect1);
             Test.Controls.Add(btnTestArduinoMotors);
             Test.Location = new Point(4, 24);
             Test.Name = "Test";
@@ -800,25 +800,25 @@
             btnTestTWatchMotor.UseVisualStyleBackColor = true;
             btnTestTWatchMotor.Click += TestTWatchMotor_Click;
             // 
-            // TestSoundEffect2
+            // btnTestSoundEffect2
             // 
-            TestSoundEffect2.Location = new Point(29, 139);
-            TestSoundEffect2.Name = "TestSoundEffect2";
-            TestSoundEffect2.Size = new Size(178, 23);
-            TestSoundEffect2.TabIndex = 2;
-            TestSoundEffect2.Text = "Test Sound Effect 2";
-            TestSoundEffect2.UseVisualStyleBackColor = true;
-            TestSoundEffect2.Click += TestSoundEffect2_Click;
+            btnTestSoundEffect2.Location = new Point(29, 139);
+            btnTestSoundEffect2.Name = "btnTestSoundEffect2";
+            btnTestSoundEffect2.Size = new Size(178, 23);
+            btnTestSoundEffect2.TabIndex = 2;
+            btnTestSoundEffect2.Text = "Test Sound Effect 2";
+            btnTestSoundEffect2.UseVisualStyleBackColor = true;
+            btnTestSoundEffect2.Click += TestSoundEffect2_Click;
             // 
-            // TestSoundEffect1
+            // btnTestSoundEffect1
             // 
-            TestSoundEffect1.Location = new Point(29, 82);
-            TestSoundEffect1.Name = "TestSoundEffect1";
-            TestSoundEffect1.Size = new Size(178, 23);
-            TestSoundEffect1.TabIndex = 1;
-            TestSoundEffect1.Text = "Test Sound Effect 1";
-            TestSoundEffect1.UseVisualStyleBackColor = true;
-            TestSoundEffect1.Click += TestSoundEffect1_Click;
+            btnTestSoundEffect1.Location = new Point(29, 82);
+            btnTestSoundEffect1.Name = "btnTestSoundEffect1";
+            btnTestSoundEffect1.Size = new Size(178, 23);
+            btnTestSoundEffect1.TabIndex = 1;
+            btnTestSoundEffect1.Text = "Test Sound Effect 1";
+            btnTestSoundEffect1.UseVisualStyleBackColor = true;
+            btnTestSoundEffect1.Click += TestSoundEffect1_Click;
             // 
             // btnTestArduinoMotors
             // 
@@ -1353,8 +1353,8 @@
         private Label label27;
         private TabPage Test;
         private Button btnTestArduinoMotors;
-        private Button TestSoundEffect1;
-        private Button TestSoundEffect2;
+        private Button btnTestSoundEffect1;
+        private Button btnTestSoundEffect2;
         private Button btnTestTWatchDisplay;
         private Button btnTestTWatchMotor;
         private Label lblTestErrMsg;

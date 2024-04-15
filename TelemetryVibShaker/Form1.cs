@@ -898,6 +898,9 @@ namespace TelemetryVibShaker
             btnTestTWatchMotor.Enabled = Enabled;
 
             btnTestArduinoMotors.Enabled = Enabled;
+
+            btnTestSoundEffect1.Enabled = Enabled;
+            btnTestSoundEffect2.Enabled = Enabled;
         }
     }
 }
