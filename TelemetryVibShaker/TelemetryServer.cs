@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Text.Json;
 using System.Text;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 
 namespace TelemetryVibShaker
@@ -13,6 +14,8 @@ namespace TelemetryVibShaker
         public TelemetryData LastData; // last telemetry datagram received
         public int DPS; // datagrams received per second
         public int MaxProcessingTime; // time of the datagram that took longer to process
+        public int LastProcessorUsed; // processor used in the last udp packet received
+        public int ThreadId; // OS Thread ID for the UDP Telemetry Server
         public string CurrentUnitType; // current type of aircraft used by the player
 
         private AoA_SoundManager soundManager;
@@ -23,6 +26,13 @@ namespace TelemetryVibShaker
         private int listeningPort;
         private UdpClient listenerUdp;
         public int MinSpeed; // km/h (below this speed, effects won't be active)
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern uint GetCurrentProcessorNumber();
+
+        [DllImport("kernel32.dll")]
+        public static extern uint GetCurrentThreadId();
+
 
         public string CurrentUnitInfo { 
             get 
@@ -90,9 +100,10 @@ namespace TelemetryVibShaker
         public void Run()
         {
             cancelationToken = false;
-            CurrentUnitType = "none";
+            CurrentUnitType = "[no unit information received]";
             lastErrorMsg = string.Empty;
             MaxProcessingTime = -1;
+            LastProcessorUsed = -1;
             DPS = 0;
             int iDPS = 0; // intermediate DPS
 
@@ -115,7 +126,10 @@ namespace TelemetryVibShaker
             {
                 try
                 {
+                    ThreadId = (int)GetCurrentThreadId(); // Let's see if it changes on receiving packets
                     receiveData = listenerUdp.Receive(ref sender); // Wait here until a new datagram is received
+                    if (Statistics) stopwatch.Restart();  // Track the time to process this datagram
+                    LastProcessorUsed = (int)GetCurrentProcessorNumber();
                 }
                 catch (Exception ex)
                 {
@@ -128,13 +142,9 @@ namespace TelemetryVibShaker
                 }
 
 
-                // Process the datagram received
+                /* Process the datagram received */
 
 
-                if (Statistics) stopwatch.Restart();  // Track the time to process this datagram
-                //bool needs_update = false;
-
-                //string datagram = Encoding.ASCII.GetString(receiveData, 0, receiveData.Length);
 
                 // Update Statistics and UI status controls
                 long newSecond = Environment.TickCount64 / 1000;
@@ -161,14 +171,16 @@ namespace TelemetryVibShaker
                 // Flaps possible values: 0-100
                 // Speed (optional): 0-255.  Units in 10th's of Km, so 10 is 100Km
 
-                if ( (receiveData.Length == 3) || (receiveData.Length == 4))
+                if ( receiveData.Length <= 4)
                 {
                     // Obtain telemetry data
                     LastData.AoA = receiveData[0];
                     LastData.SpeedBrakes = receiveData[1];
                     LastData.Flaps = receiveData[2];
 
-                    /* Speed Conversion
+                    
+                    
+                    /* Speed Reception and Conversion
                      * receivedData[3] is in decameters/s
                      * This unit was selected to make it fit in 8 bits (1 byte)
                      * Since it is received obviously without decimals, some resolution is lost but not needed in this program.
@@ -176,9 +188,12 @@ namespace TelemetryVibShaker
                      * km/h = decameters per second x 36
                      */
                     if (receiveData.Length == 4)
-                        LastData.Speed = receiveData[3] * 36;// Speed now is in km/h
+                        LastData.Speed = receiveData[3] * 36; // After this, Speed now is in km/h
 
+
+                    // Process the Effects only if the current plane is moving above the MinSpeed required by the user
                     if (LastData.Speed >= MinSpeed) { 
+                        
                         // Update the sound effects
                         soundManager.UpdateEffect(LastData.AoA);
 
@@ -192,7 +207,7 @@ namespace TelemetryVibShaker
                 {
                     string datagram = Encoding.ASCII.GetString(receiveData, 0, receiveData.Length);
                     var unit = jsonRoot.units.unit.FirstOrDefault(u => u.typeName == datagram);
-                    string lastUnitType = datagram;
+                    CurrentUnitType = datagram;
 
                     // Signal that we haven't received yet new AoA telemetry
                     LastData.AoA = -1; 
@@ -217,16 +232,14 @@ namespace TelemetryVibShaker
                             vibMotor[i].ChangeAoARange(360, 360);
 
                     }
-
-                    // this is not expected to change often, so I am ok with updating it as soon as possible
-                    if (CurrentUnitType != lastUnitType) CurrentUnitType = lastUnitType;
+                    
                 }
 
                 if (Statistics) 
                 {
                     stopwatch.Stop(); // at this point the datagram has been fully processed
-                    TimeSpan elapsed = stopwatch.Elapsed;
-                    if (MaxProcessingTime < elapsed.Milliseconds) MaxProcessingTime = elapsed.Milliseconds;
+                    int elapsed = stopwatch.Elapsed.Milliseconds;
+                    if (MaxProcessingTime < elapsed) MaxProcessingTime = elapsed;
                 }
 
             } // end-while

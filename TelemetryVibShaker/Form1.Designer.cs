@@ -32,7 +32,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             tabs = new TabControl();
             tabNormalSoundEffects = new TabPage();
-            comboBox1 = new ComboBox();
             cmbAudioDevice1 = new ComboBox();
             label33 = new Label();
             chkEnableAoASoundEffects2 = new CheckBox();
@@ -86,19 +85,32 @@
             label16 = new Label();
             txtListeningPort = new TextBox();
             label15 = new Label();
+            Test = new TabPage();
+            lblTestErrMsg = new Label();
+            TestTWatchDisplay = new Button();
+            TestTWatchMotor = new Button();
+            TestSoundEffect2 = new Button();
+            TestSoundEffect1 = new Button();
+            btnTestArduinoMotors = new Button();
             tabMonitor = new TabPage();
             panel1 = new Panel();
+            lblUIThreadID = new Label();
+            label27 = new Label();
+            lblLastProcessorUsedUI = new Label();
+            lblProcessingTimeUI = new Label();
+            lblLastProcessorUsedUDP = new Label();
+            label28 = new Label();
             lblSpeed = new Label();
             label20 = new Label();
             lblAoAUnits = new Label();
-            lblServerThread = new Label();
+            lblUDPServerThread = new Label();
             label18 = new Label();
             lblLastFlaps = new Label();
             label32 = new Label();
             lblDatagramsPerSecond = new Label();
             label29 = new Label();
-            lblProcessingTime = new Label();
-            label27 = new Label();
+            lblProcessingTimeUDP = new Label();
+            lblMaxProcessingTimeTitle = new Label();
             lblLastSpeedBrakes = new Label();
             lblCurrentUnitType = new Label();
             lblSoundStatus = new Label();
@@ -118,7 +130,6 @@
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             btnResetMax = new Button();
-            label28 = new Label();
             tabs.SuspendLayout();
             tabNormalSoundEffects.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier2).BeginInit();
@@ -132,6 +143,7 @@
             tabSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudMinSpeed).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trkEffectTimeout).BeginInit();
+            Test.SuspendLayout();
             tabMonitor.SuspendLayout();
             panel1.SuspendLayout();
             statusStrip1.SuspendLayout();
@@ -143,16 +155,16 @@
             tabs.Controls.Add(tabArduino);
             tabs.Controls.Add(tabTTGO20V3);
             tabs.Controls.Add(tabSettings);
+            tabs.Controls.Add(Test);
             tabs.Controls.Add(tabMonitor);
-            tabs.Location = new Point(24, 22);
+            tabs.Location = new Point(24, 14);
             tabs.Name = "tabs";
             tabs.SelectedIndex = 0;
-            tabs.Size = new Size(517, 429);
+            tabs.Size = new Size(517, 412);
             tabs.TabIndex = 0;
             // 
             // tabNormalSoundEffects
             // 
-            tabNormalSoundEffects.Controls.Add(comboBox1);
             tabNormalSoundEffects.Controls.Add(cmbAudioDevice1);
             tabNormalSoundEffects.Controls.Add(label33);
             tabNormalSoundEffects.Controls.Add(chkEnableAoASoundEffects2);
@@ -173,23 +185,16 @@
             tabNormalSoundEffects.Location = new Point(4, 24);
             tabNormalSoundEffects.Name = "tabNormalSoundEffects";
             tabNormalSoundEffects.Padding = new Padding(3);
-            tabNormalSoundEffects.Size = new Size(509, 401);
+            tabNormalSoundEffects.Size = new Size(509, 384);
             tabNormalSoundEffects.TabIndex = 0;
             tabNormalSoundEffects.Text = "Sound Effects";
             tabNormalSoundEffects.UseVisualStyleBackColor = true;
             // 
-            // comboBox1
-            // 
-            comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(103, 24);
-            comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(343, 23);
-            comboBox1.TabIndex = 17;
-            // 
             // cmbAudioDevice1
             // 
+            cmbAudioDevice1.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbAudioDevice1.FormattingEnabled = true;
-            cmbAudioDevice1.Location = new Point(103, 77);
+            cmbAudioDevice1.Location = new Point(103, 76);
             cmbAudioDevice1.Name = "cmbAudioDevice1";
             cmbAudioDevice1.Size = new Size(343, 23);
             cmbAudioDevice1.TabIndex = 16;
@@ -197,7 +202,7 @@
             // label33
             // 
             label33.AutoSize = true;
-            label33.Location = new Point(17, 80);
+            label33.Location = new Point(17, 79);
             label33.Name = "label33";
             label33.Size = new Size(80, 15);
             label33.TabIndex = 15;
@@ -208,7 +213,7 @@
             chkEnableAoASoundEffects2.AutoSize = true;
             chkEnableAoASoundEffects2.Checked = true;
             chkEnableAoASoundEffects2.CheckState = CheckState.Checked;
-            chkEnableAoASoundEffects2.Location = new Point(19, 255);
+            chkEnableAoASoundEffects2.Location = new Point(19, 254);
             chkEnableAoASoundEffects2.Name = "chkEnableAoASoundEffects2";
             chkEnableAoASoundEffects2.Size = new Size(268, 19);
             chkEnableAoASoundEffects2.TabIndex = 14;
@@ -219,7 +224,7 @@
             // lblVolumeMultiplier2
             // 
             lblVolumeMultiplier2.AutoSize = true;
-            lblVolumeMultiplier2.Location = new Point(454, 343);
+            lblVolumeMultiplier2.Location = new Point(454, 342);
             lblVolumeMultiplier2.Name = "lblVolumeMultiplier2";
             lblVolumeMultiplier2.Size = new Size(111, 15);
             lblVolumeMultiplier2.TabIndex = 13;
@@ -228,7 +233,7 @@
             // trkVolumeMultiplier2
             // 
             trkVolumeMultiplier2.LargeChange = 10;
-            trkVolumeMultiplier2.Location = new Point(126, 334);
+            trkVolumeMultiplier2.Location = new Point(126, 333);
             trkVolumeMultiplier2.Maximum = 100;
             trkVolumeMultiplier2.Minimum = 1;
             trkVolumeMultiplier2.Name = "trkVolumeMultiplier2";
@@ -243,7 +248,7 @@
             // label34
             // 
             label34.AutoSize = true;
-            label34.Location = new Point(19, 343);
+            label34.Location = new Point(19, 342);
             label34.Name = "label34";
             label34.Size = new Size(101, 15);
             label34.TabIndex = 11;
@@ -251,7 +256,7 @@
             // 
             // label4
             // 
-            label4.Location = new Point(17, 15);
+            label4.Location = new Point(17, 14);
             label4.Name = "label4";
             label4.Size = new Size(476, 52);
             label4.TabIndex = 10;
@@ -262,7 +267,7 @@
             chkEnableAoASoundEffects1.AutoSize = true;
             chkEnableAoASoundEffects1.Checked = true;
             chkEnableAoASoundEffects1.CheckState = CheckState.Checked;
-            chkEnableAoASoundEffects1.Location = new Point(17, 115);
+            chkEnableAoASoundEffects1.Location = new Point(17, 114);
             chkEnableAoASoundEffects1.Name = "chkEnableAoASoundEffects1";
             chkEnableAoASoundEffects1.Size = new Size(282, 19);
             chkEnableAoASoundEffects1.TabIndex = 9;
@@ -272,7 +277,7 @@
             // 
             // btnSoundEffect2
             // 
-            btnSoundEffect2.Location = new Point(456, 303);
+            btnSoundEffect2.Location = new Point(456, 302);
             btnSoundEffect2.Name = "btnSoundEffect2";
             btnSoundEffect2.Size = new Size(37, 23);
             btnSoundEffect2.TabIndex = 8;
@@ -283,7 +288,7 @@
             // 
             // btnSoundEffect1
             // 
-            btnSoundEffect1.Location = new Point(456, 167);
+            btnSoundEffect1.Location = new Point(456, 166);
             btnSoundEffect1.Name = "btnSoundEffect1";
             btnSoundEffect1.Size = new Size(37, 23);
             btnSoundEffect1.TabIndex = 7;
@@ -295,7 +300,7 @@
             // lblVolumeMultiplier1
             // 
             lblVolumeMultiplier1.AutoSize = true;
-            lblVolumeMultiplier1.Location = new Point(456, 204);
+            lblVolumeMultiplier1.Location = new Point(456, 203);
             lblVolumeMultiplier1.Name = "lblVolumeMultiplier1";
             lblVolumeMultiplier1.Size = new Size(111, 15);
             lblVolumeMultiplier1.TabIndex = 6;
@@ -304,7 +309,7 @@
             // trkVolumeMultiplier1
             // 
             trkVolumeMultiplier1.LargeChange = 10;
-            trkVolumeMultiplier1.Location = new Point(124, 195);
+            trkVolumeMultiplier1.Location = new Point(124, 194);
             trkVolumeMultiplier1.Maximum = 100;
             trkVolumeMultiplier1.Minimum = 1;
             trkVolumeMultiplier1.Name = "trkVolumeMultiplier1";
@@ -319,7 +324,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(17, 204);
+            label3.Location = new Point(17, 203);
             label3.Name = "label3";
             label3.Size = new Size(101, 15);
             label3.TabIndex = 4;
@@ -327,7 +332,7 @@
             // 
             // txtSoundEffect2
             // 
-            txtSoundEffect2.Location = new Point(17, 304);
+            txtSoundEffect2.Location = new Point(17, 303);
             txtSoundEffect2.Name = "txtSoundEffect2";
             txtSoundEffect2.Size = new Size(429, 23);
             txtSoundEffect2.TabIndex = 3;
@@ -336,7 +341,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(17, 286);
+            label2.Location = new Point(17, 285);
             label2.Name = "label2";
             label2.Size = new Size(255, 15);
             label2.TabIndex = 2;
@@ -344,7 +349,7 @@
             // 
             // txtSoundEffect1
             // 
-            txtSoundEffect1.Location = new Point(17, 167);
+            txtSoundEffect1.Location = new Point(17, 166);
             txtSoundEffect1.Name = "txtSoundEffect1";
             txtSoundEffect1.Size = new Size(429, 23);
             txtSoundEffect1.TabIndex = 1;
@@ -353,7 +358,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(17, 149);
+            label1.Location = new Point(17, 148);
             label1.Name = "label1";
             label1.Size = new Size(225, 15);
             label1.TabIndex = 0;
@@ -379,7 +384,7 @@
             tabArduino.Location = new Point(4, 24);
             tabArduino.Name = "tabArduino";
             tabArduino.Padding = new Padding(3);
-            tabArduino.Size = new Size(509, 401);
+            tabArduino.Size = new Size(509, 384);
             tabArduino.TabIndex = 1;
             tabArduino.Text = "Arduino";
             tabArduino.UseVisualStyleBackColor = true;
@@ -551,7 +556,7 @@
             tabTTGO20V3.Location = new Point(4, 24);
             tabTTGO20V3.Name = "tabTTGO20V3";
             tabTTGO20V3.Padding = new Padding(3);
-            tabTTGO20V3.Size = new Size(509, 401);
+            tabTTGO20V3.Size = new Size(509, 384);
             tabTTGO20V3.TabIndex = 2;
             tabTTGO20V3.Text = "T-Watch 2020 V3";
             tabTTGO20V3.UseVisualStyleBackColor = true;
@@ -638,7 +643,7 @@
             tabSettings.Controls.Add(label15);
             tabSettings.Location = new Point(4, 24);
             tabSettings.Name = "tabSettings";
-            tabSettings.Size = new Size(509, 401);
+            tabSettings.Size = new Size(509, 384);
             tabSettings.TabIndex = 4;
             tabSettings.Text = "General Settings";
             tabSettings.UseVisualStyleBackColor = true;
@@ -749,6 +754,79 @@
             label15.TabIndex = 0;
             label15.Text = "Listening Port:";
             // 
+            // Test
+            // 
+            Test.Controls.Add(lblTestErrMsg);
+            Test.Controls.Add(TestTWatchDisplay);
+            Test.Controls.Add(TestTWatchMotor);
+            Test.Controls.Add(TestSoundEffect2);
+            Test.Controls.Add(TestSoundEffect1);
+            Test.Controls.Add(btnTestArduinoMotors);
+            Test.Location = new Point(4, 24);
+            Test.Name = "Test";
+            Test.Size = new Size(509, 384);
+            Test.TabIndex = 5;
+            Test.Text = "Test";
+            Test.UseVisualStyleBackColor = true;
+            // 
+            // lblTestErrMsg
+            // 
+            lblTestErrMsg.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            lblTestErrMsg.ForeColor = Color.FromArgb(192, 0, 0);
+            lblTestErrMsg.Location = new Point(29, 213);
+            lblTestErrMsg.Name = "lblTestErrMsg";
+            lblTestErrMsg.Size = new Size(431, 135);
+            lblTestErrMsg.TabIndex = 5;
+            lblTestErrMsg.Text = "error msg";
+            lblTestErrMsg.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // TestTWatchDisplay
+            // 
+            TestTWatchDisplay.Location = new Point(282, 82);
+            TestTWatchDisplay.Name = "TestTWatchDisplay";
+            TestTWatchDisplay.Size = new Size(178, 23);
+            TestTWatchDisplay.TabIndex = 4;
+            TestTWatchDisplay.Text = "Test T-Watch Display";
+            TestTWatchDisplay.UseVisualStyleBackColor = true;
+            // 
+            // TestTWatchMotor
+            // 
+            TestTWatchMotor.Location = new Point(282, 30);
+            TestTWatchMotor.Name = "TestTWatchMotor";
+            TestTWatchMotor.Size = new Size(178, 23);
+            TestTWatchMotor.TabIndex = 3;
+            TestTWatchMotor.Text = "Test T-Watch Motor";
+            TestTWatchMotor.UseVisualStyleBackColor = true;
+            TestTWatchMotor.Click += TestTWatchMotor_Click;
+            // 
+            // TestSoundEffect2
+            // 
+            TestSoundEffect2.Location = new Point(29, 139);
+            TestSoundEffect2.Name = "TestSoundEffect2";
+            TestSoundEffect2.Size = new Size(178, 23);
+            TestSoundEffect2.TabIndex = 2;
+            TestSoundEffect2.Text = "Test Sound Effect 2";
+            TestSoundEffect2.UseVisualStyleBackColor = true;
+            // 
+            // TestSoundEffect1
+            // 
+            TestSoundEffect1.Location = new Point(29, 82);
+            TestSoundEffect1.Name = "TestSoundEffect1";
+            TestSoundEffect1.Size = new Size(178, 23);
+            TestSoundEffect1.TabIndex = 1;
+            TestSoundEffect1.Text = "Test Sound Effect 1";
+            TestSoundEffect1.UseVisualStyleBackColor = true;
+            // 
+            // btnTestArduinoMotors
+            // 
+            btnTestArduinoMotors.Location = new Point(29, 30);
+            btnTestArduinoMotors.Name = "btnTestArduinoMotors";
+            btnTestArduinoMotors.Size = new Size(178, 23);
+            btnTestArduinoMotors.TabIndex = 0;
+            btnTestArduinoMotors.Text = "Test Arduino Motor 1 && 2";
+            btnTestArduinoMotors.UseVisualStyleBackColor = true;
+            btnTestArduinoMotors.Click += btnTestArduinoMotors_Click;
+            // 
             // tabMonitor
             // 
             tabMonitor.Controls.Add(panel1);
@@ -756,25 +834,30 @@
             tabMonitor.Controls.Add(chkChangeToMonitor);
             tabMonitor.Location = new Point(4, 24);
             tabMonitor.Name = "tabMonitor";
-            tabMonitor.Size = new Size(509, 401);
+            tabMonitor.Size = new Size(509, 384);
             tabMonitor.TabIndex = 3;
             tabMonitor.Text = "Monitor";
             tabMonitor.UseVisualStyleBackColor = true;
             // 
             // panel1
             // 
+            panel1.Controls.Add(lblUIThreadID);
+            panel1.Controls.Add(label27);
+            panel1.Controls.Add(lblLastProcessorUsedUI);
+            panel1.Controls.Add(lblProcessingTimeUI);
+            panel1.Controls.Add(lblLastProcessorUsedUDP);
             panel1.Controls.Add(label28);
             panel1.Controls.Add(lblSpeed);
             panel1.Controls.Add(label20);
             panel1.Controls.Add(lblAoAUnits);
-            panel1.Controls.Add(lblServerThread);
+            panel1.Controls.Add(lblUDPServerThread);
             panel1.Controls.Add(label18);
             panel1.Controls.Add(lblLastFlaps);
             panel1.Controls.Add(label32);
             panel1.Controls.Add(lblDatagramsPerSecond);
             panel1.Controls.Add(label29);
-            panel1.Controls.Add(lblProcessingTime);
-            panel1.Controls.Add(label27);
+            panel1.Controls.Add(lblProcessingTimeUDP);
+            panel1.Controls.Add(lblMaxProcessingTimeTitle);
             panel1.Controls.Add(lblLastSpeedBrakes);
             panel1.Controls.Add(lblCurrentUnitType);
             panel1.Controls.Add(lblSoundStatus);
@@ -788,6 +871,64 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(492, 249);
             panel1.TabIndex = 10;
+            // 
+            // lblUIThreadID
+            // 
+            lblUIThreadID.AutoSize = true;
+            lblUIThreadID.Location = new Point(315, 11);
+            lblUIThreadID.Name = "lblUIThreadID";
+            lblUIThreadID.Size = new Size(27, 15);
+            lblUIThreadID.TabIndex = 27;
+            lblUIThreadID.Text = "----";
+            // 
+            // label27
+            // 
+            label27.AutoSize = true;
+            label27.Location = new Point(231, 11);
+            label27.Name = "label27";
+            label27.Size = new Size(74, 15);
+            label27.TabIndex = 26;
+            label27.Text = "UI Thread ID:";
+            label27.TextAlign = ContentAlignment.TopRight;
+            // 
+            // lblLastProcessorUsedUI
+            // 
+            lblLastProcessorUsedUI.AutoSize = true;
+            lblLastProcessorUsedUI.Location = new Point(244, 223);
+            lblLastProcessorUsedUI.Name = "lblLastProcessorUsedUI";
+            lblLastProcessorUsedUI.Size = new Size(18, 15);
+            lblLastProcessorUsedUI.TabIndex = 25;
+            lblLastProcessorUsedUI.Text = "UI";
+            toolTip1.SetToolTip(lblLastProcessorUsedUI, "Processor used to update the UI (monitor)");
+            // 
+            // lblProcessingTimeUI
+            // 
+            lblProcessingTimeUI.AutoSize = true;
+            lblProcessingTimeUI.Location = new Point(244, 196);
+            lblProcessingTimeUI.Name = "lblProcessingTimeUI";
+            lblProcessingTimeUI.Size = new Size(45, 15);
+            lblProcessingTimeUI.TabIndex = 24;
+            lblProcessingTimeUI.Text = "UI time";
+            toolTip1.SetToolTip(lblProcessingTimeUI, "Max UI processing time (monitor).  Ignores the first one.");
+            // 
+            // lblLastProcessorUsedUDP
+            // 
+            lblLastProcessorUsedUDP.AutoSize = true;
+            lblLastProcessorUsedUDP.Location = new Point(169, 223);
+            lblLastProcessorUsedUDP.Name = "lblLastProcessorUsedUDP";
+            lblLastProcessorUsedUDP.Size = new Size(30, 15);
+            lblLastProcessorUsedUDP.TabIndex = 23;
+            lblLastProcessorUsedUDP.Text = "UDP";
+            toolTip1.SetToolTip(lblLastProcessorUsedUDP, "Processor used to serve the last UDP packet received");
+            // 
+            // label28
+            // 
+            label28.AutoSize = true;
+            label28.Location = new Point(48, 223);
+            label28.Name = "label28";
+            label28.Size = new Size(114, 15);
+            label28.TabIndex = 22;
+            label28.Text = "Last Processor Used:";
             // 
             // lblSpeed
             // 
@@ -817,14 +958,14 @@
             lblAoAUnits.Tag = "0";
             lblAoAUnits.Text = "°";
             // 
-            // lblServerThread
+            // lblUDPServerThread
             // 
-            lblServerThread.AutoSize = true;
-            lblServerThread.Location = new Point(148, 11);
-            lblServerThread.Name = "lblServerThread";
-            lblServerThread.Size = new Size(17, 15);
-            lblServerThread.TabIndex = 18;
-            lblServerThread.Text = "id";
+            lblUDPServerThread.AutoSize = true;
+            lblUDPServerThread.Location = new Point(153, 11);
+            lblUDPServerThread.Name = "lblUDPServerThread";
+            lblUDPServerThread.Size = new Size(22, 15);
+            lblUDPServerThread.TabIndex = 18;
+            lblUDPServerThread.Text = "---";
             // 
             // label18
             // 
@@ -838,7 +979,7 @@
             // lblLastFlaps
             // 
             lblLastFlaps.AutoSize = true;
-            lblLastFlaps.Location = new Point(318, 132);
+            lblLastFlaps.Location = new Point(318, 159);
             lblLastFlaps.Name = "lblLastFlaps";
             lblLastFlaps.Size = new Size(34, 15);
             lblLastFlaps.TabIndex = 16;
@@ -848,16 +989,17 @@
             // label32
             // 
             label32.AutoSize = true;
-            label32.Location = new Point(233, 132);
+            label32.Location = new Point(272, 159);
             label32.Name = "label32";
             label32.Size = new Size(37, 15);
             label32.TabIndex = 15;
             label32.Text = "Flaps:";
+            label32.TextAlign = ContentAlignment.TopRight;
             // 
             // lblDatagramsPerSecond
             // 
             lblDatagramsPerSecond.AutoSize = true;
-            lblDatagramsPerSecond.Location = new Point(420, 197);
+            lblDatagramsPerSecond.Location = new Point(315, 40);
             lblDatagramsPerSecond.Name = "lblDatagramsPerSecond";
             lblDatagramsPerSecond.Size = new Size(49, 15);
             lblDatagramsPerSecond.TabIndex = 14;
@@ -868,36 +1010,39 @@
             // label29
             // 
             label29.AutoSize = true;
-            label29.Location = new Point(239, 197);
+            label29.Location = new Point(274, 40);
             label29.Name = "label29";
-            label29.Size = new Size(175, 15);
+            label29.Size = new Size(32, 15);
             label29.TabIndex = 13;
-            label29.Text = "Datagrams received per second:";
+            label29.Text = "Dg/s";
+            label29.TextAlign = ContentAlignment.TopRight;
+            toolTip1.SetToolTip(label29, "Datagrams received per second.");
             // 
-            // lblProcessingTime
+            // lblProcessingTimeUDP
             // 
-            lblProcessingTime.AutoSize = true;
-            lblProcessingTime.Location = new Point(164, 196);
-            lblProcessingTime.Name = "lblProcessingTime";
-            lblProcessingTime.Size = new Size(31, 15);
-            lblProcessingTime.TabIndex = 12;
-            lblProcessingTime.Tag = "0";
-            lblProcessingTime.Text = "time";
-            toolTip1.SetToolTip(lblProcessingTime, "This value is tracked for each different UnitType (aircraft).");
+            lblProcessingTimeUDP.AutoSize = true;
+            lblProcessingTimeUDP.Location = new Point(169, 196);
+            lblProcessingTimeUDP.Name = "lblProcessingTimeUDP";
+            lblProcessingTimeUDP.Size = new Size(57, 15);
+            lblProcessingTimeUDP.TabIndex = 12;
+            lblProcessingTimeUDP.Tag = "0";
+            lblProcessingTimeUDP.Text = "UDP time";
+            toolTip1.SetToolTip(lblProcessingTimeUDP, "Max UDP Packet processing time.  This value is tracked for each different UnitType (aircraft).");
             // 
-            // label27
+            // lblMaxProcessingTimeTitle
             // 
-            label27.AutoSize = true;
-            label27.Location = new Point(13, 196);
-            label27.Name = "label27";
-            label27.Size = new Size(149, 15);
-            label27.TabIndex = 11;
-            label27.Text = "Max Processing Time (ms):";
+            lblMaxProcessingTimeTitle.AutoSize = true;
+            lblMaxProcessingTimeTitle.Location = new Point(13, 196);
+            lblMaxProcessingTimeTitle.Name = "lblMaxProcessingTimeTitle";
+            lblMaxProcessingTimeTitle.Size = new Size(149, 15);
+            lblMaxProcessingTimeTitle.TabIndex = 11;
+            lblMaxProcessingTimeTitle.Text = "Max Processing Time (ms):";
+            toolTip1.SetToolTip(lblMaxProcessingTimeTitle, "This is for the UDP packet processing");
             // 
             // lblLastSpeedBrakes
             // 
             lblLastSpeedBrakes.AutoSize = true;
-            lblLastSpeedBrakes.Location = new Point(318, 106);
+            lblLastSpeedBrakes.Location = new Point(318, 132);
             lblLastSpeedBrakes.Name = "lblLastSpeedBrakes";
             lblLastSpeedBrakes.Size = new Size(34, 15);
             lblLastSpeedBrakes.TabIndex = 10;
@@ -911,7 +1056,7 @@
             lblCurrentUnitType.Name = "lblCurrentUnitType";
             lblCurrentUnitType.Size = new Size(34, 15);
             lblCurrentUnitType.TabIndex = 9;
-            lblCurrentUnitType.Tag = "none";
+            lblCurrentUnitType.Tag = "none yet";
             lblCurrentUnitType.Text = "none";
             // 
             // lblSoundStatus
@@ -942,15 +1087,17 @@
             lblLastAoA.TabIndex = 5;
             lblLastAoA.Tag = "0";
             lblLastAoA.Text = "none";
+            lblLastAoA.TextAlign = ContentAlignment.TopRight;
             // 
             // label24
             // 
             label24.AutoSize = true;
-            label24.Location = new Point(233, 106);
+            label24.Location = new Point(233, 132);
             label24.Name = "label24";
             label24.Size = new Size(79, 15);
             label24.TabIndex = 7;
             label24.Text = "Speed Brakes:";
+            label24.TextAlign = ContentAlignment.TopRight;
             // 
             // label21
             // 
@@ -1007,7 +1154,7 @@
             // 
             // btnStartListening
             // 
-            btnStartListening.Location = new Point(346, 455);
+            btnStartListening.Location = new Point(346, 428);
             btnStartListening.Name = "btnStartListening";
             btnStartListening.Size = new Size(100, 23);
             btnStartListening.TabIndex = 0;
@@ -1018,7 +1165,7 @@
             // btnStop
             // 
             btnStop.Enabled = false;
-            btnStop.Location = new Point(462, 455);
+            btnStop.Location = new Point(462, 428);
             btnStop.Name = "btnStop";
             btnStop.Size = new Size(75, 23);
             btnStop.TabIndex = 2;
@@ -1039,7 +1186,7 @@
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
-            statusStrip1.Location = new Point(0, 484);
+            statusStrip1.Location = new Point(0, 456);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(566, 22);
             statusStrip1.TabIndex = 3;
@@ -1053,7 +1200,7 @@
             // 
             // btnResetMax
             // 
-            btnResetMax.Location = new Point(24, 455);
+            btnResetMax.Location = new Point(24, 428);
             btnResetMax.Name = "btnResetMax";
             btnResetMax.Size = new Size(75, 23);
             btnResetMax.TabIndex = 4;
@@ -1061,22 +1208,13 @@
             btnResetMax.UseVisualStyleBackColor = true;
             btnResetMax.Click += btnResetMax_Click;
             // 
-            // label28
-            // 
-            label28.AutoSize = true;
-            label28.Location = new Point(268, 11);
-            label28.Name = "label28";
-            label28.Size = new Size(114, 15);
-            label28.TabIndex = 22;
-            label28.Text = "Last Processor Used:";
-            // 
             // frmMain
             // 
             AcceptButton = btnStartListening;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnStop;
-            ClientSize = new Size(566, 506);
+            ClientSize = new Size(566, 478);
             Controls.Add(btnResetMax);
             Controls.Add(statusStrip1);
             Controls.Add(btnStop);
@@ -1104,6 +1242,7 @@
             tabSettings.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)nudMinSpeed).EndInit();
             ((System.ComponentModel.ISupportInitialize)trkEffectTimeout).EndInit();
+            Test.ResumeLayout(false);
             tabMonitor.ResumeLayout(false);
             tabMonitor.PerformLayout();
             panel1.ResumeLayout(false);
@@ -1180,8 +1319,8 @@
         private Label lblCurrentUnitType;
         private Label lblLastSpeedBrakes;
         private Label label29;
-        private Label lblProcessingTime;
-        private Label label27;
+        private Label lblProcessingTimeUDP;
+        private Label lblMaxProcessingTimeTitle;
         private Label lblDatagramsPerSecond;
         private Label lblLastFlaps;
         private Label label32;
@@ -1195,7 +1334,7 @@
         private StatusStrip statusStrip1;
         private ToolStripStatusLabel toolStripStatusLabel1;
         private Label label18;
-        private Label lblServerThread;
+        private Label lblUDPServerThread;
         private Label lblAoAUnits;
         private Label lblSpeed;
         private Label label20;
@@ -1203,7 +1342,18 @@
         private Label label22;
         private NumericUpDown nudMinSpeed;
         private Label label26;
-        private ComboBox comboBox1;
         private Label label28;
+        private Label lblLastProcessorUsedUDP;
+        private Label lblProcessingTimeUI;
+        private Label lblLastProcessorUsedUI;
+        private Label lblUIThreadID;
+        private Label label27;
+        private TabPage Test;
+        private Button btnTestArduinoMotors;
+        private Button TestSoundEffect1;
+        private Button TestSoundEffect2;
+        private Button TestTWatchDisplay;
+        private Button TestTWatchMotor;
+        private Label lblTestErrMsg;
     }
 }

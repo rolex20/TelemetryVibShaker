@@ -1,6 +1,8 @@
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using System.Diagnostics;
+using System.Net.Sockets;
+using System.Net;
 using System.Runtime.InteropServices;
 
 
@@ -18,9 +20,15 @@ namespace TelemetryVibShaker
         private TelemetryServer telemetry;      // controls all telemetry logic
         private Thread threadTelemetry; // this thread runs the telemetry
         private long lastSecond; // second of the last udp datagram processed
+        private int maxUIProcessingTime;  // milliseconds elapsed in processing the monitor-update-cycle in Timer1
+        private Stopwatch stopWatchUI;  // used to measure processing time in Timer1 (updating the UI)
 
         [DllImport("kernel32.dll")]
         public static extern uint GetCurrentThreadId();
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern uint GetCurrentProcessorNumber();
+
 
         public frmMain()
         {
@@ -28,12 +36,12 @@ namespace TelemetryVibShaker
         }
 
 
-        private bool CheckFileExists(TextBox tb)
+        private bool CheckFileExists(TextBox tb, string file)
         {
             bool exist = File.Exists(tb.Text);
             if (!exist)
             {
-                MessageBox.Show("The file does not exist.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("The file does not exist.", file, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 tb.SelectAll();
                 tb.Focus();
             }
@@ -107,22 +115,13 @@ namespace TelemetryVibShaker
 
         }
 
-        private void fillAudioDevices()
+        private void FillAudioDevices()
         {
-            // create a device enumerator
-            var enumerator = new MMDeviceEnumerator();
-
-            for (int i = 0; i < WaveOut.DeviceCount; i++)
-            {
-                var device = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)[i];
-
-                cmbAudioDevice1.Items.Add(device.FriendlyName);
-            }
-
-            for (int n = -1; n < WaveOut.DeviceCount; n++)
+            // Skip the -1 Microsoft Audio Mapper
+            for (int n = 0; n < WaveOut.DeviceCount; n++)
             {
                 var capabilities = WaveOut.GetCapabilities(n);
-                comboBox1.Items.Add($"{n}: {capabilities.ProductName}");
+                cmbAudioDevice1.Items.Add(capabilities.ProductName);
             }
         }
 
@@ -261,6 +260,14 @@ namespace TelemetryVibShaker
 
         private void frmMain_Load(object sender, EventArgs e)
         {
+            // Initialize max timers
+            btnResetMax_Click(null, null);
+
+            // Flag to skip the initial max UI processing time
+            lblMaxProcessingTimeTitle.Tag = false;
+
+            stopWatchUI = new Stopwatch();
+
             // The TextChanged event is not exposed in the Designer:
             numMinIntensitySpeedBrakes.TextChanged += numMinIntensitySpeedBrakes_ValueChanged;
             numMaxIntensitySpeedBrakes.TextChanged += numMaxIntensitySpeedBrakes_ValueChanged;
@@ -280,7 +287,7 @@ namespace TelemetryVibShaker
             arduinoEffects = null;
 
 
-            fillAudioDevices();
+            FillAudioDevices();
 
             // Load the settings for all controls in the form
             LoadSettings(this);
@@ -296,9 +303,7 @@ namespace TelemetryVibShaker
             lblLastAoA.Tag = (float)0.0;
 
             lblDatagramsPerSecond.Text = string.Empty;
-            lblProcessingTime.Text = string.Empty;
-            lblServerThread.Text = string.Empty;
-
+            lblTestErrMsg.Text = string.Empty;
 
 
             btnStop.Tag = false;
@@ -437,9 +442,9 @@ namespace TelemetryVibShaker
             lastSecond = 0; // reset tracker
 
             // Check if files exist
-            if (!CheckFileExists(txtSoundEffect1)) return;
-            if (!CheckFileExists(txtSoundEffect2)) return;
-            if (!CheckFileExists(txtJSON)) return;
+            if (!CheckFileExists(txtSoundEffect1, "Sound Effect 1")) return;
+            if (!CheckFileExists(txtSoundEffect2, "Sound Effect 2")) return;
+            if (!CheckFileExists(txtJSON, "JSON File")) return;
 
 
 
@@ -474,15 +479,17 @@ namespace TelemetryVibShaker
 
 
 
+            // Reset max timers
+            btnResetMax_Click(null, null);
 
 
-            // Reset max processing time tracker
-            lblProcessingTime.Tag = -1;
-            lblProcessingTime.Text = String.Empty;
             // Start a new thread to act as the UDP Server
             threadTelemetry = new Thread(DoTelemetry);
             threadTelemetry.Start();
-            lblServerThread.Text = ((int)GetCurrentThreadId()).ToString();
+            lblUDPServerThread.Text = "---";
+            lblUIThreadID.Text = lblUDPServerThread.Text;
+            lblUDPServerThread.Tag = -1;
+            lblUIThreadID.Tag = -1;
 
 
             // Disable some controls
@@ -509,12 +516,42 @@ namespace TelemetryVibShaker
             if (Convert.ToInt32(L.Tag) != value)
             {
                 L.Tag = value;
-                L.Text = value.ToString();
+                L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
             }
+        }
+
+        private void UpdateValue(Label L, string value)
+        {
+            if (!L.Tag.Equals(value))
+            {
+                L.Tag = value;
+                L.Text = value;
+            }
+        }
+
+        private void UpdateMaxUIProcessingTime()
+        {
+            UpdateValue(lblProcessingTimeUI, maxUIProcessingTime); // this might be delayed by one cycle, but it's ok
+
+            stopWatchUI.Stop();
+            int elapsed = stopWatchUI.Elapsed.Milliseconds;
+
+            // discard the first UI processing
+            if ((bool)lblMaxProcessingTimeTitle.Tag)
+            {
+                if (maxUIProcessingTime < elapsed)
+                    maxUIProcessingTime = elapsed;
+            }
+            else
+                lblMaxProcessingTimeTitle.Tag = true;
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
+            stopWatchUI.Restart();
+            int processorUsedForUI = (int)GetCurrentProcessorNumber();
+
+
             if (telemetry != null) lastSecond = telemetry.LastSecond;
 
             // check if we haven't received more telemetry so we should mute all effects
@@ -532,21 +569,8 @@ namespace TelemetryVibShaker
                 // Report sound effectType
                 UpdateSoundEffectStatus(soundManager.Status);
 
-                if (telemetry.LastData.AoA <= 0) // new aircraft type?
-                {
-                    // Report unit type
-                    if (!telemetry.CurrentUnitType.Equals(lblCurrentUnitType.Tag))
-                    {
-                        lblCurrentUnitType.Tag = telemetry.CurrentUnitType;
-                        lblCurrentUnitType.Text = telemetry.CurrentUnitType + " (" + soundManager.AoA1.ToString() + ", " + soundManager.AoA2.ToString() + ")";
-                    }
-
-                    // Update max processing time, it should have been reseted to zero
-                    UpdateValue(lblProcessingTime, telemetry.MaxProcessingTime);
-
-
-                    return; // if no value has been received yet, don't update nothing else
-                }
+                // Report Current Unit Type
+                UpdateValue(lblCurrentUnitType, telemetry.CurrentUnitType);
 
                 // Report the last AoA received
                 UpdateValue(lblLastAoA, telemetry.LastData.AoA);
@@ -560,11 +584,26 @@ namespace TelemetryVibShaker
                 // Report flaps
                 UpdateValue(lblLastFlaps, telemetry.LastData.Flaps);
 
-                // Report max processing time
-                UpdateValue(lblProcessingTime, telemetry.MaxProcessingTime);
-
                 // Report speed
                 UpdateValue(lblSpeed, telemetry.LastData.Speed);
+
+                // Report max UDP processing time
+                UpdateValue(lblProcessingTimeUDP, telemetry.MaxProcessingTime);
+
+                // Report last processor used for UDP processing
+                UpdateValue(lblLastProcessorUsedUDP, telemetry.LastProcessorUsed);
+
+                // Report last procesor used for UI (monitor) this function
+                UpdateValue(lblLastProcessorUsedUI, processorUsedForUI);
+
+                // Report UI ThreadID
+                UpdateValue(lblUIThreadID, (int)GetCurrentThreadId());
+
+                // Report UDP ThreadID
+                UpdateValue(lblUDPServerThread, telemetry.ThreadId);
+
+                // Report max UI processing time (monitor)
+                UpdateMaxUIProcessingTime(); // the stopwatch is stopped here
 
             }
 
@@ -720,14 +759,82 @@ namespace TelemetryVibShaker
             }
         }
 
+        // Reset max timers, UI and UDP
         private void btnResetMax_Click(object sender, EventArgs e)
         {
-            if (telemetry != null) telemetry.MaxProcessingTime = -1; // Reset Max requested by user
+            lblProcessingTimeUDP.Tag = null;
+            lblProcessingTimeUI.Tag = null;
+
+            if (telemetry != null)
+            {
+                telemetry.MaxProcessingTime = -1;
+                UpdateValue(lblProcessingTimeUDP, telemetry.MaxProcessingTime);
+            }
+
+            maxUIProcessingTime = -1;
+            UpdateValue(lblProcessingTimeUI, maxUIProcessingTime);
         }
 
         private void nudMinSpeed_ValueChanged(object sender, EventArgs e)
         {
             if (telemetry != null) telemetry.MinSpeed = (int)nudMinSpeed.Value;
+        }
+
+        public void SendUdpDatagram(string ipAddress, int destinationPort, byte[] data)
+        {
+            using (UdpClient udpClient = new UdpClient())
+            {
+                try
+                {
+                    udpClient.Connect(IPAddress.Parse(ipAddress), destinationPort);
+                    udpClient.Send(data, data.Length);
+                }
+                catch (Exception ex)
+                {
+                    lblTestErrMsg.Text = ex.Message;
+                }
+            }
+        }
+
+        private async void TestTWatchMotor_Click(object sender, EventArgs e)
+        {
+            byte[] parameters = { 100, 1 }; // [0]-Motor Vibration, [1]-Screen Color
+            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
+            await Task.Delay(800);
+
+            parameters[1] = 2; // Dark Green
+            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
+            await Task.Delay(800);
+
+            parameters[2] = 3; // TFT_GREEN
+            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
+            await Task.Delay(800);
+
+            parameters[2] = 4; // TFT_RED
+            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
+            await Task.Delay(800);
+
+            parameters[2] = 0; // TFT_BLACK
+            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
+
+        }
+
+        private async void btnTestArduinoMotors_Click(object sender, EventArgs e)
+        {
+            byte[] strengthvibration = { 200, 0 };
+            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), strengthvibration);
+            await Task.Delay(800);
+
+            strengthvibration[0] = 0;
+            strengthvibration[1] = 200;
+            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), strengthvibration);
+            await Task.Delay(800);
+
+            // Turn motors off quickly
+            strengthvibration[0] = 0;
+            strengthvibration[1] = 0;
+            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), strengthvibration);
+
         }
     }
 }
