@@ -87,8 +87,8 @@
             label15 = new Label();
             Test = new TabPage();
             lblTestErrMsg = new Label();
-            TestTWatchDisplay = new Button();
-            TestTWatchMotor = new Button();
+            btnTestTWatchDisplay = new Button();
+            btnTestTWatchMotor = new Button();
             TestSoundEffect2 = new Button();
             TestSoundEffect1 = new Button();
             btnTestArduinoMotors = new Button();
@@ -757,8 +757,8 @@
             // Test
             // 
             Test.Controls.Add(lblTestErrMsg);
-            Test.Controls.Add(TestTWatchDisplay);
-            Test.Controls.Add(TestTWatchMotor);
+            Test.Controls.Add(btnTestTWatchDisplay);
+            Test.Controls.Add(btnTestTWatchMotor);
             Test.Controls.Add(TestSoundEffect2);
             Test.Controls.Add(TestSoundEffect1);
             Test.Controls.Add(btnTestArduinoMotors);
@@ -780,24 +780,25 @@
             lblTestErrMsg.Text = "error msg";
             lblTestErrMsg.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // TestTWatchDisplay
+            // btnTestTWatchDisplay
             // 
-            TestTWatchDisplay.Location = new Point(282, 82);
-            TestTWatchDisplay.Name = "TestTWatchDisplay";
-            TestTWatchDisplay.Size = new Size(178, 23);
-            TestTWatchDisplay.TabIndex = 4;
-            TestTWatchDisplay.Text = "Test T-Watch Display";
-            TestTWatchDisplay.UseVisualStyleBackColor = true;
+            btnTestTWatchDisplay.Location = new Point(282, 82);
+            btnTestTWatchDisplay.Name = "btnTestTWatchDisplay";
+            btnTestTWatchDisplay.Size = new Size(178, 23);
+            btnTestTWatchDisplay.TabIndex = 4;
+            btnTestTWatchDisplay.Text = "Test T-Watch Display";
+            btnTestTWatchDisplay.UseVisualStyleBackColor = true;
+            btnTestTWatchDisplay.Click += TestTWatchDisplay_Click;
             // 
-            // TestTWatchMotor
+            // btnTestTWatchMotor
             // 
-            TestTWatchMotor.Location = new Point(282, 30);
-            TestTWatchMotor.Name = "TestTWatchMotor";
-            TestTWatchMotor.Size = new Size(178, 23);
-            TestTWatchMotor.TabIndex = 3;
-            TestTWatchMotor.Text = "Test T-Watch Motor";
-            TestTWatchMotor.UseVisualStyleBackColor = true;
-            TestTWatchMotor.Click += TestTWatchMotor_Click;
+            btnTestTWatchMotor.Location = new Point(282, 30);
+            btnTestTWatchMotor.Name = "btnTestTWatchMotor";
+            btnTestTWatchMotor.Size = new Size(178, 23);
+            btnTestTWatchMotor.TabIndex = 3;
+            btnTestTWatchMotor.Text = "Test T-Watch Motor";
+            btnTestTWatchMotor.UseVisualStyleBackColor = true;
+            btnTestTWatchMotor.Click += TestTWatchMotor_Click;
             // 
             // TestSoundEffect2
             // 
@@ -807,6 +808,7 @@
             TestSoundEffect2.TabIndex = 2;
             TestSoundEffect2.Text = "Test Sound Effect 2";
             TestSoundEffect2.UseVisualStyleBackColor = true;
+            TestSoundEffect2.Click += TestSoundEffect2_Click;
             // 
             // TestSoundEffect1
             // 
@@ -816,6 +818,7 @@
             TestSoundEffect1.TabIndex = 1;
             TestSoundEffect1.Text = "Test Sound Effect 1";
             TestSoundEffect1.UseVisualStyleBackColor = true;
+            TestSoundEffect1.Click += TestSoundEffect1_Click;
             // 
             // btnTestArduinoMotors
             // 
@@ -1352,8 +1355,8 @@
         private Button btnTestArduinoMotors;
         private Button TestSoundEffect1;
         private Button TestSoundEffect2;
-        private Button TestTWatchDisplay;
-        private Button TestTWatchMotor;
+        private Button btnTestTWatchDisplay;
+        private Button btnTestTWatchMotor;
         private Label lblTestErrMsg;
     }
 }

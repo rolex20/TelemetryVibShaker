@@ -1,4 +1,3 @@
-using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using System.Diagnostics;
 using System.Net.Sockets;
@@ -350,6 +349,7 @@ namespace TelemetryVibShaker
             ChangeStatus(btnSoundEffect2, true);
             ChangeStatus(btnJSONFile, true);
             ChangeStatus(txtListeningPort, true);
+            TestRoutines(true);
 
 
             // Adjust valid operations
@@ -436,8 +436,6 @@ namespace TelemetryVibShaker
 
         private void btnStartListening_Click(object sender, EventArgs e)
         {
-            // Display stats if required
-            if (chkChangeToMonitor.Checked) tabs.SelectTab(4);
 
             lastSecond = 0; // reset tracker
 
@@ -459,7 +457,7 @@ namespace TelemetryVibShaker
 
 
             // Check if the user has selected a valid audio device
-            if (cmbAudioDevice1.SelectedIndex == -1)
+            if (cmbAudioDevice1.SelectedIndex < 0)
             {
                 MessageBox.Show("Please select a valid audio device first.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 cmbAudioDevice1.Focus();
@@ -500,6 +498,7 @@ namespace TelemetryVibShaker
             ChangeStatus(btnSoundEffect2, false);
             ChangeStatus(btnJSONFile, false);
             ChangeStatus(txtListeningPort, false);
+            TestRoutines(false);
 
 
             // Adjust valid operations
@@ -507,8 +506,11 @@ namespace TelemetryVibShaker
             ChangeStatus(btnStop, true);
             toolStripStatusLabel1.Text = "Listening...";
 
-            timer1.Enabled = true;
+            // Display stats if required
+            if (chkChangeToMonitor.Checked) tabs.SelectTab(4);
 
+            // Start monitoring in UI
+            timer1.Enabled = true;
         }
 
         private void UpdateValue(Label L, int value)
@@ -796,45 +798,106 @@ namespace TelemetryVibShaker
             }
         }
 
-        private async void TestTWatchMotor_Click(object sender, EventArgs e)
+
+        public void PlaySound(string filePath, int audioDeviceId)
         {
-            byte[] parameters = { 100, 1 }; // [0]-Motor Vibration, [1]-Screen Color
-            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
-            await Task.Delay(800);
+            lblTestErrMsg.Text = String.Empty;
 
-            parameters[1] = 2; // Dark Green
-            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
-            await Task.Delay(800);
-
-            parameters[2] = 3; // TFT_GREEN
-            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
-            await Task.Delay(800);
-
-            parameters[2] = 4; // TFT_RED
-            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
-            await Task.Delay(800);
-
-            parameters[2] = 0; // TFT_BLACK
-            SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
-
+            try
+            {
+                using (var audioFile = new AudioFileReader(filePath))
+                using (var outputDevice = new WaveOutEvent() { DeviceNumber = audioDeviceId })
+                {
+                    outputDevice.Init(audioFile);
+                    outputDevice.Play();
+                    while (outputDevice.PlaybackState == PlaybackState.Playing)
+                    {
+                        Thread.Sleep(1000);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                lblTestErrMsg.Text = ex.Message;
+            }
         }
 
-        private async void btnTestArduinoMotors_Click(object sender, EventArgs e)
+        private void TestSoundEffect1_Click(object sender, EventArgs e)
         {
+            PlaySound(txtSoundEffect1.Text, cmbAudioDevice1.SelectedIndex);
+        }
+
+        private void TestSoundEffect2_Click(object sender, EventArgs e)
+        {
+            PlaySound(txtSoundEffect2.Text, cmbAudioDevice1.SelectedIndex);
+        }
+
+        private void btnTestArduinoMotors_Click(object sender, EventArgs e)
+        {
+
+            lblTestErrMsg.Text = String.Empty;
+
             byte[] strengthvibration = { 200, 0 };
             SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), strengthvibration);
-            await Task.Delay(800);
+            Thread.Sleep(800);
 
             strengthvibration[0] = 0;
             strengthvibration[1] = 200;
             SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), strengthvibration);
-            await Task.Delay(800);
+            Thread.Sleep(800);
 
             // Turn motors off quickly
             strengthvibration[0] = 0;
             strengthvibration[1] = 0;
             SendUdpDatagram(txtArduinoIP.Text, Convert.ToInt32(txtArduinoPort.Text), strengthvibration);
 
+        }
+
+        private void TestTWatchMotor_Click(object sender, EventArgs e)
+        {            
+            lblTestErrMsg.Text = String.Empty;
+
+            byte[] parameters = { 100, 0 }; // [0]-Motor Vibration, [1]-Screen Color
+            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
+            Thread.Sleep(800);
+
+            parameters[0] = 0; // turn off motor vibration
+            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
+        }
+
+
+
+        private void TestTWatchDisplay_Click(object sender, EventArgs e)
+        {
+            lblTestErrMsg.Text = String.Empty;
+
+             byte[] parameters = { 0, 1 }; // [0]-Motor Vibration, [1]-Screen Color
+            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
+            Thread.Sleep(800);
+
+            parameters[1] = 2; // Dark Green
+            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters);
+            Thread.Sleep(800);
+
+            parameters[1] = 3; // TFT_GREEN
+            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters);
+            Thread.Sleep(800);
+
+            parameters[1] = 4; // TFT_RED
+            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters);
+            Thread.Sleep(800);
+
+            parameters[1] = 0; // TFT_BLACK
+            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters); 
+
+        }
+
+        private void TestRoutines(bool Enabled)
+        {
+            btnTestTWatchDisplay.Enabled = Enabled;
+            btnTestTWatchMotor.Enabled = Enabled;
+
+            btnTestArduinoMotors.Enabled = Enabled;
         }
     }
 }
