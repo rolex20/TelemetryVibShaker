@@ -5,6 +5,7 @@ using System.Net;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using System;
+using NAudio.CoreAudioApi;
 
 
 namespace TelemetryVibShaker
@@ -125,12 +126,27 @@ namespace TelemetryVibShaker
 
         private void FillAudioDevices()
         {
-            // Skip the -1 Microsoft Audio Mapper
+
+
+            /*This version has a problem is likely due to a limitation within the NAudio library. Specifically, the WaveOut.GetCapabilities method returns a ProductName that is truncated to a maximum of 31 characters
             for (int n = 0; n < WaveOut.DeviceCount; n++)
             {
                 var capabilities = WaveOut.GetCapabilities(n);
                 cmbAudioDevice1.Items.Add(capabilities.ProductName);
+
+                var device = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)[n];
+                Debug.Print(device.FriendlyName);                
+            } */
+
+            // Create enumerator
+            var enumerator = new MMDeviceEnumerator();
+            // Skip the -1 Microsoft Audio Mapper
+            for (int n = 0; n < WaveOut.DeviceCount; n++)
+            {
+                var device = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)[n];
+                cmbAudioDevice1.Items.Add(device.FriendlyName);
             }
+
         }
 
 

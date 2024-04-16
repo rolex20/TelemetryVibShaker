@@ -97,7 +97,7 @@ namespace TelemetryVibShaker
             return result;
         }
 
-        private void LogToTemp(string message)
+        private void Log(string message)
         {
             string tempPath = Path.GetTempPath();
             string logFilePath = Path.Combine(tempPath, "log.txt");
@@ -177,7 +177,6 @@ namespace TelemetryVibShaker
                         //needs_update = false;
                         iDPS++;
                     }
-                    LogToTemp(receiveData.Length.ToString());
                 }
 
                 // Always process each datagram received
@@ -186,7 +185,7 @@ namespace TelemetryVibShaker
                 // SpeedBreaks possible values: 0-100
                 // Flaps possible values: 0-100
                 // Speed (optional): 0-255.  Units in 10th's of Km, so 10 is 100Km
-                if ( receiveData.Length <= 4)
+                if ( receiveData.Length == 4)
                 {
                     // Obtain telemetry data
                     LastData.AoA = receiveData[0];
