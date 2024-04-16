@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FloatingPointPerformance", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F5D0ADF3-511C-44FC-91E3-5A062DA42447}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimConnectExporter", "SimConnectExporter\SimConnectExporter.csproj", "{60DF62EF-5B00-44A7-937F-9D4DDDE4AB92}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,14 @@ Global
 		{CE1D19C3-2FA5-4219-BFEB-40BB0FAD2D65}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CE1D19C3-2FA5-4219-BFEB-40BB0FAD2D65}.Release|x64.ActiveCfg = Release|x64
 		{CE1D19C3-2FA5-4219-BFEB-40BB0FAD2D65}.Release|x64.Build.0 = Release|x64
+		{60DF62EF-5B00-44A7-937F-9D4DDDE4AB92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60DF62EF-5B00-44A7-937F-9D4DDDE4AB92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60DF62EF-5B00-44A7-937F-9D4DDDE4AB92}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{60DF62EF-5B00-44A7-937F-9D4DDDE4AB92}.Debug|x64.Build.0 = Debug|Any CPU
+		{60DF62EF-5B00-44A7-937F-9D4DDDE4AB92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60DF62EF-5B00-44A7-937F-9D4DDDE4AB92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60DF62EF-5B00-44A7-937F-9D4DDDE4AB92}.Release|x64.ActiveCfg = Release|Any CPU
+		{60DF62EF-5B00-44A7-937F-9D4DDDE4AB92}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
