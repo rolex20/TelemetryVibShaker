@@ -2,15 +2,16 @@ using System.Net.Sockets;
 using Microsoft.FlightSimulator.SimConnect;
 using System.Runtime.InteropServices;
 using TelemetryVibShaker;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Text;
-using System.Windows.Forms;
+using System.Diagnostics;
+using Microsoft.Win32;
 
 
 namespace SimConnectExporter
 {
     public partial class frmMain : Form
     {
+        private Process currentProcess;
         private UdpClient udpSender;
         private byte[] datagram;
 
@@ -39,6 +40,19 @@ namespace SimConnectExporter
             public double spoilers; // Airbrakes / Spoilers position
             public double angleOfAttack; // Angle of Attack in degrees
         };
+
+        private const uint PROCESS_MODE_BACKGROUND_BEGIN = 0x00100000;
+        private const uint PROCESS_MODE_BACKGROUND_END = 0x00200000;
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool SetPriorityClass(IntPtr handle, uint priorityClass);
+
+        [DllImport("kernel32.dll")]
+        public static extern uint GetCurrentThreadId();
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern uint GetCurrentProcessorNumber();
+
 
         private void ConnectToSimConnect()
         {
@@ -226,10 +240,37 @@ namespace SimConnectExporter
 
         private void frmMain_Load(object sender, EventArgs e)
         {
+            ProcessorCheck();
+
+            // Allocate the udp datagram
             datagram = new byte[4];
+
             // Load the settings for all controls in the form
             LoadSettings(this);
         }
+
+        private void ProcessorCheck()
+        {
+            // LoadSettings must be called before ProcessorCheck()
+
+            // Get the current process
+            currentProcess = Process.GetCurrentProcess();
+
+            // Assign only Efficiency cores if requested and CPU==12700K
+            chkUseEfficiencyCoresOnly_CheckedChanged(null, null);
+
+
+            // Assign background mode if requested
+            if (chkUseBackgroundProcessing.Checked)
+                SetPriorityClass(currentProcess.Handle, PROCESS_MODE_BACKGROUND_BEGIN);
+
+
+            // Change the priority class to the previous setting selected (NORMAL, BELOW_NORMAL or IDLE)
+            //cmbPriorityClass.SelectedIndex = Properties.Settings.Default.PriorityClassSelectedIndex;
+            cmbPriorityClass_SelectedIndexChanged(null, null);
+
+        }
+
 
 
         // This method loads the setting Value for a given control
@@ -327,5 +368,71 @@ namespace SimConnectExporter
             Properties.Settings.Default.Save();
 
         }
+
+        private void chkUseBackgroundProcessing_CheckedChanged(object sender, EventArgs e)
+        {
+            if (currentProcess == null) return;
+
+
+            if (chkUseBackgroundProcessing.Checked)
+                SetPriorityClass(currentProcess.Handle, PROCESS_MODE_BACKGROUND_BEGIN);
+            else
+                SetPriorityClass(currentProcess.Handle, PROCESS_MODE_BACKGROUND_END);
+
+        }
+
+        private void chkUseEfficiencyCoresOnly_CheckedChanged(object sender, EventArgs e)
+        {
+            if (currentProcess == null) return;
+
+
+            // Open the registry key for the processor
+            RegistryKey regKey = Registry.LocalMachine.OpenSubKey("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0");
+
+            // Read the processor name from the registry
+            string processorName = regKey.GetValue("ProcessorNameString").ToString();
+
+            // Check if the processor name contains "Intel 12700K"
+            if (processorName.Contains("12700K"))
+            {
+                chkUseEfficiencyCoresOnly.Visible = true;
+                if (chkUseEfficiencyCoresOnly.Checked)
+                {
+
+                    // Define the CPU affinity mask for CPUs 17 to 20
+                    // CPUs are zero-indexed, so CPU 17 is represented by bit 16, and so on.
+                    IntPtr affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
+
+                    // Set the CPU affinity
+                    currentProcess.ProcessorAffinity = affinityMask;
+                }
+            }
+
+            regKey.Close();
+
+        }
+
+        private void cmbPriorityClass_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (currentProcess != null && cmbPriorityClass.Tag != null && (bool)cmbPriorityClass.Tag) // Ignore first change during InitializeComponent()
+            {
+                switch (cmbPriorityClass.SelectedIndex)
+                {
+                    case 0: //NORMAL
+                        currentProcess.PriorityClass = ProcessPriorityClass.Normal;
+                        break;
+                    case 1: // BELOW NORMAL
+                        currentProcess.PriorityClass = ProcessPriorityClass.BelowNormal;
+                        break;
+                    case 2: //IDLE
+                        currentProcess.PriorityClass = ProcessPriorityClass.Idle;
+                        break;
+                }
+            }
+
+            cmbPriorityClass.Tag = true;
+
+        }
+
     }
 }

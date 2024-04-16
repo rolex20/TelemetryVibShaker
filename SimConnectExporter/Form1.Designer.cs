@@ -109,6 +109,7 @@
             chkUseEfficiencyCoresOnly.Text = "Use Efficiency cores only on Intel 12700K";
             chkUseEfficiencyCoresOnly.UseVisualStyleBackColor = true;
             chkUseEfficiencyCoresOnly.Visible = false;
+            chkUseEfficiencyCoresOnly.CheckedChanged += chkUseEfficiencyCoresOnly_CheckedChanged;
             // 
             // chkUseBackgroundProcessing
             // 
@@ -119,6 +120,7 @@
             chkUseBackgroundProcessing.TabIndex = 21;
             chkUseBackgroundProcessing.Text = "Use background processing mode";
             chkUseBackgroundProcessing.UseVisualStyleBackColor = true;
+            chkUseBackgroundProcessing.CheckedChanged += chkUseBackgroundProcessing_CheckedChanged;
             // 
             // cmbPriorityClass
             // 
@@ -129,6 +131,7 @@
             cmbPriorityClass.Name = "cmbPriorityClass";
             cmbPriorityClass.Size = new Size(121, 23);
             cmbPriorityClass.TabIndex = 20;
+            cmbPriorityClass.SelectedIndexChanged += cmbPriorityClass_SelectedIndexChanged;
             // 
             // label30
             // 
