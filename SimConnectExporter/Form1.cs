@@ -110,8 +110,8 @@ namespace SimConnectExporter
                     datagram[3] = (byte)(sd.trueAirspeed / 10.0d); // Speed must be sent in decameters per second
                     udpSender.BeginSend(datagram, datagram.Length, new AsyncCallback(SendCallback), udpSender);
                 }
-                else
-                {// send aircraft name
+                else // send aircraft name
+                {
                     CurrentAircraftName = aircraftName;
                     byte[] sendBytes = Encoding.ASCII.GetBytes(CurrentAircraftName);
                     udpSender.BeginSend(sendBytes, sendBytes.Length, new AsyncCallback(SendCallback), udpSender);
@@ -202,20 +202,13 @@ namespace SimConnectExporter
             udpSender.Connect(txtDestinationHostname.Text, Convert.ToInt32(txtDestinationPort.Text));
         }
 
-        // send the message
-        // the destination is defined by the call to .Connect()
-        // for now, lets ignore the connected field.  anyways this fails if not connected
-        public void SendTelemtryDatagram()
-        {
-
-            udpSender.BeginSend(datagram, datagram.Length, new AsyncCallback(SendCallback), udpSender);
-        }
 
         public static void SendCallback(IAsyncResult ar)
         {
             UdpClient u = (UdpClient)ar.AsyncState;
             u.EndSend(ar);
         }
+
         public frmMain()
         {
             InitializeComponent();
@@ -226,6 +219,9 @@ namespace SimConnectExporter
             tsStatusBar1.Text = "Trying to connect";
             CurrentAircraftName = "";
             ConnectUDP();
+
+            // Automatically change to the motor if required by the user
+            if (chkChangeToMonitor.Checked) tabs.SelectedIndex = 1;
         }
 
         private void frmMain_Load(object sender, EventArgs e)

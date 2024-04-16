@@ -141,7 +141,7 @@
             // 
             // txtDestinationPort
             // 
-            txtDestinationPort.Location = new Point(140, 71);
+            txtDestinationPort.Location = new Point(140, 67);
             txtDestinationPort.Name = "txtDestinationPort";
             txtDestinationPort.Size = new Size(131, 23);
             txtDestinationPort.TabIndex = 3;
@@ -149,7 +149,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(39, 74);
+            label2.Location = new Point(39, 70);
             label2.Name = "label2";
             label2.Size = new Size(95, 15);
             label2.TabIndex = 2;
