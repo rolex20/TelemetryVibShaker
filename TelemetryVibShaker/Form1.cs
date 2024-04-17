@@ -607,7 +607,8 @@ namespace TelemetryVibShaker
             }
 
             // Statistics are updated once per second
-            if (chkShowStatistics.Checked && telemetry.IsRunning() && tabs.SelectedIndex == 5)
+            bool showStatistics = telemetry.IsRunning() && (tabs.SelectedIndex == 5);
+            if (chkShowStatistics.Checked && showStatistics)
             {
                 // Report last datagram timestamp
                 UpdateValue(lblTimestamp, telemetry.TimeStamp);
@@ -634,7 +635,7 @@ namespace TelemetryVibShaker
                 UpdateValue(lblSpeed, telemetry.LastData.Speed);
 
                 // Report max UDP processing time
-                UpdateValue(lblProcessingTimeUDP, telemetry.MaxProcessingTime);
+                //UpdateValue(lblProcessingTimeUDP, telemetry.MaxProcessingTime);
 
                 // Report last processor used for UDP processing
                 UpdateValue(lblLastProcessorUsedUDP, telemetry.LastProcessorUsed);
@@ -648,10 +649,15 @@ namespace TelemetryVibShaker
                 // Report UDP ThreadID
                 UpdateValue(lblUDPServerThread, telemetry.ThreadId);
 
-                // Report max UI processing time (monitor)
-                UpdateMaxUIProcessingTime(); // the stopwatch is stopped here
-
             }
+
+            // Report max UDP processing time
+            UpdateValue(lblProcessingTimeUDP, telemetry.MaxProcessingTime);
+
+
+            // Report max UI processing time (monitor).  This one needs to be the last                
+            UpdateMaxUIProcessingTime(); // the stopwatch is stopped here
+
 
         }
 
