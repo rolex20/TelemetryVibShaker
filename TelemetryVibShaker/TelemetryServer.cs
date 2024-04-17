@@ -201,8 +201,7 @@ namespace TelemetryVibShaker
                      * To convert decameters/s -> km/h we use 
                      * km/h = decameters per second x 36
                      */
-                    if (receiveData.Length == 4)
-                        LastData.Speed = receiveData[3] * 36; // After this, Speed now is in km/h
+                     LastData.Speed = receiveData[3] * 36; // After this, Speed now is in km/h
 
 
                     // Process the Effects only if the current plane is moving above the MinSpeed required by the user
