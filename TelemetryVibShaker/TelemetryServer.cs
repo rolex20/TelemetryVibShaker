@@ -140,7 +140,7 @@ namespace TelemetryVibShaker
                 {
                     ThreadId = (int)GetCurrentThreadId(); // Let's see if it changes on receiving packets
                     receiveData = listenerUdp.Receive(ref sender); // Wait here until a new datagram is received
-                    if (Statistics) 
+                    //if (Statistics) 
                         stopwatch.Restart();  // Track the time to process this datagram
                     LastProcessorUsed = (int)GetCurrentProcessorNumber();
                 }
@@ -249,12 +249,12 @@ namespace TelemetryVibShaker
                     
                 }
 
-                if (Statistics) 
-                {
+                //if (Statistics) 
+                //{
                     stopwatch.Stop(); // at this point the datagram has been fully processed
                     int elapsed = stopwatch.Elapsed.Milliseconds;
                     if (MaxProcessingTime < elapsed) MaxProcessingTime = elapsed;
-                }
+                //}
 
             } // end-while
 
