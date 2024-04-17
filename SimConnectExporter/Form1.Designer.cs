@@ -211,7 +211,7 @@
             lblProcessingTimeUDP.Name = "lblProcessingTimeUDP";
             lblProcessingTimeUDP.Size = new Size(57, 15);
             lblProcessingTimeUDP.TabIndex = 14;
-            lblProcessingTimeUDP.Tag = "0";
+            lblProcessingTimeUDP.Tag = "-1";
             lblProcessingTimeUDP.Text = "UDP time";
             // 
             // lblMaxProcessingTimeTitle
@@ -226,7 +226,7 @@
             // lblTimestamp
             // 
             lblTimestamp.AutoSize = true;
-            lblTimestamp.Location = new Point(392, 126);
+            lblTimestamp.Location = new Point(347, 126);
             lblTimestamp.Name = "lblTimestamp";
             lblTimestamp.Size = new Size(27, 15);
             lblTimestamp.TabIndex = 45;
@@ -236,7 +236,7 @@
             // label31
             // 
             label31.AutoSize = true;
-            label31.Location = new Point(317, 126);
+            label31.Location = new Point(272, 126);
             label31.Name = "label31";
             label31.Size = new Size(69, 15);
             label31.TabIndex = 44;
@@ -249,6 +249,7 @@
             lblLastProcessorUsedUDP.Name = "lblLastProcessorUsedUDP";
             lblLastProcessorUsedUDP.Size = new Size(27, 15);
             lblLastProcessorUsedUDP.TabIndex = 43;
+            lblLastProcessorUsedUDP.Tag = "-1";
             lblLastProcessorUsedUDP.Text = "----";
             // 
             // label28
@@ -263,16 +264,17 @@
             // lblSpeed
             // 
             lblSpeed.AutoSize = true;
-            lblSpeed.Location = new Point(105, 153);
+            lblSpeed.Location = new Point(60, 153);
             lblSpeed.Name = "lblSpeed";
             lblSpeed.Size = new Size(22, 15);
             lblSpeed.TabIndex = 41;
+            lblSpeed.Tag = "-1";
             lblSpeed.Text = "---";
             // 
             // label20
             // 
             label20.AutoSize = true;
-            label20.Location = new Point(55, 153);
+            label20.Location = new Point(10, 153);
             label20.Name = "label20";
             label20.Size = new Size(42, 15);
             label20.TabIndex = 40;
@@ -281,7 +283,7 @@
             // lblAoAUnits
             // 
             lblAoAUnits.AutoSize = true;
-            lblAoAUnits.Location = new Point(138, 126);
+            lblAoAUnits.Location = new Point(93, 126);
             lblAoAUnits.Name = "lblAoAUnits";
             lblAoAUnits.Size = new Size(12, 15);
             lblAoAUnits.TabIndex = 39;
@@ -291,17 +293,17 @@
             // lblLastFlaps
             // 
             lblLastFlaps.AutoSize = true;
-            lblLastFlaps.Location = new Point(266, 153);
+            lblLastFlaps.Location = new Point(221, 153);
             lblLastFlaps.Name = "lblLastFlaps";
             lblLastFlaps.Size = new Size(22, 15);
             lblLastFlaps.TabIndex = 38;
-            lblLastFlaps.Tag = "0";
+            lblLastFlaps.Tag = "-1";
             lblLastFlaps.Text = "---";
             // 
             // label32
             // 
             label32.AutoSize = true;
-            label32.Location = new Point(220, 153);
+            label32.Location = new Point(175, 153);
             label32.Name = "label32";
             label32.Size = new Size(37, 15);
             label32.TabIndex = 37;
@@ -311,11 +313,11 @@
             // lblLastSpeedBrakes
             // 
             lblLastSpeedBrakes.AutoSize = true;
-            lblLastSpeedBrakes.Location = new Point(266, 126);
+            lblLastSpeedBrakes.Location = new Point(221, 126);
             lblLastSpeedBrakes.Name = "lblLastSpeedBrakes";
             lblLastSpeedBrakes.Size = new Size(22, 15);
             lblLastSpeedBrakes.TabIndex = 36;
-            lblLastSpeedBrakes.Tag = "0";
+            lblLastSpeedBrakes.Tag = "-1";
             lblLastSpeedBrakes.Text = "---";
             // 
             // lblCurrentUnitType
@@ -331,18 +333,18 @@
             // lblLastAoA
             // 
             lblLastAoA.AutoSize = true;
-            lblLastAoA.Location = new Point(105, 126);
+            lblLastAoA.Location = new Point(60, 126);
             lblLastAoA.Name = "lblLastAoA";
             lblLastAoA.Size = new Size(22, 15);
             lblLastAoA.TabIndex = 31;
-            lblLastAoA.Tag = "0";
+            lblLastAoA.Tag = "-1";
             lblLastAoA.Text = "---";
             lblLastAoA.TextAlign = ContentAlignment.TopRight;
             // 
             // label24
             // 
             label24.AutoSize = true;
-            label24.Location = new Point(181, 126);
+            label24.Location = new Point(136, 126);
             label24.Name = "label24";
             label24.Size = new Size(79, 15);
             label24.TabIndex = 33;
@@ -364,14 +366,14 @@
             label25.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label25.Location = new Point(16, 71);
             label25.Name = "label25";
-            label25.Size = new Size(220, 15);
+            label25.Size = new Size(230, 15);
             label25.TabIndex = 34;
-            label25.Text = "Last Telemetry received by export.lua:";
+            label25.Text = "Last Telemetry received by SimConnect:";
             // 
             // label23
             // 
             label23.AutoSize = true;
-            label23.Location = new Point(65, 126);
+            label23.Location = new Point(20, 126);
             label23.Name = "label23";
             label23.Size = new Size(33, 15);
             label23.TabIndex = 32;
@@ -423,8 +425,10 @@
             // tsStatusBar1
             // 
             tsStatusBar1.Name = "tsStatusBar1";
-            tsStatusBar1.Size = new Size(39, 17);
-            tsStatusBar1.Text = "Status";
+            tsStatusBar1.Size = new Size(463, 17);
+            tsStatusBar1.Spring = true;
+            tsStatusBar1.Text = "Idle";
+            tsStatusBar1.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // btnDisconnect
             // 

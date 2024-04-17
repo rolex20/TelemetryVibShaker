@@ -19,6 +19,8 @@ namespace SimConnectExporter
         private const int WM_USER_SIMCONNECT = 0x0402;
 
         private string CurrentAircraftName;
+        private Stopwatch stopWatch;
+        int maxProcessingTime;
 
         enum DEFINITIONS
         {
@@ -56,29 +58,36 @@ namespace SimConnectExporter
 
         private void ConnectToSimConnect()
         {
+
             try
             {
-                simconnect = new SimConnect("MSFS2020 SimConnect WinForms", this.Handle, WM_USER_SIMCONNECT, null, 0);
+                tsStatusBar1.Text = "Trying to connect...";
+
+                simconnect = new SimConnect("MSFS2020 SimConnectExporter C#", this.Handle, WM_USER_SIMCONNECT, null, 0);
 
                 simconnect.OnRecvOpen += new SimConnect.RecvOpenEventHandler(Simconnect_OnRecvOpen);
                 simconnect.OnRecvQuit += new SimConnect.RecvQuitEventHandler(Simconnect_OnRecvQuit);
                 simconnect.OnRecvSimobjectData += new SimConnect.RecvSimobjectDataEventHandler(Simconnect_OnRecvSimobjectData);
 
                 simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Title", null, SIMCONNECT_DATATYPE.STRING256, 0, SimConnect.SIMCONNECT_UNUSED);
-                //simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Airspeed True", "knots", SIMCONNECT_DATATYPE.FLOAT64, 0, SimConnect.SIMCONNECT_UNUSED);
-                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Airspeed True", "meter per second", SIMCONNECT_DATATYPE.FLOAT64, 0, SimConnect.SIMCONNECT_UNUSED);
+                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Airspeed True", "knots", SIMCONNECT_DATATYPE.FLOAT64, 0, SimConnect.SIMCONNECT_UNUSED);
+                //simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Airspeed True", "meter per second", SIMCONNECT_DATATYPE.FLOAT64, 0, SimConnect.SIMCONNECT_UNUSED);
                 simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Trailing Edge Flaps Left Percent", "percent", SIMCONNECT_DATATYPE.FLOAT64, 0, SimConnect.SIMCONNECT_UNUSED);
                 simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Spoilers Handle Position", "percent", SIMCONNECT_DATATYPE.FLOAT64, 0, SimConnect.SIMCONNECT_UNUSED);
-                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Angle of Attack", "degrees", SIMCONNECT_DATATYPE.FLOAT64, 0, SimConnect.SIMCONNECT_UNUSED);
+                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "INCIDENCE ALPHA", "Radians", SIMCONNECT_DATATYPE.FLOAT64, 0, SimConnect.SIMCONNECT_UNUSED);
 
                 simconnect.RegisterDataDefineStruct<Struct1>(DEFINITIONS.Struct1);
                 simconnect.RequestDataOnSimObject(REQUESTS.Request1, DEFINITIONS.Struct1, SimConnect.SIMCONNECT_OBJECT_ID_USER, SIMCONNECT_PERIOD.SECOND, SIMCONNECT_DATA_REQUEST_FLAG.CHANGED, 0, 0, 0);
                 btnConnect.Enabled = false;
                 btnDisconnect.Enabled = true;
+
+                // Automatically change to the motor if required by the user
+                if (chkChangeToMonitor.Checked) tabs.SelectedIndex = 1;
+
             }
             catch (COMException ex)
             {
-                MessageBox.Show("Unable to connect to MSFS2020: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                tsStatusBar1.Text = ex.Message;
             }
         }
 
@@ -99,17 +108,19 @@ namespace SimConnectExporter
 
         private void Simconnect_OnRecvOpen(SimConnect sender, SIMCONNECT_RECV_OPEN data)
         {
-            Console.WriteLine("SimConnect connection established");
+            tsStatusBar1.Text = "Connected to MSFS SimConnect since " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
         }
 
         private void Simconnect_OnRecvQuit(SimConnect sender, SIMCONNECT_RECV data)
         {
-            Console.WriteLine("SimConnect connection closed");
+            tsStatusBar1.Text = "SimConnect connection closed at " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"); ;
             DisconnectFromSimConnect();
         }
 
         private void Simconnect_OnRecvSimobjectData(SimConnect sender, SIMCONNECT_RECV_SIMOBJECT_DATA data)
         {
+            if (chkShowStatistics.Checked) stopWatch.Restart();
+
             if (data.dwRequestID == (uint)REQUESTS.Request1)
             {
                 Struct1 sd = (Struct1)data.dwData[0];
@@ -118,30 +129,45 @@ namespace SimConnectExporter
                 string aircraftName = sd.title;
                 if (CurrentAircraftName.Equals(aircraftName))// send datagram
                 {
-                    datagram[0] = (byte)sd.angleOfAttack;
+
+                    datagram[0] = (byte)Math.Round(57.2957795f * (float)sd.angleOfAttack); // convert radians to degrees
                     datagram[1] = (byte)sd.spoilers;
                     datagram[2] = (byte)sd.flaps;
-                    datagram[3] = (byte)(sd.trueAirspeed / 10.0d); // Speed must be sent in decameters per second
-                    udpSender.BeginSend(datagram, datagram.Length, new AsyncCallback(SendCallback), udpSender);
+
+                    Debug.Print($"AOA={sd.angleOfAttack * 57.2957795f} in bytes={datagram[0]}");
+                    /* Speed Conversion 
+                     * First convert knots to meters / second by dividing the speed value by 1.94384449
+                     * Then divide by ten to convert to decameters/second to ensure the value fits in 1 byte
+                     */
+                    datagram[3] = (byte)(((float)sd.trueAirspeed / 1.94384449f) / 10.0f);
+                    //udpSender.BeginSend(datagram, datagram.Length, new AsyncCallback(SendCallback), udpSender);
                 }
                 else // send aircraft name
                 {
                     CurrentAircraftName = aircraftName;
                     byte[] sendBytes = Encoding.ASCII.GetBytes(CurrentAircraftName);
-                    udpSender.BeginSend(sendBytes, sendBytes.Length, new AsyncCallback(SendCallback), udpSender);
+                    //udpSender.BeginSend(sendBytes, sendBytes.Length, new AsyncCallback(SendCallback), udpSender);
                 }
 
 
                 /*** Update UI ***/
                 if (chkShowStatistics.Checked && tabs.SelectedIndex == 1)
                 {
+                    UpdateValue(lblLastProcessorUsedUDP, (int)GetCurrentProcessorNumber());
                     UpdateValue(lblTimestamp, Environment.TickCount64);
                     UpdateValue(lblCurrentUnitType, sd.title);
-                    UpdateValue(lblSpeed, (int)sd.trueAirspeed);
+                    UpdateValue(lblSpeed, (int)sd.trueAirspeed);// show in knots
                     UpdateValue(lblLastFlaps, (int)sd.flaps);
                     UpdateValue(lblLastSpeedBrakes, (int)sd.spoilers);
+                    UpdateValue(lblLastAoA, (int)datagram[0]);
+                    UpdateValue(lblProcessingTimeUDP, maxProcessingTime);
                 }
 
+            }
+            if (chkShowStatistics.Checked) { 
+                stopWatch.Stop();
+                int elapsed = stopWatch.Elapsed.Milliseconds;
+                if (maxProcessingTime < elapsed) maxProcessingTime = elapsed;
             }
         }
 
@@ -230,23 +256,26 @@ namespace SimConnectExporter
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
-            tsStatusBar1.Text = "Trying to connect";
             CurrentAircraftName = "";
             ConnectUDP();
-
-            // Automatically change to the motor if required by the user
-            if (chkChangeToMonitor.Checked) tabs.SelectedIndex = 1;
+            ConnectToSimConnect();
         }
 
         private void frmMain_Load(object sender, EventArgs e)
         {
-            ProcessorCheck();
-
             // Allocate the udp datagram
             datagram = new byte[4];
 
+            // Create the stopwatch
+            stopWatch = new Stopwatch();
+
             // Load the settings for all controls in the form
             LoadSettings(this);
+
+
+            ProcessorCheck();
+
+            tsStatusBar1.Text = "Idle";
         }
 
         private void ProcessorCheck()
@@ -276,6 +305,7 @@ namespace SimConnectExporter
         // This method loads the setting Value for a given control
         private void LoadSetting(Control control)
         {
+
             // Get the name of the control
             string controlName = control.Name;
 
@@ -433,6 +463,5 @@ namespace SimConnectExporter
             cmbPriorityClass.Tag = true;
 
         }
-
     }
 }
