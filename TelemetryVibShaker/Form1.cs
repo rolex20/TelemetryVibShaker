@@ -979,7 +979,7 @@ namespace TelemetryVibShaker
             // Assign only Efficiency cores if requested and CPU==12700K
             chkUseEfficiencyCoresOnly_CheckedChanged(null, null);
 
-            
+
             // Assign background mode if requested
             if (chkUseBackgroundProcessing.Checked)
                 SetPriorityClass(currentProcess.Handle, PROCESS_MODE_BACKGROUND_BEGIN);

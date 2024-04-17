@@ -136,6 +136,9 @@
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             btnResetMax = new Button();
+            label35 = new Label();
+            label36 = new Label();
+            label37 = new Label();
             tabs.SuspendLayout();
             tabNormalSoundEffects.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier2).BeginInit();
@@ -899,6 +902,9 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(label37);
+            panel1.Controls.Add(label36);
+            panel1.Controls.Add(label35);
             panel1.Controls.Add(lblTimestamp);
             panel1.Controls.Add(label31);
             panel1.Controls.Add(lblUIThreadID);
@@ -935,7 +941,7 @@
             // lblTimestamp
             // 
             lblTimestamp.AutoSize = true;
-            lblTimestamp.Location = new Point(390, 132);
+            lblTimestamp.Location = new Point(412, 132);
             lblTimestamp.Name = "lblTimestamp";
             lblTimestamp.Size = new Size(64, 15);
             lblTimestamp.TabIndex = 29;
@@ -946,7 +952,7 @@
             // label31
             // 
             label31.AutoSize = true;
-            label31.Location = new Point(315, 132);
+            label31.Location = new Point(339, 132);
             label31.Name = "label31";
             label31.Size = new Size(69, 15);
             label31.TabIndex = 28;
@@ -1018,6 +1024,7 @@
             lblSpeed.Size = new Size(34, 15);
             lblSpeed.TabIndex = 21;
             lblSpeed.Text = "none";
+            lblSpeed.TextAlign = ContentAlignment.TopRight;
             // 
             // label20
             // 
@@ -1065,6 +1072,7 @@
             lblLastFlaps.TabIndex = 16;
             lblLastFlaps.Tag = "0";
             lblLastFlaps.Text = "none";
+            lblLastFlaps.TextAlign = ContentAlignment.TopRight;
             // 
             // label32
             // 
@@ -1128,6 +1136,7 @@
             lblLastSpeedBrakes.TabIndex = 10;
             lblLastSpeedBrakes.Tag = "0";
             lblLastSpeedBrakes.Text = "none";
+            lblLastSpeedBrakes.TextAlign = ContentAlignment.TopRight;
             // 
             // lblCurrentUnitType
             // 
@@ -1288,6 +1297,36 @@
             btnResetMax.UseVisualStyleBackColor = true;
             btnResetMax.Click += btnResetMax_Click;
             // 
+            // label35
+            // 
+            label35.AutoSize = true;
+            label35.Location = new Point(135, 159);
+            label35.Name = "label35";
+            label35.Size = new Size(36, 15);
+            label35.TabIndex = 30;
+            label35.Tag = "0";
+            label35.Text = "km/h";
+            // 
+            // label36
+            // 
+            label36.AutoSize = true;
+            label36.Location = new Point(304, 132);
+            label36.Name = "label36";
+            label36.Size = new Size(17, 15);
+            label36.TabIndex = 31;
+            label36.Tag = "0";
+            label36.Text = "%";
+            // 
+            // label37
+            // 
+            label37.AutoSize = true;
+            label37.Location = new Point(304, 159);
+            label37.Name = "label37";
+            label37.Size = new Size(17, 15);
+            label37.TabIndex = 32;
+            label37.Tag = "0";
+            label37.Text = "%";
+            // 
             // frmMain
             // 
             AcceptButton = btnStartListening;
@@ -1441,5 +1480,8 @@
         private CheckBox chkUseEfficiencyCoresOnly;
         private Label label31;
         private Label lblTimestamp;
+        private Label label37;
+        private Label label36;
+        private Label label35;
     }
 }
