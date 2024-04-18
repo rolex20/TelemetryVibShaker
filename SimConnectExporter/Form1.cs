@@ -119,7 +119,8 @@ namespace SimConnectExporter
 
         private void Simconnect_OnRecvSimobjectData(SimConnect sender, SIMCONNECT_RECV_SIMOBJECT_DATA data)
         {
-            if (chkShowStatistics.Checked) stopWatch.Restart();
+            //if (chkShowStatistics.Checked) 
+                stopWatch.Restart();
 
             if (data.dwRequestID == (uint)REQUESTS.Request1)
             {
@@ -140,13 +141,13 @@ namespace SimConnectExporter
                      * Then divide by ten to convert to decameters/second to ensure the value fits in 1 byte
                      */
                     datagram[3] = (byte)(((float)sd.trueAirspeed / 1.94384449f) / 10.0f);
-                    //udpSender.BeginSend(datagram, datagram.Length, new AsyncCallback(SendCallback), udpSender);
+                    udpSender.BeginSend(datagram, datagram.Length, new AsyncCallback(SendCallback), udpSender);
                 }
                 else // send aircraft name
                 {
                     CurrentAircraftName = aircraftName;
                     byte[] sendBytes = Encoding.ASCII.GetBytes(CurrentAircraftName);
-                    //udpSender.BeginSend(sendBytes, sendBytes.Length, new AsyncCallback(SendCallback), udpSender);
+                    udpSender.BeginSend(sendBytes, sendBytes.Length, new AsyncCallback(SendCallback), udpSender);
                 }
 
 
@@ -160,15 +161,16 @@ namespace SimConnectExporter
                     UpdateValue(lblLastFlaps, (int)sd.flaps);
                     UpdateValue(lblLastSpeedBrakes, (int)sd.spoilers);
                     UpdateValue(lblLastAoA, (int)datagram[0]);
-                    UpdateValue(lblProcessingTimeUDP, maxProcessingTime);
+                    
                 }
+                UpdateValue(lblProcessingTimeUDP, maxProcessingTime);
 
             }
-            if (chkShowStatistics.Checked) { 
+            //if (chkShowStatistics.Checked) { 
                 stopWatch.Stop();
                 int elapsed = stopWatch.Elapsed.Milliseconds;
-                if (maxProcessingTime < elapsed) maxProcessingTime = elapsed;
-            }
+                if (maxProcessingTime < elapsed) maxProcessingTime = elapsed;  // this is going to be delayed by one cycle, but it's okay
+            //}
         }
 
         private void UpdateValue(Label L, int value)

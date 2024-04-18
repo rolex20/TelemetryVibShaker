@@ -127,9 +127,9 @@
             cmbPriorityClass.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbPriorityClass.FormattingEnabled = true;
             cmbPriorityClass.Items.AddRange(new object[] { "NORMAL", "BELOW NORMAL", "IDLE" });
-            cmbPriorityClass.Location = new Point(140, 110);
+            cmbPriorityClass.Location = new Point(148, 110);
             cmbPriorityClass.Name = "cmbPriorityClass";
-            cmbPriorityClass.Size = new Size(121, 23);
+            cmbPriorityClass.Size = new Size(155, 23);
             cmbPriorityClass.TabIndex = 20;
             cmbPriorityClass.SelectedIndexChanged += cmbPriorityClass_SelectedIndexChanged;
             // 
@@ -144,9 +144,9 @@
             // 
             // txtDestinationPort
             // 
-            txtDestinationPort.Location = new Point(140, 67);
+            txtDestinationPort.Location = new Point(148, 67);
             txtDestinationPort.Name = "txtDestinationPort";
-            txtDestinationPort.Size = new Size(131, 23);
+            txtDestinationPort.Size = new Size(155, 23);
             txtDestinationPort.TabIndex = 3;
             // 
             // label2
@@ -169,9 +169,9 @@
             // 
             // txtDestinationHostname
             // 
-            txtDestinationHostname.Location = new Point(140, 24);
+            txtDestinationHostname.Location = new Point(148, 24);
             txtDestinationHostname.Name = "txtDestinationHostname";
-            txtDestinationHostname.Size = new Size(131, 23);
+            txtDestinationHostname.Size = new Size(155, 23);
             txtDestinationHostname.TabIndex = 0;
             // 
             // Monitor
