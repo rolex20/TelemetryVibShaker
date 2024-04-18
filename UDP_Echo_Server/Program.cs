@@ -1,4 +1,8 @@
-﻿using System;
+﻿/* Temporary program to test sending data via UDP
+ * This program is not needed for TelemetryVibShaker and I am not using/maintaining this anymore
+ */
+
+using System;
 using System.Net.Sockets;
 using System.Net;
 using System.Text;
