@@ -1,4 +1,9 @@
-﻿using System;
+﻿/* I used this program temporary to see if there was a difference between using float operations vs double
+ * Depending on the PC, the difference is negibible, I still went for float
+ * I am not using/maintaining this program anymore
+ * 
+ */
+using System;
 using System.Diagnostics;
 
 namespace FloatingPointPerformance
@@ -48,19 +53,25 @@ namespace FloatingPointPerformance
             stopwatch.Stop();
             Console.WriteLine("Double: {0} ms", stopwatch.ElapsedMilliseconds);
 
+            /*
             // Test the decimal operations
             stopwatch.Restart();
             for (int x = 0; x < loop; x++)
             {
-                m = (decimal)Math.Sin((double)m);
-                n = (decimal)Math.Asin((double)n);
-                o = (decimal)Math.Sqrt((double)o);
+                //m = (decimal)Math.Sin((double)m);
+                //n = (decimal)Math.Asin((double)n);
+                //o = (decimal)Math.Sqrt((double)o);
                 p = p + p - p + p;
                 q = q * q + q * q;
-                r = r / r / r / r / r;
+                r = r / r / r / r / r + q - p;
             }
             stopwatch.Stop();
+           
             Console.WriteLine("Decimal: {0} ms", stopwatch.ElapsedMilliseconds);
+            */
+
+            Console.WriteLine("Press enter to exit...");
+            Console.ReadLine();
         }
     }
 }
