@@ -237,6 +237,8 @@ namespace TelemetryVibShaker
                         soundManager.AoA2 = unit.AoA2;
                         for (int i = 0; i < vibMotor.Length; i++)
                             vibMotor[i].ChangeAoARange(unit.AoA1, unit.AoA2); // ChangeAoARange() will check if this is an AoA effect-type
+
+                        CurrentUnitType += "(" + soundManager.AoA1 + ", " + soundManager.AoA2 + ")";
                     }
                     else  // basically ignore the limits, because the unit type was not found in the JSON File
                     {
@@ -246,6 +248,8 @@ namespace TelemetryVibShaker
                             vibMotor[i].ChangeAoARange(360, 360);
 
                     }
+
+                    
                     
                 }
 
