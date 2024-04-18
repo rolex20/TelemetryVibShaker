@@ -1,4 +1,14 @@
-﻿using System;
+﻿/* Only used during testing to see if the delay would be too much with aruinos and the lily go t-watch
+ * The delay with Arduino R4 WiFi was 20ms
+ * The delay with Arduino R4 using the Ethernet switch was less than 10ms
+ * The delay with LilyGo T-Watch was less than 10ms (WiFi only)
+ * The delay with two of my PC's was less than 1ms
+ * All measures taken in my local network (1Gbps ethernet Switch)
+ * All measures taken with this program
+ * I am not using/needing this program anymore.
+ * */
+
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Diagnostics;
