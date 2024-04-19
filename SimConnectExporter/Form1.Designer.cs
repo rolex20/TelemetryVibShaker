@@ -141,6 +141,7 @@
             label30.Size = new Size(121, 15);
             label30.TabIndex = 19;
             label30.Text = "Process Priority Class:";
+            label30.TextAlign = ContentAlignment.TopRight;
             // 
             // txtDestinationPort
             // 
@@ -157,6 +158,7 @@
             label2.Size = new Size(95, 15);
             label2.TabIndex = 2;
             label2.Text = "Destination Port:";
+            label2.TextAlign = ContentAlignment.TopRight;
             // 
             // label1
             // 
@@ -166,6 +168,7 @@
             label1.Size = new Size(128, 15);
             label1.TabIndex = 1;
             label1.Text = "Destination Hostname:";
+            label1.TextAlign = ContentAlignment.TopRight;
             // 
             // txtDestinationHostname
             // 
