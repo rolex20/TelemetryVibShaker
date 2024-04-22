@@ -32,6 +32,8 @@ namespace TelemetryVibShaker
         {
             if (!Enabled) return 0;
 
+            // Using a strategy pattern here only obscured the code
+            // The code below is simpler to understand
             switch (effectType)
             {
                 case VibrationEffectType.AoA:
@@ -54,11 +56,11 @@ namespace TelemetryVibShaker
                 case VibrationEffectType.BackgroundFlaps:
                     return points.GetBackgroundColor(Telemetry.Flaps);
                     break;
+                case VibrationEffectType.Gear:
+                    return points.CalculateOutput(Telemetry.Gear);
                 case VibrationEffectType.Nothing:
                     return 0;
                     break;
-                case VibrationEffectType.Gear:
-                    return points.CalculateOutput(Telemetry.Gear);
                 default:
                     throw new Exception("VibrationEffectType type not implemented in EffectDefinition.CalculateOutput().");
                     return 0;
