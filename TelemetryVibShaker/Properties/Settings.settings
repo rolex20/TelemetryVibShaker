@@ -15,7 +15,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="txtSoundEffect1" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\Program Files\Microsoft Office\root\Office16\MEDIA\APPLAUSE.WAV</Value>
+      <Value Profile="(Default)">.\Full Throttle Electric.wav</Value>
     </Setting>
     <Setting Name="trkVolumeMultiplier1" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">60</Value>
@@ -24,7 +24,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="txtSoundEffect2" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\Program Files\Microsoft Office\root\Office16\MEDIA\APPLAUSE.WAV</Value>
+      <Value Profile="(Default)">.\VMS_stall.wav</Value>
     </Setting>
     <Setting Name="trkVolumeMultiplier2" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">60</Value>

@@ -73,7 +73,7 @@ namespace TelemetryVibShaker.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Program Files\\Microsoft Office\\root\\Office16\\MEDIA\\APPLAUSE.WAV")]
+        [global::System.Configuration.DefaultSettingValueAttribute(".\\Full Throttle Electric.wav")]
         public string txtSoundEffect1 {
             get {
                 return ((string)(this["txtSoundEffect1"]));
@@ -109,7 +109,7 @@ namespace TelemetryVibShaker.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Program Files\\Microsoft Office\\root\\Office16\\MEDIA\\APPLAUSE.WAV")]
+        [global::System.Configuration.DefaultSettingValueAttribute(".\\VMS_stall.wav")]
         public string txtSoundEffect2 {
             get {
                 return ((string)(this["txtSoundEffect2"]));

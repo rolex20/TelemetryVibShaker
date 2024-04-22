@@ -345,7 +345,7 @@
             txtSoundEffect2.Name = "txtSoundEffect2";
             txtSoundEffect2.Size = new Size(429, 23);
             txtSoundEffect2.TabIndex = 3;
-            txtSoundEffect2.Text = "C:\\Program Files\\Microsoft Office\\root\\Office16\\MEDIA\\APPLAUSE.WAV";
+            txtSoundEffect2.Text = "\"C:\\Users\\ralch\\Music\\AoA\\VMS_stall.wav\"";
             // 
             // label2
             // 
@@ -362,7 +362,7 @@
             txtSoundEffect1.Name = "txtSoundEffect1";
             txtSoundEffect1.Size = new Size(429, 23);
             txtSoundEffect1.TabIndex = 1;
-            txtSoundEffect1.Text = "C:\\Program Files\\Microsoft Office\\root\\Office16\\MEDIA\\APPLAUSE.WAV";
+            txtSoundEffect1.Text = "C:\\Users\\ralch\\Music\\AoA\\Full Throttle Electric.wav";
             // 
             // label1
             // 
@@ -1340,6 +1340,7 @@
             Controls.Add(btnStartListening);
             Controls.Add(tabs);
             FormBorderStyle = FormBorderStyle.Fixed3D;
+            MaximizeBox = false;
             Name = "frmMain";
             Text = "Telemetry Vib-Sound-Shaker [UDP Server]";
             FormClosing += frmMain_FormClosing;
