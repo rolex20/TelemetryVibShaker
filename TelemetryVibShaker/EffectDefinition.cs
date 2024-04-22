@@ -57,7 +57,10 @@ namespace TelemetryVibShaker
                 case VibrationEffectType.Nothing:
                     return 0;
                     break;
+                case VibrationEffectType.Gear:
+                    return points.CalculateOutput(Telemetry.Gear);
                 default:
+                    throw new Exception("VibrationEffectType type not implemented in EffectDefinition.CalculateOutput().");
                     return 0;
                     break;
             } //switch
