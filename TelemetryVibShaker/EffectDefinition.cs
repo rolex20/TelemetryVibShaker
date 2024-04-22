@@ -38,33 +38,23 @@ namespace TelemetryVibShaker
             {
                 case VibrationEffectType.AoA:
                     return points.CalculateOutput(Telemetry.AoA);
-                    break;// just in case I add something else later
                 case VibrationEffectType.SpeedBrakes:
                     return points.CalculateOutput(Telemetry.SpeedBrakes);
-                    break;
                 case VibrationEffectType.Flaps:
                     return points.CalculateOutput(Telemetry.Flaps);
-                    break;
                 case VibrationEffectType.BackgroundAoA:                   
                     return points.GetBackgroundColor(Telemetry.AoA);
-
-                    break;
                 case VibrationEffectType.BackgroundSpeedBrakes:
                     return points.GetBackgroundColor(Telemetry.SpeedBrakes);
-                    break;
-
                 case VibrationEffectType.BackgroundFlaps:
                     return points.GetBackgroundColor(Telemetry.Flaps);
-                    break;
                 case VibrationEffectType.Gear:
                     return points.CalculateOutput(Telemetry.Gear);
                 case VibrationEffectType.Nothing:
                     return 0;
-                    break;
                 default:
                     throw new Exception("VibrationEffectType type not implemented in EffectDefinition.CalculateOutput().");
-                    return 0;
-                    break;
+                    //return 0;  // Just in case somebody else caughts/ignores this exception
             } //switch
 
 

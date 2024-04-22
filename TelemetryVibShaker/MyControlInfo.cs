@@ -1,12 +1,14 @@
 ﻿
 
+using System.Net.Sockets;
+
 namespace TelemetryVibShaker
 {
     internal class MyControlInfo
     {
         public string Name;
-        public Type Type; // string or int to store in Settings
-        public object Value;  // .Text or .Value or .SelectedIndex
+        public Type? Type; // string or int to store in Settings
+        public object? Value;  // .Text or .Value or .SelectedIndex
         private Type originalControlType;
         private Control control;
 
@@ -14,6 +16,8 @@ namespace TelemetryVibShaker
         
         public void AssignValue(object value)
         {
+#pragma warning disable CS8602 // // Dereference of a possibly null reference
+
             if (control is TextBox)
             {
                 (control as TextBox).Text = (string)value;
@@ -41,6 +45,7 @@ namespace TelemetryVibShaker
                 throw new NotImplementedException("You need to add control [" + Name + "] to MyControlInfo::AssignValue()");
             }
             // You can add more cases for other types of controls
+#pragma warning restore CS8602 // Dereference of a possibly null reference
 
         }
 
@@ -49,7 +54,7 @@ namespace TelemetryVibShaker
             string sType = "";
             int iType = 0;
             bool bType = false;
-            decimal dType = 0;
+            
 
             control = ctrl;
 
@@ -58,6 +63,7 @@ namespace TelemetryVibShaker
             Value = null;
             Type = null;
 
+#pragma warning disable CS8602 // // Dereference of a possibly null reference
             if (control is TextBox)
             {
                 Value = (control as TextBox).Text;
@@ -84,7 +90,7 @@ namespace TelemetryVibShaker
                 Type = iType.GetType();
             }
             // You can add more cases for other types of controls
-
+#pragma warning restore CS8602 // Dereference of a possibly null reference
         }
     }
 }

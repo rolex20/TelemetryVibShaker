@@ -5,7 +5,7 @@ namespace TelemetryVibShaker
     {
         private byte [] datagram;
         private EffectDefinition[] effect;
-        private UdpClient udpSender;
+        private UdpClient? udpSender;
         private string serverIP;
         private int serverPort;
         public bool Enabled;
@@ -45,14 +45,21 @@ namespace TelemetryVibShaker
                 // send the message
                 // the destination is defined by the call to .Connect()
                 // for now, lets ignore the connected field.  anyways this fails if not connected
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
                 udpSender.BeginSend(datagram, datagram.Length, new AsyncCallback(SendCallback), udpSender);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
             }
         }
 
         public static void SendCallback(IAsyncResult ar)
         {
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
             UdpClient u = (UdpClient)ar.AsyncState;
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
             u.EndSend(ar);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
         }
 
         public void ChangeAoARange(int AoA1, int AoA2)

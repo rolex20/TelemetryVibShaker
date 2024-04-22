@@ -17,15 +17,15 @@ namespace TelemetryVibShaker
         public int MaxProcessingTime; // time of the datagram that took longer to process
         public int LastProcessorUsed; // processor used in the last udp packet received
         public int ThreadId; // OS Thread ID for the UDP Telemetry Server
-        public string CurrentUnitType; // current type of aircraft used by the player
+        public string? CurrentUnitType; // current type of aircraft used by the player
 
         private AoA_SoundManager soundManager;
         private MotorController[] vibMotor;
-        private Root jsonRoot;
+        private Root? jsonRoot;
         private bool cancelationToken;
         private bool Statistics;
         private int listeningPort;
-        private UdpClient listenerUdp;
+        private UdpClient? listenerUdp;
         public int MinSpeed; // km/h (below this speed, effects won't be active)
 
         [DllImport("kernel32.dll", SetLastError = true)]

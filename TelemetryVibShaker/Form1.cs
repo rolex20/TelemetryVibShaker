@@ -15,16 +15,16 @@ namespace TelemetryVibShaker
         private const int ARDUINO = 0;
         private const int TWATCH = 1;
 
-        private MotorController[] motorControllers; // currently the interface is fixed to 2 (Arduino and TWatch) and each with 2 effects
-        private EffectDefinition[] arduinoEffects;  // currently only two vibration motors connected
-        private EffectDefinition[] TWatchEffects; // curently only 1 motor and 1 display connected
-        private AoA_SoundManager soundManager;  // manages sound effects according to the current AoA
-        private TelemetryServer telemetry;      // controls all telemetry logic
-        private Thread threadTelemetry; // this thread runs the telemetry
+        private MotorController[]? motorControllers; // currently the interface is fixed to 2 (Arduino and TWatch) and each with 2 effects
+        private EffectDefinition[]? arduinoEffects;  // currently only two vibration motors connected
+        private EffectDefinition[]? TWatchEffects; // curently only 1 motor and 1 display connected
+        private AoA_SoundManager? soundManager;  // manages sound effects according to the current AoA
+        private TelemetryServer? telemetry;      // controls all telemetry logic
+        private Thread? threadTelemetry; // this thread runs the telemetry
         private long lastSecond; // second of the last udp datagram processed
         private int maxUIProcessingTime;  // milliseconds elapsed in processing the monitor-update-cycle in Timer1
-        private Stopwatch stopWatchUI;  // used to measure processing time in Timer1 (updating the UI)
-        private Process currentProcess;
+        private Stopwatch? stopWatchUI;  // used to measure processing time in Timer1 (updating the UI)
+        private Process? currentProcess;
 
         private const uint PROCESS_MODE_BACKGROUND_BEGIN = 0x00100000;
         private const uint PROCESS_MODE_BACKGROUND_END = 0x00200000;
@@ -59,12 +59,16 @@ namespace TelemetryVibShaker
 
         private void btnSoundEffect1_Click(object sender, EventArgs e)
         {
-            updateSelectedFile(txtSoundEffect1, "Select an NWAVE compatible audio file", (string)btnSoundEffect1.Tag);
+#pragma warning disable CS8604 // Possible null reference argument.
+            updateSelectedFile(txtSoundEffect1, "Select an NWAVE compatible audio file", btnSoundEffect1.Tag as string);
+#pragma warning restore CS8604 // Possible null reference argument.
         }
 
         private void btnSoundEffect2_Click(object sender, EventArgs e)
         {
-            updateSelectedFile(txtSoundEffect2, "Select an NWAVE compatible audio file", (string)btnSoundEffect2.Tag);
+#pragma warning disable CS8604 // Possible null reference argument.
+            updateSelectedFile(txtSoundEffect2, "Select an NWAVE compatible audio file", btnSoundEffect2.Tag as string);
+#pragma warning restore CS8604 // Possible null reference argument.
         }
 
         private DialogResult updateSelectedFile(TextBox tb, string title, string filter)
@@ -89,7 +93,9 @@ namespace TelemetryVibShaker
 
         private void btnJSONFile_Click(object sender, EventArgs e)
         {
-            DialogResult jsonSelection = updateSelectedFile(txtJSON, "Select an JSON file defining AoA for each aircraft", (string)btnJSONFile.Tag);
+#pragma warning disable CS8604 // Possible null reference argument.
+            DialogResult jsonSelection = updateSelectedFile(txtJSON, "Select an JSON file defining AoA for each aircraft", btnJSONFile.Tag as string);
+#pragma warning restore CS8604 // Possible null reference argument.
             if (jsonSelection == DialogResult.OK)
             {
                 string error = TelemetryServer.TestJSONFile(txtJSON.Text);
@@ -296,10 +302,12 @@ namespace TelemetryVibShaker
             stopWatchUI = new Stopwatch();
 
             // The TextChanged event is not exposed in the Designer:
+#pragma warning disable CS8622 // Dereference of a possibly null reference
             numMinIntensitySpeedBrakes.TextChanged += numMinIntensitySpeedBrakes_ValueChanged;
             numMaxIntensitySpeedBrakes.TextChanged += numMaxIntensitySpeedBrakes_ValueChanged;
             numMinIntensityFlaps.TextChanged += numMinIntensityFlaps_ValueChanged;
             numMaxIntensityFlaps.TextChanged += numMaxIntensityFlaps_ValueChanged;
+#pragma warning restore CS8622 // Dereference of a possibly null reference
 
             // This tags are used to make sure no double processing is made between _TextChanged and _ValueChanged events
             numMinIntensitySpeedBrakes.Tag = (long)0;
@@ -350,7 +358,7 @@ namespace TelemetryVibShaker
             updateEffectsTimeout();
         }
 
-        private void btnStop_Click(object sender, EventArgs e)
+        private void btnStop_Click(object? sender, EventArgs? e)
         {
             if (telemetry == null) return;
 
@@ -403,7 +411,9 @@ namespace TelemetryVibShaker
         // Create a new thread and run the telemetry
         private void DoTelemetry()
         {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
             telemetry.Run();
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
             toolStripStatusLabel1.Text = "aborted";
         }
 
@@ -774,7 +784,7 @@ namespace TelemetryVibShaker
         }
 
         // Reset max timers, UI and UDP
-        private void btnResetMax_Click(object sender, EventArgs e)
+        private void btnResetMax_Click(object? sender, EventArgs? e)
         {
             lblProcessingTimeUDP.Tag = null;
             lblProcessingTimeUI.Tag = null;
@@ -915,7 +925,7 @@ namespace TelemetryVibShaker
             btnTestSoundEffect2.Enabled = Enabled;
         }
 
-        private void cmbPriorityClass_SelectedIndexChanged(object sender, EventArgs e)
+        private void cmbPriorityClass_SelectedIndexChanged(object? sender, EventArgs? e)
         {
             if (currentProcess != null && cmbPriorityClass.Tag != null && (bool)cmbPriorityClass.Tag) // Ignore first change during InitializeComponent()
             {
@@ -971,7 +981,7 @@ namespace TelemetryVibShaker
 
         }
 
-        private void chkUseEfficiencyCoresOnly_CheckedChanged(object sender, EventArgs e)
+        private void chkUseEfficiencyCoresOnly_CheckedChanged(object? sender, EventArgs? e)
         {
             if (currentProcess == null) return;
 
