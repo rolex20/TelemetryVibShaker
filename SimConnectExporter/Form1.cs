@@ -11,15 +11,15 @@ namespace SimConnectExporter
 {
     public partial class frmMain : Form
     {
-        private Process currentProcess;
-        private UdpClient udpSender;
-        private byte[] datagram;
+        private Process? currentProcess;
+        private UdpClient? udpSender;
+        private byte[]? datagram;
 
-        private SimConnect simconnect = null;
+        private SimConnect? simconnect = null;
         private const int WM_USER_SIMCONNECT = 0x0402;
 
-        private string CurrentAircraftName;
-        private Stopwatch stopWatch;
+        private string? CurrentAircraftName;
+        private Stopwatch? stopWatch;
         int maxProcessingTime;
 
         enum DEFINITIONS
@@ -56,13 +56,11 @@ namespace SimConnectExporter
         private static extern uint GetCurrentProcessorNumber();
 
 
-        private void ConnectToSimConnect()
-        {
-
+        private bool Connect()
+        {            
+            tsStatusBar1.Text = "Trying to connect...";
             try
             {
-                tsStatusBar1.Text = "Trying to connect...";
-
                 simconnect = new SimConnect("MSFS2020 SimConnectExporter C#", this.Handle, WM_USER_SIMCONNECT, null, 0);
 
                 simconnect.OnRecvOpen += new SimConnect.RecvOpenEventHandler(Simconnect_OnRecvOpen);
@@ -77,18 +75,30 @@ namespace SimConnectExporter
                 simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "INCIDENCE ALPHA", "Radians", SIMCONNECT_DATATYPE.FLOAT64, 0, SimConnect.SIMCONNECT_UNUSED);
 
                 simconnect.RegisterDataDefineStruct<Struct1>(DEFINITIONS.Struct1);
+
+                // Prepare udp Sender
+                ConnectUDP();
+
+                // Request data from SimConnect
                 simconnect.RequestDataOnSimObject(REQUESTS.Request1, DEFINITIONS.Struct1, SimConnect.SIMCONNECT_OBJECT_ID_USER, SIMCONNECT_PERIOD.SECOND, SIMCONNECT_DATA_REQUEST_FLAG.CHANGED, 0, 0, 0);
+
+
                 btnConnect.Enabled = false;
                 btnDisconnect.Enabled = true;
 
                 // Automatically change to the motor if required by the user
                 if (chkChangeToMonitor.Checked) tabs.SelectedIndex = 1;
+                return true;
 
             }
-            catch (COMException ex)
+            catch //(COMException ex)
             {
-                tsStatusBar1.Text = ex.Message;
+                //tsStatusBar1.Text = ex.Message;
+                tsStatusBar1.Tag = Convert.ToInt32(tsStatusBar1.Tag) + 1;
+                tsStatusBar1.Text = $"Attempted to SimConnect failed {Convert.ToInt32(tsStatusBar1.Tag)}, retrying... ";
             }
+
+            return false;
         }
 
         protected override void WndProc(ref Message m)
@@ -120,7 +130,7 @@ namespace SimConnectExporter
         private void Simconnect_OnRecvSimobjectData(SimConnect sender, SIMCONNECT_RECV_SIMOBJECT_DATA data)
         {
             //if (chkShowStatistics.Checked) 
-                stopWatch.Restart();
+            stopWatch.Restart();
 
             if (data.dwRequestID == (uint)REQUESTS.Request1)
             {
@@ -161,15 +171,15 @@ namespace SimConnectExporter
                     UpdateValue(lblLastFlaps, (int)sd.flaps);
                     UpdateValue(lblLastSpeedBrakes, (int)sd.spoilers);
                     UpdateValue(lblLastAoA, (int)datagram[0]);
-                    
+
                 }
                 UpdateValue(lblProcessingTimeUDP, maxProcessingTime);
 
             }
             //if (chkShowStatistics.Checked) { 
-                stopWatch.Stop();
-                int elapsed = stopWatch.Elapsed.Milliseconds;
-                if (maxProcessingTime < elapsed) maxProcessingTime = elapsed;  // this is going to be delayed by one cycle, but it's okay
+            stopWatch.Stop();
+            int elapsed = stopWatch.Elapsed.Milliseconds;
+            if (maxProcessingTime < elapsed) maxProcessingTime = elapsed;  // this is going to be delayed by one cycle, but it's okay
             //}
         }
 
@@ -258,9 +268,10 @@ namespace SimConnectExporter
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
+            tsStatusBar1.Tag = 0;
             CurrentAircraftName = "";
-            ConnectUDP();
-            ConnectToSimConnect();
+            tsStatusBar1.Text = "Connection attempt requested...";
+            timer1.Enabled = true;
         }
 
         private void frmMain_Load(object sender, EventArgs e)
@@ -413,7 +424,7 @@ namespace SimConnectExporter
 
         }
 
-        private void chkUseEfficiencyCoresOnly_CheckedChanged(object sender, EventArgs e)
+        private void chkUseEfficiencyCoresOnly_CheckedChanged(object? sender, EventArgs? e)
         {
             if (currentProcess == null) return;
 
@@ -444,7 +455,7 @@ namespace SimConnectExporter
 
         }
 
-        private void cmbPriorityClass_SelectedIndexChanged(object sender, EventArgs e)
+        private void cmbPriorityClass_SelectedIndexChanged(object? sender, EventArgs? e)
         {
             if (currentProcess != null && cmbPriorityClass.Tag != null && (bool)cmbPriorityClass.Tag) // Ignore first change during InitializeComponent()
             {
@@ -464,6 +475,19 @@ namespace SimConnectExporter
 
             cmbPriorityClass.Tag = true;
 
+        }
+
+        private void btnResetMax_Click(object sender, EventArgs e)
+        {
+            maxProcessingTime = 0;
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (Connect())
+            {
+                timer1.Enabled = false;
+            }
         }
     }
 }

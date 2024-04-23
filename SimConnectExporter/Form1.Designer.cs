@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             tabs = new TabControl();
             Settings = new TabPage();
             chkUseEfficiencyCoresOnly = new CheckBox();
@@ -63,6 +64,8 @@
             statusStrip1 = new StatusStrip();
             tsStatusBar1 = new ToolStripStatusLabel();
             btnDisconnect = new Button();
+            btnResetMax = new Button();
+            timer1 = new System.Windows.Forms.Timer(components);
             tabs.SuspendLayout();
             Settings.SuspendLayout();
             Monitor.SuspendLayout();
@@ -444,11 +447,27 @@
             btnDisconnect.UseVisualStyleBackColor = true;
             btnDisconnect.Click += btnDisconnect_Click;
             // 
+            // btnResetMax
+            // 
+            btnResetMax.Location = new Point(25, 275);
+            btnResetMax.Name = "btnResetMax";
+            btnResetMax.Size = new Size(75, 23);
+            btnResetMax.TabIndex = 4;
+            btnResetMax.Text = "Reset Max";
+            btnResetMax.UseVisualStyleBackColor = true;
+            btnResetMax.Click += btnResetMax_Click;
+            // 
+            // timer1
+            // 
+            timer1.Interval = 1500;
+            timer1.Tick += timer1_Tick;
+            // 
             // frmMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(478, 336);
+            Controls.Add(btnResetMax);
             Controls.Add(btnDisconnect);
             Controls.Add(statusStrip1);
             Controls.Add(btnConnect);
@@ -508,5 +527,7 @@
         private Label label30;
         private Label lblProcessingTimeUDP;
         private Label lblMaxProcessingTimeTitle;
+        private Button btnResetMax;
+        private System.Windows.Forms.Timer timer1;
     }
 }
