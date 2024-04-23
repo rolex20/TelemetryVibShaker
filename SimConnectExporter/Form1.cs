@@ -88,8 +88,6 @@ namespace SimConnectExporter
                 btnConnect.Enabled = false;
                 btnDisconnect.Enabled = true;
 
-                // Automatically change to the motor if required by the user
-                if (chkChangeToMonitor.Checked) tabs.SelectedIndex = 1;
                 return true;
 
             }
@@ -271,6 +269,9 @@ namespace SimConnectExporter
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
+            // Automatically change to the motor if required by the user
+            if (chkChangeToMonitor.Checked) tabs.SelectedIndex = 1;
+
             tsStatusBar1.Tag = 0;
             CurrentAircraftName = "";
             tsStatusBar1.Text = "Connection attempt requested...";
