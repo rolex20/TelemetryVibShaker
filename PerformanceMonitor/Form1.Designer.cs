@@ -153,6 +153,7 @@
             this.tcTabControl = new System.Windows.Forms.TabControl();
             this.tbMonitor = new System.Windows.Forms.TabPage();
             this.tbSettings = new System.Windows.Forms.TabPage();
+            this.lbl12700KNote = new System.Windows.Forms.Label();
             this.cmbPriorityClass = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.nudPollingInterval = new System.Windows.Forms.NumericUpDown();
@@ -160,7 +161,6 @@
             this.tbErrors = new System.Windows.Forms.TabPage();
             this.txtErrors = new System.Windows.Forms.TextBox();
             this.lblErrorsTitle = new System.Windows.Forms.Label();
-            this.lbl12700KNote = new System.Windows.Forms.Label();
             this.toolStrip1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.tcTabControl.SuspendLayout();
@@ -1423,6 +1423,18 @@
             this.tbSettings.Text = "Settings";
             this.tbSettings.UseVisualStyleBackColor = true;
             // 
+            // lbl12700KNote
+            // 
+            this.lbl12700KNote.AutoSize = true;
+            this.lbl12700KNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbl12700KNote.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.lbl12700KNote.Location = new System.Drawing.Point(26, 149);
+            this.lbl12700KNote.Name = "lbl12700KNote";
+            this.lbl12700KNote.Size = new System.Drawing.Size(268, 13);
+            this.lbl12700KNote.TabIndex = 4;
+            this.lbl12700KNote.Text = "12700K detected:   Using only efficient cores ";
+            this.lbl12700KNote.Visible = false;
+            // 
             // cmbPriorityClass
             // 
             this.cmbPriorityClass.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -1516,18 +1528,6 @@
             this.lblErrorsTitle.Size = new System.Drawing.Size(168, 13);
             this.lblErrorsTitle.TabIndex = 0;
             this.lblErrorsTitle.Text = "Errors: (only the first 100 are listed)";
-            // 
-            // lbl12700KNote
-            // 
-            this.lbl12700KNote.AutoSize = true;
-            this.lbl12700KNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbl12700KNote.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
-            this.lbl12700KNote.Location = new System.Drawing.Point(26, 149);
-            this.lbl12700KNote.Name = "lbl12700KNote";
-            this.lbl12700KNote.Size = new System.Drawing.Size(268, 13);
-            this.lbl12700KNote.TabIndex = 4;
-            this.lbl12700KNote.Text = "12700K detected:   Using only efficient cores ";
-            this.lbl12700KNote.Visible = false;
             // 
             // frmMain
             // 

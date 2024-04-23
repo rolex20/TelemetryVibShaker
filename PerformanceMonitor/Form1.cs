@@ -69,8 +69,6 @@ namespace PerformanceMonitor
 
         private void cmbPriorityClass_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (cmbPriorityClass.Tag!=null && (bool)cmbPriorityClass.Tag) // Ignore first change during InitializeComponent()
-            {
                 switch (cmbPriorityClass.SelectedIndex)
                 {
                     case 0: //NORMAL
@@ -83,7 +81,6 @@ namespace PerformanceMonitor
                         currentProcess.PriorityClass = ProcessPriorityClass.Idle;
                         break;
                 }
-            }
 
             cmbPriorityClass.Tag = true;
         }
@@ -208,11 +205,8 @@ namespace PerformanceMonitor
 
             // Change the priority class to the previous setting selected (NORMAL, BELOW_NORMAL or IDLE)
             cmbPriorityClass.SelectedIndex = Properties.Settings.Default.PriorityClassSelectedIndex;
-            cmbPriorityClass_SelectedIndexChanged(null, null);
+            //cmbPriorityClass_SelectedIndexChanged(null, null);
 
-
-            //cmbPriorityClass.Tag = false; // Flag to ignore cmbPriorityClass.OnChange() once
-            //cmbPriorityClass.SelectedIndex = 1;  // BELOW NORMAL
 
 
             diskCounterC = new PerformanceCounter("PhysicalDisk", "Disk Bytes/sec", "0 C:", true);
@@ -375,7 +369,7 @@ namespace PerformanceMonitor
                 this.TopMost = tschkAlwaysOnTop.Checked;
 
 
-
+/*
             if (!(bool)timer1.Tag) // only do this once
             {
                 Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
@@ -389,7 +383,7 @@ namespace PerformanceMonitor
                 }
                 timer1.Tag = true;  // flag for one-time control in timer1_Tick()
             }
-
+*/
             if (tschkShowLastThread.Checked)
             {
                 int th = (int)GetCurrentThreadId(); 
