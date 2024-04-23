@@ -160,7 +160,7 @@ namespace TelemetryVibShaker
 
 
                 // Update Statistics and UI status controls
-                TimeStamp = Environment.TickCount64;
+                TimeStamp = Stopwatch.GetTimestamp();
                 long newSecond = TimeStamp / 1000;
                 if (Statistics)
                 {

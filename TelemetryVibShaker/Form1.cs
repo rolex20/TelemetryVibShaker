@@ -610,7 +610,7 @@ namespace TelemetryVibShaker
             if (telemetry != null) lastSecond = telemetry.LastSecond;
 
             // check if we haven't received more telemetry so we should mute all effects
-            if ((soundManager.SoundIsActive()) && (Environment.TickCount64 / 1000 - lastSecond > trkEffectTimeout.Value))
+            if ((soundManager.SoundIsActive()) && (Environment.TickCount / 1000 - lastSecond > trkEffectTimeout.Value))
             {
                 soundManager.MuteEffects();
                 UpdateSoundEffectStatus(SoundEffectStatus.Canceled);
@@ -736,7 +736,7 @@ namespace TelemetryVibShaker
 
         private void UpdateIntensity(NumericUpDown control, EffectDefinition[] effects, int index, float min, float max)
         {
-            long now = Environment.TickCount64 / 100; // if you type too fast, you might need to decrease this value
+            long now = Environment.TickCount / 100; // if you type too fast, you might need to decrease this value
             if ((long)control.Tag == now) return;  // don't do this twice (one for _ValueChanged and another one for _TextChanged)
             control.Tag = now; // update the timestamp of the last time we updated the value
 
