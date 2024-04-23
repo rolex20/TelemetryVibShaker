@@ -66,6 +66,8 @@
             btnDisconnect = new Button();
             btnResetMax = new Button();
             timer1 = new System.Windows.Forms.Timer(components);
+            label3 = new Label();
+            lblGear = new Label();
             tabs.SuspendLayout();
             Settings.SuspendLayout();
             Monitor.SuspendLayout();
@@ -182,6 +184,8 @@
             // 
             // Monitor
             // 
+            Monitor.Controls.Add(lblGear);
+            Monitor.Controls.Add(label3);
             Monitor.Controls.Add(lblProcessingTimeUDP);
             Monitor.Controls.Add(lblMaxProcessingTimeTitle);
             Monitor.Controls.Add(lblTimestamp);
@@ -232,7 +236,7 @@
             // lblTimestamp
             // 
             lblTimestamp.AutoSize = true;
-            lblTimestamp.Location = new Point(347, 126);
+            lblTimestamp.Location = new Point(347, 153);
             lblTimestamp.Name = "lblTimestamp";
             lblTimestamp.Size = new Size(27, 15);
             lblTimestamp.TabIndex = 45;
@@ -242,7 +246,7 @@
             // label31
             // 
             label31.AutoSize = true;
-            label31.Location = new Point(272, 126);
+            label31.Location = new Point(272, 153);
             label31.Name = "label31";
             label31.Size = new Size(69, 15);
             label31.TabIndex = 44;
@@ -462,6 +466,26 @@
             timer1.Interval = 1500;
             timer1.Tick += timer1_Tick;
             // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(307, 126);
+            label3.Name = "label3";
+            label3.Size = new Size(34, 15);
+            label3.TabIndex = 46;
+            label3.Text = "Gear:";
+            label3.TextAlign = ContentAlignment.TopRight;
+            // 
+            // lblGear
+            // 
+            lblGear.AutoSize = true;
+            lblGear.Location = new Point(347, 126);
+            lblGear.Name = "lblGear";
+            lblGear.Size = new Size(27, 15);
+            lblGear.TabIndex = 47;
+            lblGear.Tag = "-1";
+            lblGear.Text = "----";
+            // 
             // frmMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -529,5 +553,7 @@
         private Label lblMaxProcessingTimeTitle;
         private Button btnResetMax;
         private System.Windows.Forms.Timer timer1;
+        private Label lblGear;
+        private Label label3;
     }
 }

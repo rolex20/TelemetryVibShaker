@@ -38,9 +38,10 @@ namespace SimConnectExporter
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
             public string title; // Aircraft aircraftName
             public double trueAirspeed; // True airspeed in knots
-            public double flaps; // Flaps position
-            public double spoilers; // Airbrakes / Spoilers position
+            public double flaps; // Flaps position in percentage
+            public double spoilers; // Airbrakes / Spoilers position in percentage
             public double angleOfAttack; // Angle of Attack in degrees
+            public float gear;  // gear animation opsition in percentage
         };
 
         private const uint PROCESS_MODE_BACKGROUND_BEGIN = 0x00100000;
@@ -73,6 +74,7 @@ namespace SimConnectExporter
                 simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Trailing Edge Flaps Left Percent", "percent", SIMCONNECT_DATATYPE.FLOAT64, 0, SimConnect.SIMCONNECT_UNUSED);
                 simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Spoilers Handle Position", "percent", SIMCONNECT_DATATYPE.FLOAT64, 0, SimConnect.SIMCONNECT_UNUSED);
                 simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "INCIDENCE ALPHA", "Radians", SIMCONNECT_DATATYPE.FLOAT64, 0, SimConnect.SIMCONNECT_UNUSED);
+                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "GEAR ANIMATION POSITION", "percent", SIMCONNECT_DATATYPE.FLOAT32, 0, SimConnect.SIMCONNECT_UNUSED);
 
                 simconnect.RegisterDataDefineStruct<Struct1>(DEFINITIONS.Struct1);
 
@@ -171,6 +173,7 @@ namespace SimConnectExporter
                     UpdateValue(lblLastFlaps, (int)sd.flaps);
                     UpdateValue(lblLastSpeedBrakes, (int)sd.spoilers);
                     UpdateValue(lblLastAoA, (int)datagram[0]);
+                    UpdateValue(lblGear, (int)sd.gear);
 
                 }
                 UpdateValue(lblProcessingTimeUDP, maxProcessingTime);
@@ -271,6 +274,7 @@ namespace SimConnectExporter
             tsStatusBar1.Tag = 0;
             CurrentAircraftName = "";
             tsStatusBar1.Text = "Connection attempt requested...";
+            btnConnect.Enabled = false;
             timer1.Enabled = true;
         }
 
