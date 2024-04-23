@@ -165,7 +165,7 @@ namespace SimConnectExporter
                 if (chkShowStatistics.Checked && tabs.SelectedIndex == 1)
                 {
                     UpdateValue(lblLastProcessorUsedUDP, (int)GetCurrentProcessorNumber());
-                    UpdateValue(lblTimestamp, Environment.TickCount64);
+                    UpdateValue(lblTimestamp, (int)(1000 * Stopwatch.GetTimestamp()) / Stopwatch.Frequency);
                     UpdateValue(lblCurrentUnitType, sd.title);
                     UpdateValue(lblSpeed, (int)sd.trueAirspeed);// show in knots
                     UpdateValue(lblLastFlaps, (int)sd.flaps);
