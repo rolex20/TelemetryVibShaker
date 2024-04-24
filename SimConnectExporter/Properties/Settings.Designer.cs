@@ -130,5 +130,29 @@ namespace SimConnectExporter.Properties {
                 this["chkShowStatistics"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool chkTrackGForces {
+            get {
+                return ((bool)(this["chkTrackGForces"]));
+            }
+            set {
+                this["chkTrackGForces"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("300")]
+        public int nudFrequency {
+            get {
+                return ((int)(this["nudFrequency"]));
+            }
+            set {
+                this["nudFrequency"] = value;
+            }
+        }
     }
 }

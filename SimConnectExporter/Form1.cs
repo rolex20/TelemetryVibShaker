@@ -5,6 +5,7 @@ using TelemetryVibShaker;
 using System.Text;
 using System.Diagnostics;
 using Microsoft.Win32;
+using System.Windows.Forms;
 
 
 namespace SimConnectExporter
@@ -19,8 +20,11 @@ namespace SimConnectExporter
         private const int WM_USER_SIMCONNECT = 0x0402;
 
         private string? CurrentAircraftName;
+        private float maxGForce; // Max G force recorded for the CurrentAircraftName
         private Stopwatch? stopWatch;
-        int maxProcessingTime;
+        private int maxProcessingTime;
+        private long lastTimeStamp_ms;
+
 
         enum DEFINITIONS
         {
@@ -37,11 +41,13 @@ namespace SimConnectExporter
         {
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
             public string title; // Aircraft aircraftName
-            public double trueAirspeed; // True airspeed in knots
-            public double flaps; // Flaps position in percentage
-            public double spoilers; // Airbrakes / Spoilers position in percentage
-            public double angleOfAttack; // Angle of Attack in degrees
+            public float trueAirspeed; // True airspeed in knots
+            public float flaps; // Flaps position in percentage
+            public float spoilers; // Airbrakes / Spoilers position in percentage
+            public float angleOfAttack; // Angle of Attack in degrees
             public float gear;  // gear animation opsition in percentage
+            public float gForce;
+            public float altitude; // Altitude above ground level in feet
         };
 
         private const uint PROCESS_MODE_BACKGROUND_BEGIN = 0x00100000;
@@ -58,7 +64,7 @@ namespace SimConnectExporter
 
 
         private bool Connect()
-        {            
+        {
             tsStatusBar1.Text = "Trying to connect...";
             try
             {
@@ -69,12 +75,15 @@ namespace SimConnectExporter
                 simconnect.OnRecvSimobjectData += new SimConnect.RecvSimobjectDataEventHandler(Simconnect_OnRecvSimobjectData);
 
                 simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Title", null, SIMCONNECT_DATATYPE.STRING256, 0, SimConnect.SIMCONNECT_UNUSED);
-                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Airspeed True", "knots", SIMCONNECT_DATATYPE.FLOAT64, 0, SimConnect.SIMCONNECT_UNUSED);
+                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Airspeed True", "knots", SIMCONNECT_DATATYPE.FLOAT32, 0, SimConnect.SIMCONNECT_UNUSED);
                 //simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Airspeed True", "meter per second", SIMCONNECT_DATATYPE.FLOAT64, 0, SimConnect.SIMCONNECT_UNUSED);
-                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Trailing Edge Flaps Left Percent", "percent", SIMCONNECT_DATATYPE.FLOAT64, 0, SimConnect.SIMCONNECT_UNUSED);
-                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Spoilers Handle Position", "percent", SIMCONNECT_DATATYPE.FLOAT64, 0, SimConnect.SIMCONNECT_UNUSED);
-                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "INCIDENCE ALPHA", "Radians", SIMCONNECT_DATATYPE.FLOAT64, 0, SimConnect.SIMCONNECT_UNUSED);
-                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "GEAR ANIMATION POSITION", "percent", SIMCONNECT_DATATYPE.FLOAT32, 0, SimConnect.SIMCONNECT_UNUSED);
+                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Trailing Edge Flaps Left Percent", "percent", SIMCONNECT_DATATYPE.FLOAT32, 0, SimConnect.SIMCONNECT_UNUSED);
+                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "Spoilers Handle Position", "percent", SIMCONNECT_DATATYPE.FLOAT32, 0, SimConnect.SIMCONNECT_UNUSED);
+                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "INCIDENCE ALPHA", "Radians", SIMCONNECT_DATATYPE.FLOAT32, 0, SimConnect.SIMCONNECT_UNUSED);
+                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "GEAR CENTER POSITION", "percent", SIMCONNECT_DATATYPE.FLOAT32, 0, SimConnect.SIMCONNECT_UNUSED); //GEAR ANIMATION POSITION
+                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "G FORCE", "Gforce", SIMCONNECT_DATATYPE.FLOAT32, 0, SimConnect.SIMCONNECT_UNUSED);
+                simconnect.AddToDataDefinition(DEFINITIONS.Struct1, "PLANE ALT ABOVE GROUND", "meters", SIMCONNECT_DATATYPE.FLOAT32, 0, SimConnect.SIMCONNECT_UNUSED);
+
 
                 simconnect.RegisterDataDefineStruct<Struct1>(DEFINITIONS.Struct1);
 
@@ -82,11 +91,11 @@ namespace SimConnectExporter
                 ConnectUDP();
 
                 // Request data from SimConnect
-                simconnect.RequestDataOnSimObject(REQUESTS.Request1, DEFINITIONS.Struct1, SimConnect.SIMCONNECT_OBJECT_ID_USER, SIMCONNECT_PERIOD.SECOND, SIMCONNECT_DATA_REQUEST_FLAG.CHANGED, 0, 0, 0);
+                simconnect.RequestDataOnSimObject(REQUESTS.Request1, DEFINITIONS.Struct1, SimConnect.SIMCONNECT_OBJECT_ID_USER, SIMCONNECT_PERIOD.VISUAL_FRAME, SIMCONNECT_DATA_REQUEST_FLAG.CHANGED, 0, 0, 0);
 
 
                 btnConnect.Enabled = false;
-                btnDisconnect.Enabled = true;
+
 
                 return true;
 
@@ -96,6 +105,7 @@ namespace SimConnectExporter
                 //tsStatusBar1.Text = ex.Message;
                 tsStatusBar1.Tag = Convert.ToInt32(tsStatusBar1.Tag) + 1;
                 tsStatusBar1.Text = $"Attempted to SimConnect failed {Convert.ToInt32(tsStatusBar1.Tag)}, retrying... ";
+
             }
 
             return false;
@@ -124,13 +134,26 @@ namespace SimConnectExporter
         private void Simconnect_OnRecvQuit(SimConnect sender, SIMCONNECT_RECV data)
         {
             tsStatusBar1.Text = "SimConnect connection closed at " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"); ;
-            DisconnectFromSimConnect();
+
+            // Notify that a Disconnect has been generated by MSFS, not by the user clicking the btnDisconnect button
+            btnDisconnect_Click(null, null);
         }
 
         private void Simconnect_OnRecvSimobjectData(SimConnect sender, SIMCONNECT_RECV_SIMOBJECT_DATA data)
         {
-            //if (chkShowStatistics.Checked) 
-            stopWatch.Restart();
+            // perform division in double to retain maximum precision
+            // result is in milliseconds
+            long currentTimeStamp_ms = (long)((double)(1000.0D * ((double)Stopwatch.GetTimestamp()) / (double)Stopwatch.Frequency));
+
+            if (currentTimeStamp_ms - lastTimeStamp_ms < nudFrequency.Value)
+                return; // Skip this telemetry
+
+            // update the new timestamp
+            lastTimeStamp_ms = currentTimeStamp_ms;
+
+
+            if (chkShowStatistics.Checked)
+                stopWatch.Restart();
 
             if (data.dwRequestID == (uint)REQUESTS.Request1)
             {
@@ -140,24 +163,50 @@ namespace SimConnectExporter
                 string aircraftName = sd.title;
                 if (CurrentAircraftName.Equals(aircraftName))// send datagram
                 {
-
-                    datagram[0] = (byte)Math.Round(57.2957795f * (float)sd.angleOfAttack); // convert radians to degrees
+                    float aoa = 57.2957795f * sd.angleOfAttack; // convert radians to degrees
+                    datagram[0] = aoa < 0.0f ? (byte)0 : (byte)aoa;
                     datagram[1] = (byte)sd.spoilers;
                     datagram[2] = (byte)sd.flaps;
 
-                    Debug.Print($"AOA={sd.angleOfAttack * 57.2957795f} in bytes={datagram[0]}");
+
                     /* Speed Conversion 
                      * First convert knots to meters / second by dividing the speed value by 1.94384449
                      * Then divide by ten to convert to decameters/second to ensure the value fits in 1 byte
                      */
                     datagram[3] = (byte)(((float)sd.trueAirspeed / 1.94384449f) / 10.0f);
                     udpSender.BeginSend(datagram, datagram.Length, new AsyncCallback(SendCallback), udpSender);
+
+                    /* Check maxG and Track */
+                    if (sd.gForce > maxGForce)
+                    {
+                        maxGForce = sd.gForce;
+
+
+                        if (chkTrackGForces.Checked)
+                        {
+                            // Create a new row object based on the row template
+                            DataGridViewRow newRow = (DataGridViewRow)dgGForces.Rows[0].Clone();
+
+
+                            // Set the values for each cell in the row
+                            newRow.Cells[0].Value = aircraftName;
+                            newRow.Cells[1].Value = $"{maxGForce:F1}";
+                            newRow.Cells[2].Value = $"{lastTimeStamp_ms}";
+
+                            // Add the new row to the DataGridView
+                            dgGForces.Rows.Add(newRow);
+                        }
+
+
+
+                    }
                 }
                 else // send aircraft name
                 {
                     CurrentAircraftName = aircraftName;
                     byte[] sendBytes = Encoding.ASCII.GetBytes(CurrentAircraftName);
                     udpSender.BeginSend(sendBytes, sendBytes.Length, new AsyncCallback(SendCallback), udpSender);
+                    maxGForce = 0.0f; // resetting max g force detected
                 }
 
 
@@ -165,24 +214,38 @@ namespace SimConnectExporter
                 if (chkShowStatistics.Checked && tabs.SelectedIndex == 1)
                 {
                     UpdateValue(lblLastProcessorUsedUDP, (int)GetCurrentProcessorNumber());
-                    UpdateValue(lblTimestamp, (int)(1000 * Stopwatch.GetTimestamp()) / Stopwatch.Frequency);
+                    UpdateValue(lblTimestamp, lastTimeStamp_ms);
                     UpdateValue(lblCurrentUnitType, sd.title);
                     UpdateValue(lblSpeed, (int)sd.trueAirspeed);// show in knots
                     UpdateValue(lblLastFlaps, (int)sd.flaps);
                     UpdateValue(lblLastSpeedBrakes, (int)sd.spoilers);
                     UpdateValue(lblLastAoA, (int)datagram[0]);
                     UpdateValue(lblGear, (int)sd.gear);
-
+                    UpdateValue(lblAltitude, (int)sd.altitude);
+                    UpdateValue(lblGforce, (int)sd.gForce);
+                    UpdateValue(lblMaxGForce, maxGForce);
                 }
                 UpdateValue(lblProcessingTimeUDP, maxProcessingTime);
 
             }
-            //if (chkShowStatistics.Checked) { 
-            stopWatch.Stop();
-            int elapsed = stopWatch.Elapsed.Milliseconds;
-            if (maxProcessingTime < elapsed) maxProcessingTime = elapsed;  // this is going to be delayed by one cycle, but it's okay
-            //}
+            if (chkShowStatistics.Checked)
+            {
+                stopWatch.Stop();
+                int elapsed = stopWatch.Elapsed.Milliseconds;
+                if (maxProcessingTime < elapsed) maxProcessingTime = elapsed;  // this is going to be delayed by one cycle, but it's okay
+            }
         }
+
+
+        private void UpdateValue(Label L, double value)
+        {
+            if (Convert.ToInt32(L.Tag) != value)
+            {
+                L.Tag = value;
+                L.Text = (value >= 0) ? $"{value:F1}" : "---"; // if value<0 then it is not valid or applicable yet
+            }
+        }
+
 
         private void UpdateValue(Label L, int value)
         {
@@ -212,31 +275,28 @@ namespace SimConnectExporter
         }
 
 
-
-
-        private void DisconnectFromSimConnect()
-        {
-            if (simconnect != null)
-            {
-                simconnect.Dispose();
-                simconnect = null;
-            }
-            btnConnect.Enabled = true;
-            btnDisconnect.Enabled = false;
-        }
-
-
-
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            DisconnectUDP();
             DisconnectFromSimConnect();
+            DisconnectUDP();
         }
 
         private void btnDisconnect_Click(object sender, EventArgs e)
         {
-            DisconnectUDP();
+            tsStatusBar1.Text = "SimConnect disconnection requested by user at " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"); ;
             DisconnectFromSimConnect();
+            DisconnectUDP();
+
+            // Notify that a disconnection was generated by MSFS, not by the user, and attempt to reconnect again when possible
+            // This can happen if the user, quit MSFS to make some changes and then they start MSFS
+            // Without this code, the user will have to go back to SimConnectExporter and click on Connect again
+            if (sender is null)
+                btnConnect_Click(null, null);
+            else
+            {
+                if (timer1.Enabled) timer1.Enabled = false;
+                btnConnect.Enabled = true;
+            }
         }
 
         private void DisconnectUDP()
@@ -248,6 +308,17 @@ namespace SimConnectExporter
             }
 
         }
+
+        private void DisconnectFromSimConnect()
+        {
+            if (simconnect != null)
+            {
+                simconnect.Dispose();
+                simconnect = null;
+            }
+            btnConnect.Enabled = true;
+        }
+
 
         private void ConnectUDP()
         {
@@ -273,14 +344,21 @@ namespace SimConnectExporter
             if (chkChangeToMonitor.Checked) tabs.SelectedIndex = 1;
 
             tsStatusBar1.Tag = 0;
-            CurrentAircraftName = "";
-            tsStatusBar1.Text = "Connection attempt requested...";
+            //CurrentAircraftName = "";
+            if (sender is not null) tsStatusBar1.Text = "Connection attempt requested...";
             btnConnect.Enabled = false;
+            btnDisconnect.Enabled = true;
             timer1.Enabled = true;
         }
 
         private void frmMain_Load(object sender, EventArgs e)
         {
+            // Restore previous location
+            this.Location = new Point(Properties.Settings.Default.XCoordinate, Properties.Settings.Default.YCoordinate);
+
+
+            CurrentAircraftName = "";
+
             // Allocate the udp datagram
             datagram = new byte[4];
 
@@ -492,6 +570,18 @@ namespace SimConnectExporter
             if (Connect())
             {
                 timer1.Enabled = false;
+            }
+        }
+
+        private void dgGForces_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0 && e.ColumnIndex >= 0) // Check if the clicked cell is valid
+            {
+                var cellValue = dgGForces.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+                if (cellValue != null)
+                {
+                    Clipboard.SetText(cellValue.ToString());
+                }
             }
         }
     }

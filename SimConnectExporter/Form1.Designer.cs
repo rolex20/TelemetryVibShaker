@@ -31,6 +31,8 @@
             components = new System.ComponentModel.Container();
             tabs = new TabControl();
             Settings = new TabPage();
+            label8 = new Label();
+            nudFrequency = new NumericUpDown();
             chkUseEfficiencyCoresOnly = new CheckBox();
             chkUseBackgroundProcessing = new CheckBox();
             cmbPriorityClass = new ComboBox();
@@ -40,6 +42,16 @@
             label1 = new Label();
             txtDestinationHostname = new TextBox();
             Monitor = new TabPage();
+            lblMaxGForce = new Label();
+            label9 = new Label();
+            label7 = new Label();
+            label4 = new Label();
+            lblAltitude = new Label();
+            label6 = new Label();
+            lblGforce = new Label();
+            label5 = new Label();
+            lblGear = new Label();
+            label3 = new Label();
             lblProcessingTimeUDP = new Label();
             lblMaxProcessingTimeTitle = new Label();
             lblTimestamp = new Label();
@@ -60,17 +72,26 @@
             label23 = new Label();
             chkShowStatistics = new CheckBox();
             chkChangeToMonitor = new CheckBox();
+            tbGForces = new TabPage();
+            dgGForces = new DataGridView();
+            AircraftName = new DataGridViewTextBoxColumn();
+            MaxGForce = new DataGridViewTextBoxColumn();
+            Timestamp = new DataGridViewTextBoxColumn();
+            chkTrackGForces = new CheckBox();
             btnConnect = new Button();
             statusStrip1 = new StatusStrip();
             tsStatusBar1 = new ToolStripStatusLabel();
             btnDisconnect = new Button();
             btnResetMax = new Button();
             timer1 = new System.Windows.Forms.Timer(components);
-            label3 = new Label();
-            lblGear = new Label();
+            label10 = new Label();
+            label11 = new Label();
             tabs.SuspendLayout();
             Settings.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)nudFrequency).BeginInit();
             Monitor.SuspendLayout();
+            tbGForces.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgGForces).BeginInit();
             statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -78,14 +99,17 @@
             // 
             tabs.Controls.Add(Settings);
             tabs.Controls.Add(Monitor);
-            tabs.Location = new Point(21, 32);
+            tabs.Controls.Add(tbGForces);
+            tabs.Location = new Point(12, 24);
             tabs.Name = "tabs";
             tabs.SelectedIndex = 0;
-            tabs.Size = new Size(443, 237);
+            tabs.Size = new Size(469, 278);
             tabs.TabIndex = 0;
             // 
             // Settings
             // 
+            Settings.Controls.Add(label8);
+            Settings.Controls.Add(nudFrequency);
             Settings.Controls.Add(chkUseEfficiencyCoresOnly);
             Settings.Controls.Add(chkUseBackgroundProcessing);
             Settings.Controls.Add(cmbPriorityClass);
@@ -97,17 +121,38 @@
             Settings.Location = new Point(4, 24);
             Settings.Name = "Settings";
             Settings.Padding = new Padding(3);
-            Settings.Size = new Size(435, 209);
+            Settings.Size = new Size(461, 250);
             Settings.TabIndex = 0;
             Settings.Text = "Settings";
             Settings.UseVisualStyleBackColor = true;
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new Point(17, 147);
+            label8.Name = "label8";
+            label8.Size = new Size(119, 15);
+            label8.TabIndex = 24;
+            label8.Text = "Telemetry Frequency:";
+            label8.TextAlign = ContentAlignment.TopRight;
+            // 
+            // nudFrequency
+            // 
+            nudFrequency.Increment = new decimal(new int[] { 100, 0, 0, 0 });
+            nudFrequency.Location = new Point(152, 145);
+            nudFrequency.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            nudFrequency.Minimum = new decimal(new int[] { 100, 0, 0, 0 });
+            nudFrequency.Name = "nudFrequency";
+            nudFrequency.Size = new Size(155, 23);
+            nudFrequency.TabIndex = 23;
+            nudFrequency.Value = new decimal(new int[] { 300, 0, 0, 0 });
             // 
             // chkUseEfficiencyCoresOnly
             // 
             chkUseEfficiencyCoresOnly.AutoSize = true;
             chkUseEfficiencyCoresOnly.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Bold, GraphicsUnit.Point);
             chkUseEfficiencyCoresOnly.ForeColor = Color.FromArgb(91, 155, 213);
-            chkUseEfficiencyCoresOnly.Location = new Point(13, 174);
+            chkUseEfficiencyCoresOnly.Location = new Point(13, 214);
             chkUseEfficiencyCoresOnly.Name = "chkUseEfficiencyCoresOnly";
             chkUseEfficiencyCoresOnly.Size = new Size(290, 19);
             chkUseEfficiencyCoresOnly.TabIndex = 22;
@@ -119,7 +164,7 @@
             // chkUseBackgroundProcessing
             // 
             chkUseBackgroundProcessing.AutoSize = true;
-            chkUseBackgroundProcessing.Location = new Point(13, 147);
+            chkUseBackgroundProcessing.Location = new Point(13, 187);
             chkUseBackgroundProcessing.Name = "chkUseBackgroundProcessing";
             chkUseBackgroundProcessing.Size = new Size(206, 19);
             chkUseBackgroundProcessing.TabIndex = 21;
@@ -132,7 +177,7 @@
             cmbPriorityClass.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbPriorityClass.FormattingEnabled = true;
             cmbPriorityClass.Items.AddRange(new object[] { "NORMAL", "BELOW NORMAL", "IDLE" });
-            cmbPriorityClass.Location = new Point(148, 110);
+            cmbPriorityClass.Location = new Point(152, 102);
             cmbPriorityClass.Name = "cmbPriorityClass";
             cmbPriorityClass.Size = new Size(155, 23);
             cmbPriorityClass.TabIndex = 20;
@@ -141,7 +186,7 @@
             // label30
             // 
             label30.AutoSize = true;
-            label30.Location = new Point(13, 113);
+            label30.Location = new Point(17, 105);
             label30.Name = "label30";
             label30.Size = new Size(121, 15);
             label30.TabIndex = 19;
@@ -150,7 +195,7 @@
             // 
             // txtDestinationPort
             // 
-            txtDestinationPort.Location = new Point(148, 67);
+            txtDestinationPort.Location = new Point(152, 59);
             txtDestinationPort.Name = "txtDestinationPort";
             txtDestinationPort.Size = new Size(155, 23);
             txtDestinationPort.TabIndex = 3;
@@ -158,7 +203,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(39, 70);
+            label2.Location = new Point(43, 62);
             label2.Name = "label2";
             label2.Size = new Size(95, 15);
             label2.TabIndex = 2;
@@ -168,7 +213,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(6, 27);
+            label1.Location = new Point(10, 19);
             label1.Name = "label1";
             label1.Size = new Size(128, 15);
             label1.TabIndex = 1;
@@ -177,13 +222,23 @@
             // 
             // txtDestinationHostname
             // 
-            txtDestinationHostname.Location = new Point(148, 24);
+            txtDestinationHostname.Location = new Point(152, 16);
             txtDestinationHostname.Name = "txtDestinationHostname";
             txtDestinationHostname.Size = new Size(155, 23);
             txtDestinationHostname.TabIndex = 0;
             // 
             // Monitor
             // 
+            Monitor.Controls.Add(label11);
+            Monitor.Controls.Add(label10);
+            Monitor.Controls.Add(lblMaxGForce);
+            Monitor.Controls.Add(label9);
+            Monitor.Controls.Add(label7);
+            Monitor.Controls.Add(label4);
+            Monitor.Controls.Add(lblAltitude);
+            Monitor.Controls.Add(label6);
+            Monitor.Controls.Add(lblGforce);
+            Monitor.Controls.Add(label5);
             Monitor.Controls.Add(lblGear);
             Monitor.Controls.Add(label3);
             Monitor.Controls.Add(lblProcessingTimeUDP);
@@ -209,15 +264,112 @@
             Monitor.Location = new Point(4, 24);
             Monitor.Name = "Monitor";
             Monitor.Padding = new Padding(3);
-            Monitor.Size = new Size(435, 209);
+            Monitor.Size = new Size(461, 250);
             Monitor.TabIndex = 1;
             Monitor.Text = "Monitor";
             Monitor.UseVisualStyleBackColor = true;
             // 
+            // lblMaxGForce
+            // 
+            lblMaxGForce.AutoSize = true;
+            lblMaxGForce.Location = new Point(399, 180);
+            lblMaxGForce.Name = "lblMaxGForce";
+            lblMaxGForce.Size = new Size(27, 15);
+            lblMaxGForce.TabIndex = 55;
+            lblMaxGForce.Tag = "-1";
+            lblMaxGForce.Text = "----";
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Location = new Point(317, 180);
+            label9.Name = "label9";
+            label9.Size = new Size(76, 15);
+            label9.TabIndex = 54;
+            label9.Text = "Max G Force:";
+            label9.TextAlign = ContentAlignment.TopRight;
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(93, 180);
+            label7.Name = "label7";
+            label7.Size = new Size(151, 15);
+            label7.TabIndex = 53;
+            label7.Text = "meters (Above the Ground)";
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new Point(93, 153);
+            label4.Name = "label4";
+            label4.Size = new Size(36, 15);
+            label4.TabIndex = 52;
+            label4.Text = "knots";
+            // 
+            // lblAltitude
+            // 
+            lblAltitude.AutoSize = true;
+            lblAltitude.Location = new Point(60, 180);
+            lblAltitude.Name = "lblAltitude";
+            lblAltitude.Size = new Size(22, 15);
+            lblAltitude.TabIndex = 51;
+            lblAltitude.Tag = "-1";
+            lblAltitude.Text = "---";
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Location = new Point(4, 180);
+            label6.Name = "label6";
+            label6.Size = new Size(52, 15);
+            label6.TabIndex = 50;
+            label6.Text = "Altitude:";
+            // 
+            // lblGforce
+            // 
+            lblGforce.AutoSize = true;
+            lblGforce.Location = new Point(399, 153);
+            lblGforce.Name = "lblGforce";
+            lblGforce.Size = new Size(27, 15);
+            lblGforce.TabIndex = 49;
+            lblGforce.Tag = "-1";
+            lblGforce.Text = "----";
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Location = new Point(343, 153);
+            label5.Name = "label5";
+            label5.Size = new Size(50, 15);
+            label5.TabIndex = 48;
+            label5.Text = "G Force:";
+            label5.TextAlign = ContentAlignment.TopRight;
+            // 
+            // lblGear
+            // 
+            lblGear.AutoSize = true;
+            lblGear.Location = new Point(399, 126);
+            lblGear.Name = "lblGear";
+            lblGear.Size = new Size(27, 15);
+            lblGear.TabIndex = 47;
+            lblGear.Tag = "-1";
+            lblGear.Text = "----";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(359, 126);
+            label3.Name = "label3";
+            label3.Size = new Size(34, 15);
+            label3.TabIndex = 46;
+            label3.Text = "Gear:";
+            label3.TextAlign = ContentAlignment.TopRight;
+            // 
             // lblProcessingTimeUDP
             // 
             lblProcessingTimeUDP.AutoSize = true;
-            lblProcessingTimeUDP.Location = new Point(170, 182);
+            lblProcessingTimeUDP.Location = new Point(170, 225);
             lblProcessingTimeUDP.Name = "lblProcessingTimeUDP";
             lblProcessingTimeUDP.Size = new Size(57, 15);
             lblProcessingTimeUDP.TabIndex = 14;
@@ -227,7 +379,7 @@
             // lblMaxProcessingTimeTitle
             // 
             lblMaxProcessingTimeTitle.AutoSize = true;
-            lblMaxProcessingTimeTitle.Location = new Point(15, 182);
+            lblMaxProcessingTimeTitle.Location = new Point(15, 225);
             lblMaxProcessingTimeTitle.Name = "lblMaxProcessingTimeTitle";
             lblMaxProcessingTimeTitle.Size = new Size(149, 15);
             lblMaxProcessingTimeTitle.TabIndex = 13;
@@ -236,7 +388,7 @@
             // lblTimestamp
             // 
             lblTimestamp.AutoSize = true;
-            lblTimestamp.Location = new Point(347, 153);
+            lblTimestamp.Location = new Point(399, 100);
             lblTimestamp.Name = "lblTimestamp";
             lblTimestamp.Size = new Size(27, 15);
             lblTimestamp.TabIndex = 45;
@@ -246,7 +398,7 @@
             // label31
             // 
             label31.AutoSize = true;
-            label31.Location = new Point(272, 153);
+            label31.Location = new Point(324, 100);
             label31.Name = "label31";
             label31.Size = new Size(69, 15);
             label31.TabIndex = 44;
@@ -255,7 +407,7 @@
             // lblLastProcessorUsedUDP
             // 
             lblLastProcessorUsedUDP.AutoSize = true;
-            lblLastProcessorUsedUDP.Location = new Point(392, 182);
+            lblLastProcessorUsedUDP.Location = new Point(399, 225);
             lblLastProcessorUsedUDP.Name = "lblLastProcessorUsedUDP";
             lblLastProcessorUsedUDP.Size = new Size(27, 15);
             lblLastProcessorUsedUDP.TabIndex = 43;
@@ -265,7 +417,7 @@
             // label28
             // 
             label28.AutoSize = true;
-            label28.Location = new Point(272, 182);
+            label28.Location = new Point(279, 225);
             label28.Name = "label28";
             label28.Size = new Size(114, 15);
             label28.TabIndex = 42;
@@ -284,7 +436,7 @@
             // label20
             // 
             label20.AutoSize = true;
-            label20.Location = new Point(10, 153);
+            label20.Location = new Point(14, 153);
             label20.Name = "label20";
             label20.Size = new Size(42, 15);
             label20.TabIndex = 40;
@@ -303,7 +455,7 @@
             // lblLastFlaps
             // 
             lblLastFlaps.AutoSize = true;
-            lblLastFlaps.Location = new Point(221, 153);
+            lblLastFlaps.Location = new Point(256, 153);
             lblLastFlaps.Name = "lblLastFlaps";
             lblLastFlaps.Size = new Size(22, 15);
             lblLastFlaps.TabIndex = 38;
@@ -313,7 +465,7 @@
             // label32
             // 
             label32.AutoSize = true;
-            label32.Location = new Point(175, 153);
+            label32.Location = new Point(210, 153);
             label32.Name = "label32";
             label32.Size = new Size(37, 15);
             label32.TabIndex = 37;
@@ -323,7 +475,7 @@
             // lblLastSpeedBrakes
             // 
             lblLastSpeedBrakes.AutoSize = true;
-            lblLastSpeedBrakes.Location = new Point(221, 126);
+            lblLastSpeedBrakes.Location = new Point(256, 126);
             lblLastSpeedBrakes.Name = "lblLastSpeedBrakes";
             lblLastSpeedBrakes.Size = new Size(22, 15);
             lblLastSpeedBrakes.TabIndex = 36;
@@ -354,7 +506,7 @@
             // label24
             // 
             label24.AutoSize = true;
-            label24.Location = new Point(136, 126);
+            label24.Location = new Point(171, 126);
             label24.Name = "label24";
             label24.Size = new Size(79, 15);
             label24.TabIndex = 33;
@@ -383,7 +535,7 @@
             // label23
             // 
             label23.AutoSize = true;
-            label23.Location = new Point(20, 126);
+            label23.Location = new Point(23, 126);
             label23.Name = "label23";
             label23.Size = new Size(33, 15);
             label23.TabIndex = 32;
@@ -413,9 +565,67 @@
             chkChangeToMonitor.Text = "Automatically change to monitor tab when connected.";
             chkChangeToMonitor.UseVisualStyleBackColor = true;
             // 
+            // tbGForces
+            // 
+            tbGForces.Controls.Add(dgGForces);
+            tbGForces.Controls.Add(chkTrackGForces);
+            tbGForces.Location = new Point(4, 24);
+            tbGForces.Name = "tbGForces";
+            tbGForces.Size = new Size(461, 250);
+            tbGForces.TabIndex = 2;
+            tbGForces.Text = "G Forces Tracker";
+            tbGForces.UseVisualStyleBackColor = true;
+            // 
+            // dgGForces
+            // 
+            dgGForces.AllowUserToDeleteRows = false;
+            dgGForces.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            dgGForces.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            dgGForces.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgGForces.Columns.AddRange(new DataGridViewColumn[] { AircraftName, MaxGForce, Timestamp });
+            dgGForces.EditMode = DataGridViewEditMode.EditProgrammatically;
+            dgGForces.Location = new Point(8, 39);
+            dgGForces.Name = "dgGForces";
+            dgGForces.ReadOnly = true;
+            dgGForces.RowTemplate.Height = 25;
+            dgGForces.Size = new Size(441, 198);
+            dgGForces.TabIndex = 1;
+            dgGForces.CellClick += dgGForces_CellClick;
+            // 
+            // AircraftName
+            // 
+            AircraftName.HeaderText = "Aircraft Name";
+            AircraftName.Name = "AircraftName";
+            AircraftName.ReadOnly = true;
+            AircraftName.Width = 106;
+            // 
+            // MaxGForce
+            // 
+            MaxGForce.HeaderText = "Max G Force";
+            MaxGForce.Name = "MaxGForce";
+            MaxGForce.ReadOnly = true;
+            MaxGForce.Width = 98;
+            // 
+            // Timestamp
+            // 
+            Timestamp.HeaderText = "Timestamp";
+            Timestamp.Name = "Timestamp";
+            Timestamp.ReadOnly = true;
+            Timestamp.Width = 91;
+            // 
+            // chkTrackGForces
+            // 
+            chkTrackGForces.AutoSize = true;
+            chkTrackGForces.Location = new Point(13, 14);
+            chkTrackGForces.Name = "chkTrackGForces";
+            chkTrackGForces.Size = new Size(101, 19);
+            chkTrackGForces.TabIndex = 0;
+            chkTrackGForces.Text = "Track G Forces";
+            chkTrackGForces.UseVisualStyleBackColor = true;
+            // 
             // btnConnect
             // 
-            btnConnect.Location = new Point(299, 275);
+            btnConnect.Location = new Point(321, 316);
             btnConnect.Name = "btnConnect";
             btnConnect.Size = new Size(75, 23);
             btnConnect.TabIndex = 1;
@@ -426,16 +636,16 @@
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new ToolStripItem[] { tsStatusBar1 });
-            statusStrip1.Location = new Point(0, 314);
+            statusStrip1.Location = new Point(0, 358);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(478, 22);
+            statusStrip1.Size = new Size(493, 22);
             statusStrip1.TabIndex = 2;
             statusStrip1.Text = "statusStrip1";
             // 
             // tsStatusBar1
             // 
             tsStatusBar1.Name = "tsStatusBar1";
-            tsStatusBar1.Size = new Size(463, 17);
+            tsStatusBar1.Size = new Size(478, 17);
             tsStatusBar1.Spring = true;
             tsStatusBar1.Text = "Idle";
             tsStatusBar1.TextAlign = ContentAlignment.MiddleLeft;
@@ -443,7 +653,7 @@
             // btnDisconnect
             // 
             btnDisconnect.Enabled = false;
-            btnDisconnect.Location = new Point(385, 275);
+            btnDisconnect.Location = new Point(402, 316);
             btnDisconnect.Name = "btnDisconnect";
             btnDisconnect.Size = new Size(75, 23);
             btnDisconnect.TabIndex = 3;
@@ -453,7 +663,7 @@
             // 
             // btnResetMax
             // 
-            btnResetMax.Location = new Point(25, 275);
+            btnResetMax.Location = new Point(16, 316);
             btnResetMax.Name = "btnResetMax";
             btnResetMax.Size = new Size(75, 23);
             btnResetMax.TabIndex = 4;
@@ -466,31 +676,31 @@
             timer1.Interval = 1500;
             timer1.Tick += timer1_Tick;
             // 
-            // label3
+            // label10
             // 
-            label3.AutoSize = true;
-            label3.Location = new Point(307, 126);
-            label3.Name = "label3";
-            label3.Size = new Size(34, 15);
-            label3.TabIndex = 46;
-            label3.Text = "Gear:";
-            label3.TextAlign = ContentAlignment.TopRight;
+            label10.AutoSize = true;
+            label10.Location = new Point(284, 126);
+            label10.Name = "label10";
+            label10.Size = new Size(17, 15);
+            label10.TabIndex = 56;
+            label10.Tag = "0";
+            label10.Text = "%";
             // 
-            // lblGear
+            // label11
             // 
-            lblGear.AutoSize = true;
-            lblGear.Location = new Point(347, 126);
-            lblGear.Name = "lblGear";
-            lblGear.Size = new Size(27, 15);
-            lblGear.TabIndex = 47;
-            lblGear.Tag = "-1";
-            lblGear.Text = "----";
+            label11.AutoSize = true;
+            label11.Location = new Point(284, 153);
+            label11.Name = "label11";
+            label11.Size = new Size(17, 15);
+            label11.TabIndex = 57;
+            label11.Tag = "0";
+            label11.Text = "%";
             // 
             // frmMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(478, 336);
+            ClientSize = new Size(493, 380);
             Controls.Add(btnResetMax);
             Controls.Add(btnDisconnect);
             Controls.Add(statusStrip1);
@@ -506,8 +716,12 @@
             tabs.ResumeLayout(false);
             Settings.ResumeLayout(false);
             Settings.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)nudFrequency).EndInit();
             Monitor.ResumeLayout(false);
             Monitor.PerformLayout();
+            tbGForces.ResumeLayout(false);
+            tbGForces.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dgGForces).EndInit();
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
             ResumeLayout(false);
@@ -555,5 +769,23 @@
         private System.Windows.Forms.Timer timer1;
         private Label lblGear;
         private Label label3;
+        private Label lblGforce;
+        private Label label5;
+        private Label lblAltitude;
+        private Label label6;
+        private Label label7;
+        private Label label4;
+        private Label lblMaxGForce;
+        private Label label9;
+        private TabPage tbGForces;
+        private DataGridView dgGForces;
+        private CheckBox chkTrackGForces;
+        private DataGridViewTextBoxColumn AircraftName;
+        private DataGridViewTextBoxColumn MaxGForce;
+        private DataGridViewTextBoxColumn Timestamp;
+        private NumericUpDown nudFrequency;
+        private Label label8;
+        private Label label10;
+        private Label label11;
     }
 }
