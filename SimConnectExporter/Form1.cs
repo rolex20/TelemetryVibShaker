@@ -62,6 +62,8 @@ namespace SimConnectExporter
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint GetCurrentProcessorNumber();
 
+        [DllImport("kernel32.dll")]
+        private static extern ulong GetTickCount64();
 
         private bool Connect()
         {
@@ -143,17 +145,16 @@ namespace SimConnectExporter
         {
             // perform division in double to retain maximum precision
             // result is in milliseconds
-            long currentTimeStamp_ms = (long)((double)(1000.0D * ((double)Stopwatch.GetTimestamp()) / (double)Stopwatch.Frequency));
+            long currentTimeStamp_ms = (long)GetTickCount64();
 
             if (currentTimeStamp_ms - lastTimeStamp_ms < nudFrequency.Value)
                 return; // Skip this telemetry
 
-            // update the new timestamp
-            lastTimeStamp_ms = currentTimeStamp_ms;
-
-
             if (chkShowStatistics.Checked)
                 stopWatch.Restart();
+
+            // update the new timestamp
+            lastTimeStamp_ms = currentTimeStamp_ms;
 
             if (data.dwRequestID == (uint)REQUESTS.Request1)
             {
@@ -161,7 +162,7 @@ namespace SimConnectExporter
 
                 /*** Send Datagram ***/
                 string aircraftName = sd.title;
-                if (CurrentAircraftName.Equals(aircraftName))// send datagram
+                if (CurrentAircraftName.Equals(aircraftName)) // same aircraft as before, just send the datagram with telemetry
                 {
                     float aoa = 57.2957795f * sd.angleOfAttack; // convert radians to degrees
                     datagram[0] = 1;  // this flag means that this datagram contains telemetry instead of aircraft name
@@ -179,8 +180,8 @@ namespace SimConnectExporter
                     datagram[5] = sd.gForce < 0.0f ? (byte)0 : (byte)sd.gForce;
 
                     // Altitude
-                    int hm = (int)sd.altitude / 100; // convert meters to Hectometers (fit in 1 byte) 
-                    datagram[6] = hm <= 255 ? (byte)hm : (byte)255; // max is 25km, good enough to make sure we are in the air
+                    int hm = (int)sd.altitude / 10; // convert meters to Decameters (fit in 1 byte) 
+                    datagram[6] = hm <= 255 ? (byte)hm : (byte)255; // max is 2550m, just good enough to make sure we are in the air
 
                     // Send  Telemetry
                     udpSender.BeginSend(datagram, datagram.Length, new AsyncCallback(SendCallback), udpSender);
@@ -212,7 +213,7 @@ namespace SimConnectExporter
                     CurrentAircraftName = aircraftName;
                     byte[] sendBytes = Encoding.ASCII.GetBytes(CurrentAircraftName);
                     udpSender.BeginSend(sendBytes, sendBytes.Length, new AsyncCallback(SendCallback), udpSender);
-                    maxGForce = 0.0f; // resetting max g force detected
+                    maxGForce = 0.0f; // resetting max g force detected for this aircraft
                 }
 
 
@@ -225,7 +226,7 @@ namespace SimConnectExporter
                     UpdateValue(lblSpeed, (int)sd.trueAirspeed);// show in knots
                     UpdateValue(lblLastFlaps, (int)sd.flaps);
                     UpdateValue(lblLastSpeedBrakes, (int)sd.spoilers);
-                    UpdateValue(lblLastAoA, (int)datagram[0]);
+                    UpdateValue(lblLastAoA, (int)datagram[1]);
                     UpdateValue(lblGear, (int)sd.gear);
                     UpdateValue(lblAltitude, (int)sd.altitude);
                     UpdateValue(lblGforce, (int)sd.gForce);

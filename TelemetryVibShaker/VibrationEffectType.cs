@@ -14,7 +14,6 @@ namespace TelemetryVibShaker
         BackgroundAoA,
         BackgroundSpeedBrakes,
         BackgroundFlaps,
-        Gear, // future use
         Nothing
     }
 

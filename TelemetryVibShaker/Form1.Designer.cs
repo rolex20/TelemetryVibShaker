@@ -1332,9 +1332,9 @@
             label25.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label25.Location = new Point(13, 77);
             label25.Name = "label25";
-            label25.Size = new Size(220, 15);
+            label25.Size = new Size(144, 15);
             label25.TabIndex = 8;
-            label25.Text = "Last Telemetry received by export.lua:";
+            label25.Text = "Last Telemetry received:";
             // 
             // label23
             // 

@@ -34,6 +34,12 @@ namespace TelemetryVibShaker
 
         [DllImport("kernel32.dll")]
         public static extern uint GetCurrentThreadId();
+       
+        [DllImport("kernel32.dll")]
+        private static extern uint GetTickCount();
+
+        [DllImport("kernel32.dll")]
+        private static extern ulong GetTickCount64();
 
 
         public string CurrentUnitInfo { 
@@ -142,9 +148,6 @@ namespace TelemetryVibShaker
                 {
                     ThreadId = (int)GetCurrentThreadId(); // Let's see if it changes on receiving packets
                     receiveData = listenerUdp.Receive(ref sender); // Wait here until a new datagram is received
-                    //if (Statistics) 
-                        stopwatch.Restart();  // Track the time to process this datagram
-                    LastProcessorUsed = (int)GetCurrentProcessorNumber();
                 }
                 catch (Exception ex)
                 {
@@ -157,15 +160,13 @@ namespace TelemetryVibShaker
                 }
 
 
-                /* Process the datagram received */
-
-
-
-                // Update Statistics and UI status controls
-                TimeStamp = Stopwatch.GetTimestamp();
-                long newSecond = TimeStamp / 1000;
                 if (Statistics)
                 {
+                    stopwatch.Restart();  // Track the time to process this datagram
+                    TimeStamp = (long)GetTickCount64();
+                    long newSecond = TimeStamp / 1000;
+                    LastProcessorUsed = (int)GetCurrentProcessorNumber();
+
                     if (LastSecond != newSecond)
                     {
                         //lblDatagramsPerSecond.Text = DPS.ToString();  // update datagrams per second
@@ -195,9 +196,7 @@ namespace TelemetryVibShaker
                     LastData.SpeedBrakes = receiveData[2];
                     LastData.Flaps = receiveData[3];
 
-
-                    
-                    
+                                       
                     /* Speed Reception and Conversion
                      * receivedData[3] is in decameters/s
                      * This unit was selected to make it fit in 8 bits (1 byte)
@@ -210,8 +209,8 @@ namespace TelemetryVibShaker
                     // GForces 
                     LastData.GForces = receiveData[5];
 
-                    // Altitude is sent in Hectometers without decimals: some accuracy lost here
-                    LastData.Altitude = receiveData[6] * 100; // Now Altitude is in meters
+                    // Altitude is sent in Decameters without decimals: some accuracy lost here, maximum is 2550 meters
+                    LastData.Altitude = receiveData[6] * 10; // Now Altitude is in meters
 
                     // Process the Effects only if the current plane is moving above the MinSpeed required by the user
                     if (LastData.Speed >= MinSpeed && LastData.Altitude >= MinAltitude) { 
@@ -236,6 +235,8 @@ namespace TelemetryVibShaker
                     LastData.Speed = 0;
                     LastData.SpeedBrakes = -1;
                     LastData.Flaps = -1;
+                    LastData.GForces = -1;
+                    LastData.Altitude = -1;
 
                     MaxProcessingTime = -1; // Reset MaxProcessingTime with each new airplane
 
@@ -261,12 +262,12 @@ namespace TelemetryVibShaker
                     
                 }
 
-                //if (Statistics) 
-                //{
+                if (Statistics) 
+                {
                     stopwatch.Stop(); // at this point the datagram has been fully processed
                     int elapsed = stopwatch.Elapsed.Milliseconds;
                     if (MaxProcessingTime < elapsed) MaxProcessingTime = elapsed;
-                //}
+                }
 
             } // end-while
 

@@ -42,6 +42,8 @@
             label1 = new Label();
             txtDestinationHostname = new TextBox();
             Monitor = new TabPage();
+            label11 = new Label();
+            label10 = new Label();
             lblMaxGForce = new Label();
             label9 = new Label();
             label7 = new Label();
@@ -84,8 +86,6 @@
             btnDisconnect = new Button();
             btnResetMax = new Button();
             timer1 = new System.Windows.Forms.Timer(components);
-            label10 = new Label();
-            label11 = new Label();
             tabs.SuspendLayout();
             Settings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudFrequency).BeginInit();
@@ -269,10 +269,30 @@
             Monitor.Text = "Monitor";
             Monitor.UseVisualStyleBackColor = true;
             // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            label11.Location = new Point(284, 153);
+            label11.Name = "label11";
+            label11.Size = new Size(17, 15);
+            label11.TabIndex = 57;
+            label11.Tag = "0";
+            label11.Text = "%";
+            // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Location = new Point(284, 126);
+            label10.Name = "label10";
+            label10.Size = new Size(17, 15);
+            label10.TabIndex = 56;
+            label10.Tag = "0";
+            label10.Text = "%";
+            // 
             // lblMaxGForce
             // 
             lblMaxGForce.AutoSize = true;
-            lblMaxGForce.Location = new Point(399, 180);
+            lblMaxGForce.Location = new Point(395, 180);
             lblMaxGForce.Name = "lblMaxGForce";
             lblMaxGForce.Size = new Size(27, 15);
             lblMaxGForce.TabIndex = 55;
@@ -282,7 +302,7 @@
             // label9
             // 
             label9.AutoSize = true;
-            label9.Location = new Point(317, 180);
+            label9.Location = new Point(313, 180);
             label9.Name = "label9";
             label9.Size = new Size(76, 15);
             label9.TabIndex = 54;
@@ -329,7 +349,7 @@
             // lblGforce
             // 
             lblGforce.AutoSize = true;
-            lblGforce.Location = new Point(399, 153);
+            lblGforce.Location = new Point(395, 153);
             lblGforce.Name = "lblGforce";
             lblGforce.Size = new Size(27, 15);
             lblGforce.TabIndex = 49;
@@ -339,7 +359,7 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(343, 153);
+            label5.Location = new Point(339, 153);
             label5.Name = "label5";
             label5.Size = new Size(50, 15);
             label5.TabIndex = 48;
@@ -349,7 +369,7 @@
             // lblGear
             // 
             lblGear.AutoSize = true;
-            lblGear.Location = new Point(399, 126);
+            lblGear.Location = new Point(395, 126);
             lblGear.Name = "lblGear";
             lblGear.Size = new Size(27, 15);
             lblGear.TabIndex = 47;
@@ -359,7 +379,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(359, 126);
+            label3.Location = new Point(355, 126);
             label3.Name = "label3";
             label3.Size = new Size(34, 15);
             label3.TabIndex = 46;
@@ -388,7 +408,7 @@
             // lblTimestamp
             // 
             lblTimestamp.AutoSize = true;
-            lblTimestamp.Location = new Point(399, 100);
+            lblTimestamp.Location = new Point(395, 100);
             lblTimestamp.Name = "lblTimestamp";
             lblTimestamp.Size = new Size(27, 15);
             lblTimestamp.TabIndex = 45;
@@ -398,7 +418,7 @@
             // label31
             // 
             label31.AutoSize = true;
-            label31.Location = new Point(324, 100);
+            label31.Location = new Point(320, 100);
             label31.Name = "label31";
             label31.Size = new Size(69, 15);
             label31.TabIndex = 44;
@@ -407,7 +427,7 @@
             // lblLastProcessorUsedUDP
             // 
             lblLastProcessorUsedUDP.AutoSize = true;
-            lblLastProcessorUsedUDP.Location = new Point(399, 225);
+            lblLastProcessorUsedUDP.Location = new Point(395, 225);
             lblLastProcessorUsedUDP.Name = "lblLastProcessorUsedUDP";
             lblLastProcessorUsedUDP.Size = new Size(27, 15);
             lblLastProcessorUsedUDP.TabIndex = 43;
@@ -417,7 +437,7 @@
             // label28
             // 
             label28.AutoSize = true;
-            label28.Location = new Point(279, 225);
+            label28.Location = new Point(275, 225);
             label28.Name = "label28";
             label28.Size = new Size(114, 15);
             label28.TabIndex = 42;
@@ -675,26 +695,6 @@
             // 
             timer1.Interval = 1500;
             timer1.Tick += timer1_Tick;
-            // 
-            // label10
-            // 
-            label10.AutoSize = true;
-            label10.Location = new Point(284, 126);
-            label10.Name = "label10";
-            label10.Size = new Size(17, 15);
-            label10.TabIndex = 56;
-            label10.Tag = "0";
-            label10.Text = "%";
-            // 
-            // label11
-            // 
-            label11.AutoSize = true;
-            label11.Location = new Point(284, 153);
-            label11.Name = "label11";
-            label11.Size = new Size(17, 15);
-            label11.TabIndex = 57;
-            label11.Tag = "0";
-            label11.Text = "%";
             // 
             // frmMain
             // 

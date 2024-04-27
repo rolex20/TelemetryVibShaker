@@ -37,7 +37,7 @@ namespace SimConnectExporter.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("56769")]
+        [global::System.Configuration.DefaultSettingValueAttribute("54671")]
         public string txtDestinationPort {
             get {
                 return ((string)(this["txtDestinationPort"]));

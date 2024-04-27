@@ -6,7 +6,7 @@
       <Value Profile="(Default)">192.168.1.5</Value>
     </Setting>
     <Setting Name="txtDestinationPort" Type="System.String" Scope="User">
-      <Value Profile="(Default)">56769</Value>
+      <Value Profile="(Default)">54671</Value>
     </Setting>
     <Setting Name="XCoordinate" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">100</Value>
