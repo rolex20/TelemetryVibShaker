@@ -13,7 +13,10 @@ namespace TelemetryVibShaker
         public int Flaps; // 0 to 100 percent
         public int Speed; // true AirSpeed, km/h
         public int Gear;  // 0 to 100 percent (future use)
-        public int DatagramLength; 
+        public int GForces; // G forces
+        public int Altitude; // Altitude above the ground in meters
+
+        //public int DatagramLength; 
 
         public TelemetryData()
         {
@@ -22,7 +25,9 @@ namespace TelemetryVibShaker
             SpeedBrakes = -1;
             Flaps = -1;
             Speed = 0;
-            DatagramLength = 0;
+            GForces = 0;
+            Altitude = 0;
+            //DatagramLength = 0;
         }
     }
 }

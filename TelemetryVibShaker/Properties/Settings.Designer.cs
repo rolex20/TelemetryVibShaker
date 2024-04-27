@@ -325,7 +325,7 @@ namespace TelemetryVibShaker.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\ralch\\source\\repos\\UDPEchoServer1\\AoA_UDP_Server\\units.json")]
+        [global::System.Configuration.DefaultSettingValueAttribute(".\\units.json")]
         public string txtJSON {
             get {
                 return ((string)(this["txtJSON"]));
@@ -373,7 +373,7 @@ namespace TelemetryVibShaker.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
         public int nudMinSpeed {
             get {
                 return ((int)(this["nudMinSpeed"]));
@@ -416,6 +416,18 @@ namespace TelemetryVibShaker.Properties {
             }
             set {
                 this["chkUseBackgroundProcessing"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int nudMinAltitude {
+            get {
+                return ((int)(this["nudMinAltitude"]));
+            }
+            set {
+                this["nudMinAltitude"] = value;
             }
         }
     }

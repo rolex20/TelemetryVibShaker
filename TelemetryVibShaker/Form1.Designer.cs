@@ -74,6 +74,9 @@
             label14 = new Label();
             label12 = new Label();
             tabSettings = new TabPage();
+            nudMinAltitude = new NumericUpDown();
+            label38 = new Label();
+            label39 = new Label();
             chkUseEfficiencyCoresOnly = new CheckBox();
             chkUseBackgroundProcessing = new CheckBox();
             cmbPriorityClass = new ComboBox();
@@ -98,6 +101,11 @@
             btnTestArduinoMotors = new Button();
             tabMonitor = new TabPage();
             panel1 = new Panel();
+            label40 = new Label();
+            lblAltitude = new Label();
+            label43 = new Label();
+            lblGForces = new Label();
+            label45 = new Label();
             label37 = new Label();
             label36 = new Label();
             label35 = new Label();
@@ -150,6 +158,7 @@
             ((System.ComponentModel.ISupportInitialize)numMinIntensitySpeedBrakes).BeginInit();
             tabTTGO20V3.SuspendLayout();
             tabSettings.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)nudMinAltitude).BeginInit();
             ((System.ComponentModel.ISupportInitialize)nudMinSpeed).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trkEffectTimeout).BeginInit();
             Test.SuspendLayout();
@@ -639,6 +648,9 @@
             // 
             // tabSettings
             // 
+            tabSettings.Controls.Add(nudMinAltitude);
+            tabSettings.Controls.Add(label38);
+            tabSettings.Controls.Add(label39);
             tabSettings.Controls.Add(chkUseEfficiencyCoresOnly);
             tabSettings.Controls.Add(chkUseBackgroundProcessing);
             tabSettings.Controls.Add(cmbPriorityClass);
@@ -661,12 +673,42 @@
             tabSettings.Text = "General Settings";
             tabSettings.UseVisualStyleBackColor = true;
             // 
+            // nudMinAltitude
+            // 
+            nudMinAltitude.Increment = new decimal(new int[] { 100, 0, 0, 0 });
+            nudMinAltitude.Location = new Point(122, 172);
+            nudMinAltitude.Maximum = new decimal(new int[] { 2000, 0, 0, 0 });
+            nudMinAltitude.Name = "nudMinAltitude";
+            nudMinAltitude.Size = new Size(116, 23);
+            nudMinAltitude.TabIndex = 21;
+            toolTip1.SetToolTip(nudMinAltitude, "Effects won't be active until your aircraft is above this altitude above the ground");
+            nudMinAltitude.ValueChanged += nudMinAltitude_ValueChanged;
+            // 
+            // label38
+            // 
+            label38.AutoSize = true;
+            label38.Location = new Point(244, 174);
+            label38.Name = "label38";
+            label38.Size = new Size(131, 15);
+            label38.TabIndex = 20;
+            label38.Text = "meters (Above Ground)";
+            // 
+            // label39
+            // 
+            label39.AutoSize = true;
+            label39.Location = new Point(3, 175);
+            label39.Name = "label39";
+            label39.Size = new Size(108, 15);
+            label39.TabIndex = 19;
+            label39.Text = "Minimum Altitude:";
+            label39.TextAlign = ContentAlignment.TopRight;
+            // 
             // chkUseEfficiencyCoresOnly
             // 
             chkUseEfficiencyCoresOnly.AutoSize = true;
             chkUseEfficiencyCoresOnly.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Bold, GraphicsUnit.Point);
             chkUseEfficiencyCoresOnly.ForeColor = Color.FromArgb(91, 155, 213);
-            chkUseEfficiencyCoresOnly.Location = new Point(17, 305);
+            chkUseEfficiencyCoresOnly.Location = new Point(17, 341);
             chkUseEfficiencyCoresOnly.Name = "chkUseEfficiencyCoresOnly";
             chkUseEfficiencyCoresOnly.Size = new Size(290, 19);
             chkUseEfficiencyCoresOnly.TabIndex = 18;
@@ -678,7 +720,7 @@
             // chkUseBackgroundProcessing
             // 
             chkUseBackgroundProcessing.AutoSize = true;
-            chkUseBackgroundProcessing.Location = new Point(17, 278);
+            chkUseBackgroundProcessing.Location = new Point(17, 314);
             chkUseBackgroundProcessing.Name = "chkUseBackgroundProcessing";
             chkUseBackgroundProcessing.Size = new Size(206, 19);
             chkUseBackgroundProcessing.TabIndex = 17;
@@ -691,7 +733,7 @@
             cmbPriorityClass.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbPriorityClass.FormattingEnabled = true;
             cmbPriorityClass.Items.AddRange(new object[] { "NORMAL", "BELOW NORMAL", "IDLE" });
-            cmbPriorityClass.Location = new Point(144, 241);
+            cmbPriorityClass.Location = new Point(144, 277);
             cmbPriorityClass.Name = "cmbPriorityClass";
             cmbPriorityClass.Size = new Size(121, 23);
             cmbPriorityClass.TabIndex = 15;
@@ -700,7 +742,7 @@
             // label30
             // 
             label30.AutoSize = true;
-            label30.Location = new Point(17, 244);
+            label30.Location = new Point(17, 280);
             label30.Name = "label30";
             label30.Size = new Size(121, 15);
             label30.TabIndex = 14;
@@ -709,7 +751,7 @@
             // nudMinSpeed
             // 
             nudMinSpeed.Increment = new decimal(new int[] { 20, 0, 0, 0 });
-            nudMinSpeed.Location = new Point(106, 128);
+            nudMinSpeed.Location = new Point(122, 128);
             nudMinSpeed.Maximum = new decimal(new int[] { 2000, 0, 0, 0 });
             nudMinSpeed.Name = "nudMinSpeed";
             nudMinSpeed.Size = new Size(116, 23);
@@ -720,7 +762,7 @@
             // label26
             // 
             label26.AutoSize = true;
-            label26.Location = new Point(228, 130);
+            label26.Location = new Point(244, 130);
             label26.Name = "label26";
             label26.Size = new Size(36, 15);
             label26.TabIndex = 12;
@@ -729,7 +771,7 @@
             // label22
             // 
             label22.AutoSize = true;
-            label22.Location = new Point(2, 130);
+            label22.Location = new Point(13, 131);
             label22.Name = "label22";
             label22.Size = new Size(98, 15);
             label22.TabIndex = 11;
@@ -737,7 +779,7 @@
             // 
             // btnJSONFile
             // 
-            btnJSONFile.Location = new Point(455, 197);
+            btnJSONFile.Location = new Point(455, 233);
             btnJSONFile.Name = "btnJSONFile";
             btnJSONFile.Size = new Size(37, 23);
             btnJSONFile.TabIndex = 10;
@@ -748,7 +790,7 @@
             // 
             // txtJSON
             // 
-            txtJSON.Location = new Point(16, 197);
+            txtJSON.Location = new Point(16, 233);
             txtJSON.Name = "txtJSON";
             txtJSON.Size = new Size(429, 23);
             txtJSON.TabIndex = 9;
@@ -758,7 +800,7 @@
             // label17
             // 
             label17.AutoSize = true;
-            label17.Location = new Point(16, 179);
+            label17.Location = new Point(16, 215);
             label17.Name = "label17";
             label17.Size = new Size(59, 15);
             label17.TabIndex = 8;
@@ -767,7 +809,7 @@
             // lblEffectTimeout
             // 
             lblEffectTimeout.AutoSize = true;
-            lblEffectTimeout.Location = new Point(234, 71);
+            lblEffectTimeout.Location = new Point(250, 71);
             lblEffectTimeout.Name = "lblEffectTimeout";
             lblEffectTimeout.Size = new Size(94, 15);
             lblEffectTimeout.TabIndex = 4;
@@ -775,7 +817,7 @@
             // 
             // trkEffectTimeout
             // 
-            trkEffectTimeout.Location = new Point(106, 62);
+            trkEffectTimeout.Location = new Point(122, 62);
             trkEffectTimeout.Minimum = 1;
             trkEffectTimeout.Name = "trkEffectTimeout";
             trkEffectTimeout.Size = new Size(116, 45);
@@ -787,7 +829,7 @@
             // label16
             // 
             label16.AutoSize = true;
-            label16.Location = new Point(13, 71);
+            label16.Location = new Point(24, 72);
             label16.Name = "label16";
             label16.Size = new Size(87, 15);
             label16.TabIndex = 2;
@@ -795,7 +837,7 @@
             // 
             // txtListeningPort
             // 
-            txtListeningPort.Location = new Point(106, 17);
+            txtListeningPort.Location = new Point(122, 17);
             txtListeningPort.Name = "txtListeningPort";
             txtListeningPort.Size = new Size(116, 23);
             txtListeningPort.TabIndex = 1;
@@ -806,7 +848,7 @@
             // label15
             // 
             label15.AutoSize = true;
-            label15.Location = new Point(17, 20);
+            label15.Location = new Point(28, 21);
             label15.Name = "label15";
             label15.Size = new Size(83, 15);
             label15.TabIndex = 0;
@@ -902,6 +944,11 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(label40);
+            panel1.Controls.Add(lblAltitude);
+            panel1.Controls.Add(label43);
+            panel1.Controls.Add(lblGForces);
+            panel1.Controls.Add(label45);
             panel1.Controls.Add(label37);
             panel1.Controls.Add(label36);
             panel1.Controls.Add(label35);
@@ -938,10 +985,62 @@
             panel1.Size = new Size(503, 249);
             panel1.TabIndex = 10;
             // 
+            // label40
+            // 
+            label40.AutoSize = true;
+            label40.Location = new Point(455, 159);
+            label40.Name = "label40";
+            label40.Size = new Size(18, 15);
+            label40.TabIndex = 38;
+            label40.Tag = "0";
+            label40.Text = "m";
+            // 
+            // lblAltitude
+            // 
+            lblAltitude.AutoSize = true;
+            lblAltitude.Location = new Point(415, 159);
+            lblAltitude.Name = "lblAltitude";
+            lblAltitude.Size = new Size(34, 15);
+            lblAltitude.TabIndex = 36;
+            lblAltitude.Tag = "0";
+            lblAltitude.Text = "none";
+            lblAltitude.TextAlign = ContentAlignment.TopRight;
+            // 
+            // label43
+            // 
+            label43.AutoSize = true;
+            label43.Location = new Point(354, 159);
+            label43.Name = "label43";
+            label43.Size = new Size(52, 15);
+            label43.TabIndex = 35;
+            label43.Text = "Altitude:";
+            label43.TextAlign = ContentAlignment.TopRight;
+            // 
+            // lblGForces
+            // 
+            lblGForces.AutoSize = true;
+            lblGForces.Location = new Point(415, 132);
+            lblGForces.Name = "lblGForces";
+            lblGForces.Size = new Size(34, 15);
+            lblGForces.TabIndex = 34;
+            lblGForces.Tag = "0";
+            lblGForces.Text = "none";
+            lblGForces.TextAlign = ContentAlignment.TopRight;
+            // 
+            // label45
+            // 
+            label45.AutoSize = true;
+            label45.Location = new Point(349, 132);
+            label45.Name = "label45";
+            label45.Size = new Size(57, 15);
+            label45.TabIndex = 33;
+            label45.Text = "G-Forces:";
+            label45.TextAlign = ContentAlignment.TopRight;
+            // 
             // label37
             // 
             label37.AutoSize = true;
-            label37.Location = new Point(304, 159);
+            label37.Location = new Point(285, 159);
             label37.Name = "label37";
             label37.Size = new Size(17, 15);
             label37.TabIndex = 32;
@@ -951,7 +1050,7 @@
             // label36
             // 
             label36.AutoSize = true;
-            label36.Location = new Point(304, 132);
+            label36.Location = new Point(285, 132);
             label36.Name = "label36";
             label36.Size = new Size(17, 15);
             label36.TabIndex = 31;
@@ -961,7 +1060,7 @@
             // label35
             // 
             label35.AutoSize = true;
-            label35.Location = new Point(135, 159);
+            label35.Location = new Point(116, 159);
             label35.Name = "label35";
             label35.Size = new Size(36, 15);
             label35.TabIndex = 30;
@@ -971,7 +1070,7 @@
             // lblTimestamp
             // 
             lblTimestamp.AutoSize = true;
-            lblTimestamp.Location = new Point(412, 132);
+            lblTimestamp.Location = new Point(410, 196);
             lblTimestamp.Name = "lblTimestamp";
             lblTimestamp.Size = new Size(64, 15);
             lblTimestamp.TabIndex = 29;
@@ -982,7 +1081,7 @@
             // label31
             // 
             label31.AutoSize = true;
-            label31.Location = new Point(339, 132);
+            label31.Location = new Point(337, 196);
             label31.Name = "label31";
             label31.Size = new Size(69, 15);
             label31.TabIndex = 28;
@@ -991,7 +1090,7 @@
             // lblUIThreadID
             // 
             lblUIThreadID.AutoSize = true;
-            lblUIThreadID.Location = new Point(315, 11);
+            lblUIThreadID.Location = new Point(288, 11);
             lblUIThreadID.Name = "lblUIThreadID";
             lblUIThreadID.Size = new Size(27, 15);
             lblUIThreadID.TabIndex = 27;
@@ -1000,7 +1099,7 @@
             // label27
             // 
             label27.AutoSize = true;
-            label27.Location = new Point(231, 11);
+            label27.Location = new Point(204, 11);
             label27.Name = "label27";
             label27.Size = new Size(74, 15);
             label27.TabIndex = 26;
@@ -1049,7 +1148,7 @@
             // lblSpeed
             // 
             lblSpeed.AutoSize = true;
-            lblSpeed.Location = new Point(102, 159);
+            lblSpeed.Location = new Point(83, 159);
             lblSpeed.Name = "lblSpeed";
             lblSpeed.Size = new Size(34, 15);
             lblSpeed.TabIndex = 21;
@@ -1059,7 +1158,7 @@
             // label20
             // 
             label20.AutoSize = true;
-            label20.Location = new Point(52, 159);
+            label20.Location = new Point(33, 159);
             label20.Name = "label20";
             label20.Size = new Size(42, 15);
             label20.TabIndex = 20;
@@ -1068,7 +1167,7 @@
             // lblAoAUnits
             // 
             lblAoAUnits.AutoSize = true;
-            lblAoAUnits.Location = new Point(135, 132);
+            lblAoAUnits.Location = new Point(116, 132);
             lblAoAUnits.Name = "lblAoAUnits";
             lblAoAUnits.Size = new Size(12, 15);
             lblAoAUnits.TabIndex = 19;
@@ -1096,7 +1195,7 @@
             // lblLastFlaps
             // 
             lblLastFlaps.AutoSize = true;
-            lblLastFlaps.Location = new Point(264, 159);
+            lblLastFlaps.Location = new Point(245, 159);
             lblLastFlaps.Name = "lblLastFlaps";
             lblLastFlaps.Size = new Size(34, 15);
             lblLastFlaps.TabIndex = 16;
@@ -1107,7 +1206,7 @@
             // label32
             // 
             label32.AutoSize = true;
-            label32.Location = new Point(218, 159);
+            label32.Location = new Point(199, 159);
             label32.Name = "label32";
             label32.Size = new Size(37, 15);
             label32.TabIndex = 15;
@@ -1117,7 +1216,7 @@
             // lblDatagramsPerSecond
             // 
             lblDatagramsPerSecond.AutoSize = true;
-            lblDatagramsPerSecond.Location = new Point(315, 40);
+            lblDatagramsPerSecond.Location = new Point(288, 40);
             lblDatagramsPerSecond.Name = "lblDatagramsPerSecond";
             lblDatagramsPerSecond.Size = new Size(49, 15);
             lblDatagramsPerSecond.TabIndex = 14;
@@ -1128,7 +1227,7 @@
             // label29
             // 
             label29.AutoSize = true;
-            label29.Location = new Point(270, 40);
+            label29.Location = new Point(243, 40);
             label29.Name = "label29";
             label29.Size = new Size(35, 15);
             label29.TabIndex = 13;
@@ -1160,7 +1259,7 @@
             // lblLastSpeedBrakes
             // 
             lblLastSpeedBrakes.AutoSize = true;
-            lblLastSpeedBrakes.Location = new Point(264, 132);
+            lblLastSpeedBrakes.Location = new Point(245, 132);
             lblLastSpeedBrakes.Name = "lblLastSpeedBrakes";
             lblLastSpeedBrakes.Size = new Size(34, 15);
             lblLastSpeedBrakes.TabIndex = 10;
@@ -1171,7 +1270,7 @@
             // lblCurrentUnitType
             // 
             lblCurrentUnitType.AutoSize = true;
-            lblCurrentUnitType.Location = new Point(102, 106);
+            lblCurrentUnitType.Location = new Point(83, 106);
             lblCurrentUnitType.Name = "lblCurrentUnitType";
             lblCurrentUnitType.Size = new Size(34, 15);
             lblCurrentUnitType.TabIndex = 9;
@@ -1200,7 +1299,7 @@
             // lblLastAoA
             // 
             lblLastAoA.AutoSize = true;
-            lblLastAoA.Location = new Point(102, 132);
+            lblLastAoA.Location = new Point(83, 132);
             lblLastAoA.Name = "lblLastAoA";
             lblLastAoA.Size = new Size(34, 15);
             lblLastAoA.TabIndex = 5;
@@ -1211,7 +1310,7 @@
             // label24
             // 
             label24.AutoSize = true;
-            label24.Location = new Point(179, 132);
+            label24.Location = new Point(160, 132);
             label24.Name = "label24";
             label24.Size = new Size(79, 15);
             label24.TabIndex = 7;
@@ -1221,11 +1320,11 @@
             // label21
             // 
             label21.AutoSize = true;
-            label21.Location = new Point(13, 106);
+            label21.Location = new Point(19, 106);
             label21.Name = "label21";
-            label21.Size = new Size(83, 15);
+            label21.Size = new Size(56, 15);
             label21.TabIndex = 4;
-            label21.Text = "Last Unit Type:";
+            label21.Text = "Last Unit:";
             // 
             // label25
             // 
@@ -1240,7 +1339,7 @@
             // label23
             // 
             label23.AutoSize = true;
-            label23.Location = new Point(62, 132);
+            label23.Location = new Point(43, 132);
             label23.Name = "label23";
             label23.Size = new Size(33, 15);
             label23.TabIndex = 6;
@@ -1360,6 +1459,7 @@
             tabTTGO20V3.PerformLayout();
             tabSettings.ResumeLayout(false);
             tabSettings.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)nudMinAltitude).EndInit();
             ((System.ComponentModel.ISupportInitialize)nudMinSpeed).EndInit();
             ((System.ComponentModel.ISupportInitialize)trkEffectTimeout).EndInit();
             Test.ResumeLayout(false);
@@ -1484,5 +1584,13 @@
         private Label label37;
         private Label label36;
         private Label label35;
+        private NumericUpDown nudMinAltitude;
+        private Label label38;
+        private Label label39;
+        private Label label40;
+        private Label lblAltitude;
+        private Label label43;
+        private Label lblGForces;
+        private Label label45;
     }
 }

@@ -47,7 +47,7 @@ namespace SimConnectExporter
             public float angleOfAttack; // Angle of Attack in degrees
             public float gear;  // gear animation opsition in percentage
             public float gForce;
-            public float altitude; // Altitude above ground level in feet
+            public float altitude; // Altitude above ground level in meters
         };
 
         private const uint PROCESS_MODE_BACKGROUND_BEGIN = 0x00100000;
@@ -164,23 +164,32 @@ namespace SimConnectExporter
                 if (CurrentAircraftName.Equals(aircraftName))// send datagram
                 {
                     float aoa = 57.2957795f * sd.angleOfAttack; // convert radians to degrees
-                    datagram[0] = aoa < 0.0f ? (byte)0 : (byte)aoa;
-                    datagram[1] = (byte)sd.spoilers;
-                    datagram[2] = (byte)sd.flaps;
-
+                    datagram[0] = 1;  // this flag means that this datagram contains telemetry instead of aircraft name
+                    datagram[1] = aoa < 0.0f ? (byte)0 : (byte)aoa;
+                    datagram[2] = (byte)sd.spoilers;
+                    datagram[3] = (byte)sd.flaps;
 
                     /* Speed Conversion 
                      * First convert knots to meters / second by dividing the speed value by 1.94384449
                      * Then divide by ten to convert to decameters/second to ensure the value fits in 1 byte
                      */
-                    datagram[3] = (byte)(((float)sd.trueAirspeed / 1.94384449f) / 10.0f);
+                    datagram[4] = (byte)(((float)sd.trueAirspeed / 1.94384449f) / 10.0f); // No need for more resolution in here
+
+                    // G-Forces
+                    datagram[5] = sd.gForce < 0.0f ? (byte)0 : (byte)sd.gForce;
+
+                    // Altitude
+                    int hm = (int)sd.altitude / 100; // convert meters to Hectometers (fit in 1 byte) 
+                    datagram[6] = hm <= 255 ? (byte)hm : (byte)255; // max is 25km, good enough to make sure we are in the air
+
+                    // Send  Telemetry
                     udpSender.BeginSend(datagram, datagram.Length, new AsyncCallback(SendCallback), udpSender);
+
 
                     /* Check maxG and Track */
                     if (sd.gForce > maxGForce)
                     {
                         maxGForce = sd.gForce;
-
 
                         if (chkTrackGForces.Checked)
                         {
@@ -196,9 +205,6 @@ namespace SimConnectExporter
                             // Add the new row to the DataGridView
                             dgGForces.Rows.Add(newRow);
                         }
-
-
-
                     }
                 }
                 else // send aircraft name
@@ -360,7 +366,7 @@ namespace SimConnectExporter
             CurrentAircraftName = "";
 
             // Allocate the udp datagram
-            datagram = new byte[4];
+            datagram = new byte[7];
 
             // Create the stopwatch
             stopWatch = new Stopwatch();

@@ -78,7 +78,7 @@
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="txtJSON" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\Users\ralch\source\repos\UDPEchoServer1\AoA_UDP_Server\units.json</Value>
+      <Value Profile="(Default)">.\units.json</Value>
     </Setting>
     <Setting Name="chkChangeToMonitor" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -90,7 +90,7 @@
       <Value Profile="(Default)">255</Value>
     </Setting>
     <Setting Name="nudMinSpeed" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">50</Value>
     </Setting>
     <Setting Name="cmbPriorityClass" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
@@ -100,6 +100,9 @@
     </Setting>
     <Setting Name="chkUseBackgroundProcessing" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="nudMinAltitude" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
     </Setting>
   </Settings>
 </SettingsFile>

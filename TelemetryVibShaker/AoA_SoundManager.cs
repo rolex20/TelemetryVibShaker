@@ -144,7 +144,7 @@ namespace TelemetryVibShaker
                     {
                         lastVolume1 = newVolume;
                         newVolume *= volumeAmplifier1;
-                        mp1.Volume = newVolume;  //mp1.Dispatcher.BeginInvoke(new Action(() => { mp1.Volume = newVolume; }));
+                        mp1.Volume = newVolume;  
                         volumeHasChanged = true;
                     }
                 }

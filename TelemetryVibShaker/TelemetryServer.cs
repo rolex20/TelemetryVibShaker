@@ -19,7 +19,7 @@ namespace TelemetryVibShaker
         public int ThreadId; // OS Thread ID for the UDP Telemetry Server
         public string? CurrentUnitType; // current type of aircraft used by the player
 
-        private AoA_SoundManager soundManager;
+        private AoA_SoundManager soundManager_AoA;
         private MotorController[] vibMotor;
         private Root? jsonRoot;
         private bool cancelationToken;
@@ -27,6 +27,7 @@ namespace TelemetryVibShaker
         private int listeningPort;
         private UdpClient? listenerUdp;
         public int MinSpeed; // km/h (below this speed, effects won't be active)
+        public int MinAltitude; // Meters above the ground (below this Altitude, effects won't be active)
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint GetCurrentProcessorNumber();
@@ -38,7 +39,7 @@ namespace TelemetryVibShaker
         public string CurrentUnitInfo { 
             get 
             {
-                return (soundManager == null)? string.Empty: CurrentUnitType + $"({soundManager.AoA1},{soundManager.AoA2})"; // AoA ranges information for the current type of aircraft used by the player
+                return (soundManager_AoA == null)? string.Empty: CurrentUnitType + $"({soundManager_AoA.AoA1},{soundManager_AoA.AoA2})"; // AoA ranges information for the current type of aircraft used by the player
             } 
         } 
 
@@ -66,7 +67,7 @@ namespace TelemetryVibShaker
 
         public TelemetryServer(AoA_SoundManager SoundManager, MotorController[] Motor, bool CalculateStats, int ListeningPort)
         {
-            soundManager = SoundManager;
+            soundManager_AoA = SoundManager;
             vibMotor = Motor;
             jsonRoot = null;
             Statistics = CalculateStats;
@@ -76,6 +77,7 @@ namespace TelemetryVibShaker
             LastData = new TelemetryData();
             listenerUdp = null;
             MinSpeed = 0;
+            MinAltitude = 0;
         }
 
         public bool SetJSON(string FilePath)
@@ -186,12 +188,13 @@ namespace TelemetryVibShaker
                 // SpeedBreaks possible values: 0-100
                 // Flaps possible values: 0-100
                 // Speed (optional): 0-255.  Units in 10th's of Km, so 10 is 100Km
-                if ( receiveData.Length == 4)
+                if (receiveData[0]==1) // is this a telemetry datagram with 7 bytes total?
                 {
                     // Obtain telemetry data
-                    LastData.AoA = receiveData[0];
-                    LastData.SpeedBrakes = receiveData[1];
-                    LastData.Flaps = receiveData[2];
+                    LastData.AoA = receiveData[1];
+                    LastData.SpeedBrakes = receiveData[2];
+                    LastData.Flaps = receiveData[3];
+
 
                     
                     
@@ -202,14 +205,19 @@ namespace TelemetryVibShaker
                      * To convert decameters/s -> km/h we use 
                      * km/h = decameters per second x 36
                      */
-                     LastData.Speed = receiveData[3] * 36; // After this, Speed now is in km/h
+                     LastData.Speed = receiveData[4] * 36; // After this, Speed now is in km/h
 
+                    // GForces 
+                    LastData.GForces = receiveData[5];
+
+                    // Altitude is sent in Hectometers without decimals: some accuracy lost here
+                    LastData.Altitude = receiveData[6] * 100; // Now Altitude is in meters
 
                     // Process the Effects only if the current plane is moving above the MinSpeed required by the user
-                    if (LastData.Speed >= MinSpeed) { 
+                    if (LastData.Speed >= MinSpeed && LastData.Altitude >= MinAltitude) { 
                         
                         // Update the sound effects
-                        soundManager.UpdateEffect(LastData.AoA);
+                        soundManager_AoA.UpdateEffect(LastData.AoA);
 
                         // Update vibration-motors effects
                         for (int i = 0; i < vibMotor.Length; i++)
@@ -217,7 +225,7 @@ namespace TelemetryVibShaker
                     }
 
                 }
-                else  // If not numeric, then datagram received must be an aircraft type name
+                else  // If not, then datagram received must be an aircraft type name
                 {
                     string datagram = Encoding.ASCII.GetString(receiveData, 0, receiveData.Length);
                     var unit = jsonRoot.units.unit.FirstOrDefault(u => u.typeName == datagram);
@@ -233,17 +241,17 @@ namespace TelemetryVibShaker
 
                     if (unit != null)  // If found, use the limits defined in the JSON file
                     {
-                        soundManager.AoA1 = unit.AoA1;
-                        soundManager.AoA2 = unit.AoA2;
+                        soundManager_AoA.AoA1 = unit.AoA1;
+                        soundManager_AoA.AoA2 = unit.AoA2;
                         for (int i = 0; i < vibMotor.Length; i++)
                             vibMotor[i].ChangeAoARange(unit.AoA1, unit.AoA2); // ChangeAoARange() will check if this is an AoA effect-type
 
-                        CurrentUnitType += "(" + soundManager.AoA1 + ", " + soundManager.AoA2 + ")";
+                        CurrentUnitType += "(" + soundManager_AoA.AoA1 + ", " + soundManager_AoA.AoA2 + ")";
                     }
                     else  // basically ignore the limits, because the unit type was not found in the JSON File
                     {
-                        soundManager.AoA1 = 360;
-                        soundManager.AoA2 = 360;
+                        soundManager_AoA.AoA1 = 360;
+                        soundManager_AoA.AoA2 = 360;
                         for (int i = 0; i < vibMotor.Length; i++)
                             vibMotor[i].ChangeAoARange(360, 360);
 

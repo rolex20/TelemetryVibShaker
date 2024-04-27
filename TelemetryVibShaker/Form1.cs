@@ -474,6 +474,7 @@ namespace TelemetryVibShaker
             telemetry = new TelemetryServer(soundManager, motorControllers, chkShowStatistics.Checked, Int32.Parse(txtListeningPort.Text));
             telemetry.SetJSON(txtJSON.Text);
             telemetry.MinSpeed = (int)nudMinSpeed.Value;
+            telemetry.MinAltitude = (int)nudMinAltitude.Value;
         }
 
 
@@ -646,8 +647,12 @@ namespace TelemetryVibShaker
                 // Report speed
                 UpdateValue(lblSpeed, telemetry.LastData.Speed);
 
-                // Report max UDP processing time
-                //UpdateValue(lblProcessingTimeUDP, telemetry.MaxProcessingTime);
+                // Report G-Forces
+                UpdateValue(lblGForces, telemetry.LastData.GForces);
+
+                // Report Altitude Above Ground
+                UpdateValue(lblAltitude, telemetry.LastData.Altitude);
+
 
                 // Report last processor used for UDP processing
                 UpdateValue(lblLastProcessorUsedUDP, telemetry.LastProcessorUsed);
@@ -1010,6 +1015,12 @@ namespace TelemetryVibShaker
 
             regKey.Close();
 
+        }
+
+
+        private void nudMinAltitude_ValueChanged(object sender, EventArgs e)
+        {
+            if (telemetry != null) telemetry.MinAltitude = (int)nudMinAltitude.Value;
         }
     }
 }
