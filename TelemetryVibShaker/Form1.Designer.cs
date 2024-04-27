@@ -548,7 +548,7 @@
             label5.Name = "label5";
             label5.Size = new Size(476, 52);
             label5.TabIndex = 11;
-            label5.Text = "Send UDP datagrams with telemetry information to two small vibration motors controlled by a networked Arduino microcontroller.  The vibration motors are supposed to be attached to your hotas or stick.";
+            label5.Text = resources.GetString("label5.Text");
             // 
             // chkVibrateMotorForSpeedBrake
             // 

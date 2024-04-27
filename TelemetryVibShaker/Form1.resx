@@ -123,6 +123,10 @@
   <data name="label4.Text" xml:space="preserve">
     <value>Normal AoA Sound Effects:  Sound files are played when your aircraft is in AoA optimal range and above the optimal range.  You can use those sound cues to try to maintain optimal sustained turning rate performance.</value>
   </data>
+  <data name="label5.Text" xml:space="preserve">
+    <value>Send UDP datagrams with telemetry information to two small vibration motors controlled by a networked Arduino microcontroller.  The vibration motors are meant
+ to be attached to your throttle or stick.</value>
+  </data>
   <data name="label12.Text" xml:space="preserve">
     <value>Send UDP datagrams with telemetry information to a LILYGO T-WATCH 2020 V3 device.  This device is a watch you wear and it can vibrate and change display background according to specific telemetry data.</value>
   </data>
