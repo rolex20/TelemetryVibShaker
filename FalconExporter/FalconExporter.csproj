@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>falcon3.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -76,6 +79,7 @@
     <Compile Include="LightBits2.cs" />
     <Compile Include="LightBits3.cs" />
     <Compile Include="MiscBits.cs" />
+    <Compile Include="MyControlInfo.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="NavModes.cs" />
     <Compile Include="OSBData.cs" />
@@ -116,6 +120,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="falcon3.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

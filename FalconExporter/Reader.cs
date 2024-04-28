@@ -397,6 +397,13 @@ namespace FalconExporter
                 NativeMethods.MapViewOfFile(_hSecondarySharedMemoryAreaFileMappingObject, NativeMethods.SECTION_MAP_READ,
                     0, 0, 0);
 
+/*
+ * 
+ * NO NEED FOR THESE OTHER SHARED MEMORY AREAS IN MY APP
+ * 
+ * 
+ * 
+ * 
             _hOsbSharedMemoryAreaFileMappingObject = NativeMethods.OpenFileMapping(NativeMethods.SECTION_MAP_READ, false,
                 OsbSharedMemoryAreaFileName);
             _lpOsbSharedMemoryAreaBaseAddress = NativeMethods.MapViewOfFile(_hOsbSharedMemoryAreaFileMappingObject,
@@ -426,6 +433,10 @@ namespace FalconExporter
                 DrawingSharedMemoryAreaFileName);
             _lpDrawingSharedMemoryAreaBaseAddress = NativeMethods.MapViewOfFile(_hDrawingSharedMemoryAreaFileMappingObject,
                 NativeMethods.SECTION_MAP_READ, 0, 0, 0);
+
+            *
+            *
+            */
         }
 
         private void Disconnect()
