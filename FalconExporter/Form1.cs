@@ -121,6 +121,7 @@ namespace FalconExporter
                 // decameters per second = 0.3048 * _lastFlightData.vt / 10;
                 datagram[4] = (byte)(0.0304799999536704f * _lastFlightData.vt);
 
+
                 // G-Forces
                 datagram[5] = _lastFlightData.gs >= 0.0f ? (byte)_lastFlightData.gs : (byte)0;
 
@@ -133,8 +134,10 @@ namespace FalconExporter
                 // Send Telemetry
                 timeStamp = GetTickCount64();
                 udpSender.Send(datagram, datagram.Length);
-            } else if ( totalFuel > lastTelemetry)
+            } else if ( totalFuel > lastTelemetry) // when suddenly there is more fuel, it should be because we are in a new plane, (since I don't refuel)
             {
+                //TODO: find a better way to detect aircraft change
+
                 lastTelemetry = totalFuel;
                 byte[] sendBytes = Encoding.ASCII.GetBytes(txtAircraftName.Text);
                 timeStamp = GetTickCount64();
@@ -151,7 +154,7 @@ namespace FalconExporter
                 UpdateCaption(lblSpeed, _lastFlightData.kias);
                 UpdateCaption(lblAltitude, aia);
                 UpdateCaption(lblSpeedBrakes, _lastFlightData.speedBrake * 100.0f);
-                UpdateCaption(lblTrueAirspeed, _lastFlightData.vt);
+                UpdateCaption(lblTrueAirspeed, _lastFlightData.vt*0.592484f ); //convert to knots
                 UpdateCaption(lblGForces, _lastFlightData.gs);
                 UpdateCaption(lblVehicleType, _lastFlightData.vehicleACD);
                 UpdateCaption(lblFuel, totalFuel);
