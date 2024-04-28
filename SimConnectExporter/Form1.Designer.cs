@@ -86,6 +86,7 @@
             btnDisconnect = new Button();
             btnResetMax = new Button();
             timer1 = new System.Windows.Forms.Timer(components);
+            label12 = new Label();
             tabs.SuspendLayout();
             Settings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudFrequency).BeginInit();
@@ -108,6 +109,7 @@
             // 
             // Settings
             // 
+            Settings.Controls.Add(label12);
             Settings.Controls.Add(label8);
             Settings.Controls.Add(nudFrequency);
             Settings.Controls.Add(chkUseEfficiencyCoresOnly);
@@ -696,6 +698,15 @@
             timer1.Interval = 1500;
             timer1.Tick += timer1_Tick;
             // 
+            // label12
+            // 
+            label12.AutoSize = true;
+            label12.Location = new Point(313, 147);
+            label12.Name = "label12";
+            label12.Size = new Size(73, 15);
+            label12.TabIndex = 25;
+            label12.Text = "milliseconds";
+            // 
             // frmMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -787,5 +798,6 @@
         private Label label8;
         private Label label10;
         private Label label11;
+        private Label label12;
     }
 }
