@@ -133,7 +133,8 @@ namespace FalconExporter
 
                 // Send Telemetry
                 timeStamp = GetTickCount64();
-                udpSender.Send(datagram, datagram.Length);
+                //udpSender.Send(datagram, datagram.Length);
+                udpSender.BeginSend(datagram, datagram.Length, new AsyncCallback(SendCallback), udpSender);
             } else if ( totalFuel > lastTelemetry) // when suddenly there is more fuel, it should be because we are in a new plane, (since I don't refuel)
             {
                 //TODO: find a better way to detect aircraft change
@@ -141,7 +142,8 @@ namespace FalconExporter
                 lastTelemetry = totalFuel;
                 byte[] sendBytes = Encoding.ASCII.GetBytes(txtAircraftName.Text);
                 timeStamp = GetTickCount64();
-                udpSender.Send(sendBytes, sendBytes.Length);
+                //udpSender.Send(sendBytes, sendBytes.Length);
+                udpSender.BeginSend(sendBytes, sendBytes.Length, new AsyncCallback(SendCallback), udpSender);
                 tsAircraftChange.Tag = true;
             }
 
