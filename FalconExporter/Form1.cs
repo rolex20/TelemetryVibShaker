@@ -56,11 +56,36 @@ namespace FalconExporter
 
             // Switch to Monitor
             if (chkChangeToMonitor.Checked) tabControl1.SelectedIndex = 1;
+            DisableChildControls(tabSettings);
 
             btnDisconnect.Enabled = true;
             btnStart.Enabled = false;
             timer1.Interval = (int)nudFrequency.Value;
             timer1.Enabled = true;
+        }
+
+        private void btnDisconnect_Click(object sender, EventArgs e)
+        {
+            timer1.Enabled = false;
+            EnableChildControls(tabSettings);            
+
+            btnDisconnect.Enabled = false;
+            btnStart.Enabled = true;
+            tsStatus.Text = "Timer stopped.";
+            DisconnectUDP();
+        }
+
+
+        private void EnableChildControls(Control control, bool enabled = true)
+        {
+            foreach (var thisControl in control.Controls)
+            {
+                (thisControl as Control).Enabled = enabled;
+            }
+        }
+        private void DisableChildControls(Control control)
+        {
+            EnableChildControls(control, false);
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -406,15 +431,6 @@ namespace FalconExporter
             }
         }
 
-        private void btnDisconnect_Click(object sender, EventArgs e)
-        {
-            timer1.Enabled = false;
-
-            btnDisconnect.Enabled = false;
-            btnStart.Enabled = true;
-            tsStatus.Text = "Timer stopped.";
-            DisconnectUDP();
-        }
 
         private void chkShowStatistics_CheckedChanged(object sender, EventArgs e)
         {
