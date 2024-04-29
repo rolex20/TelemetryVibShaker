@@ -21,7 +21,7 @@ namespace TelemetryVibShaker
         private AoA_SoundManager? soundManager;  // manages sound effects according to the current AoA
         private TelemetryServer? telemetry;      // controls all telemetry logic
         private Thread? threadTelemetry; // this thread runs the telemetry
-        private long lastSecond; // second of the last udp datagram processed
+        private int lastSecond; // second of the last udp datagram processed
         private int maxUIProcessingTime;  // milliseconds elapsed in processing the monitor-update-cycle in Timer1
         private Stopwatch? stopWatchUI;  // used to measure processing time in Timer1 (updating the UI)
         private Process? currentProcess;
@@ -37,6 +37,13 @@ namespace TelemetryVibShaker
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint GetCurrentProcessorNumber();
+
+        [DllImport("kernel32.dll")]
+        private static extern uint GetTickCount();
+
+        [DllImport("kernel32.dll")]
+        private static extern ulong GetTickCount64();
+
 
 
         public frmMain()
@@ -611,7 +618,7 @@ namespace TelemetryVibShaker
             if (telemetry != null) lastSecond = telemetry.LastSecond;
 
             // check if we haven't received more telemetry so we should mute all effects
-            if ((soundManager.SoundIsActive()) && (Environment.TickCount / 1000 - lastSecond > trkEffectTimeout.Value))
+            if ((soundManager.SoundIsActive()) && (GetTickCount() / 1000 - lastSecond > trkEffectTimeout.Value))
             {
                 soundManager.MuteEffects();
                 UpdateSoundEffectStatus(SoundEffectStatus.Canceled);
@@ -620,9 +627,10 @@ namespace TelemetryVibShaker
             }
 
             // Statistics are updated once per second
-            bool showStatistics = telemetry.IsRunning() && (tabs.SelectedIndex == 5);
-            if (chkShowStatistics.Checked && showStatistics)
+            if (chkShowStatistics.Checked && telemetry.IsRunning() && (tabs.SelectedIndex == 5))
             {
+                this.SuspendLayout();
+
                 // Report last datagram timestamp
                 UpdateValue(lblTimestamp, telemetry.TimeStamp);
 
@@ -666,14 +674,16 @@ namespace TelemetryVibShaker
                 // Report UDP ThreadID
                 UpdateValue(lblUDPServerThread, telemetry.ThreadId);
 
+                // Always calculate/Report max UDP processing time
+                UpdateValue(lblProcessingTimeUDP, telemetry.MaxProcessingTime);
+
+
+                // Always calculate/Report max UI processing time (monitor).  This one needs to be the last                
+                UpdateMaxUIProcessingTime(); // the stopwatch is stopped here
+
+                this.ResumeLayout();
             }
 
-            // Always calculate/Report max UDP processing time
-            UpdateValue(lblProcessingTimeUDP, telemetry.MaxProcessingTime);
-
-
-            // Always calculate/Report max UI processing time (monitor).  This one needs to be the last                
-            UpdateMaxUIProcessingTime(); // the stopwatch is stopped here
 
 
         }

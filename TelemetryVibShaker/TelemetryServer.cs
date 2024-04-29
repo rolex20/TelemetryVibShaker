@@ -10,8 +10,8 @@ namespace TelemetryVibShaker
 {
     internal class TelemetryServer
     {
-        public long LastSecond; // second of the last received datagram
-        public long TimeStamp; // timestamp of the last datagram received
+        public int LastSecond; // second of the last received datagram
+        public int TimeStamp; // timestamp of the last datagram received
         public TelemetryData LastData; // last telemetry datagram received
         public int DPS; // datagrams received per second
         public int MaxProcessingTime; // time of the datagram that took longer to process
@@ -163,14 +163,12 @@ namespace TelemetryVibShaker
                 if (Statistics)
                 {
                     stopwatch.Restart();  // Track the time to process this datagram
-                    TimeStamp = (long)GetTickCount64();
-                    long newSecond = TimeStamp / 1000;
+                    TimeStamp = (int)GetTickCount();
                     LastProcessorUsed = (int)GetCurrentProcessorNumber();
+                    int newSecond = TimeStamp / 1000;
 
                     if (LastSecond != newSecond)
                     {
-                        //lblDatagramsPerSecond.Text = DPS.ToString();  // update datagrams per second
-                        //BeginInvoke(new Action(() => { lblDatagramsPerSecond.Text = DPS.ToString();  /* update datagrams per second  */ }));
                         DPS = iDPS; // Only update when the last DPS per second has been calculated which is now
                         iDPS = 1; // reset the counter
                         LastSecond = newSecond;
