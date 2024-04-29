@@ -1439,6 +1439,7 @@
             Controls.Add(btnStartListening);
             Controls.Add(tabs);
             FormBorderStyle = FormBorderStyle.Fixed3D;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "frmMain";
             Text = "Telemetry Vib-Sound-Shaker [UDP Server]";
