@@ -71,7 +71,7 @@ namespace FalconExporter
 
             btnDisconnect.Enabled = false;
             btnStart.Enabled = true;
-            tsStatus.Text = "Timer stopped.";
+            UpdateCaption(tsStatus, "Timer stopped.");
             DisconnectUDP();
         }
 
