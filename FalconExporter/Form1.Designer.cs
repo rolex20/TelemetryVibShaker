@@ -82,6 +82,7 @@
             this.tsAircraftChange = new System.Windows.Forms.ToolStripLabel();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.btnResetMax = new System.Windows.Forms.Button();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.tabControl1.SuspendLayout();
             this.tabSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudFrequency)).BeginInit();
@@ -128,6 +129,7 @@
             this.txtAircraftName.Name = "txtAircraftName";
             this.txtAircraftName.Size = new System.Drawing.Size(161, 20);
             this.txtAircraftName.TabIndex = 11;
+            this.toolTip1.SetToolTip(this.txtAircraftName, "Always send this aircraft name when new mission is started.");
             // 
             // label5
             // 
@@ -184,6 +186,7 @@
             this.nudFrequency.Name = "nudFrequency";
             this.nudFrequency.Size = new System.Drawing.Size(161, 20);
             this.nudFrequency.TabIndex = 7;
+            this.toolTip1.SetToolTip(this.nudFrequency, "Values of 50 ms or less are too much for the timer control.");
             this.nudFrequency.Value = new decimal(new int[] {
             50,
             0,
@@ -716,6 +719,7 @@
         private System.Windows.Forms.Button btnResetMax;
         private System.Windows.Forms.ToolStripLabel tsAircraftChange;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }
 
