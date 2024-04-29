@@ -29,8 +29,10 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             tabs = new TabControl();
             Settings = new TabPage();
+            label12 = new Label();
             label8 = new Label();
             nudFrequency = new NumericUpDown();
             chkUseEfficiencyCoresOnly = new CheckBox();
@@ -86,7 +88,6 @@
             btnDisconnect = new Button();
             btnResetMax = new Button();
             timer1 = new System.Windows.Forms.Timer(components);
-            label12 = new Label();
             tabs.SuspendLayout();
             Settings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudFrequency).BeginInit();
@@ -127,6 +128,15 @@
             Settings.TabIndex = 0;
             Settings.Text = "Settings";
             Settings.UseVisualStyleBackColor = true;
+            // 
+            // label12
+            // 
+            label12.AutoSize = true;
+            label12.Location = new Point(313, 147);
+            label12.Name = "label12";
+            label12.Size = new Size(73, 15);
+            label12.TabIndex = 25;
+            label12.Text = "milliseconds";
             // 
             // label8
             // 
@@ -698,15 +708,6 @@
             timer1.Interval = 1500;
             timer1.Tick += timer1_Tick;
             // 
-            // label12
-            // 
-            label12.AutoSize = true;
-            label12.Location = new Point(313, 147);
-            label12.Name = "label12";
-            label12.Size = new Size(73, 15);
-            label12.TabIndex = 25;
-            label12.Text = "milliseconds";
-            // 
             // frmMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -718,6 +719,7 @@
             Controls.Add(btnConnect);
             Controls.Add(tabs);
             FormBorderStyle = FormBorderStyle.Fixed3D;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "frmMain";
             SizeGripStyle = SizeGripStyle.Hide;
