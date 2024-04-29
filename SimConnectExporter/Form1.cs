@@ -220,6 +220,7 @@ namespace SimConnectExporter
                 /*** Update UI ***/
                 if (chkShowStatistics.Checked && tabs.SelectedIndex == 1)
                 {
+                    this.SuspendLayout();
                     UpdateValue(lblLastProcessorUsedUDP, (int)GetCurrentProcessorNumber());
                     UpdateValue(lblTimestamp, lastTimeStamp_ms);
                     UpdateValue(lblCurrentUnitType, sd.title);
@@ -231,8 +232,10 @@ namespace SimConnectExporter
                     UpdateValue(lblAltitude, (int)sd.altitude);
                     UpdateValue(lblGforce, (int)sd.gForce);
                     UpdateValue(lblMaxGForce, maxGForce);
+                    UpdateValue(lblProcessingTimeUDP, maxProcessingTime);
+                    this.ResumeLayout();
                 }
-                UpdateValue(lblProcessingTimeUDP, maxProcessingTime);
+                
 
             }
             if (chkShowStatistics.Checked)
