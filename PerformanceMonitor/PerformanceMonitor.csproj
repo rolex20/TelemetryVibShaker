@@ -52,6 +52,9 @@
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>ApplicationFrameHost_N2ed736NZX.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -107,6 +110,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="cpu.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ApplicationFrameHost_N2ed736NZX.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
