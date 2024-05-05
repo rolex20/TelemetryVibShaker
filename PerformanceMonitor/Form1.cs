@@ -627,9 +627,9 @@ namespace PerformanceMonitor
                     <h1>{message}</h1>
                     <form method='post' border='1'>
                         <br><br><label for='x'>X:</label>
-                        <input type='number' name='x' value='{this.Location.X}' min='0' required placeholder='type new X coordinate'/><br><br>
+                        <input type='number' name='x' value='{this.Location.X}' required placeholder='type new X coordinate'/><br><br>
                         <label for='y'>Y:</label>
-                        <input type='number' name='y' value='{this.Location.Y}' min='0' required placeholder='type new Y coordinate' autofocus/><br><br>
+                        <input type='number' name='y' value='{this.Location.Y}' required placeholder='type new Y coordinate' autofocus/><br><br>
 
                         <input type='checkbox' id='topmost' name='topmost' value='always_on_top' {marked}>
                         <label for='topmost'> Always on top</label><br>
