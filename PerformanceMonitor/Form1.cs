@@ -601,7 +601,7 @@ namespace PerformanceMonitor
             this.Invoke(new Action(() => {
                 dispatcherUIThread = (int)GetCurrentThreadId();
 
-                txtErrors.AppendText($"Moving form to x={x}, y={y}" + Environment.NewLine);
+                //txtErrors.AppendText($"Moving form to x={x}, y={y}" + Environment.NewLine);
 
                 //if (x >= 0 && y >= 0)
                 this.Location = new System.Drawing.Point(x, y);
