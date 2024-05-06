@@ -601,8 +601,10 @@ namespace PerformanceMonitor
             this.Invoke(new Action(() => {
                 dispatcherUIThread = (int)GetCurrentThreadId();
 
-                if (x >= 0 && y >= 0)
-                    this.Location = new System.Drawing.Point(x, y);
+                txtErrors.AppendText($"Moving form to x={x}, y={y}" + Environment.NewLine);
+
+                //if (x >= 0 && y >= 0)
+                this.Location = new System.Drawing.Point(x, y);
 
                 // If the user submitted the form with topMost empty, this means the user might want to set this property to false
                 this.TopMost = topMost != null;
