@@ -161,6 +161,8 @@
             this.tbErrors = new System.Windows.Forms.TabPage();
             this.txtErrors = new System.Windows.Forms.TextBox();
             this.lblErrorsTitle = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.txtIPAddress = new System.Windows.Forms.TextBox();
             this.toolStrip1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.tcTabControl.SuspendLayout();
@@ -1024,7 +1026,6 @@
             // 
             // tstxtAutoMoveY
             // 
-            this.tstxtAutoMoveY.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.tstxtAutoMoveY.Name = "tstxtAutoMoveY";
             this.tstxtAutoMoveY.Size = new System.Drawing.Size(50, 28);
             this.tstxtAutoMoveY.Text = "1100";
@@ -1410,6 +1411,8 @@
             // 
             // tbSettings
             // 
+            this.tbSettings.Controls.Add(this.txtIPAddress);
+            this.tbSettings.Controls.Add(this.label2);
             this.tbSettings.Controls.Add(this.lbl12700KNote);
             this.tbSettings.Controls.Add(this.cmbPriorityClass);
             this.tbSettings.Controls.Add(this.label1);
@@ -1428,7 +1431,7 @@
             this.lbl12700KNote.AutoSize = true;
             this.lbl12700KNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbl12700KNote.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
-            this.lbl12700KNote.Location = new System.Drawing.Point(26, 149);
+            this.lbl12700KNote.Location = new System.Drawing.Point(26, 197);
             this.lbl12700KNote.Name = "lbl12700KNote";
             this.lbl12700KNote.Size = new System.Drawing.Size(268, 13);
             this.lbl12700KNote.TabIndex = 4;
@@ -1443,7 +1446,7 @@
             "NORMAL",
             "BELOW NORMAL",
             "IDLE"});
-            this.cmbPriorityClass.Location = new System.Drawing.Point(134, 91);
+            this.cmbPriorityClass.Location = new System.Drawing.Point(134, 85);
             this.cmbPriorityClass.Name = "cmbPriorityClass";
             this.cmbPriorityClass.Size = new System.Drawing.Size(121, 21);
             this.cmbPriorityClass.TabIndex = 3;
@@ -1452,7 +1455,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(58, 94);
+            this.label1.Location = new System.Drawing.Point(58, 88);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(69, 13);
             this.label1.TabIndex = 2;
@@ -1528,6 +1531,23 @@
             this.lblErrorsTitle.Size = new System.Drawing.Size(168, 13);
             this.lblErrorsTitle.TabIndex = 0;
             this.lblErrorsTitle.Text = "Errors: (only the first 100 are listed)";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(66, 134);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(61, 13);
+            this.label2.TabIndex = 5;
+            this.label2.Text = "IP Address:";
+            // 
+            // txtIPAddress
+            // 
+            this.txtIPAddress.Location = new System.Drawing.Point(135, 131);
+            this.txtIPAddress.Name = "txtIPAddress";
+            this.txtIPAddress.ReadOnly = true;
+            this.txtIPAddress.Size = new System.Drawing.Size(120, 20);
+            this.txtIPAddress.TabIndex = 6;
             // 
             // frmMain
             // 
@@ -1696,6 +1716,8 @@
         private System.Windows.Forms.TextBox txtErrors;
         private System.Windows.Forms.Label lblErrorsTitle;
         private System.Windows.Forms.Label lbl12700KNote;
+        private System.Windows.Forms.TextBox txtIPAddress;
+        private System.Windows.Forms.Label label2;
     }
 }
 

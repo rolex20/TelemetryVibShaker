@@ -143,6 +143,20 @@ namespace PerformanceMonitor
             tslblExceptions.Tag = 0L;
             ExCounter = 0L;
         }
+
+        private string GetMyIPAddress()
+        {
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                {
+                    return ip.ToString();
+                }
+            }
+
+            return "localhost";
+        }
         private void frmMain_Load(object sender, EventArgs e)
         {
             webServerThreadId = -1;
@@ -205,7 +219,10 @@ namespace PerformanceMonitor
 
             // Change the priority class to the previous setting selected (NORMAL, BELOW_NORMAL or IDLE)
             cmbPriorityClass.SelectedIndex = Properties.Settings.Default.PriorityClassSelectedIndex;
-            //cmbPriorityClass_SelectedIndexChanged(null, null);
+
+
+            // Obtain current IP Address
+            txtIPAddress.Text = GetMyIPAddress();
 
 
 
@@ -532,9 +549,10 @@ namespace PerformanceMonitor
         private void StartWebServer()
         {
             listener = new HttpListener();
-            listener.Prefixes.Add("http://perfmon:8080/");
-            listener.Prefixes.Add("http://192.168.1.5:8080/"); // remove this line when debugging
-            listener.Prefixes.Add("http://localhost:8080/");
+            listener.Prefixes.Add($"http://{txtIPAddress.Text}:8080/");
+            //listener.Prefixes.Add("http://perfmon:8080/");
+            //listener.Prefixes.Add("http://192.168.1.5:8080/"); // remove this line when debugging
+            //listener.Prefixes.Add("http://localhost:8080/");
             try
             {
                 listener.Start();
@@ -575,17 +593,19 @@ namespace PerformanceMonitor
                             y = int.Parse(sy);
                         }
 
-                        string topMost;// = String.Empty;
-                        string focus;// = String.Empty;
-                        string reset;// = String.Empty;
+                        string topMost, focus, reset, exit;
 
                         parameters.TryGetValue("topmost", out topMost);
                         parameters.TryGetValue("focus", out focus);
                         parameters.TryGetValue("reset", out reset);
+                        parameters.TryGetValue("exit", out exit);
+
 
                         MakeFormChanges(x, y, topMost, focus, reset);
 
                         SendResponse(response, $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Successfully requested coordinates change to X: {x}, Y: {y}");
+
+                        if (exit != null) Application.Exit();
                     }
                 }
                 else
@@ -600,6 +620,7 @@ namespace PerformanceMonitor
         {
             this.Invoke(new Action(() => {
                 dispatcherUIThread = (int)GetCurrentThreadId();
+
 
                 //txtErrors.AppendText($"Moving form to x={x}, y={y}" + Environment.NewLine);
 
@@ -643,6 +664,8 @@ namespace PerformanceMonitor
                         <input type='checkbox' id='reset' name='reset' value='Reset'>
                         <label for='reset'>Reset All Max Values</label><br>
                         
+                        <input type='checkbox' id='exit' name='exit' value='Exit'>
+                        <label for='exit'>Exit program</label><br>
 
                         <input type='submit' value='Submit' />
                     </form>
