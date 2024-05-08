@@ -19,7 +19,7 @@ namespace WarThunderExporter
         private Stopwatch stopWatch = new Stopwatch();
         private int maxProcessingTime;
         private ulong timeStamp;
-        private string? lastAircraftName;
+        private string? lastAircraftName, indicators_url, state_url;
 
 
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -373,12 +373,12 @@ namespace WarThunderExporter
             {
                 stopWatch.Restart();
             }
-            
+
             try
             {
 
                 // Get indicators-telemetry data from War Thunder
-                HttpResponseMessage response2 = await httpClient.GetAsync("http://localhost:8111/state");
+                HttpResponseMessage response2 = await httpClient.GetAsync(indicators_url); //txtWtUrl
                 response2.EnsureSuccessStatusCode();
                 string responseBody2 = await response2.Content.ReadAsStringAsync();
 
@@ -393,7 +393,7 @@ namespace WarThunderExporter
                 if (aircraftName is not null) // if we don't have an aircraft name, then we are not flying
                 {
                     // Get state-telemetry data from War Thunder
-                    HttpResponseMessage response1 = await httpClient.GetAsync("http://localhost:8111/state");
+                    HttpResponseMessage response1 = await httpClient.GetAsync(state_url);
                     response1.EnsureSuccessStatusCode();
                     string responseBody1 = await response1.Content.ReadAsStringAsync();
                     timeStamp = GetTickCount64();
@@ -434,7 +434,8 @@ namespace WarThunderExporter
                         // Send Telemetry
                         udpSender.BeginSend(datagram, datagram.Length, new AsyncCallback(SendCallback), udpSender);
 
-                    } else
+                    }
+                    else // let's report the new aircraft name/type we are flying
                     {
                         lastAircraftName = aircraftName;
                         byte[] sendBytes = Encoding.ASCII.GetBytes(lastAircraftName);
@@ -466,7 +467,7 @@ namespace WarThunderExporter
                 } //if-then-else (aircraftName is not null
 
 
-                
+
             }
             catch (Exception ex)
             {
@@ -492,10 +493,10 @@ namespace WarThunderExporter
                 int elapsed = stopWatch.Elapsed.Milliseconds;
                 if (maxProcessingTime < elapsed) maxProcessingTime = elapsed;  // this is going to be delayed by one cycle, but it's okay
             }
-            
+
         }
 
-        private void TimerActivateNewInterval(System.Windows.Forms.Timer timer,  int interval)
+        private void TimerActivateNewInterval(System.Windows.Forms.Timer timer, int interval)
         {
             if (timer.Interval != (int)timer.Tag) // let's use the Tag-duplicated value to not call this property change if not really needed
             {
@@ -509,6 +510,28 @@ namespace WarThunderExporter
             {
                 timer.Enabled = true;
             }
+        }
+
+        private void txtWtUrl_TextChanged(object sender, EventArgs e)
+        {
+            txtWtUrl.Text = SanitizeURL(txtWtUrl.Text);
+
+            indicators_url = txtWtUrl.Text + "/indicators";
+            state_url = txtWtUrl.Text + "/state";
+        }
+
+        private string SanitizeURL(string input)
+        {
+            // Trim spaces at the beginning and end of the string
+            string trimmedString = input.Trim();
+
+            // Remove trailing slash if it exists
+            if (trimmedString.EndsWith("/"))
+            {
+                trimmedString = trimmedString.Remove(trimmedString.Length - 1);
+            }
+
+            return trimmedString;
         }
     }
 }

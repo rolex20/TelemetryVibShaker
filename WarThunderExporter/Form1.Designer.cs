@@ -120,6 +120,7 @@
             txtWtUrl.Name = "txtWtUrl";
             txtWtUrl.Size = new Size(177, 23);
             txtWtUrl.TabIndex = 10;
+            txtWtUrl.TextChanged += txtWtUrl_TextChanged;
             // 
             // label5
             // 
