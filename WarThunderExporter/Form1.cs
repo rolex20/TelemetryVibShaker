@@ -3,9 +3,11 @@ using System.Diagnostics;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
-using System.Diagnostics.Metrics;
-using System.Linq.Expressions;
 using System.Text;
+using System;
+using Microsoft.VisualBasic.Devices;
+using System.Net;
+using System.Diagnostics.Metrics;
 
 
 namespace WarThunderExporter
@@ -238,17 +240,36 @@ namespace WarThunderExporter
             panel1.Visible = chkShowStatistics.Checked;
         }
 
+        private void PrepareMonitorLabels()
+        {
+            lblAoA.Tag = -1;
+            lblSpeed.Tag = -1;
+            lblAltitude.Tag = -1;
+            lblSpeedBrakes.Tag = -1;
+            lblFlaps.Tag = -1;
+            lblGForces.Tag = -1;
+            lblLastTimeStamp.Tag = 1L; // -1 here causes problems with overflow
+            lblMaxProcessingTime.Tag = 0; // no need to use -1 here
+        }
+
         private void btnStart_Click(object sender, EventArgs e)
         {
+            // Before connecting udpSender, lets make sure our int cached copy is up to date
+            nudFrequency.Tag = (int)nudFrequency.Value;
+
+
+            UpdateCaption(tsStatus, "Connecting...");
+            PrepareMonitorLabels();
+
             // Allocate the udp datagram
             datagram = new byte[7];
             datagram[0] = 1; // flag to indicate this is a telemetry datagram for my TelemetryVibShaker program
-
             ConnectUDP();
 
             // Switch to Monitor
             if (chkChangeToMonitor.Checked) tabControl1.SelectedIndex = 1;
             DisableChildControls(tabSettings);
+            nudFrequency.Enabled = true; // we still want to be able to change this
 
 
             btnStop.Enabled = true;
@@ -396,12 +417,14 @@ namespace WarThunderExporter
                 JObject telemetryIndicators = JObject.Parse(responseBody2);
 
                 // Extract the required telemetry information
-                string aircraftName = telemetryIndicators["type"].Value<string>();
-                float altitudeInFeets = telemetryIndicators["altitude_10k"].Value<float>();
-                float gMeter = telemetryIndicators["g_meter"].Value<float>();
+                string? aircraftName = null;
+                aircraftName = telemetryIndicators?["type"].Value<string>();
 
                 if (aircraftName is not null) // if we don't have an aircraft name, then we are not flying
                 {
+                    float altitudeInFeets = telemetryIndicators["altitude_10k"].Value<float>();
+                    float gMeter = telemetryIndicators["g_meter"].Value<float>();
+
                     // Get state-telemetry data from War Thunder
                     HttpResponseMessage response1 = await httpClient.GetAsync(state_url, cancellationTokenSource.Token);
                     response1.EnsureSuccessStatusCode();
@@ -416,6 +439,7 @@ namespace WarThunderExporter
                     int flapsStatus = telemetryState["flaps, %"].Value<int>();
                     int airBrakePct = telemetryState["airbrake, %"].Value<int>();
                     float angleOfAttack = telemetryState["AoA, deg"].Value<float>();
+
 
                     if (aircraftName.Equals(lastAircraftName)) // just send the telemetry for the same aircraft
                     {
@@ -460,7 +484,8 @@ namespace WarThunderExporter
                         UpdateCaption(lblAoA, angleOfAttack);
                         UpdateCaption(lblSpeed, speedInKnots);
                         UpdateCaption(lblAltitude, altitudeInFeets);
-                        UpdateCaption(lblSpeedBrakes, airBrakePct);
+                        UpdateCaption(lblSpeedBrakes, airBrakePct);                        
+                        UpdateCaption(lblFlaps, flapsStatus);
                         UpdateCaption(lblGForces, gMeter);
                         UpdateCaption(lblAircraftType, aircraftName);
                         UpdateCaption(lblLastTimeStamp, timeStamp);
@@ -479,12 +504,28 @@ namespace WarThunderExporter
 
 
             }
+            catch (Newtonsoft.Json.JsonReaderException ex)
+            {
+                RecoverFromTypicalException("Error parsing Json WarThunder Telemetry response.  Retrying soon...", true);
+            }
+
             catch (OperationCanceledException) // Operation canceled by user, this is no error
             {
-                timeStamp = GetTickCount64();
-                UpdateCaption(lblLastTimeStamp, timeStamp);
-                // UpdateCaption(tsStatus, "Operation canceled by the user."); // already done in btnStop_Click()
+                RecoverFromTypicalException(null, false); // Status Text will be set in btnStop_Click()
             }
+            catch (InvalidOperationException) 
+            {
+                RecoverFromTypicalException("requestUri must be an absolute URI or BaseAddress must be set.", true);                
+            }
+            catch (HttpRequestException)
+            {
+                RecoverFromTypicalException("Request failed (network connectivity, timeout, etc).  Retrying soon...", true);
+            }
+            catch (UriFormatException)
+            {
+                RecoverFromTypicalException("URI is not valid relative or absolute URI.  Retrying soon...", true);
+            }
+
             catch (Exception ex)
             {
                 timeStamp = GetTickCount64();
@@ -513,6 +554,18 @@ namespace WarThunderExporter
                 if (maxProcessingTime < elapsed) maxProcessingTime = elapsed;  // this is going to be delayed by one cycle, but it's okay
             }
 
+        }
+
+        private void RecoverFromTypicalException(string?  msg, bool reenable)
+        {
+            timeStamp = GetTickCount64();
+            UpdateCaption(lblLastTimeStamp, timeStamp);
+            if (msg is not null)
+            {
+                UpdateCaption(tsStatus, msg);
+                Debug.Print(msg);
+            }
+            if (reenable) TimerActivateNewInterval(timer1, 1000);  // Wait more time before trying again
         }
 
         private void TimerActivateNewInterval(System.Windows.Forms.Timer timer, int interval)

@@ -341,6 +341,7 @@
             lblAircraftType.Name = "lblAircraftType";
             lblAircraftType.Size = new Size(27, 15);
             lblAircraftType.TabIndex = 7;
+            lblAircraftType.Tag = "empty";
             lblAircraftType.Text = "----";
             // 
             // lblSpeedBrakes
@@ -493,6 +494,7 @@
             // 
             // btnStop
             // 
+            btnStop.Enabled = false;
             btnStop.Location = new Point(407, 353);
             btnStop.Name = "btnStop";
             btnStop.Size = new Size(75, 23);
@@ -528,10 +530,13 @@
             // 
             // tsStatus
             // 
+            tsStatus.AutoToolTip = true;
+            tsStatus.DisplayStyle = ToolStripItemDisplayStyle.Text;
             tsStatus.Name = "tsStatus";
             tsStatus.Size = new Size(26, 22);
             tsStatus.Tag = "empty";
             tsStatus.Text = "Idle";
+            tsStatus.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // frmWarThunderTelemetry
             // 
