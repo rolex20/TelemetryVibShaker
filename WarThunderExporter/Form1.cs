@@ -20,6 +20,7 @@ namespace WarThunderExporter
         private int maxProcessingTime;
         private ulong timeStamp;
         private string? lastAircraftName, indicators_url, state_url;
+        private CancellationTokenSource cancellationTokenSource;
 
 
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -42,7 +43,7 @@ namespace WarThunderExporter
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            txtDebug.Tag = true; // The first time we detect an error, let's show it to the user
+            txtDebug.Tag = 0; // Used to track the number of errors detected
             timer1.Tag = -1; // Make sure we have an int here for ActivateNewTimerInterval
 
             // Restore previous location
@@ -253,6 +254,8 @@ namespace WarThunderExporter
             btnStop.Enabled = true;
             btnStart.Enabled = false;
 
+            cancellationTokenSource = new CancellationTokenSource();
+
             TimerActivateNewInterval(timer1, (int)nudFrequency.Value);
         }
 
@@ -286,12 +289,14 @@ namespace WarThunderExporter
 
         private void btnStop_Click(object sender, EventArgs e)
         {
+            cancellationTokenSource?.Cancel();
+
             timer1.Enabled = false;
             EnableChildControls(tabSettings);
 
             btnStop.Enabled = false;
             btnStart.Enabled = true;
-            UpdateCaption(tsStatus, "Timer stopped.");
+            UpdateCaption(tsStatus, "Operation canceled by the user.");
             DisconnectUDP();
         }
 
@@ -365,6 +370,11 @@ namespace WarThunderExporter
         }
 
 
+        // This is how to read Telemetry from War Thunder
+        // More info here: https://github.com/lucasvmx/WarThunder-localhost-documentation
+        // The function is large because timer1 has issues with async calls and because
+        // I wanted to avoid inherinting all async markings to all functions.
+        // The function is large, but straightforward to understand and almost no indirection-levels required to understand it
         private async Task WarThunderTelemetryAsync()
         {
             timer1.Enabled = false;
@@ -378,7 +388,7 @@ namespace WarThunderExporter
             {
 
                 // Get indicators-telemetry data from War Thunder
-                HttpResponseMessage response2 = await httpClient.GetAsync(indicators_url); //txtWtUrl
+                HttpResponseMessage response2 = await httpClient.GetAsync(indicators_url, cancellationTokenSource.Token); //txtWtUrl
                 response2.EnsureSuccessStatusCode();
                 string responseBody2 = await response2.Content.ReadAsStringAsync();
 
@@ -393,7 +403,7 @@ namespace WarThunderExporter
                 if (aircraftName is not null) // if we don't have an aircraft name, then we are not flying
                 {
                     // Get state-telemetry data from War Thunder
-                    HttpResponseMessage response1 = await httpClient.GetAsync(state_url);
+                    HttpResponseMessage response1 = await httpClient.GetAsync(state_url, cancellationTokenSource.Token);
                     response1.EnsureSuccessStatusCode();
                     string responseBody1 = await response1.Content.ReadAsStringAsync();
                     timeStamp = GetTickCount64();
@@ -464,24 +474,33 @@ namespace WarThunderExporter
                 else // let's try again, but let's wait 1 second
                 {
                     TimerActivateNewInterval(timer1, 1000); // nudFrequency.Tag = (int)nudFrequency.Value
-                } //if-then-else (aircraftName is not null
+                } //if-then-else (aircraftName) is not null
 
 
 
             }
+            catch (OperationCanceledException) // Operation canceled by user, this is no error
+            {
+                timeStamp = GetTickCount64();
+                UpdateCaption(lblLastTimeStamp, timeStamp);
+                // UpdateCaption(tsStatus, "Operation canceled by the user."); // already done in btnStop_Click()
+            }
             catch (Exception ex)
             {
-                // Show error information
                 timeStamp = GetTickCount64();
-                txtDebug.AppendText($"[{timeStamp}] {ex.Message}" + Environment.NewLine);
-                tsStatus.Text = $"Error Retrievieng Telemetry Data: [{ex.Message}], retrying...";
-                lblLastTimeStamp.Text = timeStamp.ToString();
-
-                // The first time we get an error, let's show it to the user
-                if ((bool)txtDebug.Tag)
+                UpdateCaption(lblLastTimeStamp, timeStamp);
+                if ((int)txtDebug.Tag < 100) // only show first 100 errors
                 {
-                    tabControl1.SelectedIndex = 2; // Debug tab
-                    txtDebug.Tag = false;  // Only let's call the attention on the first error
+                    // Show error information                    
+                    txtDebug.AppendText($"[{timeStamp}] {ex.Message}" + Environment.NewLine);
+                    UpdateCaption(tsStatus, "Error Retrievieng Telemetry Data. Retrying...");                    
+
+                    // The first time we get an error, let's show it to the user
+                    if ((int)txtDebug.Tag == 0)
+                    {
+                        tabControl1.SelectedIndex = 2; // Debug tab
+                        txtDebug.Tag = (int)txtDebug.Tag + 1; // Only let's call the attention on the first error
+                    }
                 }
 
                 TimerActivateNewInterval(timer1, 1000);  // Wait more time before trying again

@@ -66,6 +66,7 @@
             chkShowStatistics = new CheckBox();
             chkChangeToMonitor = new CheckBox();
             tabDebug = new TabPage();
+            lblDebugTitle = new Label();
             txtDebug = new TextBox();
             btnStart = new Button();
             btnStop = new Button();
@@ -452,6 +453,7 @@
             // 
             // tabDebug
             // 
+            tabDebug.Controls.Add(lblDebugTitle);
             tabDebug.Controls.Add(txtDebug);
             tabDebug.Location = new Point(4, 24);
             tabDebug.Name = "tabDebug";
@@ -460,14 +462,23 @@
             tabDebug.Text = "Debug";
             tabDebug.UseVisualStyleBackColor = true;
             // 
+            // lblDebugTitle
+            // 
+            lblDebugTitle.AutoSize = true;
+            lblDebugTitle.Location = new Point(25, 16);
+            lblDebugTitle.Name = "lblDebugTitle";
+            lblDebugTitle.Size = new Size(258, 15);
+            lblDebugTitle.TabIndex = 1;
+            lblDebugTitle.Text = "Errors Detected (only first 100 errors are shown):";
+            // 
             // txtDebug
             // 
-            txtDebug.Location = new Point(25, 18);
+            txtDebug.Location = new Point(25, 44);
             txtDebug.Multiline = true;
             txtDebug.Name = "txtDebug";
             txtDebug.ReadOnly = true;
             txtDebug.ScrollBars = ScrollBars.Both;
-            txtDebug.Size = new Size(407, 265);
+            txtDebug.Size = new Size(407, 239);
             txtDebug.TabIndex = 0;
             // 
             // btnStart
@@ -519,6 +530,7 @@
             // 
             tsStatus.Name = "tsStatus";
             tsStatus.Size = new Size(26, 22);
+            tsStatus.Tag = "empty";
             tsStatus.Text = "Idle";
             // 
             // frmWarThunderTelemetry
@@ -600,5 +612,6 @@
         private Label label15;
         private TabPage tabDebug;
         private TextBox txtDebug;
+        private Label lblDebugTitle;
     }
 }
