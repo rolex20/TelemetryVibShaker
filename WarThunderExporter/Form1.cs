@@ -21,7 +21,7 @@ namespace WarThunderExporter
         private Stopwatch stopWatch = new Stopwatch();
         private int maxProcessingTime;
         private ulong timeStamp;
-        private string? lastAircraftName, indicators_url, state_url;
+        private string? lastAircraftName;
         private CancellationTokenSource cancellationTokenSource;
 
 
@@ -257,8 +257,10 @@ namespace WarThunderExporter
             // Before connecting udpSender, lets make sure our int cached copy is up to date
             nudFrequency.Tag = (int)nudFrequency.Value;
 
+            string baseAddress = SanitizeURL(txtWtUrl.Text);
+            httpClient.BaseAddress = new Uri(baseAddress);
 
-            UpdateCaption(tsStatus, "Connecting...");
+            UpdateCaption(tsStatus, $"Connecting to [{baseAddress}]...");
             PrepareMonitorLabels();
 
             // Allocate the udp datagram
@@ -409,7 +411,7 @@ namespace WarThunderExporter
             {
 
                 // Get indicators-telemetry data from War Thunder
-                HttpResponseMessage response2 = await httpClient.GetAsync(indicators_url, cancellationTokenSource.Token); //txtWtUrl
+                HttpResponseMessage response2 = await httpClient.GetAsync("indicators", cancellationTokenSource.Token); //txtWtUrl
                 response2.EnsureSuccessStatusCode();
                 string responseBody2 = await response2.Content.ReadAsStringAsync();
 
@@ -426,7 +428,7 @@ namespace WarThunderExporter
                     float gMeter = telemetryIndicators["g_meter"].Value<float>();
 
                     // Get state-telemetry data from War Thunder
-                    HttpResponseMessage response1 = await httpClient.GetAsync(state_url, cancellationTokenSource.Token);
+                    HttpResponseMessage response1 = await httpClient.GetAsync("state", cancellationTokenSource.Token);
                     response1.EnsureSuccessStatusCode();
                     string responseBody1 = await response1.Content.ReadAsStringAsync();
                     timeStamp = GetTickCount64();
@@ -584,26 +586,19 @@ namespace WarThunderExporter
             }
         }
 
-        private void txtWtUrl_TextChanged(object sender, EventArgs e)
-        {
-            txtWtUrl.Text = SanitizeURL(txtWtUrl.Text);
-
-            indicators_url = txtWtUrl.Text + "/indicators";
-            state_url = txtWtUrl.Text + "/state";
-        }
 
         private string SanitizeURL(string input)
         {
             // Trim spaces at the beginning and end of the string
-            string trimmedString = input.Trim();
+            string sanitizedString = input.Trim();
 
-            // Remove trailing slash if it exists
-            if (trimmedString.EndsWith("/"))
+            // Add trailing slash if it doesn't exist
+            if (!sanitizedString.EndsWith("/"))
             {
-                trimmedString = trimmedString.Remove(trimmedString.Length - 1);
+                sanitizedString += "/";
             }
 
-            return trimmedString;
+            return sanitizedString;
         }
     }
 }
