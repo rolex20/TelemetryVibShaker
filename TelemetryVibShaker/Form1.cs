@@ -20,8 +20,7 @@ namespace TelemetryVibShaker
         private EffectDefinition[]? TWatchEffects; // curently only 1 motor and 1 display connected
         private AoA_SoundManager? soundManager;  // manages sound effects according to the current AoA
         private TelemetryServer? telemetry;      // controls all telemetry logic
-        private Thread? threadTelemetry; // this thread runs the telemetry
-        private int lastSecond; // second of the last udp datagram processed
+        private Thread? threadTelemetry; // this thread runs the telemetry        
         private int maxUIProcessingTime;  // milliseconds elapsed in processing the monitor-update-cycle in Timer1
         private Stopwatch? stopWatchUI;  // used to measure processing time in Timer1 (updating the UI)
         private Process? currentProcess;
@@ -485,8 +484,6 @@ namespace TelemetryVibShaker
         private void btnStartListening_Click(object sender, EventArgs e)
         {
 
-            lastSecond = 0; // reset tracker
-
             // Check if files exist
             if (!CheckFileExists(txtSoundEffect1, "Sound Effect 1")) return;
             if (!CheckFileExists(txtSoundEffect2, "Sound Effect 2")) return;
@@ -567,7 +564,8 @@ namespace TelemetryVibShaker
             if (Convert.ToInt32(L.Tag) != value)
             {
                 L.Tag = value;
-                L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
+                L.Text = value.ToString();
+                //L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
             }
         }
 
@@ -576,7 +574,8 @@ namespace TelemetryVibShaker
             if (Convert.ToInt64(L.Tag) != value)
             {
                 L.Tag = value;
-                L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
+                L.Text = value.ToString();
+                //L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
             }
         }
 
@@ -593,30 +592,34 @@ namespace TelemetryVibShaker
         {
             UpdateValue(lblProcessingTimeUI, maxUIProcessingTime); // this might be delayed by one cycle, but it's ok
 
-            stopWatchUI.Stop();
-            int elapsed = stopWatchUI.Elapsed.Milliseconds;
-
-            // discard the first UI processing
-            if ((bool)lblMaxProcessingTimeTitle.Tag)
+            if (chkShowStatistics.Checked)
             {
-                if (maxUIProcessingTime < elapsed)
-                    maxUIProcessingTime = elapsed;
+                stopWatchUI.Stop();
+                int elapsed = stopWatchUI.Elapsed.Milliseconds;
+
+                // discard the first UI processing
+                if ((bool)lblMaxProcessingTimeTitle.Tag)
+                {
+                    if (maxUIProcessingTime < elapsed)
+                        maxUIProcessingTime = elapsed;
+                }
+                else
+                    lblMaxProcessingTimeTitle.Tag = true;
             }
-            else
-                lblMaxProcessingTimeTitle.Tag = true;
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            stopWatchUI.Restart();
-            int processorUsedForUI = (int)GetCurrentProcessorNumber();
+            int processorUsedForUI = 0;
+            if (chkShowStatistics.Checked)
+            {
+                stopWatchUI.Restart();
+                processorUsedForUI = (int)GetCurrentProcessorNumber();
+            }
 
 
-            if (telemetry != null) lastSecond = telemetry.LastSecond;
-
-            // check if we haven't received more telemetry so we should mute all effects
-            
-            if ((soundManager.SoundIsActive()) && ((int)(Stopwatch.GetTimestamp() / Stopwatch.Frequency) - lastSecond > trkEffectTimeout.Value))
+            // check if we haven't received more telemetry so we should mute all effects            
+            if ((soundManager.SoundIsActive()) && ((Stopwatch.GetTimestamp() / Stopwatch.Frequency) - telemetry.LastSecond > trkEffectTimeout.Value))
             {
                 soundManager.MuteEffects();
                 UpdateSoundEffectStatus(SoundEffectStatus.Canceled);

@@ -10,7 +10,7 @@ namespace TelemetryVibShaker
 {
     internal class TelemetryServer
     {
-        public int LastSecond; // second of the last received datagram
+        public long LastSecond; // second of the last received datagram
         public long TimeStamp; // timestamp of the last datagram received
         public TelemetryData LastData; // last telemetry datagram received
         public int DPS; // datagrams received per second
@@ -148,6 +148,8 @@ namespace TelemetryVibShaker
                 {
                     ThreadId = (int)GetCurrentThreadId(); // Let's see if it changes on receiving packets
                     receiveData = listenerUdp.Receive(ref sender); // Wait here until a new datagram is received
+                    if (Statistics) stopwatch.Restart();  // Track the time to process this datagram
+
                 }
                 catch (Exception ex)
                 {
@@ -159,27 +161,24 @@ namespace TelemetryVibShaker
                     return; // Abort listening
                 }
 
+                TimeStamp = Stopwatch.GetTimestamp();
+                LastProcessorUsed = (int)GetCurrentProcessorNumber();
+                long newSecond = Stopwatch.GetTimestamp() / Stopwatch.Frequency;
 
-                if (Statistics)
+
+                // Even if Statistics==false, we need always to keep track of the LastSecond
+                // and if we are doing this, let's also keep track of DPS
+                if (LastSecond != newSecond)
                 {
-                    stopwatch.Restart();  // Track the time to process this datagram
-                    TimeStamp = Stopwatch.GetTimestamp();
-                    LastProcessorUsed = (int)GetCurrentProcessorNumber();
-                    int newSecond = (int)(TimeStamp / Stopwatch.Frequency);
-
-                    if (LastSecond != newSecond)
-                    {
-                        DPS = iDPS; // Only update when the last DPS per second has been calculated which is now
-                        iDPS = 1; // reset the counter
-                        LastSecond = newSecond;
-                        //needs_update = true;  // Update required for Statistics, but only if the user wants to see them                        
-                    }
-                    else
-                    {
-                        //needs_update = false;
-                        iDPS++;
-                    }
+                    DPS = iDPS; // Only update when the last DPS per second has been calculated which is now
+                    iDPS = 1; // reset the counter
+                    LastSecond = newSecond;
                 }
+                else
+                {
+                    iDPS++;
+                }
+                
 
                 // Always process each datagram received
                 // datagram is composed of: AoA, SpeedBrakes, Flaps (each one in one byte)
@@ -237,6 +236,9 @@ namespace TelemetryVibShaker
                     LastData.Altitude = -1;
 
                     MaxProcessingTime = -1; // Reset MaxProcessingTime with each new airplane
+
+                    soundManager_AoA.MuteEffects(); // Just in case
+
 
                     if (unit != null)  // If found, use the limits defined in the JSON file
                     {
