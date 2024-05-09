@@ -322,11 +322,12 @@ namespace WarThunderExporter
 
         private void UpdateCaption(Label L, float value)
         {
-            float twodecimals = value * 100.0f;
+            int twodecimals = (int)(value * 100.0f);
             if (Convert.ToInt32(L.Tag) != twodecimals)
             {
                 L.Tag = twodecimals;
-                L.Text = (value >= 0.0f) ? $"{value:F1}" : "---"; // if value<0 then it is not valid or applicable yet
+                L.Text = $"{value:F1};
+                //L.Text = (value >= 0.0f) ? $"{value:F1}" : "---"; // if value<0 then it is not valid or applicable yet
             }
         }
 
@@ -336,7 +337,8 @@ namespace WarThunderExporter
             if (Convert.ToInt32(L.Tag) != value)
             {
                 L.Tag = value;
-                L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
+                L.Text = value.ToString();
+                //L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
             }
         }
 
@@ -345,7 +347,8 @@ namespace WarThunderExporter
             if (Convert.ToUInt64(L.Tag) != value)
             {
                 L.Tag = value;
-                L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
+                L.Text = value.ToString();
+                //L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
             }
         }
 
@@ -355,7 +358,8 @@ namespace WarThunderExporter
             if (Convert.ToUInt64(L.Tag) != value)
             {
                 L.Tag = value;
-                L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
+                L.Text = value.ToString();
+                //L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
             }
         }
 
@@ -399,31 +403,41 @@ namespace WarThunderExporter
             return telemetry.TryGetValue(keyName, out var value) ? (float)value : defaultValue;
         }
 
+        private float FindJsonValue(JObject telemetry, string keyName, float defaultValue, float maxValue)
+        {
+            if (telemetry.TryGetValue(keyName, out var value))
+                return value<=maxValue ? (float)value : maxValue;
+            else
+                return defaultValue;
+            //return telemetry.TryGetValue(keyName, out var value) ? (float)value : defaultValue;
+        }
+
         private string FindJsonValue(JObject telemetry, string keyName, string defaultValue)
         {
             return telemetry.TryGetValue(keyName, out var value) ? (string)value : defaultValue;
         }
 
 
-        // This is how to read Telemetry from War Thunder
+        // This is where the War Thunder Telemetry is read
         // More info here: https://github.com/lucasvmx/WarThunder-localhost-documentation
         // The function is large because timer1 has issues with async calls and because
         // I wanted to avoid inherinting all async markings to all functions.
         // The function is large, but straightforward to understand and almost no indirection-levels required to understand it
         private async Task WarThunderTelemetryAsync()
         {
-            timer1.Enabled = false;
-
-            if (chkShowStatistics.Checked)
-            {
-                stopWatch.Restart();
-            }
+            timer1.Enabled = false; // some times there is a long wait caused by War Thunder to deliver the response
 
             try
             {
 
                 // Get indicators-telemetry data from War Thunder
                 HttpResponseMessage response2 = await httpClient.GetAsync("indicators", cancellationTokenSource.Token); //txtWtUrl
+
+                if (chkShowStatistics.Checked)
+                {
+                    stopWatch.Restart(); // I am not counting the possible long delay-first-response from war thunder
+                }
+
                 response2.EnsureSuccessStatusCode();
                 string responseBody2 = await response2.Content.ReadAsStringAsync();
                 
@@ -456,7 +470,7 @@ namespace WarThunderExporter
                     float speedInKnots = FindJsonValue(telemetryState, "TAS, km/h", 0.0f) * 0.53995680345572f;//telemetryState["TAS, km/h"].Value<float>() * 0.53995680345572f;
                     int flapsStatus = FindJsonValue(telemetryState, "flaps, %", 0); // telemetryState["flaps, %"].Value<int>();
                     int airBrakePct = FindJsonValue(telemetryState, "airbrake, %", 0);// telemetryState["airbrake, %"].Value<int>();
-                    float angleOfAttack = FindJsonValue(telemetryState, "AoA, deg", 0.0f);// telemetryState["AoA, deg"].Value<float>();
+                    float angleOfAttack = FindJsonValue(telemetryState, "AoA, deg", 0.0f, 255.0f);// telemetryState["AoA, deg"].Value<float>();
 
 
                     if (aircraftName.Equals(lastAircraftName)) // just send the telemetry for the same aircraft
