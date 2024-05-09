@@ -564,8 +564,8 @@ namespace TelemetryVibShaker
             if (Convert.ToInt32(L.Tag) != value)
             {
                 L.Tag = value;
-                L.Text = value.ToString();
-                //L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
+                //L.Text = value.ToString();
+                L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
             }
         }
 
@@ -574,8 +574,8 @@ namespace TelemetryVibShaker
             if (Convert.ToInt64(L.Tag) != value)
             {
                 L.Tag = value;
-                L.Text = value.ToString();
-                //L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
+                //L.Text = value.ToString();
+                L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
             }
         }
 

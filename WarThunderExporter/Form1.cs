@@ -326,7 +326,7 @@ namespace WarThunderExporter
             if (Convert.ToInt32(L.Tag) != twodecimals)
             {
                 L.Tag = twodecimals;
-                L.Text = $"{value:F1};
+                L.Text = $"{value:F1}";
                 //L.Text = (value >= 0.0f) ? $"{value:F1}" : "---"; // if value<0 then it is not valid or applicable yet
             }
         }
@@ -406,7 +406,7 @@ namespace WarThunderExporter
         private float FindJsonValue(JObject telemetry, string keyName, float defaultValue, float maxValue)
         {
             if (telemetry.TryGetValue(keyName, out var value))
-                return value<=maxValue ? (float)value : maxValue;
+                return (float)value<=maxValue ? (float)value : maxValue;
             else
                 return defaultValue;
             //return telemetry.TryGetValue(keyName, out var value) ? (float)value : defaultValue;

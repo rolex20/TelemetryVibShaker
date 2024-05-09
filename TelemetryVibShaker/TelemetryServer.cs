@@ -218,7 +218,13 @@ namespace TelemetryVibShaker
                         // Update vibration-motors effects
                         for (int i = 0; i < vibMotor.Length; i++)
                             vibMotor[i].ProcessEffect(LastData);
+                    } else if (soundManager_AoA.SoundIsActive()) // if sound was active due to previous datagrams, we need to check if sound needs to be turned off now
+                    {
+                        // Update the sound effects
+                        soundManager_AoA.UpdateEffect(LastData.AoA);
                     }
+
+
 
                 }
                 else  // If not, then datagram received must be an aircraft type name
@@ -237,7 +243,6 @@ namespace TelemetryVibShaker
 
                     MaxProcessingTime = -1; // Reset MaxProcessingTime with each new airplane
 
-                    soundManager_AoA.MuteEffects(); // Just in case
 
 
                     if (unit != null)  // If found, use the limits defined in the JSON file
