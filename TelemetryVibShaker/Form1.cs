@@ -38,12 +38,8 @@ namespace TelemetryVibShaker
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint GetCurrentProcessorNumber();
 
-        [DllImport("kernel32.dll")]
-        private static extern uint GetTickCount();
-
-        [DllImport("kernel32.dll")]
-        private static extern ulong GetTickCount64();
-
+        //[DllImport("kernel32.dll")]
+        //private static extern uint GetTickCount();
 
 
         public frmMain()
@@ -141,7 +137,8 @@ namespace TelemetryVibShaker
         {
 
 
-            /*This version has a problem is likely due to a limitation within the NAudio library. Specifically, the WaveOut.GetCapabilities method returns a ProductName that is truncated to a maximum of 31 characters
+            //This version has a problem is likely due to a limitation within the NAudio library. Specifically, the WaveOut.GetCapabilities method returns a ProductName that is truncated to a maximum of 31 characters
+            var enumerator = new MMDeviceEnumerator();
             for (int n = 0; n < WaveOut.DeviceCount; n++)
             {
                 var capabilities = WaveOut.GetCapabilities(n);
@@ -149,17 +146,17 @@ namespace TelemetryVibShaker
 
                 var device = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)[n];
                 Debug.Print(device.FriendlyName);                
-            } */
-
+            } 
+/*
             // Create enumerator
             var enumerator = new MMDeviceEnumerator();
             // Skip the -1 Microsoft Audio Mapper
             for (int n = 0; n < WaveOut.DeviceCount; n++)
             {
                 var device = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)[n];
-                cmbAudioDevice1.Items.Add(device.FriendlyName);
+                cmbAudioDevice1.Items.Add($"{device.ID} - {device.InstanceId} - {device.FriendlyName}");
             }
-
+*/
         }
 
 
@@ -618,7 +615,8 @@ namespace TelemetryVibShaker
             if (telemetry != null) lastSecond = telemetry.LastSecond;
 
             // check if we haven't received more telemetry so we should mute all effects
-            if ((soundManager.SoundIsActive()) && (GetTickCount() / 1000 - lastSecond > trkEffectTimeout.Value))
+            
+            if ((soundManager.SoundIsActive()) && ((int)(Stopwatch.GetTimestamp() / Stopwatch.Frequency) - lastSecond > trkEffectTimeout.Value))
             {
                 soundManager.MuteEffects();
                 UpdateSoundEffectStatus(SoundEffectStatus.Canceled);

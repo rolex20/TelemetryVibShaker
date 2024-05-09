@@ -1113,6 +1113,7 @@
             lblLastProcessorUsedUI.Name = "lblLastProcessorUsedUI";
             lblLastProcessorUsedUI.Size = new Size(18, 15);
             lblLastProcessorUsedUI.TabIndex = 25;
+            lblLastProcessorUsedUI.Tag = "-1";
             lblLastProcessorUsedUI.Text = "UI";
             toolTip1.SetToolTip(lblLastProcessorUsedUI, "Processor used to update the UI (monitor)");
             // 
@@ -1123,6 +1124,7 @@
             lblProcessingTimeUI.Name = "lblProcessingTimeUI";
             lblProcessingTimeUI.Size = new Size(45, 15);
             lblProcessingTimeUI.TabIndex = 24;
+            lblProcessingTimeUI.Tag = "-1";
             lblProcessingTimeUI.Text = "UI time";
             toolTip1.SetToolTip(lblProcessingTimeUI, "Max UI processing time (monitor).  Ignores the first one.");
             // 
@@ -1133,6 +1135,7 @@
             lblLastProcessorUsedUDP.Name = "lblLastProcessorUsedUDP";
             lblLastProcessorUsedUDP.Size = new Size(30, 15);
             lblLastProcessorUsedUDP.TabIndex = 23;
+            lblLastProcessorUsedUDP.Tag = "-1";
             lblLastProcessorUsedUDP.Text = "UDP";
             toolTip1.SetToolTip(lblLastProcessorUsedUDP, "Processor used to serve the last UDP packet received");
             // 
@@ -1220,7 +1223,7 @@
             lblDatagramsPerSecond.Name = "lblDatagramsPerSecond";
             lblDatagramsPerSecond.Size = new Size(49, 15);
             lblDatagramsPerSecond.TabIndex = 14;
-            lblDatagramsPerSecond.Tag = "0";
+            lblDatagramsPerSecond.Tag = "-1";
             lblDatagramsPerSecond.Text = "number";
             toolTip1.SetToolTip(lblDatagramsPerSecond, "Designed for ~10 per second.");
             // 
@@ -1242,7 +1245,7 @@
             lblProcessingTimeUDP.Name = "lblProcessingTimeUDP";
             lblProcessingTimeUDP.Size = new Size(57, 15);
             lblProcessingTimeUDP.TabIndex = 12;
-            lblProcessingTimeUDP.Tag = "0";
+            lblProcessingTimeUDP.Tag = "-1";
             lblProcessingTimeUDP.Text = "UDP time";
             toolTip1.SetToolTip(lblProcessingTimeUDP, "Max UDP Packet processing time.  This value is tracked for each different UnitType (aircraft).");
             // 

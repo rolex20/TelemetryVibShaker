@@ -11,10 +11,10 @@ namespace TelemetryVibShaker
     internal class TelemetryServer
     {
         public int LastSecond; // second of the last received datagram
-        public int TimeStamp; // timestamp of the last datagram received
+        public long TimeStamp; // timestamp of the last datagram received
         public TelemetryData LastData; // last telemetry datagram received
         public int DPS; // datagrams received per second
-        public int MaxProcessingTime; // time of the datagram that took longer to process
+        public int MaxProcessingTime; // time of the datagram that took longer to process, this is per aircraft
         public int LastProcessorUsed; // processor used in the last udp packet received
         public int ThreadId; // OS Thread ID for the UDP Telemetry Server
         public string? CurrentUnitType; // current type of aircraft used by the player
@@ -35,11 +35,11 @@ namespace TelemetryVibShaker
         [DllImport("kernel32.dll")]
         public static extern uint GetCurrentThreadId();
        
-        [DllImport("kernel32.dll")]
-        private static extern uint GetTickCount();
+        //[DllImport("kernel32.dll")]
+        //private static extern uint GetTickCount();
 
-        [DllImport("kernel32.dll")]
-        private static extern ulong GetTickCount64();
+        //[DllImport("kernel32.dll")]
+        //private static extern ulong GetTickCount64();
 
 
         public string CurrentUnitInfo { 
@@ -163,9 +163,9 @@ namespace TelemetryVibShaker
                 if (Statistics)
                 {
                     stopwatch.Restart();  // Track the time to process this datagram
-                    TimeStamp = (int)GetTickCount();
+                    TimeStamp = Stopwatch.GetTimestamp();
                     LastProcessorUsed = (int)GetCurrentProcessorNumber();
-                    int newSecond = TimeStamp / 1000;
+                    int newSecond = (int)(TimeStamp / Stopwatch.Frequency);
 
                     if (LastSecond != newSecond)
                     {
