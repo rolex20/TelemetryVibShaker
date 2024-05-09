@@ -392,6 +392,21 @@ namespace WarThunderExporter
             u.EndSend(ar);
         }
 
+        private int FindJsonValue(JObject telemetry, string keyName, int defaultValue)
+        {
+            return telemetry.TryGetValue(keyName, out var value) ? (int)value : defaultValue;
+        }
+
+        private float FindJsonValue(JObject telemetry, string keyName, float defaultValue)
+        {
+            return telemetry.TryGetValue(keyName, out var value) ? (float)value : defaultValue;
+        }
+
+        private string FindJsonValue(JObject telemetry, string keyName, string defaultValue)
+        {
+            return telemetry.TryGetValue(keyName, out var value) ? (string)value : defaultValue;
+        }
+
 
         // This is how to read Telemetry from War Thunder
         // More info here: https://github.com/lucasvmx/WarThunder-localhost-documentation
@@ -419,13 +434,11 @@ namespace WarThunderExporter
                 JObject telemetryIndicators = JObject.Parse(responseBody2);
 
                 // Extract the required telemetry information
-                string? aircraftName = null;
-                aircraftName = telemetryIndicators?["type"].Value<string>();
-
-                if (aircraftName is not null) // if we don't have an aircraft name, then we are not flying
+                string aircraftName = FindJsonValue(telemetryIndicators, "type", String.Empty);
+                if (aircraftName.Length>0)
                 {
-                    float altitudeInFeets = telemetryIndicators["altitude_10k"].Value<float>();
-                    float gMeter = telemetryIndicators["g_meter"].Value<float>();
+                    float altitudeInFeets = FindJsonValue(telemetryIndicators, "altitude_10k", 0.0f);
+                    float gMeter = FindJsonValue(telemetryIndicators, "g_meter", 0.0f);
 
                     // Get state-telemetry data from War Thunder
                     HttpResponseMessage response1 = await httpClient.GetAsync("state", cancellationTokenSource.Token);
@@ -437,10 +450,10 @@ namespace WarThunderExporter
                     JObject telemetryState = JObject.Parse(responseBody1);
 
                     // Extract the required telemetry information
-                    float speedInKnots = telemetryState["TAS, km/h"].Value<float>() * 0.53995680345572f;
-                    int flapsStatus = telemetryState["flaps, %"].Value<int>();
-                    int airBrakePct = telemetryState["airbrake, %"].Value<int>();
-                    float angleOfAttack = telemetryState["AoA, deg"].Value<float>();
+                    float speedInKnots = FindJsonValue(telemetryState, "TAS, km/h", 0.0f) * 0.53995680345572f;//telemetryState["TAS, km/h"].Value<float>() * 0.53995680345572f;
+                    int flapsStatus = FindJsonValue(telemetryState, "flaps, %", 0); // telemetryState["flaps, %"].Value<int>();
+                    int airBrakePct = FindJsonValue(telemetryState, "airbrake, %", 0);// telemetryState["airbrake, %"].Value<int>();
+                    float angleOfAttack = FindJsonValue(telemetryState, "AoA, deg", 0.0f);// telemetryState["AoA, deg"].Value<float>();
 
 
                     if (aircraftName.Equals(lastAircraftName)) // just send the telemetry for the same aircraft
@@ -473,7 +486,7 @@ namespace WarThunderExporter
                     }
                     else // let's report the new aircraft name/type we are flying
                     {
-                        lastAircraftName = aircraftName;
+                        lastAircraftName = (string)aircraftName;
                         byte[] sendBytes = Encoding.ASCII.GetBytes(lastAircraftName);
                         udpSender.BeginSend(sendBytes, sendBytes.Length, new AsyncCallback(SendCallback), udpSender);
                     }
@@ -489,7 +502,7 @@ namespace WarThunderExporter
                         UpdateCaption(lblSpeedBrakes, airBrakePct);                        
                         UpdateCaption(lblFlaps, flapsStatus);
                         UpdateCaption(lblGForces, gMeter);
-                        UpdateCaption(lblAircraftType, aircraftName);
+                        UpdateCaption(lblAircraftType, (string)aircraftName);
                         UpdateCaption(lblLastTimeStamp, timeStamp);
                         UpdateCaption(lblMaxProcessingTime, maxProcessingTime);
                         this.ResumeLayout();
@@ -497,16 +510,16 @@ namespace WarThunderExporter
 
                     TimerActivateNewInterval(timer1, (int)nudFrequency.Tag); // nudFrequency.Tag = (int)nudFrequency.Value
 
-                } //if-then (aircraftName is not null) 
+                } //if-then (aircraftName.Length>0) 
                 else // let's try again, but let's wait 1 second
                 {
                     TimerActivateNewInterval(timer1, 1000); // nudFrequency.Tag = (int)nudFrequency.Value
-                } //if-then-else (aircraftName) is not null
+                } //if-then-else (aircraftName.Length>0)
 
 
 
             }
-            catch (Newtonsoft.Json.JsonReaderException ex)
+            catch (Newtonsoft.Json.JsonReaderException)
             {
                 RecoverFromTypicalException("Error parsing Json WarThunder Telemetry response.  Retrying soon...", true);
             }
@@ -530,13 +543,11 @@ namespace WarThunderExporter
 
             catch (Exception ex)
             {
-                timeStamp = GetTickCount64();
-                UpdateCaption(lblLastTimeStamp, timeStamp);
+
                 if ((int)txtDebug.Tag < 100) // only show first 100 errors
                 {
                     // Show error information                    
                     txtDebug.AppendText($"[{timeStamp}] {ex.Message}" + Environment.NewLine);
-                    UpdateCaption(tsStatus, "Error Retrievieng Telemetry Data. Retrying...");                    
 
                     // The first time we get an error, let's show it to the user
                     if ((int)txtDebug.Tag == 0)
@@ -545,8 +556,7 @@ namespace WarThunderExporter
                         txtDebug.Tag = (int)txtDebug.Tag + 1; // Only let's call the attention on the first error
                     }
                 }
-
-                TimerActivateNewInterval(timer1, 1000);  // Wait more time before trying again
+                RecoverFromTypicalException("Error Retrieveing Telemtry Data.  Retrying soon...", true);
             }
 
             if (chkShowStatistics.Checked)
