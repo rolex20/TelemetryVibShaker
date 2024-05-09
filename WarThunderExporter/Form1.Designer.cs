@@ -282,7 +282,7 @@
             // lblLastTimeStamp
             // 
             lblLastTimeStamp.AutoSize = true;
-            lblLastTimeStamp.Location = new Point(354, 168);
+            lblLastTimeStamp.Location = new Point(332, 168);
             lblLastTimeStamp.Name = "lblLastTimeStamp";
             lblLastTimeStamp.Size = new Size(27, 15);
             lblLastTimeStamp.TabIndex = 13;
@@ -291,7 +291,7 @@
             // label14
             // 
             label14.AutoSize = true;
-            label14.Location = new Point(251, 168);
+            label14.Location = new Point(229, 168);
             label14.Name = "label14";
             label14.Size = new Size(97, 15);
             label14.TabIndex = 12;

@@ -4,22 +4,18 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
 using System.Text;
-using System;
-using Microsoft.VisualBasic.Devices;
-using System.Net;
-using System.Diagnostics.Metrics;
 
 
 namespace WarThunderExporter
 {
     public partial class frmWarThunderTelemetry : Form
     {
-        HttpClient httpClient = new HttpClient();
+        HttpClient httpClient;
         private Process currentProcess;
         private UdpClient udpSender;
         private byte[] datagram;
         private Stopwatch stopWatch = new Stopwatch();
-        private int maxProcessingTime;
+        private int maxProcessingTime; // This is per aircraft
         private ulong timeStamp;
         private string? lastAircraftName;
         private CancellationTokenSource cancellationTokenSource;
@@ -257,6 +253,7 @@ namespace WarThunderExporter
             // Before connecting udpSender, lets make sure our int cached copy is up to date
             nudFrequency.Tag = (int)nudFrequency.Value;
 
+            httpClient = new HttpClient();
             string baseAddress = SanitizeURL(txtWtUrl.Text);
             httpClient.BaseAddress = new Uri(baseAddress);
 
@@ -429,7 +426,10 @@ namespace WarThunderExporter
                 HttpResponseMessage response2 = await httpClient.GetAsync("indicators", cancellationTokenSource.Token); //txtWtUrl
                 response2.EnsureSuccessStatusCode();
                 string responseBody2 = await response2.Content.ReadAsStringAsync();
-
+                
+                // Let's check if the request was canceled
+                if (cancellationTokenSource.Token.IsCancellationRequested) return;
+                
                 // Parse the JSON data
                 JObject telemetryIndicators = JObject.Parse(responseBody2);
 
@@ -445,6 +445,9 @@ namespace WarThunderExporter
                     response1.EnsureSuccessStatusCode();
                     string responseBody1 = await response1.Content.ReadAsStringAsync();
                     timeStamp = GetTickCount64();
+
+                    // Let's check if the request was canceled
+                    if (cancellationTokenSource.Token.IsCancellationRequested) return;
 
                     // Parse the JSON data
                     JObject telemetryState = JObject.Parse(responseBody1);
@@ -486,6 +489,7 @@ namespace WarThunderExporter
                     }
                     else // let's report the new aircraft name/type we are flying
                     {
+                        maxProcessingTime = 0; // this is per aircraft
                         lastAircraftName = (string)aircraftName;
                         byte[] sendBytes = Encoding.ASCII.GetBytes(lastAircraftName);
                         udpSender.BeginSend(sendBytes, sendBytes.Length, new AsyncCallback(SendCallback), udpSender);
@@ -589,8 +593,8 @@ namespace WarThunderExporter
             }
 
 
-            // If we are in running state, then udpSender is not null and we want to need the timer
-            if (udpSender is not null)
+            // If we are in running state, then udpSender is not null and we need to enable the timer
+            if (!cancellationTokenSource.Token.IsCancellationRequested && udpSender is not null)
             {
                 timer.Enabled = true;
             }
