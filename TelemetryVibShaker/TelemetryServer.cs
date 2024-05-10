@@ -241,9 +241,11 @@ namespace TelemetryVibShaker
                     LastData.GForces = -1;
                     LastData.Altitude = -1;
 
-                    MaxProcessingTime = -1; // Reset MaxProcessingTime with each new airplane
+                    // Reset MaxProcessingTime with each new airplane
+                    MaxProcessingTime = -1; 
 
-
+                    // New aircraft, let's make sure, sounds are muted
+                    soundManager_AoA.MuteEffects();
 
                     if (unit != null)  // If found, use the limits defined in the JSON file
                     {
