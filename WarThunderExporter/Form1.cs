@@ -534,6 +534,8 @@ namespace WarThunderExporter
                 } //if-then (aircraftName.Length>0) 
                 else // let's try again, but let's wait 1 second
                 {
+                    //if war-thunder is not sending an aircraft-type, let's force a change for the next time
+                    lastAircraftName = String.Empty;
                     TimerActivateNewInterval(timer1, 1000); // nudFrequency.Tag = (int)nudFrequency.Value
                 } //if-then-else (aircraftName.Length>0)
 
