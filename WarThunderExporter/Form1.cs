@@ -229,6 +229,7 @@ namespace WarThunderExporter
         private void btnResetMax_Click(object sender, EventArgs e)
         {
             maxProcessingTime = 0;
+            lblMaxProcTimeControl.Tag = false; //flag to skip the first frame
         }
 
         private void chkShowStatistics_CheckedChanged(object sender, EventArgs e)
@@ -249,10 +250,12 @@ namespace WarThunderExporter
             lblAircraftType.Tag = String.Empty;
             lblAircraftType.Text = String.Empty;
             lastAircraftName = String.Empty;
+            
+            btnResetMax_Click(null, null);
         }
 
         private void btnStart_Click(object sender, EventArgs e)
-        {
+        {            
             // Before connecting udpSender, lets make sure our int cached copy is up to date
             nudFrequency.Tag = (int)nudFrequency.Value;
 
@@ -506,7 +509,7 @@ namespace WarThunderExporter
                     }
                     else // let's report the new aircraft name/type we are flying
                     {
-                        maxProcessingTime = 0; // this is per aircraft
+                        btnResetMax_Click(null, null); // this is per aircraft
                         lastAircraftName = (string)aircraftName;
                         byte[] sendBytes = Encoding.ASCII.GetBytes(lastAircraftName);
                         udpSender.BeginSend(sendBytes, sendBytes.Length, new AsyncCallback(SendCallback), udpSender);
@@ -586,7 +589,11 @@ namespace WarThunderExporter
             {
                 stopWatch.Stop();
                 int elapsed = stopWatch.Elapsed.Milliseconds;
-                if (maxProcessingTime < elapsed) maxProcessingTime = elapsed;  // this is going to be delayed by one cycle, but it's okay
+                if (maxProcessingTime < elapsed) {
+                    if ((bool)lblMaxProcTimeControl.Tag) // I want to ignore the first one
+                        maxProcessingTime = elapsed;  // this is going to be delayed by one cycle, but it's okay
+                    lblMaxProcTimeControl.Tag = true; // Next, time, the maxProcessingTime will be updated
+                }
             }
 
         }

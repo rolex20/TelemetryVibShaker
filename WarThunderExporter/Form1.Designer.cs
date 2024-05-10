@@ -50,7 +50,7 @@
             lblLastTimeStamp = new Label();
             label14 = new Label();
             lblMaxProcessingTime = new Label();
-            label12 = new Label();
+            lblMaxProcTimeControl = new Label();
             lblFlaps = new Label();
             lblAltitude = new Label();
             lblAircraftType = new Label();
@@ -242,7 +242,7 @@
             panel1.Controls.Add(lblLastTimeStamp);
             panel1.Controls.Add(label14);
             panel1.Controls.Add(lblMaxProcessingTime);
-            panel1.Controls.Add(label12);
+            panel1.Controls.Add(lblMaxProcTimeControl);
             panel1.Controls.Add(lblFlaps);
             panel1.Controls.Add(lblAltitude);
             panel1.Controls.Add(lblAircraftType);
@@ -306,14 +306,14 @@
             lblMaxProcessingTime.TabIndex = 11;
             lblMaxProcessingTime.Text = "----";
             // 
-            // label12
+            // lblMaxProcTimeControl
             // 
-            label12.AutoSize = true;
-            label12.Location = new Point(11, 168);
-            label12.Name = "label12";
-            label12.Size = new Size(149, 15);
-            label12.TabIndex = 10;
-            label12.Text = "Max Processing Time (ms):";
+            lblMaxProcTimeControl.AutoSize = true;
+            lblMaxProcTimeControl.Location = new Point(11, 168);
+            lblMaxProcTimeControl.Name = "lblMaxProcTimeControl";
+            lblMaxProcTimeControl.Size = new Size(149, 15);
+            lblMaxProcTimeControl.TabIndex = 10;
+            lblMaxProcTimeControl.Text = "Max Processing Time (ms):";
             // 
             // lblFlaps
             // 
@@ -608,7 +608,7 @@
         private Label lblAltitude;
         private ToolStrip toolStrip1;
         private ToolStripLabel tsStatus;
-        private Label label12;
+        private Label lblMaxProcTimeControl;
         private Label lblMaxProcessingTime;
         private Label lblLastTimeStamp;
         private Label label14;
