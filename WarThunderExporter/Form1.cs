@@ -244,8 +244,11 @@ namespace WarThunderExporter
             lblSpeedBrakes.Tag = -1;
             lblFlaps.Tag = -1;
             lblGForces.Tag = -1;
-            lblLastTimeStamp.Tag = 1L; // -1 here causes problems with overflow
+            lblLastTimeStamp.Tag = 1L; // -1 here caused problems with overflow
             lblMaxProcessingTime.Tag = 0; // no need to use -1 here
+            lblAircraftType.Tag = String.Empty;
+            lblAircraftType.Text = String.Empty;
+            lastAircraftName = String.Empty;
         }
 
         private void btnStart_Click(object sender, EventArgs e)
