@@ -74,6 +74,7 @@
             timer1 = new System.Windows.Forms.Timer(components);
             toolStrip1 = new ToolStrip();
             tsStatus = new ToolStripLabel();
+            label12 = new Label();
             tabControl1.SuspendLayout();
             tabSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudFrequency).BeginInit();
@@ -96,6 +97,7 @@
             // 
             // tabSettings
             // 
+            tabSettings.Controls.Add(label12);
             tabSettings.Controls.Add(txtWtUrl);
             tabSettings.Controls.Add(label5);
             tabSettings.Controls.Add(nudFrequency);
@@ -213,7 +215,7 @@
             chkUseEfficiencyCoresOnly.AutoSize = true;
             chkUseEfficiencyCoresOnly.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Bold, GraphicsUnit.Point);
             chkUseEfficiencyCoresOnly.ForeColor = Color.FromArgb(91, 155, 213);
-            chkUseEfficiencyCoresOnly.Location = new Point(37, 245);
+            chkUseEfficiencyCoresOnly.Location = new Point(10, 273);
             chkUseEfficiencyCoresOnly.Name = "chkUseEfficiencyCoresOnly";
             chkUseEfficiencyCoresOnly.Size = new Size(290, 19);
             chkUseEfficiencyCoresOnly.TabIndex = 0;
@@ -537,6 +539,14 @@
             tsStatus.Text = "Idle";
             tsStatus.TextAlign = ContentAlignment.MiddleLeft;
             // 
+            // label12
+            // 
+            label12.Location = new Point(178, 228);
+            label12.Name = "label12";
+            label12.Size = new Size(282, 42);
+            label12.TabIndex = 11;
+            label12.Text = "Note: Don't use localhost. It has IPV6 issues with HttpClient.  You can use 127.0.0.1 instead.";
+            // 
             // frmWarThunderTelemetry
             // 
             AcceptButton = btnStart;
@@ -617,5 +627,6 @@
         private TabPage tabDebug;
         private TextBox txtDebug;
         private Label lblDebugTitle;
+        private Label label12;
     }
 }

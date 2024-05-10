@@ -43,12 +43,21 @@ namespace WarThunderExporter
         {
             txtDebug.Tag = 0; // Used to track the number of errors detected
             timer1.Tag = -1; // Make sure we have an int here for ActivateNewTimerInterval
+            txtWtUrl.Tag = false; // flag used to control that the base address only can be changed once
 
             // Restore previous location
             this.Location = new Point(Properties.Settings.Default.XCoordinate, Properties.Settings.Default.YCoordinate);
             // Load the settings for all controls in the form
             LoadSettings(this);
             ProcessorCheck();
+
+            var handler = new SocketsHttpHandler
+            {
+                UseProxy = false, // Disable proxy
+                //PooledConnectionLifetime = TimeSpan.FromMinutes(10) // Set pooled connection lifetime};
+            };
+
+            httpClient = new HttpClient(handler);
         }
 
         private void ProcessorCheck()
@@ -259,16 +268,21 @@ namespace WarThunderExporter
             // Before connecting udpSender, lets make sure our int cached copy is up to date
             nudFrequency.Tag = (int)nudFrequency.Value;
 
-            httpClient = new HttpClient();
-            string baseAddress = SanitizeURL(txtWtUrl.Text);
-            httpClient.BaseAddress = new Uri(baseAddress);
-
-            UpdateCaption(tsStatus, $"Connecting to [{baseAddress}]...");
             PrepareMonitorLabels();
+
+            if (!(bool)txtWtUrl.Tag) // make sure we only change this once, this is an HttpClient limitation
+            {
+                string baseAddress = SanitizeURL(txtWtUrl.Text);
+                httpClient.BaseAddress = new Uri(baseAddress);                
+                txtWtUrl.Tag = true; // no more changes accepted to base address
+            }
+            UpdateCaption(tsStatus, $"Connecting to [{httpClient.BaseAddress.ToString()}]...");
 
             // Allocate the udp datagram
             datagram = new byte[7];
             datagram[0] = 1; // flag to indicate this is a telemetry datagram for my TelemetryVibShaker program
+            
+            // Prepare the UDP connection to the War Thunder Telemetry
             ConnectUDP();
 
             // Switch to Monitor
@@ -319,6 +333,7 @@ namespace WarThunderExporter
 
             timer1.Enabled = false;
             EnableChildControls(tabSettings);
+            if ((bool)txtWtUrl.Tag) txtWtUrl.Enabled = false; // only can be changed once
 
             btnStop.Enabled = false;
             btnStart.Enabled = true;
@@ -464,7 +479,7 @@ namespace WarThunderExporter
                     HttpResponseMessage response1 = await httpClient.GetAsync("state", cancellationTokenSource.Token);
                     response1.EnsureSuccessStatusCode();
                     string responseBody1 = await response1.Content.ReadAsStringAsync();
-                    timeStamp = GetTickCount64();
+                    timeStamp = GetTickCount64();  // Timestamping here is safer than the previous call which might return with empty data
 
                     // Let's check if the request was canceled
                     if (cancellationTokenSource.Token.IsCancellationRequested) return;
@@ -600,12 +615,11 @@ namespace WarThunderExporter
 
         private void RecoverFromTypicalException(string?  msg, bool reenable)
         {
-            timeStamp = GetTickCount64();
-            UpdateCaption(lblLastTimeStamp, timeStamp);
+            ulong nowTimeStamp = GetTickCount64(); // don't want to timestamp errors, only valid telemetry
+            //UpdateCaption(lblLastTimeStamp, timeStamp);
             if (msg is not null)
             {
-                UpdateCaption(tsStatus, msg);
-                Debug.Print(msg);
+                UpdateCaption(tsStatus, $"[{nowTimeStamp}] {msg}");                
             }
             if (reenable) TimerActivateNewInterval(timer1, 1000);  // Wait more time before trying again
         }
@@ -620,7 +634,7 @@ namespace WarThunderExporter
 
 
             // If we are in running state, then udpSender is not null and we need to enable the timer
-            if (!cancellationTokenSource.Token.IsCancellationRequested && udpSender is not null)
+            if (udpSender is not null && !(cancellationTokenSource.Token.IsCancellationRequested))
             {
                 timer.Enabled = true;
             }

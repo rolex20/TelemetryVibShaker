@@ -30,7 +30,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="txtWtUrl" Type="System.String" Scope="User">
-      <Value Profile="(Default)">http://localhost:8111</Value>
+      <Value Profile="(Default)">http://127.0.0.1:8111</Value>
     </Setting>
     <Setting Name="txtDebug" Type="System.String" Scope="User">
       <Value Profile="(Default)" />

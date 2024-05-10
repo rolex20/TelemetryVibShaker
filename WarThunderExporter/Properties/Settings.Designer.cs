@@ -133,7 +133,7 @@ namespace WarThunderExporter.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:8111")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://127.0.0.1:8111")]
         public string txtWtUrl {
             get {
                 return ((string)(this["txtWtUrl"]));
