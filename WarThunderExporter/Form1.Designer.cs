@@ -32,6 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmWarThunderTelemetry));
             tabControl1 = new TabControl();
             tabSettings = new TabPage();
+            label12 = new Label();
             txtWtUrl = new TextBox();
             label5 = new Label();
             nudFrequency = new NumericUpDown();
@@ -74,7 +75,7 @@
             timer1 = new System.Windows.Forms.Timer(components);
             toolStrip1 = new ToolStrip();
             tsStatus = new ToolStripLabel();
-            label12 = new Label();
+            lblMaxWarThunderProcessingTime = new Label();
             tabControl1.SuspendLayout();
             tabSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudFrequency).BeginInit();
@@ -116,6 +117,14 @@
             tabSettings.TabIndex = 0;
             tabSettings.Text = "Settings";
             tabSettings.UseVisualStyleBackColor = true;
+            // 
+            // label12
+            // 
+            label12.Location = new Point(178, 228);
+            label12.Name = "label12";
+            label12.Size = new Size(282, 42);
+            label12.TabIndex = 11;
+            label12.Text = "Note: Don't use localhost. It has IPV6 issues with HttpClient.  You can use 127.0.0.1 instead.";
             // 
             // txtWtUrl
             // 
@@ -239,6 +248,7 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(lblMaxWarThunderProcessingTime);
             panel1.Controls.Add(lblGForces);
             panel1.Controls.Add(label15);
             panel1.Controls.Add(lblLastTimeStamp);
@@ -284,7 +294,7 @@
             // lblLastTimeStamp
             // 
             lblLastTimeStamp.AutoSize = true;
-            lblLastTimeStamp.Location = new Point(332, 168);
+            lblLastTimeStamp.Location = new Point(348, 127);
             lblLastTimeStamp.Name = "lblLastTimeStamp";
             lblLastTimeStamp.Size = new Size(27, 15);
             lblLastTimeStamp.TabIndex = 13;
@@ -293,11 +303,11 @@
             // label14
             // 
             label14.AutoSize = true;
-            label14.Location = new Point(229, 168);
+            label14.Location = new Point(255, 127);
             label14.Name = "label14";
-            label14.Size = new Size(97, 15);
+            label14.Size = new Size(85, 15);
             label14.TabIndex = 12;
-            label14.Text = "Last Time Stamp:";
+            label14.Text = "Last Telemetry:";
             // 
             // lblMaxProcessingTime
             // 
@@ -539,13 +549,14 @@
             tsStatus.Text = "Idle";
             tsStatus.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // label12
+            // lblMaxWarThunderProcessingTime
             // 
-            label12.Location = new Point(178, 228);
-            label12.Name = "label12";
-            label12.Size = new Size(282, 42);
-            label12.TabIndex = 11;
-            label12.Text = "Note: Don't use localhost. It has IPV6 issues with HttpClient.  You can use 127.0.0.1 instead.";
+            lblMaxWarThunderProcessingTime.AutoSize = true;
+            lblMaxWarThunderProcessingTime.Location = new Point(226, 168);
+            lblMaxWarThunderProcessingTime.Name = "lblMaxWarThunderProcessingTime";
+            lblMaxWarThunderProcessingTime.Size = new Size(27, 15);
+            lblMaxWarThunderProcessingTime.TabIndex = 16;
+            lblMaxWarThunderProcessingTime.Text = "----";
             // 
             // frmWarThunderTelemetry
             // 
@@ -628,5 +639,6 @@
         private TextBox txtDebug;
         private Label lblDebugTitle;
         private Label label12;
+        private Label lblMaxWarThunderProcessingTime;
     }
 }

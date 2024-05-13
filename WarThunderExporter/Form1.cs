@@ -15,7 +15,9 @@ namespace WarThunderExporter
         private UdpClient udpSender;
         private byte[] datagram;
         private Stopwatch stopWatch = new Stopwatch();
+        private Stopwatch stopWatchWarThunder = new Stopwatch();
         private int maxProcessingTime; // This is per aircraft
+        private int maxWarThunderProcessingTime; // Per aircraft too
         private ulong timeStamp;
         private string? lastAircraftName;
         private CancellationTokenSource cancellationTokenSource;
@@ -238,7 +240,9 @@ namespace WarThunderExporter
         private void btnResetMax_Click(object sender, EventArgs e)
         {
             maxProcessingTime = 0;
+            maxWarThunderProcessingTime = 0;
             lblMaxProcTimeControl.Tag = false; //flag to skip the first frame
+            lblMaxWarThunderProcessingTime.Tag = false;
         }
 
         private void chkShowStatistics_CheckedChanged(object sender, EventArgs e)
@@ -259,12 +263,12 @@ namespace WarThunderExporter
             lblAircraftType.Tag = String.Empty;
             lblAircraftType.Text = String.Empty;
             lastAircraftName = String.Empty;
-            
+
             btnResetMax_Click(null, null);
         }
 
         private void btnStart_Click(object sender, EventArgs e)
-        {            
+        {
             // Before connecting udpSender, lets make sure our int cached copy is up to date
             nudFrequency.Tag = (int)nudFrequency.Value;
 
@@ -273,7 +277,7 @@ namespace WarThunderExporter
             if (!(bool)txtWtUrl.Tag) // make sure we only change this once, this is an HttpClient limitation
             {
                 string baseAddress = SanitizeURL(txtWtUrl.Text);
-                httpClient.BaseAddress = new Uri(baseAddress);                
+                httpClient.BaseAddress = new Uri(baseAddress);
                 txtWtUrl.Tag = true; // no more changes accepted to base address
             }
             UpdateCaption(tsStatus, $"Connecting to [{httpClient.BaseAddress.ToString()}]...");
@@ -281,7 +285,7 @@ namespace WarThunderExporter
             // Allocate the udp datagram
             datagram = new byte[7];
             datagram[0] = 1; // flag to indicate this is a telemetry datagram for my TelemetryVibShaker program
-            
+
             // Prepare the UDP connection to the War Thunder Telemetry
             ConnectUDP();
 
@@ -427,7 +431,7 @@ namespace WarThunderExporter
         private float FindJsonValue(JObject telemetry, string keyName, float defaultValue, float maxValue)
         {
             if (telemetry.TryGetValue(keyName, out var value))
-                return (float)value<=maxValue ? (float)value : maxValue;
+                return (float)value <= maxValue ? (float)value : maxValue;
             else
                 return defaultValue;
             //return telemetry.TryGetValue(keyName, out var value) ? (float)value : defaultValue;
@@ -452,33 +456,37 @@ namespace WarThunderExporter
             {
 
                 // Get indicators-telemetry data from War Thunder
-                HttpResponseMessage response2 = await httpClient.GetAsync("indicators", cancellationTokenSource.Token); //txtWtUrl
+                if (chkShowStatistics.Checked) stopWatchWarThunder.Restart(); // Measure War Thunder Response time
+                    HttpResponseMessage response2 = await httpClient.GetAsync("indicators", cancellationTokenSource.Token); //txtWtUrl
+                    response2.EnsureSuccessStatusCode();
+                    string responseBody2 = await response2.Content.ReadAsStringAsync();
+                if (chkShowStatistics.Checked) stopWatchWarThunder.Stop();
 
-                if (chkShowStatistics.Checked)
-                {
-                    stopWatch.Restart(); // I am not counting the possible long delay-first-response from war thunder
-                }
+                // I am not counting the possible long delay-first-response from war thunder
+                if (chkShowStatistics.Checked) stopWatch.Restart(); 
 
-                response2.EnsureSuccessStatusCode();
-                string responseBody2 = await response2.Content.ReadAsStringAsync();
-                
                 // Let's check if the request was canceled
                 if (cancellationTokenSource.Token.IsCancellationRequested) return;
-                
+
                 // Parse the JSON data
                 JObject telemetryIndicators = JObject.Parse(responseBody2);
 
                 // Extract the required telemetry information
                 string aircraftName = FindJsonValue(telemetryIndicators, "type", String.Empty);
-                if (aircraftName.Length>0)
+                if (aircraftName.Length > 0)
                 {
                     float altitudeInFeets = FindJsonValue(telemetryIndicators, "altitude_10k", 0.0f);
                     float gMeter = FindJsonValue(telemetryIndicators, "g_meter", 0.0f);
+                    if (chkShowStatistics.Checked) stopWatch.Stop();
 
                     // Get state-telemetry data from War Thunder
+                    if (chkShowStatistics.Checked) stopWatchWarThunder.Start();
                     HttpResponseMessage response1 = await httpClient.GetAsync("state", cancellationTokenSource.Token);
                     response1.EnsureSuccessStatusCode();
                     string responseBody1 = await response1.Content.ReadAsStringAsync();
+                    if (chkShowStatistics.Checked) stopWatchWarThunder.Stop();
+
+                    if (chkShowStatistics.Checked) stopWatch.Start();
                     timeStamp = GetTickCount64();  // Timestamping here is safer than the previous call which might return with empty data
 
                     // Let's check if the request was canceled
@@ -538,12 +546,13 @@ namespace WarThunderExporter
                         UpdateCaption(lblAoA, angleOfAttack);
                         UpdateCaption(lblSpeed, speedInKnots);
                         UpdateCaption(lblAltitude, altitudeInFeets);
-                        UpdateCaption(lblSpeedBrakes, airBrakePct);                        
+                        UpdateCaption(lblSpeedBrakes, airBrakePct);
                         UpdateCaption(lblFlaps, flapsStatus);
                         UpdateCaption(lblGForces, gMeter);
                         UpdateCaption(lblAircraftType, (string)aircraftName);
                         UpdateCaption(lblLastTimeStamp, timeStamp);
                         UpdateCaption(lblMaxProcessingTime, maxProcessingTime);
+                        UpdateCaption(lblMaxWarThunderProcessingTime, maxWarThunderProcessingTime);
                         this.ResumeLayout();
                     }
 
@@ -569,9 +578,9 @@ namespace WarThunderExporter
             {
                 RecoverFromTypicalException(null, false); // Status Text will be set in btnStop_Click()
             }
-            catch (InvalidOperationException) 
+            catch (InvalidOperationException)
             {
-                RecoverFromTypicalException("requestUri must be an absolute URI or BaseAddress must be set.", true);                
+                RecoverFromTypicalException("requestUri must be an absolute URI or BaseAddress must be set.", true);
             }
             catch (HttpRequestException)
             {
@@ -604,22 +613,33 @@ namespace WarThunderExporter
             {
                 stopWatch.Stop();
                 int elapsed = stopWatch.Elapsed.Milliseconds;
-                if (maxProcessingTime < elapsed) {
+                if (maxProcessingTime < elapsed)
+                {
                     if ((bool)lblMaxProcTimeControl.Tag) // I want to ignore the first one
                         maxProcessingTime = elapsed;  // this is going to be delayed by one cycle, but it's okay
                     lblMaxProcTimeControl.Tag = true; // Next, time, the maxProcessingTime will be updated
                 }
+
+                elapsed = stopWatchWarThunder.Elapsed.Milliseconds;
+                if (maxWarThunderProcessingTime < elapsed)
+                {
+                    if ((bool)lblMaxWarThunderProcessingTime.Tag) // I want to ignore the first one
+                        maxWarThunderProcessingTime = elapsed;  // this is going to be delayed by one cycle, but it's okay
+                    lblMaxWarThunderProcessingTime.Tag = true; // Next, time, the maxWarThunderProcessingTime will be updated
+                }
+
+
             }
 
         }
 
-        private void RecoverFromTypicalException(string?  msg, bool reenable)
+        private void RecoverFromTypicalException(string? msg, bool reenable)
         {
             ulong nowTimeStamp = GetTickCount64(); // don't want to timestamp errors, only valid telemetry
             //UpdateCaption(lblLastTimeStamp, timeStamp);
             if (msg is not null)
             {
-                UpdateCaption(tsStatus, $"[{nowTimeStamp}] {msg}");                
+                UpdateCaption(tsStatus, $"[{nowTimeStamp}] {msg}");
             }
             if (reenable) TimerActivateNewInterval(timer1, 1000);  // Wait more time before trying again
         }
@@ -654,5 +674,7 @@ namespace WarThunderExporter
 
             return sanitizedString;
         }
+
+
     }
 }
