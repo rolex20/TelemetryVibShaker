@@ -241,8 +241,8 @@ namespace WarThunderExporter
         {
             maxProcessingTime = 0;
             maxWarThunderProcessingTime = 0;
-            lblMaxProcTimeControl.Tag = false; //flag to skip the first frame
-            lblMaxWarThunderProcessingTime.Tag = false;
+            lblMaxProcTimeControl.Tag = false; //flag to skip the first delay
+            lblMaxWarThunderProcessingTime.Tag = false; //flag to skip the first delay
         }
 
         private void chkShowStatistics_CheckedChanged(object sender, EventArgs e)
@@ -451,22 +451,26 @@ namespace WarThunderExporter
         private async Task WarThunderTelemetryAsync()
         {
             timer1.Enabled = false; // some times there is a long wait caused by War Thunder to deliver the response
+            bool ShowStatistics_cache = chkShowStatistics.Checked; // to avoid repetitive calls to the getter
 
             try
             {
 
                 // Get indicators-telemetry data from War Thunder
-                if (chkShowStatistics.Checked) stopWatchWarThunder.Restart(); // Measure War Thunder Response time
+                if (ShowStatistics_cache) stopWatchWarThunder.Restart(); // Measure War Thunder Response time
                     HttpResponseMessage response2 = await httpClient.GetAsync("indicators", cancellationTokenSource.Token); //txtWtUrl
                     response2.EnsureSuccessStatusCode();
                     string responseBody2 = await response2.Content.ReadAsStringAsync();
-                if (chkShowStatistics.Checked) stopWatchWarThunder.Stop();
 
-                // I am not counting the possible long delay-first-response from war thunder
-                if (chkShowStatistics.Checked) stopWatch.Restart(); 
+                if (ShowStatistics_cache)
+                {
+                    stopWatchWarThunder.Stop(); // This timer is only for War Thunder web services measurements
+                    stopWatch.Restart(); // This timer is only for our own processing
+                }
 
                 // Let's check if the request was canceled
                 if (cancellationTokenSource.Token.IsCancellationRequested) return;
+
 
                 // Parse the JSON data
                 JObject telemetryIndicators = JObject.Parse(responseBody2);
@@ -477,16 +481,23 @@ namespace WarThunderExporter
                 {
                     float altitudeInFeets = FindJsonValue(telemetryIndicators, "altitude_10k", 0.0f);
                     float gMeter = FindJsonValue(telemetryIndicators, "g_meter", 0.0f);
-                    if (chkShowStatistics.Checked) stopWatch.Stop();
 
-                    // Get state-telemetry data from War Thunder
-                    if (chkShowStatistics.Checked) stopWatchWarThunder.Start();
+
+                    if (ShowStatistics_cache)
+                    {
+                        stopWatch.Stop();
+                        stopWatchWarThunder.Start();
+                    }
+
+                    // Get state-telemetry data from War Thunder                    
                     HttpResponseMessage response1 = await httpClient.GetAsync("state", cancellationTokenSource.Token);
                     response1.EnsureSuccessStatusCode();
                     string responseBody1 = await response1.Content.ReadAsStringAsync();
-                    if (chkShowStatistics.Checked) stopWatchWarThunder.Stop();
 
-                    if (chkShowStatistics.Checked) stopWatch.Start();
+                    if (ShowStatistics_cache) {
+                        stopWatchWarThunder.Stop();
+                        stopWatch.Start();
+                    }
                     timeStamp = GetTickCount64();  // Timestamping here is safer than the previous call which might return with empty data
 
                     // Let's check if the request was canceled
