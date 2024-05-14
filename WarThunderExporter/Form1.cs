@@ -628,7 +628,7 @@ namespace WarThunderExporter
                 {
                     if ((bool)lblMaxProcTimeControl.Tag) // I want to ignore the first one
                         maxProcessingTime = elapsed;  // this is going to be delayed by one cycle, but it's okay
-                    // lblMaxProcTimeControl.Tag = true; // Now, this is done below.  (Next, time, the maxProcessingTime will be updated)
+                    //else  lblMaxProcTimeControl.Tag = true; // Now, this is done below.  (Next, time, the maxProcessingTime will be updated)
                 }
 
                 elapsed = stopWatchWarThunder.Elapsed.Milliseconds;
@@ -636,7 +636,8 @@ namespace WarThunderExporter
                 {
                     if ((bool)lblMaxProcTimeControl.Tag) // I can reuse here
                         maxWarThunderProcessingTime = elapsed;  // this is going to be delayed by one cycle, but it's okay
-                    lblMaxProcTimeControl.Tag = true; // Next, time, the maxWarThunderProcessingTime will be updated
+                    else 
+                        lblMaxProcTimeControl.Tag = true; // Next, time, the maxWarThunderProcessingTime will be updated
                 }
 
 
