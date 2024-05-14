@@ -21,6 +21,8 @@ namespace WarThunderExporter
         private ulong timeStamp;
         private string? lastAircraftName;
         private CancellationTokenSource cancellationTokenSource;
+        private SimpleStatsCalculator internalStats = new SimpleStatsCalculator();
+        private SimpleStatsCalculator wtStats = new SimpleStatsCalculator();
 
 
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -242,7 +244,7 @@ namespace WarThunderExporter
             maxProcessingTime = 0;
             maxWarThunderProcessingTime = 0;
             lblMaxProcTimeControl.Tag = false; //flag to skip the first delay
-            lblMaxWarThunderProcessingTime.Tag = false; //flag to skip the first delay
+            lblMaxProcessingTimeWT.Tag = false; //flag to skip the first delay
         }
 
         private void chkShowStatistics_CheckedChanged(object sender, EventArgs e)
@@ -356,6 +358,17 @@ namespace WarThunderExporter
             }
         }
 
+        private void UpdateCaption(ToolStripLabel L, ulong value)
+        {
+            if (Convert.ToUInt64(L.Tag) != value)
+            {
+                L.Tag = value;
+                L.Text = value.ToString();
+                //L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
+            }
+        }
+
+
 
         private void UpdateCaption(Label L, int value)
         {
@@ -367,15 +380,6 @@ namespace WarThunderExporter
             }
         }
 
-        private void UpdateCaption(ToolStripLabel L, ulong value)
-        {
-            if (Convert.ToUInt64(L.Tag) != value)
-            {
-                L.Tag = value;
-                L.Text = value.ToString();
-                //L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
-            }
-        }
 
 
         private void UpdateCaption(Label L, ulong value)
@@ -452,6 +456,8 @@ namespace WarThunderExporter
         {
             timer1.Enabled = false; // some times there is a long wait caused by War Thunder to deliver the response
             bool ShowStatistics_cache = chkShowStatistics.Checked; // to avoid repetitive calls to the getter
+
+
 
             try
             {
@@ -543,6 +549,8 @@ namespace WarThunderExporter
                     }
                     else // let's report the new aircraft name/type we are flying
                     {
+                        internalStats.Initialize();
+                        wtStats.Initialize();
                         btnResetMax_Click(null, null); // this is per aircraft
                         lastAircraftName = (string)aircraftName;
                         byte[] sendBytes = Encoding.ASCII.GetBytes(lastAircraftName);
@@ -562,8 +570,12 @@ namespace WarThunderExporter
                         UpdateCaption(lblGForces, gMeter);
                         UpdateCaption(lblAircraftType, (string)aircraftName);
                         UpdateCaption(lblLastTimeStamp, timeStamp);
-                        UpdateCaption(lblMaxProcessingTime, maxProcessingTime);
-                        UpdateCaption(lblMaxWarThunderProcessingTime, maxWarThunderProcessingTime);
+                        UpdateCaption(lblMaxProcessingTime, internalStats.Max());
+                        UpdateCaption(lblAvgProcessingTime, internalStats.Average());
+                        UpdateCaption(lblMinProcessingTime, internalStats.Min());
+                        UpdateCaption(lblMaxProcessingTimeWT, wtStats.Max());
+                        UpdateCaption(lblAvgProcessingTimeWT, wtStats.Average());
+                        UpdateCaption(lblMinProcessingTimeWT, wtStats.Min());
                         this.ResumeLayout();
                     }
 
@@ -624,6 +636,7 @@ namespace WarThunderExporter
             {
                 stopWatch.Stop();
                 int elapsed = stopWatch.Elapsed.Milliseconds;
+                internalStats.AddSample(elapsed);
                 if (maxProcessingTime < elapsed)
                 {
                     if ((bool)lblMaxProcTimeControl.Tag) // I want to ignore the first one
@@ -632,6 +645,7 @@ namespace WarThunderExporter
                 }
 
                 elapsed = stopWatchWarThunder.Elapsed.Milliseconds;
+                wtStats.AddSample(elapsed);
                 if (maxWarThunderProcessingTime < elapsed)
                 {
                     if ((bool)lblMaxProcTimeControl.Tag) // I can reuse here
