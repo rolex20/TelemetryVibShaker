@@ -346,7 +346,7 @@ namespace WarThunderExporter
             UpdateCaption(tsStatus, "Operation canceled by the user.");
             DisconnectUDP();
         }
-
+/*
         private void UpdateCaption(Label L, float value)
         {
             int twodecimals = (int)(value * 100.0f);
@@ -407,6 +407,36 @@ namespace WarThunderExporter
             {
                 L.Tag = value;
                 L.Text = value;
+            }
+
+        }
+*/
+        private void UpdateCaption<TControl, TValue>(TControl L, TValue value)
+            where TControl : Control
+        {
+            if (!Equals(L.Tag, value))
+            {
+                L.Tag = value;
+                L.Text = value switch
+                {
+                    float f => $"{f:F1}",
+                    string s => s,
+                    _ => value.ToString()
+                };
+            }
+        }
+
+        private void UpdateCaption<TValue>(ToolStripLabel L, TValue value)
+        {
+            if (!Equals(L.Tag, value))
+            {
+                L.Tag = value;
+                L.Text = value switch
+                {
+                    float f => $"{f:F1}",
+                    string s => s,
+                    _ => value.ToString()
+                };
             }
         }
 
