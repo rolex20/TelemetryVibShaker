@@ -55,23 +55,29 @@ function LuaExportAfterNextFrame()
 
 	if udp then
 		local new_time_stamp = getDeciSecondsAsInt()	
-		if new_time_stamp ~= last_time_stamp then -- Avoid send something every millisecond, , no need for more resolution, i.e. only send every tenth of a second to minimize cpu load
+		if new_time_stamp ~= last_time_stamp then -- Avoid send something every millisecond, no need for more resolution, i.e. only send every tenth of a second to minimize cpu load
 			local unitId = LoGetPlayerPlaneId() or 0
 			if unitId then 
 				if (lastUnitId == unitId) then
 					-- use the following for my new program
 					local AoA = tvsSanitizeByte(LoGetAngleOfAttack() or 0)
 					local speed = ((LoGetTrueAirSpeed() or 0) / 10) --we want to send decameters/second so that it fits in 1 byte					
-					local mechInfo = LoGetMechInfo()
-					local sb, flaps
+					local altitud = LoGetAltitudeAboveGroundLevel() / 10 -- we want to send decameters so that it fits in 1 byte
+					altitud = math.min(255, altitud) -- maximum altitud, will be 2550 meters above ground, enough to check if we are flying
+					local accelunits = LoGetAccelerationUnits()
+					local gforce = math.max(accelunits.x, accelunits.y, accelunits.z)				
+					local mechInfo = LoGetMechInfo()					
+					local sb, flaps, gear
 					if (mechInfo) then
 						sb = ((mechInfo.speedbrakes.value or 0) * 100)
-						flaps = ((mechInfo.flaps.value or 0) * 100)						
+						flaps = ((mechInfo.flaps.value or 0) * 100)
+						--gear = ((mechInfo.gear.value or 0) * 100)
 					else
 						sb = 0
 						flaps = 0
+						gear = 0
 					end
-					udp:send(string.char(AoA, sb, flaps, speed))
+					udp:send(string.char(1, AoA, sb, flaps, speed, gforce, altitud)) --add gear at the end
 					
 					--use the following for my older program
 					--local AoA = LoGetAngleOfAttack() or 0
@@ -85,7 +91,7 @@ function LuaExportAfterNextFrame()
 					if unitObject then
 						udp:send(unitObject.Name)
 					else
-						udp:send("unknown")
+						udp:send("unknown in export.lua")
 					end
 					lastUnitId = unitId
 				end
