@@ -83,6 +83,9 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.btnResetMax = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.label3 = new System.Windows.Forms.Label();
+            this.label24 = new System.Windows.Forms.Label();
+            this.lblGear = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudFrequency)).BeginInit();
@@ -277,6 +280,9 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.label3);
+            this.panel1.Controls.Add(this.label24);
+            this.panel1.Controls.Add(this.lblGear);
             this.panel1.Controls.Add(this.lblTimeStamp);
             this.panel1.Controls.Add(this.label23);
             this.panel1.Controls.Add(this.label22);
@@ -632,6 +638,33 @@
             this.btnResetMax.UseVisualStyleBackColor = true;
             this.btnResetMax.Click += new System.EventHandler(this.btnResetMax_Click);
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(408, 94);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(15, 13);
+            this.label3.TabIndex = 31;
+            this.label3.Text = "%";
+            // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(296, 94);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(76, 13);
+            this.label24.TabIndex = 29;
+            this.label24.Text = "Speed brakes:";
+            // 
+            // lblGear
+            // 
+            this.lblGear.AutoSize = true;
+            this.lblGear.Location = new System.Drawing.Point(378, 93);
+            this.lblGear.Name = "lblGear";
+            this.lblGear.Size = new System.Drawing.Size(16, 13);
+            this.lblGear.TabIndex = 30;
+            this.lblGear.Text = "---";
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -720,6 +753,9 @@
         private System.Windows.Forms.ToolStripLabel tsAircraftChange;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label24;
+        private System.Windows.Forms.Label lblGear;
     }
 }
 

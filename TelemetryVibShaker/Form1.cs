@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using System;
 using NAudio.CoreAudioApi;
+using WarThunderExporter;
 
 
 namespace TelemetryVibShaker
@@ -21,7 +22,7 @@ namespace TelemetryVibShaker
         private AoA_SoundManager? soundManager;  // manages sound effects according to the current AoA
         private TelemetryServer? telemetry;      // controls all telemetry logic
         private Thread? threadTelemetry; // this thread runs the telemetry        
-        private int maxUIProcessingTime;  // milliseconds elapsed in processing the monitor-update-cycle in Timer1
+        private SimpleStatsCalculator Stats = new SimpleStatsCalculator();  // milliseconds elapsed in processing the monitor-update-cycle in Timer1 (UI)
         private Stopwatch? stopWatchUI;  // used to measure processing time in Timer1 (updating the UI)
         private Process? currentProcess;
 
@@ -447,14 +448,14 @@ namespace TelemetryVibShaker
             // Now Define TWatch Effects
             TWatchEffects = new EffectDefinition[2];
 
-            // AoA data points
+            // Gear data points
             // The 15 and 16 doesnt matter too much, they will be replaced by the actual aircraft AoA ranges
             // For the TWatch the vibration strength doesn't matter too much because
             // currently I have only found how to turn them on or off, not how to control the strength
             // however this interface simplifies the creation of effect points
             //points = new MotorStrengthPoints(11, 100, 15, 100, 16, 100, 255, 255);
-            points = new MotorStrengthPoints(11, 0, 15, 0, 16, 100, 255, 100);
-            TWatchEffects[0] = new EffectDefinition(VibrationEffectType.AoA, points, chkTWatchVibrate.Checked);
+            points = new MotorStrengthPoints(1, 0, 89, 0, 90, 100, 100, 100);
+            TWatchEffects[0] = new EffectDefinition(VibrationEffectType.Gear, points, chkTWatchVibrate.Checked);
 
             // AoA Background Color Display
             // Will show Yellow,Green or Red depending on AoA
@@ -559,52 +560,34 @@ namespace TelemetryVibShaker
             timer1.Enabled = true;
         }
 
-        private void UpdateValue(Label L, int value)
+        private void UpdateValue<TControl, TValue>(TControl L, TValue value)
+            where TControl : Control
         {
-            if (Convert.ToInt32(L.Tag) != value)
+            if (!Equals(L.Tag, value))
             {
                 L.Tag = value;
-                //L.Text = value.ToString();
-                L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
+                L.Text = value switch
+                {
+                    float f => $"{f:F1}",
+                    string s => s,
+                    _ => value.ToString()
+                };
             }
         }
 
-        private void UpdateValue(Label L, long value)
-        {
-            if (Convert.ToInt64(L.Tag) != value)
-            {
-                L.Tag = value;
-                //L.Text = value.ToString();
-                L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
-            }
-        }
 
-        private void UpdateValue(Label L, string value)
-        {
-            if (!L.Tag.Equals(value))
-            {
-                L.Tag = value;
-                L.Text = value;
-            }
-        }
 
         private void UpdateMaxUIProcessingTime()
         {
-            UpdateValue(lblProcessingTimeUI, maxUIProcessingTime); // this might be delayed by one cycle, but it's ok
+            UpdateValue(lblProcessingTimeUIMax, Stats.Max()); // this might be delayed by one cycle, but it's ok
+            UpdateValue(lblProcessingTimeUIMin, Stats.Min());
+            UpdateValue(lblProcessingTimeUIAvg, Stats.Average());
+
 
             if (chkShowStatistics.Checked)
             {
                 stopWatchUI.Stop();
-                int elapsed = stopWatchUI.Elapsed.Milliseconds;
-
-                // discard the first UI processing
-                if ((bool)lblMaxProcessingTimeTitle.Tag)
-                {
-                    if (maxUIProcessingTime < elapsed)
-                        maxUIProcessingTime = elapsed;
-                }
-                else
-                    lblMaxProcessingTimeTitle.Tag = true;
+                Stats.AddSample(stopWatchUI.Elapsed.Milliseconds);
             }
         }
 
@@ -676,7 +659,9 @@ namespace TelemetryVibShaker
                 UpdateValue(lblUDPServerThread, telemetry.ThreadId);
 
                 // Always calculate/Report max UDP processing time
-                UpdateValue(lblProcessingTimeUDP, telemetry.MaxProcessingTime);
+                UpdateValue(lblProcessingTimeUDPMax, telemetry.Stats.Max());
+                UpdateValue(lblProcessingTimeUDPMin, telemetry.Stats.Min());
+                UpdateValue(lblProcessingTimeUDPAvg, telemetry.Stats.Average());
 
 
                 // Always calculate/Report max UI processing time (monitor).  This one needs to be the last                
@@ -802,17 +787,15 @@ namespace TelemetryVibShaker
         // Reset max timers, UI and UDP
         private void btnResetMax_Click(object? sender, EventArgs? e)
         {
-            lblProcessingTimeUDP.Tag = null;
-            lblProcessingTimeUI.Tag = null;
 
             if (telemetry != null)
             {
-                telemetry.MaxProcessingTime = -1;
-                UpdateValue(lblProcessingTimeUDP, telemetry.MaxProcessingTime);
+                telemetry.Stats.Initialize();
+                UpdateValue(lblProcessingTimeUDPMax, telemetry.Stats.Max());
             }
 
-            maxUIProcessingTime = -1;
-            UpdateValue(lblProcessingTimeUI, maxUIProcessingTime);
+            Stats.Initialize();
+            UpdateValue(lblProcessingTimeUIMax, Stats.Max());
         }
 
         private void nudMinSpeed_ValueChanged(object sender, EventArgs e)

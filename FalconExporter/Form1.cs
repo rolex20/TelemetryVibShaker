@@ -49,7 +49,7 @@ namespace FalconExporter
         private void btnStart_Click(object sender, EventArgs e)
         {
             // Allocate the udp datagram
-            datagram = new byte[7];
+            datagram = new byte[8];
             datagram[0] = 1; // flag to indicate this is a telemetry datagram for my TelemetryVibShaker program
 
             ConnectUDP();
@@ -130,10 +130,12 @@ namespace FalconExporter
             // Using totalFuel as kind of a flag when we are in a new plane
             // If totalFuel decreases, we are in the same aircraft fying in it or something
             // If totalFuel increases, probably we are in a new plane, new mission, since I don't do refueling
+            float speedBrakesPct = 0.0f;
+            float gearPct = 0.0f;
             if (totalFuel < lastTelemetry)
             {
                 lastTelemetry = totalFuel; 
-                float speedBrakesPct = _lastFlightData.speedBrake * 100.0f;
+                speedBrakesPct = _lastFlightData.speedBrake * 100.0f;
 
                 // datagram[0] = 1;  // already done this with btnStart_Click()
                 datagram[1] = _lastFlightData.alpha >= 0.0f ? (byte)_lastFlightData.alpha : (byte)0; // AoA
@@ -155,6 +157,10 @@ namespace FalconExporter
                 // (it would if I could find an above the ground reliable, always available telemetry (RALT is not always available)
                 float alt = 0.0304799999536704f * aia;
                 datagram[6] = alt <= 255.0f ? (byte)alt : (byte)255;
+
+                // Gear
+                gearPct = _lastFlightData.gearPos * 100.0f;
+                datagram[7] = (byte)(gearPct);
 
                 // Send Telemetry
                 timeStamp = GetTickCount64();
@@ -180,13 +186,14 @@ namespace FalconExporter
                 UpdateCaption(lblAoA, _lastFlightData.alpha);
                 UpdateCaption(lblSpeed, _lastFlightData.kias);
                 UpdateCaption(lblAltitude, aia);
-                UpdateCaption(lblSpeedBrakes, _lastFlightData.speedBrake * 100.0f);
+                UpdateCaption(lblSpeedBrakes, speedBrakesPct);
                 UpdateCaption(lblTrueAirspeed, _lastFlightData.vt*0.592484f ); //convert to knots
                 UpdateCaption(lblGForces, _lastFlightData.gs);
                 UpdateCaption(lblVehicleType, _lastFlightData.vehicleACD);
                 UpdateCaption(lblFuel, totalFuel);
                 UpdateCaption(lblTimeStamp, timeStamp);
                 UpdateCaption(lblMaxProcessingTime, maxProcessingTime);
+                UpdateCaption(lblGear, gearPct);
                 if ((bool)tsAircraftChange.Tag)
                 {
                     UpdateCaption(tsAircraftChange, timeStamp);
@@ -373,6 +380,8 @@ namespace FalconExporter
 
             cmbPriorityClass.Tag = true;
         }
+
+
 
         private void UpdateCaption(Label L, float value)
         {

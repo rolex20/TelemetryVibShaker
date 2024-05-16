@@ -11,7 +11,7 @@ namespace TelemetryGenerator
         private CancellationTokenSource cancellationTokenSource;
         private CancellationToken token;
         private UdpClient? udpSender;
-        private byte[] datagram = new byte[7];
+        private byte[] datagram = new byte[8];
 
         public Form1()
         {
@@ -59,6 +59,9 @@ namespace TelemetryGenerator
 
                 // Altitude
                 datagram[6] = (byte)nudAltitude.Value;
+
+                // Gear
+                datagram[7] = (byte)nudGear.Value;
 
                 // Send  Telemetry
                 udpSender.Send(datagram, datagram.Length);

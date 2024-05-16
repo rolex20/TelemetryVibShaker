@@ -180,8 +180,11 @@ namespace SimConnectExporter
                     datagram[5] = sd.gForce < 0.0f ? (byte)0 : (byte)sd.gForce;
 
                     // Altitude
-                    int hm = (int)sd.altitude / 10; // convert meters to Decameters (fit in 1 byte) 
-                    datagram[6] = hm <= 255 ? (byte)hm : (byte)255; // max is 2550m, just good enough to make sure we are in the air
+                    int dm = (int)sd.altitude / 10; // convert meters to Decameters (fit in 1 byte) 
+                    datagram[6] = dm <= 255 ? (byte)dm : (byte)255; // max is 2550m, just good enough to make sure we are in the air
+
+                    // Gear
+                    datagram[7] = (byte)sd.gear;
 
                     // Send  Telemetry
                     udpSender.BeginSend(datagram, datagram.Length, new AsyncCallback(SendCallback), udpSender);
@@ -370,7 +373,7 @@ namespace SimConnectExporter
             CurrentAircraftName = "";
 
             // Allocate the udp datagram
-            datagram = new byte[7];
+            datagram = new byte[8];
 
             // Create the stopwatch
             stopWatch = new Stopwatch();

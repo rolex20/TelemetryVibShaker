@@ -101,6 +101,15 @@
             btnTestArduinoMotors = new Button();
             tabMonitor = new TabPage();
             panel1 = new Panel();
+            lblProcessingTimeUIAvg = new Label();
+            lblProcessingTimeUDPAvg = new Label();
+            label49 = new Label();
+            lblProcessingTimeUIMin = new Label();
+            lblProcessingTimeUDPMin = new Label();
+            label46 = new Label();
+            label44 = new Label();
+            label42 = new Label();
+            label41 = new Label();
             label40 = new Label();
             lblAltitude = new Label();
             label43 = new Label();
@@ -114,7 +123,7 @@
             lblUIThreadID = new Label();
             label27 = new Label();
             lblLastProcessorUsedUI = new Label();
-            lblProcessingTimeUI = new Label();
+            lblProcessingTimeUIMax = new Label();
             lblLastProcessorUsedUDP = new Label();
             label28 = new Label();
             lblSpeed = new Label();
@@ -126,7 +135,7 @@
             label32 = new Label();
             lblDatagramsPerSecond = new Label();
             label29 = new Label();
-            lblProcessingTimeUDP = new Label();
+            lblProcessingTimeUDPMax = new Label();
             lblMaxProcessingTimeTitle = new Label();
             lblLastSpeedBrakes = new Label();
             lblCurrentUnitType = new Label();
@@ -599,7 +608,7 @@
             chkTWatchVibrate.Name = "chkTWatchVibrate";
             chkTWatchVibrate.Size = new Size(442, 41);
             chkTWatchVibrate.TabIndex = 30;
-            chkTWatchVibrate.Text = "Vibrate Motors with AoA Telemetry:  Only when beyond optimal AoA range.";
+            chkTWatchVibrate.Text = "Vibrate Motors with Gear Telemetry:  Vibration is only on or off in the TWatch.";
             chkTWatchVibrate.UseVisualStyleBackColor = true;
             chkTWatchVibrate.CheckedChanged += chkTWatchVibrate_CheckedChanged;
             // 
@@ -944,6 +953,15 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(lblProcessingTimeUIAvg);
+            panel1.Controls.Add(lblProcessingTimeUDPAvg);
+            panel1.Controls.Add(label49);
+            panel1.Controls.Add(lblProcessingTimeUIMin);
+            panel1.Controls.Add(lblProcessingTimeUDPMin);
+            panel1.Controls.Add(label46);
+            panel1.Controls.Add(label44);
+            panel1.Controls.Add(label42);
+            panel1.Controls.Add(label41);
             panel1.Controls.Add(label40);
             panel1.Controls.Add(lblAltitude);
             panel1.Controls.Add(label43);
@@ -957,7 +975,7 @@
             panel1.Controls.Add(lblUIThreadID);
             panel1.Controls.Add(label27);
             panel1.Controls.Add(lblLastProcessorUsedUI);
-            panel1.Controls.Add(lblProcessingTimeUI);
+            panel1.Controls.Add(lblProcessingTimeUIMax);
             panel1.Controls.Add(lblLastProcessorUsedUDP);
             panel1.Controls.Add(label28);
             panel1.Controls.Add(lblSpeed);
@@ -969,7 +987,7 @@
             panel1.Controls.Add(label32);
             panel1.Controls.Add(lblDatagramsPerSecond);
             panel1.Controls.Add(label29);
-            panel1.Controls.Add(lblProcessingTimeUDP);
+            panel1.Controls.Add(lblProcessingTimeUDPMax);
             panel1.Controls.Add(lblMaxProcessingTimeTitle);
             panel1.Controls.Add(lblLastSpeedBrakes);
             panel1.Controls.Add(lblCurrentUnitType);
@@ -980,10 +998,101 @@
             panel1.Controls.Add(label21);
             panel1.Controls.Add(label25);
             panel1.Controls.Add(label23);
-            panel1.Location = new Point(3, 97);
+            panel1.Location = new Point(3, 68);
             panel1.Name = "panel1";
-            panel1.Size = new Size(503, 249);
+            panel1.Size = new Size(503, 299);
             panel1.TabIndex = 10;
+            // 
+            // lblProcessingTimeUIAvg
+            // 
+            lblProcessingTimeUIAvg.AutoSize = true;
+            lblProcessingTimeUIAvg.Location = new Point(410, 271);
+            lblProcessingTimeUIAvg.Name = "lblProcessingTimeUIAvg";
+            lblProcessingTimeUIAvg.Size = new Size(45, 15);
+            lblProcessingTimeUIAvg.TabIndex = 47;
+            lblProcessingTimeUIAvg.Tag = "-1";
+            lblProcessingTimeUIAvg.Text = "UI time";
+            toolTip1.SetToolTip(lblProcessingTimeUIAvg, "Max UI processing time (monitor).  Ignores the first one.");
+            // 
+            // lblProcessingTimeUDPAvg
+            // 
+            lblProcessingTimeUDPAvg.AutoSize = true;
+            lblProcessingTimeUDPAvg.Location = new Point(410, 246);
+            lblProcessingTimeUDPAvg.Name = "lblProcessingTimeUDPAvg";
+            lblProcessingTimeUDPAvg.Size = new Size(57, 15);
+            lblProcessingTimeUDPAvg.TabIndex = 46;
+            lblProcessingTimeUDPAvg.Text = "UDP time";
+            // 
+            // label49
+            // 
+            label49.AutoSize = true;
+            label49.Location = new Point(410, 219);
+            label49.Name = "label49";
+            label49.Size = new Size(31, 15);
+            label49.TabIndex = 45;
+            label49.Text = "Avg:";
+            toolTip1.SetToolTip(label49, "This is for the UDP packet processing");
+            // 
+            // lblProcessingTimeUIMin
+            // 
+            lblProcessingTimeUIMin.AutoSize = true;
+            lblProcessingTimeUIMin.Location = new Point(294, 271);
+            lblProcessingTimeUIMin.Name = "lblProcessingTimeUIMin";
+            lblProcessingTimeUIMin.Size = new Size(45, 15);
+            lblProcessingTimeUIMin.TabIndex = 44;
+            lblProcessingTimeUIMin.Tag = "-1";
+            lblProcessingTimeUIMin.Text = "UI time";
+            toolTip1.SetToolTip(lblProcessingTimeUIMin, "Max UI processing time (monitor).  Ignores the first one.");
+            // 
+            // lblProcessingTimeUDPMin
+            // 
+            lblProcessingTimeUDPMin.AutoSize = true;
+            lblProcessingTimeUDPMin.Location = new Point(294, 246);
+            lblProcessingTimeUDPMin.Name = "lblProcessingTimeUDPMin";
+            lblProcessingTimeUDPMin.Size = new Size(57, 15);
+            lblProcessingTimeUDPMin.TabIndex = 43;
+            lblProcessingTimeUDPMin.Text = "UDP time";
+            // 
+            // label46
+            // 
+            label46.AutoSize = true;
+            label46.Location = new Point(294, 219);
+            label46.Name = "label46";
+            label46.Size = new Size(31, 15);
+            label46.TabIndex = 42;
+            label46.Text = "Min:";
+            toolTip1.SetToolTip(label46, "This is for the UDP packet processing");
+            // 
+            // label44
+            // 
+            label44.AutoSize = true;
+            label44.Location = new Point(121, 271);
+            label44.Name = "label44";
+            label44.Size = new Size(21, 15);
+            label44.TabIndex = 41;
+            label44.Text = "UI:";
+            toolTip1.SetToolTip(label44, "This is for the UDP packet processing");
+            // 
+            // label42
+            // 
+            label42.AutoSize = true;
+            label42.Location = new Point(177, 219);
+            label42.Name = "label42";
+            label42.Size = new Size(33, 15);
+            label42.TabIndex = 40;
+            label42.Text = "Max:";
+            toolTip1.SetToolTip(label42, "This is for the UDP packet processing");
+            // 
+            // label41
+            // 
+            label41.AutoSize = true;
+            label41.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label41.Location = new Point(13, 219);
+            label41.Name = "label41";
+            label41.Size = new Size(132, 15);
+            label41.TabIndex = 39;
+            label41.Text = "Processing Times (ms):";
+            toolTip1.SetToolTip(label41, "This is for the UDP packet processing");
             // 
             // label40
             // 
@@ -1070,7 +1179,7 @@
             // lblTimestamp
             // 
             lblTimestamp.AutoSize = true;
-            lblTimestamp.Location = new Point(410, 196);
+            lblTimestamp.Location = new Point(410, 77);
             lblTimestamp.Name = "lblTimestamp";
             lblTimestamp.Size = new Size(64, 15);
             lblTimestamp.TabIndex = 29;
@@ -1081,7 +1190,7 @@
             // label31
             // 
             label31.AutoSize = true;
-            label31.Location = new Point(337, 196);
+            label31.Location = new Point(337, 77);
             label31.Name = "label31";
             label31.Size = new Size(69, 15);
             label31.TabIndex = 28;
@@ -1090,7 +1199,7 @@
             // lblUIThreadID
             // 
             lblUIThreadID.AutoSize = true;
-            lblUIThreadID.Location = new Point(288, 11);
+            lblUIThreadID.Location = new Point(287, 11);
             lblUIThreadID.Name = "lblUIThreadID";
             lblUIThreadID.Size = new Size(27, 15);
             lblUIThreadID.TabIndex = 27;
@@ -1099,7 +1208,7 @@
             // label27
             // 
             label27.AutoSize = true;
-            label27.Location = new Point(204, 11);
+            label27.Location = new Point(203, 11);
             label27.Name = "label27";
             label27.Size = new Size(74, 15);
             label27.TabIndex = 26;
@@ -1109,7 +1218,7 @@
             // lblLastProcessorUsedUI
             // 
             lblLastProcessorUsedUI.AutoSize = true;
-            lblLastProcessorUsedUI.Location = new Point(244, 223);
+            lblLastProcessorUsedUI.Location = new Point(215, 186);
             lblLastProcessorUsedUI.Name = "lblLastProcessorUsedUI";
             lblLastProcessorUsedUI.Size = new Size(18, 15);
             lblLastProcessorUsedUI.TabIndex = 25;
@@ -1117,21 +1226,21 @@
             lblLastProcessorUsedUI.Text = "UI";
             toolTip1.SetToolTip(lblLastProcessorUsedUI, "Processor used to update the UI (monitor)");
             // 
-            // lblProcessingTimeUI
+            // lblProcessingTimeUIMax
             // 
-            lblProcessingTimeUI.AutoSize = true;
-            lblProcessingTimeUI.Location = new Point(244, 196);
-            lblProcessingTimeUI.Name = "lblProcessingTimeUI";
-            lblProcessingTimeUI.Size = new Size(45, 15);
-            lblProcessingTimeUI.TabIndex = 24;
-            lblProcessingTimeUI.Tag = "-1";
-            lblProcessingTimeUI.Text = "UI time";
-            toolTip1.SetToolTip(lblProcessingTimeUI, "Max UI processing time (monitor).  Ignores the first one.");
+            lblProcessingTimeUIMax.AutoSize = true;
+            lblProcessingTimeUIMax.Location = new Point(177, 271);
+            lblProcessingTimeUIMax.Name = "lblProcessingTimeUIMax";
+            lblProcessingTimeUIMax.Size = new Size(45, 15);
+            lblProcessingTimeUIMax.TabIndex = 24;
+            lblProcessingTimeUIMax.Tag = "-1";
+            lblProcessingTimeUIMax.Text = "UI time";
+            toolTip1.SetToolTip(lblProcessingTimeUIMax, "Max UI processing time (monitor).  Ignores the first one.");
             // 
             // lblLastProcessorUsedUDP
             // 
             lblLastProcessorUsedUDP.AutoSize = true;
-            lblLastProcessorUsedUDP.Location = new Point(177, 223);
+            lblLastProcessorUsedUDP.Location = new Point(148, 186);
             lblLastProcessorUsedUDP.Name = "lblLastProcessorUsedUDP";
             lblLastProcessorUsedUDP.Size = new Size(30, 15);
             lblLastProcessorUsedUDP.TabIndex = 23;
@@ -1142,7 +1251,7 @@
             // label28
             // 
             label28.AutoSize = true;
-            label28.Location = new Point(48, 223);
+            label28.Location = new Point(19, 186);
             label28.Name = "label28";
             label28.Size = new Size(114, 15);
             label28.TabIndex = 22;
@@ -1238,25 +1347,25 @@
             label29.TextAlign = ContentAlignment.TopRight;
             toolTip1.SetToolTip(label29, "Datagrams received per second.");
             // 
-            // lblProcessingTimeUDP
+            // lblProcessingTimeUDPMax
             // 
-            lblProcessingTimeUDP.AutoSize = true;
-            lblProcessingTimeUDP.Location = new Point(177, 196);
-            lblProcessingTimeUDP.Name = "lblProcessingTimeUDP";
-            lblProcessingTimeUDP.Size = new Size(57, 15);
-            lblProcessingTimeUDP.TabIndex = 12;
-            lblProcessingTimeUDP.Tag = "-1";
-            lblProcessingTimeUDP.Text = "UDP time";
-            toolTip1.SetToolTip(lblProcessingTimeUDP, "Max UDP Packet processing time.  This value is tracked for each different UnitType (aircraft).");
+            lblProcessingTimeUDPMax.AutoSize = true;
+            lblProcessingTimeUDPMax.Location = new Point(177, 246);
+            lblProcessingTimeUDPMax.Name = "lblProcessingTimeUDPMax";
+            lblProcessingTimeUDPMax.Size = new Size(57, 15);
+            lblProcessingTimeUDPMax.TabIndex = 12;
+            lblProcessingTimeUDPMax.Tag = "-1";
+            lblProcessingTimeUDPMax.Text = "UDP time";
+            toolTip1.SetToolTip(lblProcessingTimeUDPMax, "Max UDP Packet processing time.  This value is tracked for each different UnitType (aircraft).");
             // 
             // lblMaxProcessingTimeTitle
             // 
             lblMaxProcessingTimeTitle.AutoSize = true;
-            lblMaxProcessingTimeTitle.Location = new Point(13, 196);
+            lblMaxProcessingTimeTitle.Location = new Point(109, 246);
             lblMaxProcessingTimeTitle.Name = "lblMaxProcessingTimeTitle";
-            lblMaxProcessingTimeTitle.Size = new Size(149, 15);
+            lblMaxProcessingTimeTitle.Size = new Size(33, 15);
             lblMaxProcessingTimeTitle.TabIndex = 11;
-            lblMaxProcessingTimeTitle.Text = "Max Processing Time (ms):";
+            lblMaxProcessingTimeTitle.Text = "UDP:";
             toolTip1.SetToolTip(lblMaxProcessingTimeTitle, "This is for the UDP packet processing");
             // 
             // lblLastSpeedBrakes
@@ -1353,7 +1462,7 @@
             chkShowStatistics.AutoSize = true;
             chkShowStatistics.Checked = true;
             chkShowStatistics.CheckState = CheckState.Checked;
-            chkShowStatistics.Location = new Point(15, 55);
+            chkShowStatistics.Location = new Point(15, 37);
             chkShowStatistics.Name = "chkShowStatistics";
             chkShowStatistics.Size = new Size(300, 19);
             chkShowStatistics.TabIndex = 9;
@@ -1366,7 +1475,7 @@
             chkChangeToMonitor.AutoSize = true;
             chkChangeToMonitor.Checked = true;
             chkChangeToMonitor.CheckState = CheckState.Checked;
-            chkChangeToMonitor.Location = new Point(14, 20);
+            chkChangeToMonitor.Location = new Point(14, 12);
             chkChangeToMonitor.Name = "chkChangeToMonitor";
             chkChangeToMonitor.Size = new Size(298, 19);
             chkChangeToMonitor.TabIndex = 0;
@@ -1543,7 +1652,7 @@
         private Label lblCurrentUnitType;
         private Label lblLastSpeedBrakes;
         private Label label29;
-        private Label lblProcessingTimeUDP;
+        private Label lblProcessingTimeUDPMax;
         private Label lblMaxProcessingTimeTitle;
         private Label lblDatagramsPerSecond;
         private Label lblLastFlaps;
@@ -1568,7 +1677,7 @@
         private Label label26;
         private Label label28;
         private Label lblLastProcessorUsedUDP;
-        private Label lblProcessingTimeUI;
+        private Label lblProcessingTimeUIMax;
         private Label lblLastProcessorUsedUI;
         private Label lblUIThreadID;
         private Label label27;
@@ -1596,5 +1705,14 @@
         private Label label43;
         private Label lblGForces;
         private Label label45;
+        private Label label41;
+        private Label label44;
+        private Label label42;
+        private Label label46;
+        private Label lblProcessingTimeUIMin;
+        private Label lblProcessingTimeUDPMin;
+        private Label lblProcessingTimeUIAvg;
+        private Label lblProcessingTimeUDPAvg;
+        private Label label49;
     }
 }

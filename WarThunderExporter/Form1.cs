@@ -285,7 +285,7 @@ namespace WarThunderExporter
             UpdateCaption(tsStatus, $"Connecting to [{httpClient.BaseAddress.ToString()}]...");
 
             // Allocate the udp datagram
-            datagram = new byte[7];
+            datagram = new byte[8];
             datagram[0] = 1; // flag to indicate this is a telemetry datagram for my TelemetryVibShaker program
 
             // Prepare the UDP connection to the War Thunder Telemetry
@@ -519,6 +519,7 @@ namespace WarThunderExporter
                     float gMeter = FindJsonValue(telemetryIndicators, "g_meter", 0.0f);
 
 
+
                     if (ShowStatistics_cache)
                     {
                         stopWatch.Stop();
@@ -547,7 +548,7 @@ namespace WarThunderExporter
                     int flapsStatus = FindJsonValue(telemetryState, "flaps, %", 0); // telemetryState["flaps, %"].Value<int>();
                     int airBrakePct = FindJsonValue(telemetryState, "airbrake, %", 0);// telemetryState["airbrake, %"].Value<int>();
                     float angleOfAttack = FindJsonValue(telemetryState, "AoA, deg", 0.0f, 255.0f);// telemetryState["AoA, deg"].Value<float>();
-
+                    int gearPct = FindJsonValue(telemetryState, "gear, %", 0); 
 
                     if (aircraftName.Equals(lastAircraftName)) // just send the telemetry for the same aircraft
                     {
@@ -572,6 +573,9 @@ namespace WarThunderExporter
 
                         // Altitude conversion: From feet to decameters
                         datagram[6] = (byte)(altitudeInFeets * 0.0304799999536704f);
+
+                        // Gear
+                        datagram[7] = (byte)gearPct; //Gear
 
                         // Send Telemetry
                         udpSender.BeginSend(datagram, datagram.Length, new AsyncCallback(SendCallback), udpSender);

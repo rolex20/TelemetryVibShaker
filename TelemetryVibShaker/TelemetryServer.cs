@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using WarThunderExporter;
 
 
 namespace TelemetryVibShaker
@@ -14,7 +15,7 @@ namespace TelemetryVibShaker
         public long TimeStamp; // timestamp of the last datagram received
         public TelemetryData LastData; // last telemetry datagram received
         public int DPS; // datagrams received per second
-        public int MaxProcessingTime; // time of the datagram that took longer to process, this is per aircraft
+        public SimpleStatsCalculator Stats = new SimpleStatsCalculator(); // time of the datagram that took longer to process, this is per aircraft
         public int LastProcessorUsed; // processor used in the last udp packet received
         public int ThreadId; // OS Thread ID for the UDP Telemetry Server
         public string? CurrentUnitType; // current type of aircraft used by the player
@@ -122,7 +123,7 @@ namespace TelemetryVibShaker
             cancelationToken = false;
             CurrentUnitType = "[no unit information received]";
             lastErrorMsg = string.Empty;
-            MaxProcessingTime = -1;
+            Stats.Initialize();
             LastProcessorUsed = -1;
             DPS = 0;
             int iDPS = 0; // intermediate DPS
@@ -186,7 +187,10 @@ namespace TelemetryVibShaker
                 // SpeedBreaks possible values: 0-100
                 // Flaps possible values: 0-100
                 // Speed (optional): 0-255.  Units in 10th's of Km, so 10 is 100Km
-                if (receiveData[0]==1) // is this a telemetry datagram with 7 bytes total?
+                // G-Forces 
+                // Altitud in decameters to fit in 1 byte
+                // Gear: 0-100
+                if (receiveData[0]==1) // is this a telemetry datagram with 8 bytes total?
                 {
                     // Obtain telemetry data
                     LastData.AoA = receiveData[1];
@@ -208,6 +212,9 @@ namespace TelemetryVibShaker
 
                     // Altitude is sent in Decameters without decimals: some accuracy lost here, maximum is 2550 meters
                     LastData.Altitude = receiveData[6] * 10; // Now Altitude is in meters
+
+                    // Gear 0-100
+                    LastData.Gear = receiveData[7];
 
                     // Process the Effects only if the current plane is moving above the MinSpeed required by the user
                     if (LastData.Speed >= MinSpeed && LastData.Altitude >= MinAltitude) { 
@@ -240,9 +247,10 @@ namespace TelemetryVibShaker
                     LastData.Flaps = -1;
                     LastData.GForces = -1;
                     LastData.Altitude = -1;
+                    LastData.Gear = -1;
 
                     // Reset MaxProcessingTime with each new airplane
-                    MaxProcessingTime = -1; 
+                    Stats.Initialize();
 
                     // New aircraft, let's make sure, sounds are muted
                     soundManager_AoA.MuteEffects();
@@ -272,8 +280,7 @@ namespace TelemetryVibShaker
                 if (Statistics) 
                 {
                     stopwatch.Stop(); // at this point the datagram has been fully processed
-                    int elapsed = stopwatch.Elapsed.Milliseconds;
-                    if (MaxProcessingTime < elapsed) MaxProcessingTime = elapsed;
+                    Stats.AddSample(stopwatch.Elapsed.Milliseconds);                    
                 }
 
             } // end-while
