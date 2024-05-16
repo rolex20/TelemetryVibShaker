@@ -645,6 +645,9 @@ namespace TelemetryVibShaker
                 // Report Altitude Above Ground
                 UpdateValue(lblAltitude, telemetry.LastData.Altitude);
 
+                // Report gear
+                UpdateValue(lblLastGear, telemetry.LastData.Gear);
+
 
                 // Report last processor used for UDP processing
                 UpdateValue(lblLastProcessorUsedUDP, telemetry.LastProcessorUsed);

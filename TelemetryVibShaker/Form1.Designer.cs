@@ -156,6 +156,9 @@
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             btnResetMax = new Button();
+            label47 = new Label();
+            lblLastGear = new Label();
+            label50 = new Label();
             tabs.SuspendLayout();
             tabNormalSoundEffects.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier2).BeginInit();
@@ -953,6 +956,9 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(label47);
+            panel1.Controls.Add(lblLastGear);
+            panel1.Controls.Add(label50);
             panel1.Controls.Add(lblProcessingTimeUIAvg);
             panel1.Controls.Add(lblProcessingTimeUDPAvg);
             panel1.Controls.Add(label49);
@@ -1538,6 +1544,37 @@
             btnResetMax.UseVisualStyleBackColor = true;
             btnResetMax.Click += btnResetMax_Click;
             // 
+            // label47
+            // 
+            label47.AutoSize = true;
+            label47.Location = new Point(455, 186);
+            label47.Name = "label47";
+            label47.Size = new Size(17, 15);
+            label47.TabIndex = 50;
+            label47.Tag = "0";
+            label47.Text = "%";
+            // 
+            // lblLastGear
+            // 
+            lblLastGear.AutoSize = true;
+            lblLastGear.Location = new Point(415, 186);
+            lblLastGear.Name = "lblLastGear";
+            lblLastGear.Size = new Size(34, 15);
+            lblLastGear.TabIndex = 49;
+            lblLastGear.Tag = "0";
+            lblLastGear.Text = "none";
+            lblLastGear.TextAlign = ContentAlignment.TopRight;
+            // 
+            // label50
+            // 
+            label50.AutoSize = true;
+            label50.Location = new Point(369, 186);
+            label50.Name = "label50";
+            label50.Size = new Size(34, 15);
+            label50.TabIndex = 48;
+            label50.Text = "Gear:";
+            label50.TextAlign = ContentAlignment.TopRight;
+            // 
             // frmMain
             // 
             AcceptButton = btnStartListening;
@@ -1714,5 +1751,8 @@
         private Label lblProcessingTimeUIAvg;
         private Label lblProcessingTimeUDPAvg;
         private Label label49;
+        private Label label47;
+        private Label lblLastGear;
+        private Label label50;
     }
 }
