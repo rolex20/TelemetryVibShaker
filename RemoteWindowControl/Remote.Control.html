@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Remote Control</title>
+    <link rel="stylesheet" href="https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/styles/24b6bbbc.site-ltr.css">
+    <script>
+        function validateForm() {
+            const select = document.getElementById('Process');
+            if (select.value>=0) {
+                return true; // Allow form submission
+            } else {
+                alert('Please select a value from the dropdown.');
+                return false; // Prevent form submission
+            }
+        }
+    </script>		
+  </head>
+  <body  leftmargin="100" topmargin="100">
+    <p><br>
+      <table width="30%" border="1" align="center">
+          <tr>
+            <td>
+              <form name="RemoteControlForm" 
+                method="POST" align="center" onsubmit="return validateForm()">
+                <p><br>
+                <p> Select Process:
+                  {cmbProcess}
+                </p>
+                <p><br> Select State:
+                  <select name="State">
+                    <option selected="selected" value="0">NoChange</option>
+                    <option value="-1">Minimize</option>
+                    <option value="1">Restore</option>
+                  </select>
+                </p>
+                <p><br> X Coordinate <input type='number' value="{X}" name="X" placeholder='type new X coordinates' step='10'>
+                </p>
+                <p><br> Y Coordinate <input type='number' value="{Y}" name="Y" placeholder='type new Y coordinates' step='10'><br>
+                </p>
+                <p><br><input type="submit" name="Submit" value="Submit">
+				<input type="submit" name="GetValues" value="GetValues">
+              </form>
+            </td>
+          </tr>
+		  <tr><td>{footer}</td></tr>
+      </table>
+    </p>
+  </body>
+</html>
