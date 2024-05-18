@@ -14,6 +14,7 @@ namespace RemoteWindowControl
         private int webServerThreadId;
         private int ExCounter = 0;  // Exceptions Counter
         private string HTML_Template;
+        private Mutex SingleInstanceMutex;
 
         [DllImport("kernel32.dll")]
         public static extern uint GetCurrentThreadId();
@@ -379,6 +380,8 @@ namespace RemoteWindowControl
 
         private void frmMain_Load(object sender, EventArgs e)
         {
+            SingleInstanceChecker();
+
             tabControls.SelectedIndex = 1;
 
             txtDebug.Tag = 0; // Used to track the number of errors detected
@@ -561,8 +564,58 @@ namespace RemoteWindowControl
             }
 
             regKey.Close();
+        }
 
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
 
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
+
+        [DllImport("user32.dll")]
+        private static extern bool IsIconic(IntPtr hWnd);
+
+        private void SingleInstanceChecker()
+        {
+            SingleInstanceMutex = new Mutex(true, this.Text + "_mutex", out bool createdNew);
+            if (!createdNew)
+            {
+                BringExistingInstanceToFront();
+                ShowNotification("Another instance of this application is already running.");                    
+                Application.Exit();
+            }
+        }
+
+        private void BringExistingInstanceToFront()
+        {
+            Process currentProcess = Process.GetCurrentProcess();
+            foreach (Process process in Process.GetProcessesByName(currentProcess.ProcessName))
+            {
+                if (process.Id != currentProcess.Id)
+                {
+                    IntPtr handle = process.MainWindowHandle;
+                    if (IsIconic(handle))
+                    {
+                        ShowWindowAsync(handle, SW_RESTORE);
+                    }
+                    SetForegroundWindow(handle);
+                    break;
+                }
+            }            
+        }
+
+        private void ShowNotification(string message)
+        {
+            NotifyIcon notifyIcon = new NotifyIcon
+            {
+                Visible = true,
+                Icon = SystemIcons.Information,
+                BalloonTipIcon = ToolTipIcon.Info,
+                BalloonTipTitle = "Application Notification",
+                BalloonTipText = message
+            };
+
+            notifyIcon.ShowBalloonTip(10000);
         }
     }
 }
