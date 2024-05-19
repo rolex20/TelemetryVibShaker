@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Forms;
 
 
 namespace RemoteWindowControl
@@ -111,7 +112,8 @@ namespace RemoteWindowControl
                 Process[] processes = Process.GetProcessesByName(ProcessName);
                 IntPtr windowHandle = processes[Instance].MainWindowHandle;
                 return windowHandle;
-            } catch
+            }
+            catch
             {
                 return IntPtr.Zero;
             }
@@ -150,7 +152,7 @@ namespace RemoteWindowControl
             return GetWindowPosition(windowHandle);
         }
 
-        private RECT GetWindowPosition(IntPtr  hWnd)
+        private RECT GetWindowPosition(IntPtr hWnd)
         {
             RECT rect = new RECT();
             if (hWnd != IntPtr.Zero)
@@ -160,7 +162,7 @@ namespace RemoteWindowControl
                 rect.Left = 0;
                 rect.Top = 0;
             }
-                
+
             return rect;
         }
 
@@ -255,7 +257,7 @@ namespace RemoteWindowControl
                                 if (parameters.TryGetValue("Submit", out temp))
                                 {
                                     LogError("Clicked Submit", "ProcessRequest()");
-                                    
+
                                     // Check required new state: Minimized, Restore, NoChange
                                     parameters.TryGetValue("State", out temp);
                                     int newState = int.TryParse(temp, out int parsedValue) ? parsedValue : 0;
@@ -277,6 +279,7 @@ namespace RemoteWindowControl
                     }
                 }
 
+                if (!chkUseCachedHTML.Checked) HTML_Template = ReadFileContents(txtHTML.Text);
                 string HTML = HTML_Template.Replace("{X}", newX.ToString());
                 HTML = HTML.Replace("{Y}", newY.ToString());
                 HTML = HTML.Replace("{cmbProcess}", GetHtmlProcessCombo(processName));
@@ -291,7 +294,7 @@ namespace RemoteWindowControl
         {
             StringBuilder html = new StringBuilder();
             html.Append("<select name='Process' required>");
-            for(int i=0; i<cmbProcesses.Items.Count; i++)
+            for (int i = 0; i < cmbProcesses.Items.Count; i++)
             {
                 string pname = cmbProcesses.Items[i].ToString();
                 string selected = pname.Equals(ProcessName) ? " selected " : String.Empty;
@@ -300,28 +303,6 @@ namespace RemoteWindowControl
             html.Append("</select>");
 
             return html.ToString();
-        }
-
-        private void MakeFormChanges(int x, int y, string topMost, string focus, string reset)
-        {
-            this.Invoke(new Action(() =>
-            {
-                //dispatcherUIThread = (int)GetCurrentThreadId();
-
-
-                //txtErrors.AppendText($"Moving form to x={x}, y={y}" + Environment.NewLine);
-
-                //if (x >= 0 && y >= 0)
-                this.Location = new System.Drawing.Point(x, y);
-
-                // If the user submitted the form with topMost empty, this means the user might want to set this property to false
-                this.TopMost = topMost != null;
-
-                if (focus != null) this.Activate();
-
-                if (reset != null) LogError("reset was called", "MakeFormChanges()");
-
-            }));
         }
 
         public string ReadFileContents(string filename)
@@ -392,6 +373,25 @@ namespace RemoteWindowControl
             LoadSettings(this);
             ProcessorCheck();
 
+            if (chkAutostart.Checked)
+            {
+                Task.Run(() => AutoStartWebServer());
+            }
+        }
+
+        private async Task AutoStartWebServer()
+        {
+            for (int i = 10; i >= 0; i--)
+            {
+                lblCountDownTimer.BeginInvoke(new Action(() => { lblCountDownTimer.Text = i.ToString(); }));
+                if (!chkAutostart.Checked || !btnStartWebServer.Enabled) break;
+                System.Threading.Thread.Sleep(1000);
+            }
+            lblCountDownTimer.BeginInvoke(new Action(() => { lblCountDownTimer.Text = String.Empty; }));
+
+            // Verify that the user hasn't aborted the autostart or clicked manually on btnStartWebServer
+            if (chkAutostart.Checked && btnStartWebServer.Enabled) 
+                btnStartWebServer_Click(null, null);
         }
 
         private void txtIPAddress_TextChanged(object sender, EventArgs e)
@@ -406,6 +406,9 @@ namespace RemoteWindowControl
 
         private void UpdateLink()
         {
+            // Check if this function is being called from a thread other than the UI thread
+            //lblLink.Invoke(new Action(() => lblLink.Text = $"http://{txtIPAddress.Text}:{txtPort.Text}/"));
+
             lblLink.Text = $"http://{txtIPAddress.Text}:{txtPort.Text}/";
         }
 
@@ -416,10 +419,15 @@ namespace RemoteWindowControl
 
         private void btnStartWebServer_Click(object sender, EventArgs e)
         {
-            UpdateLink();
+            this.BeginInvoke(new Action(() => {
+                btnStartWebServer.Enabled = false;
+                txtHTML.Enabled = false;
 
-            txtHTML.Enabled = false;
-            btnStartWebServer.Enabled = false;
+                UpdateLink();
+            }));
+
+
+            //Prepare the cached copy of the HTML Template
             HTML_Template = ReadFileContents(txtHTML.Text);
 
             StartWebServer();
@@ -581,7 +589,7 @@ namespace RemoteWindowControl
             if (!createdNew)
             {
                 BringExistingInstanceToFront();
-                ShowNotification("Another instance of this application is already running.");                    
+                ShowNotification("Another instance of this application is already running.");
                 Application.Exit();
             }
         }
@@ -601,7 +609,7 @@ namespace RemoteWindowControl
                     SetForegroundWindow(handle);
                     break;
                 }
-            }            
+            }
         }
 
         private void ShowNotification(string message)
@@ -617,5 +625,14 @@ namespace RemoteWindowControl
 
             notifyIcon.ShowBalloonTip(10000);
         }
+
+        private void lblLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            var processInfo = new ProcessStartInfo($"microsoft-edge:{lblLink.Text}");
+            processInfo.UseShellExecute = true;
+            Process.Start(processInfo);
+        }
+
+
     }
 }

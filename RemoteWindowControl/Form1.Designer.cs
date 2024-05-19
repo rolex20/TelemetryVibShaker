@@ -44,6 +44,9 @@
             label1 = new Label();
             txtXCoord = new TextBox();
             tabSettings = new TabPage();
+            chkUseCachedHTML = new CheckBox();
+            lblCountDownTimer = new Label();
+            chkAutostart = new CheckBox();
             chkUseEfficiencyCoresOnly = new CheckBox();
             btnStartWebServer = new Button();
             txtHTML = new TextBox();
@@ -221,6 +224,9 @@
             // 
             // tabSettings
             // 
+            tabSettings.Controls.Add(chkUseCachedHTML);
+            tabSettings.Controls.Add(lblCountDownTimer);
+            tabSettings.Controls.Add(chkAutostart);
             tabSettings.Controls.Add(chkUseEfficiencyCoresOnly);
             tabSettings.Controls.Add(btnStartWebServer);
             tabSettings.Controls.Add(txtHTML);
@@ -240,6 +246,40 @@
             tabSettings.Text = "Settings";
             tabSettings.UseVisualStyleBackColor = true;
             // 
+            // chkUseCachedHTML
+            // 
+            chkUseCachedHTML.AutoSize = true;
+            chkUseCachedHTML.Checked = true;
+            chkUseCachedHTML.CheckState = CheckState.Checked;
+            chkUseCachedHTML.Location = new Point(21, 239);
+            chkUseCachedHTML.Name = "chkUseCachedHTML";
+            chkUseCachedHTML.Size = new Size(172, 19);
+            chkUseCachedHTML.TabIndex = 13;
+            chkUseCachedHTML.Text = "Use cached HTML Template";
+            chkUseCachedHTML.UseVisualStyleBackColor = true;
+            // 
+            // lblCountDownTimer
+            // 
+            lblCountDownTimer.AutoSize = true;
+            lblCountDownTimer.Location = new Point(206, 215);
+            lblCountDownTimer.Name = "lblCountDownTimer";
+            lblCountDownTimer.Size = new Size(22, 15);
+            lblCountDownTimer.TabIndex = 12;
+            lblCountDownTimer.Tag = "";
+            lblCountDownTimer.Text = "---";
+            // 
+            // chkAutostart
+            // 
+            chkAutostart.AutoSize = true;
+            chkAutostart.Checked = true;
+            chkAutostart.CheckState = CheckState.Checked;
+            chkAutostart.Location = new Point(21, 214);
+            chkAutostart.Name = "chkAutostart";
+            chkAutostart.Size = new Size(186, 19);
+            chkAutostart.TabIndex = 11;
+            chkAutostart.Text = "Auto start web server on load: ";
+            chkAutostart.UseVisualStyleBackColor = true;
+            // 
             // chkUseEfficiencyCoresOnly
             // 
             chkUseEfficiencyCoresOnly.AutoSize = true;
@@ -247,7 +287,7 @@
             chkUseEfficiencyCoresOnly.CheckState = CheckState.Checked;
             chkUseEfficiencyCoresOnly.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Bold, GraphicsUnit.Point);
             chkUseEfficiencyCoresOnly.ForeColor = Color.FromArgb(91, 155, 213);
-            chkUseEfficiencyCoresOnly.Location = new Point(21, 228);
+            chkUseEfficiencyCoresOnly.Location = new Point(21, 265);
             chkUseEfficiencyCoresOnly.Name = "chkUseEfficiencyCoresOnly";
             chkUseEfficiencyCoresOnly.Size = new Size(290, 19);
             chkUseEfficiencyCoresOnly.TabIndex = 10;
@@ -258,7 +298,7 @@
             // 
             // btnStartWebServer
             // 
-            btnStartWebServer.Location = new Point(153, 283);
+            btnStartWebServer.Location = new Point(185, 295);
             btnStartWebServer.Name = "btnStartWebServer";
             btnStartWebServer.Size = new Size(126, 23);
             btnStartWebServer.TabIndex = 9;
@@ -268,16 +308,16 @@
             // 
             // txtHTML
             // 
-            txtHTML.Location = new Point(153, 175);
+            txtHTML.Location = new Point(153, 173);
             txtHTML.Name = "txtHTML";
-            txtHTML.Size = new Size(126, 23);
+            txtHTML.Size = new Size(158, 23);
             txtHTML.TabIndex = 8;
             txtHTML.Text = ".\\Remote.Control.html";
             // 
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(44, 178);
+            label6.Location = new Point(44, 176);
             label6.Name = "label6";
             label6.Size = new Size(93, 15);
             label6.TabIndex = 7;
@@ -313,12 +353,13 @@
             // lblLink
             // 
             lblLink.AutoSize = true;
-            lblLink.Location = new Point(153, 140);
+            lblLink.Location = new Point(153, 138);
             lblLink.Name = "lblLink";
             lblLink.Size = new Size(60, 15);
             lblLink.TabIndex = 3;
             lblLink.TabStop = true;
             lblLink.Text = "linkLabel1";
+            lblLink.LinkClicked += lblLink_LinkClicked;
             // 
             // lblWebServerThreadId
             // 
@@ -333,7 +374,7 @@
             // 
             txtPort.Location = new Point(153, 62);
             txtPort.Name = "txtPort";
-            txtPort.Size = new Size(126, 23);
+            txtPort.Size = new Size(158, 23);
             txtPort.TabIndex = 1;
             txtPort.Text = "8081";
             txtPort.TextChanged += txtPort_TextChanged;
@@ -342,7 +383,7 @@
             // 
             txtIPAddress.Location = new Point(153, 21);
             txtIPAddress.Name = "txtIPAddress";
-            txtIPAddress.Size = new Size(126, 23);
+            txtIPAddress.Size = new Size(158, 23);
             txtIPAddress.TabIndex = 0;
             txtIPAddress.Text = "192.168.1.5";
             txtIPAddress.TextChanged += txtIPAddress_TextChanged;
@@ -369,6 +410,7 @@
             // 
             // frmMain
             // 
+            AcceptButton = btnStartWebServer;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(376, 391);
@@ -421,5 +463,8 @@
         private Button btnStartWebServer;
         private Button button1;
         private CheckBox chkUseEfficiencyCoresOnly;
+        private CheckBox chkAutostart;
+        private Label lblCountDownTimer;
+        private CheckBox chkUseCachedHTML;
     }
 }

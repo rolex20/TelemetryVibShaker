@@ -202,5 +202,29 @@ namespace RemoteWindowControl.Properties {
                 this["YCoordinate"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool chkAutostart {
+            get {
+                return ((bool)(this["chkAutostart"]));
+            }
+            set {
+                this["chkAutostart"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool chkUseCachedHTML {
+            get {
+                return ((bool)(this["chkUseCachedHTML"]));
+            }
+            set {
+                this["chkUseCachedHTML"] = value;
+            }
+        }
     }
 }
