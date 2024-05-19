@@ -21,22 +21,11 @@
     color: #333;
   }  
 </style>
-    <script>
-        function validateForm() {
-            const select = document.getElementById('Process');
-            if (select.value>=0) {
-                return true; // Allow form submission
-            } else {
-                alert('Please select a value from the dropdown.');
-                return false; // Prevent form submission
-            }
-        }
-    </script>	
 </head>
 <body>
 
 <div class="container">
-<form name="RemoteControlForm" method="POST" align="center" onsubmit="return validateForm()">
+<form name="RemoteControlForm" method="POST" align="center">
   <h2>Window Remote Movement</h2>
   <p class="welcome-message">Use this app to move windows to other monitors when playing in VR</p>
   
