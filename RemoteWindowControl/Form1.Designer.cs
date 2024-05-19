@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             tabControls = new TabControl();
             tabMovements = new TabPage();
             button1 = new Button();
@@ -416,6 +417,7 @@
             ClientSize = new Size(376, 391);
             Controls.Add(tabControls);
             FormBorderStyle = FormBorderStyle.Fixed3D;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "frmMain";
             Text = "Window Remote Control";
