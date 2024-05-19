@@ -430,5 +430,17 @@ namespace TelemetryVibShaker.Properties {
                 this["nudMinAltitude"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool chkAutoStart {
+            get {
+                return ((bool)(this["chkAutoStart"]));
+            }
+            set {
+                this["chkAutoStart"] = value;
+            }
+        }
     }
 }

@@ -74,6 +74,8 @@
             label14 = new Label();
             label12 = new Label();
             tabSettings = new TabPage();
+            lblCountDownTimer = new Label();
+            chkAutoStart = new CheckBox();
             nudMinAltitude = new NumericUpDown();
             label38 = new Label();
             label39 = new Label();
@@ -101,6 +103,9 @@
             btnTestArduinoMotors = new Button();
             tabMonitor = new TabPage();
             panel1 = new Panel();
+            label47 = new Label();
+            lblLastGear = new Label();
+            label50 = new Label();
             lblProcessingTimeUIAvg = new Label();
             lblProcessingTimeUDPAvg = new Label();
             label49 = new Label();
@@ -156,9 +161,6 @@
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             btnResetMax = new Button();
-            label47 = new Label();
-            lblLastGear = new Label();
-            label50 = new Label();
             tabs.SuspendLayout();
             tabNormalSoundEffects.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier2).BeginInit();
@@ -660,6 +662,8 @@
             // 
             // tabSettings
             // 
+            tabSettings.Controls.Add(lblCountDownTimer);
+            tabSettings.Controls.Add(chkAutoStart);
             tabSettings.Controls.Add(nudMinAltitude);
             tabSettings.Controls.Add(label38);
             tabSettings.Controls.Add(label39);
@@ -684,6 +688,26 @@
             tabSettings.TabIndex = 4;
             tabSettings.Text = "General Settings";
             tabSettings.UseVisualStyleBackColor = true;
+            // 
+            // lblCountDownTimer
+            // 
+            lblCountDownTimer.AutoSize = true;
+            lblCountDownTimer.Location = new Point(174, 317);
+            lblCountDownTimer.Name = "lblCountDownTimer";
+            lblCountDownTimer.Size = new Size(22, 15);
+            lblCountDownTimer.TabIndex = 23;
+            lblCountDownTimer.Text = "---";
+            // 
+            // chkAutoStart
+            // 
+            chkAutoStart.AutoSize = true;
+            chkAutoStart.Location = new Point(17, 316);
+            chkAutoStart.Name = "chkAutoStart";
+            chkAutoStart.Size = new Size(151, 19);
+            chkAutoStart.TabIndex = 22;
+            chkAutoStart.Text = "Auto start after Loading";
+            toolTip1.SetToolTip(chkAutoStart, "Auto start Listening when the program starts");
+            chkAutoStart.UseVisualStyleBackColor = true;
             // 
             // nudMinAltitude
             // 
@@ -732,33 +756,38 @@
             // chkUseBackgroundProcessing
             // 
             chkUseBackgroundProcessing.AutoSize = true;
-            chkUseBackgroundProcessing.Location = new Point(17, 314);
+            chkUseBackgroundProcessing.Enabled = false;
+            chkUseBackgroundProcessing.Location = new Point(17, 278);
             chkUseBackgroundProcessing.Name = "chkUseBackgroundProcessing";
             chkUseBackgroundProcessing.Size = new Size(206, 19);
             chkUseBackgroundProcessing.TabIndex = 17;
             chkUseBackgroundProcessing.Text = "Use background processing mode";
             chkUseBackgroundProcessing.UseVisualStyleBackColor = true;
+            chkUseBackgroundProcessing.Visible = false;
             chkUseBackgroundProcessing.CheckedChanged += chkUseBackgroundProcessing_CheckedChanged;
             // 
             // cmbPriorityClass
             // 
             cmbPriorityClass.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbPriorityClass.Enabled = false;
             cmbPriorityClass.FormattingEnabled = true;
             cmbPriorityClass.Items.AddRange(new object[] { "NORMAL", "BELOW NORMAL", "IDLE" });
-            cmbPriorityClass.Location = new Point(144, 277);
+            cmbPriorityClass.Location = new Point(371, 276);
             cmbPriorityClass.Name = "cmbPriorityClass";
             cmbPriorityClass.Size = new Size(121, 23);
             cmbPriorityClass.TabIndex = 15;
+            cmbPriorityClass.Visible = false;
             cmbPriorityClass.SelectedIndexChanged += cmbPriorityClass_SelectedIndexChanged;
             // 
             // label30
             // 
             label30.AutoSize = true;
-            label30.Location = new Point(17, 280);
+            label30.Location = new Point(244, 279);
             label30.Name = "label30";
             label30.Size = new Size(121, 15);
             label30.TabIndex = 14;
             label30.Text = "Process Priority Class:";
+            label30.Visible = false;
             // 
             // nudMinSpeed
             // 
@@ -1009,6 +1038,37 @@
             panel1.Size = new Size(503, 299);
             panel1.TabIndex = 10;
             // 
+            // label47
+            // 
+            label47.AutoSize = true;
+            label47.Location = new Point(455, 186);
+            label47.Name = "label47";
+            label47.Size = new Size(17, 15);
+            label47.TabIndex = 50;
+            label47.Tag = "0";
+            label47.Text = "%";
+            // 
+            // lblLastGear
+            // 
+            lblLastGear.AutoSize = true;
+            lblLastGear.Location = new Point(415, 186);
+            lblLastGear.Name = "lblLastGear";
+            lblLastGear.Size = new Size(34, 15);
+            lblLastGear.TabIndex = 49;
+            lblLastGear.Tag = "0";
+            lblLastGear.Text = "none";
+            lblLastGear.TextAlign = ContentAlignment.TopRight;
+            // 
+            // label50
+            // 
+            label50.AutoSize = true;
+            label50.Location = new Point(369, 186);
+            label50.Name = "label50";
+            label50.Size = new Size(34, 15);
+            label50.TabIndex = 48;
+            label50.Text = "Gear:";
+            label50.TextAlign = ContentAlignment.TopRight;
+            // 
             // lblProcessingTimeUIAvg
             // 
             lblProcessingTimeUIAvg.AutoSize = true;
@@ -1018,7 +1078,7 @@
             lblProcessingTimeUIAvg.TabIndex = 47;
             lblProcessingTimeUIAvg.Tag = "-1";
             lblProcessingTimeUIAvg.Text = "UI time";
-            toolTip1.SetToolTip(lblProcessingTimeUIAvg, "Max UI processing time (monitor).  Ignores the first one.");
+            toolTip1.SetToolTip(lblProcessingTimeUIAvg, "Avg UI processing time (monitor).  Ignores the first one.");
             // 
             // lblProcessingTimeUDPAvg
             // 
@@ -1027,7 +1087,9 @@
             lblProcessingTimeUDPAvg.Name = "lblProcessingTimeUDPAvg";
             lblProcessingTimeUDPAvg.Size = new Size(57, 15);
             lblProcessingTimeUDPAvg.TabIndex = 46;
+            lblProcessingTimeUDPAvg.Tag = "-1";
             lblProcessingTimeUDPAvg.Text = "UDP time";
+            toolTip1.SetToolTip(lblProcessingTimeUDPAvg, "Avg UDP Packet processing time.  This value is tracked for each different UnitType (aircraft).");
             // 
             // label49
             // 
@@ -1048,7 +1110,7 @@
             lblProcessingTimeUIMin.TabIndex = 44;
             lblProcessingTimeUIMin.Tag = "-1";
             lblProcessingTimeUIMin.Text = "UI time";
-            toolTip1.SetToolTip(lblProcessingTimeUIMin, "Max UI processing time (monitor).  Ignores the first one.");
+            toolTip1.SetToolTip(lblProcessingTimeUIMin, "Min UI processing time (monitor).  Ignores the first one.");
             // 
             // lblProcessingTimeUDPMin
             // 
@@ -1057,7 +1119,9 @@
             lblProcessingTimeUDPMin.Name = "lblProcessingTimeUDPMin";
             lblProcessingTimeUDPMin.Size = new Size(57, 15);
             lblProcessingTimeUDPMin.TabIndex = 43;
+            lblProcessingTimeUDPMin.Tag = "-1";
             lblProcessingTimeUDPMin.Text = "UDP time";
+            toolTip1.SetToolTip(lblProcessingTimeUDPMin, "Min UDP Packet processing time.  This value is tracked for each different UnitType (aircraft).");
             // 
             // label46
             // 
@@ -1544,37 +1608,6 @@
             btnResetMax.UseVisualStyleBackColor = true;
             btnResetMax.Click += btnResetMax_Click;
             // 
-            // label47
-            // 
-            label47.AutoSize = true;
-            label47.Location = new Point(455, 186);
-            label47.Name = "label47";
-            label47.Size = new Size(17, 15);
-            label47.TabIndex = 50;
-            label47.Tag = "0";
-            label47.Text = "%";
-            // 
-            // lblLastGear
-            // 
-            lblLastGear.AutoSize = true;
-            lblLastGear.Location = new Point(415, 186);
-            lblLastGear.Name = "lblLastGear";
-            lblLastGear.Size = new Size(34, 15);
-            lblLastGear.TabIndex = 49;
-            lblLastGear.Tag = "0";
-            lblLastGear.Text = "none";
-            lblLastGear.TextAlign = ContentAlignment.TopRight;
-            // 
-            // label50
-            // 
-            label50.AutoSize = true;
-            label50.Location = new Point(369, 186);
-            label50.Name = "label50";
-            label50.Size = new Size(34, 15);
-            label50.TabIndex = 48;
-            label50.Text = "Gear:";
-            label50.TextAlign = ContentAlignment.TopRight;
-            // 
             // frmMain
             // 
             AcceptButton = btnStartListening;
@@ -1754,5 +1787,7 @@
         private Label label47;
         private Label lblLastGear;
         private Label label50;
+        private CheckBox chkAutoStart;
+        private Label lblCountDownTimer;
     }
 }

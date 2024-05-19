@@ -145,18 +145,18 @@ namespace TelemetryVibShaker
                 cmbAudioDevice1.Items.Add(capabilities.ProductName);
 
                 var device = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)[n];
-                Debug.Print(device.FriendlyName);                
-            } 
-/*
-            // Create enumerator
-            var enumerator = new MMDeviceEnumerator();
-            // Skip the -1 Microsoft Audio Mapper
-            for (int n = 0; n < WaveOut.DeviceCount; n++)
-            {
-                var device = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)[n];
-                cmbAudioDevice1.Items.Add($"{device.ID} - {device.InstanceId} - {device.FriendlyName}");
+                Debug.Print(device.FriendlyName);
             }
-*/
+            /*
+                        // Create enumerator
+                        var enumerator = new MMDeviceEnumerator();
+                        // Skip the -1 Microsoft Audio Mapper
+                        for (int n = 0; n < WaveOut.DeviceCount; n++)
+                        {
+                            var device = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)[n];
+                            cmbAudioDevice1.Items.Add($"{device.ID} - {device.InstanceId} - {device.FriendlyName}");
+                        }
+            */
         }
 
 
@@ -295,7 +295,7 @@ namespace TelemetryVibShaker
 
         private void frmMain_Load(object sender, EventArgs e)
         {
-
+            SingleInstanceChecker();
 
             // Initialize max timers
             btnResetMax_Click(null, null);
@@ -353,9 +353,33 @@ namespace TelemetryVibShaker
             UpdateSoundEffectStatus(SoundEffectStatus.NotPlaying);
 
 
-
-
+            if (chkAutoStart.Checked)
+            {
+                Task.Run(() => AutoStartWebServer());
+            }
         }
+
+        private async Task AutoStartWebServer()
+        {
+            for (int i = 10; i >= 0; i--)
+            {
+                lblCountDownTimer.BeginInvoke(new Action(() => { lblCountDownTimer.Text = i.ToString(); }));
+                if (!chkAutoStart.Checked || !btnStartListening.Enabled) break;
+                System.Threading.Thread.Sleep(1000);
+            }
+            lblCountDownTimer.BeginInvoke(new Action(() => { lblCountDownTimer.Text = String.Empty; }));
+
+            this.Invoke((MethodInvoker)delegate
+            {
+                // Code here will run on the UI thread
+                // We can safely interact with UI elements
+
+                // Verify that the user hasn't aborted the autostart or clicked manually on btnStartListening
+                if (chkAutoStart.Checked && btnStartListening.Enabled)
+                    btnStartListening_Click(null, null);
+            });
+        }
+
 
         private void trkEffectTimeout_Scroll(object sender, EventArgs e)
         {
@@ -454,7 +478,7 @@ namespace TelemetryVibShaker
             // currently I have only found how to turn them on or off, not how to control the strength
             // however this interface simplifies the creation of effect points
             //points = new MotorStrengthPoints(11, 100, 15, 100, 16, 100, 255, 255);
-            points = new MotorStrengthPoints(1, 0, 89, 0, 90, 100, 100, 100);
+            points = new MotorStrengthPoints(1, 0, 98, 0, 99, 100, 100, 100);
             TWatchEffects[0] = new EffectDefinition(VibrationEffectType.Gear, points, chkTWatchVibrate.Checked);
 
             // AoA Background Color Display
@@ -570,6 +594,7 @@ namespace TelemetryVibShaker
                 {
                     float f => $"{f:F1}",
                     string s => s,
+                    int s => s==int.MaxValue ? "N/A": s.ToString(),
                     _ => value.ToString()
                 };
             }
@@ -1018,6 +1043,62 @@ namespace TelemetryVibShaker
         private void nudMinAltitude_ValueChanged(object sender, EventArgs e)
         {
             if (telemetry != null) telemetry.MinAltitude = (int)nudMinAltitude.Value;
+        }
+
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
+
+        [DllImport("user32.dll")]
+        private static extern bool IsIconic(IntPtr hWnd);
+
+        private const int SW_RESTORE = 9;
+
+        private Mutex singleInstanceChecker;
+
+        private void SingleInstanceChecker()
+        {
+            singleInstanceChecker = new Mutex(true, this.Text + "_mutex", out bool createdNew);
+            if (!createdNew)
+            {
+                BringExistingInstanceToFront();
+                ShowNotification("Another instance of this application is already running.");
+                Application.Exit();
+            }
+        }
+
+        private void BringExistingInstanceToFront()
+        {
+            Process currentProcess = Process.GetCurrentProcess();
+            foreach (Process process in Process.GetProcessesByName(currentProcess.ProcessName))
+            {
+                if (process.Id != currentProcess.Id)
+                {
+                    IntPtr handle = process.MainWindowHandle;
+                    if (IsIconic(handle))
+                    {
+                        ShowWindowAsync(handle, SW_RESTORE);
+                    }
+                    SetForegroundWindow(handle);
+                    break;
+                }
+            }
+        }
+
+        private void ShowNotification(string message)
+        {
+            NotifyIcon notifyIcon = new NotifyIcon
+            {
+                Visible = true,
+                Icon = SystemIcons.Information,
+                BalloonTipIcon = ToolTipIcon.Info,
+                BalloonTipTitle = "Application Notification",
+                BalloonTipText = message
+            };
+
+            notifyIcon.ShowBalloonTip(10000);
         }
     }
 }
