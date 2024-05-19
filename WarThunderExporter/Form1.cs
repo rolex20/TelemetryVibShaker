@@ -445,7 +445,11 @@ namespace WarThunderExporter
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            WarThunderTelemetryAsync();
+            // Some times there is a long wait caused by War Thunder to deliver the response
+            timer1.Enabled = false;
+
+            // Async function call, don't wait
+            WarThunderTelemetryAsync(); // this function re-enables timer1 when it finishes
         }
 
         public static void SendCallback(IAsyncResult ar)
@@ -486,9 +490,11 @@ namespace WarThunderExporter
         // The function is large, but straightforward to understand and almost no indirection-levels required to understand it
         private async Task WarThunderTelemetryAsync()
         {
-            timer1.Enabled = false; // some times there is a long wait caused by War Thunder to deliver the response
-            bool ShowStatistics_cache = chkShowStatistics.Checked; // to avoid repetitive calls to the getter
+            // Some times there is a long wait caused by War Thunder to deliver the response
+            // timer1.Enabled = false; // Now this is done in the caller
 
+            // Avoid repetitive calls to the getter
+            bool ShowStatistics_cache = chkShowStatistics.Checked; 
 
 
             try
