@@ -692,7 +692,7 @@
             // lblCountDownTimer
             // 
             lblCountDownTimer.AutoSize = true;
-            lblCountDownTimer.Location = new Point(174, 317);
+            lblCountDownTimer.Location = new Point(179, 317);
             lblCountDownTimer.Name = "lblCountDownTimer";
             lblCountDownTimer.Size = new Size(22, 15);
             lblCountDownTimer.TabIndex = 23;

@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Text;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using WarThunderExporter;
+
 
 
 namespace TelemetryVibShaker

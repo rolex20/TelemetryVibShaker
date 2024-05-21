@@ -4,9 +4,7 @@ using System.Net.Sockets;
 using System.Net;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
-using System;
 using NAudio.CoreAudioApi;
-using WarThunderExporter;
 
 
 namespace TelemetryVibShaker
