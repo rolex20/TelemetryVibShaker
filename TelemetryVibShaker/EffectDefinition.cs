@@ -49,7 +49,7 @@ namespace TelemetryVibShaker
                 case VibrationEffectType.BackgroundFlaps:
                     return points.GetBackgroundColor(Telemetry.Flaps);
                 case VibrationEffectType.Gear:
-                    return points.GetBackgroundColor(Telemetry.Gear);
+                    return points.CalculateOutput(Telemetry.Gear);
                 case VibrationEffectType.Nothing:
                     return 0;
                 default:
