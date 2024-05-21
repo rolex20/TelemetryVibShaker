@@ -1,4 +1,4 @@
 // wifi configuration
 
-#define SECRET_SSID "*****"
-#define SECRET_PASS "*****"
+#define SECRET_SSID "Disabled_2.4Ghz"
+#define SECRET_PASS "et2v80iekd"

@@ -1,19 +1,26 @@
 
-// Global variables
+// Global variables for UI housekeeping
 
 int initialBattPercentage = 0;                // Initial battery level when not charging
 ulong initialBattTimeStamp = 0;   // and corresponding timestamp
-
 ulong lastClockTimeStamp = 10; // last time the clock was updated,setting this to 10 minutes forces the initial update, no need to change this
-String percentageString;              // global to avoid constructor on each local call
+String string;              // global to avoid constructor on each local call
 
+
+// Clock globals
 PCF8563_Class *rtc;
 TFT_eSPI *tft;
 bool rtcIrq = false;
+
+// Cpu Mhz
+uint32_t currentCpuFrequencyMhz = 0;
+
+// Definition of ntp server, gmt offset, etc
 #include "config_time.h"
 
-
+//****************************************************************
 // Functions to maintain the UI updated and used for initial setup
+//****************************************************************
 
 // Use the line equation from two points to predict battery level
 // x = (y +mx1 - y1)/m
@@ -65,34 +72,51 @@ int BattMinutesLeft(ulong now)
 // Wake the screen if the user touches the touchscreen
 bool AwakeScreenOnTouch(ulong now)
 {
+
     if (digitalRead(TP_INT) == LOW) {
-      screenSaver.AwakeScreen(now, 128);
+      if (screenSaver.GetCurrentBrightness() == REG_BRIGHTNESS) // turn on/off the screen on each press
+      {
+          screenSaver.AwakeScreen(now, TURN_OFF_LCD);
+          return false;      
+      }
+
+      screenSaver.AwakeScreen(now, REG_BRIGHTNESS);
       return true;
     } else {
-      screenSaver.SaveScreen(now, 30);
+      screenSaver.SaveScreen(now, LOW_BRIGHTNESS);
       return false;
     }
+
+
 }
 
 void ShowBatteryPercentage(ulong now) 
 {
-      int minutesLeft = BattMinutesLeft(now);
-      percentageString = (minutesLeft>=0) ? " - minleft:" + String(minutesLeft): "                 ";
+      string = String(ttgo->power->getBattPercentage()) + "%    ";
+      tft->drawString(string, 10, 220);
 
-      percentageString = String(ttgo->power->getBattPercentage()) + "%"  + percentageString;
-      tft->drawString(percentageString, 10, 200);
+      int minutesLeft = BattMinutesLeft(now);
+      string = (minutesLeft>=0) ? " minleft:" + String(minutesLeft): "                 ";
+      tft->drawString(string, 55, 220);
 }
 
 void UpdateClock() 
 {
       tft->drawString(rtc->formatDateTime(PCF_TIMEFORMAT_HM), 15, 80, 7);
-      tft->drawString(rtc->formatDateTime(PCF_TIMEFORMAT_YYYY_MM_DD), 60, 160);
+      tft->drawString(rtc->formatDateTime(PCF_TIMEFORMAT_YYYY_MM_DD), 60, 145);
 }
 
 // If the watch is charging, draw a small circle at the top right corner of the screen
 void ShowChargingStatus()
 {
       ttgo->tft->fillCircle(ttgo->tft->width() - 10, ttgo->tft->height() / 2, 5, (ttgo->power->isChargeing()) ? TFT_GREEN: TFT_BLACK);
+}
+
+// Show if WiFi is still connected
+void ShowWiFiStatus() 
+{
+  string = (WiFi.status() == WL_CONNECTED)? WiFi.SSID(): "                ";
+  tft->drawString(string, 65, 195, 2);
 }
 
 // Print the time every minute
@@ -106,10 +130,15 @@ void UpdateUI(bool forcedUpdate, ulong now)
       UpdateClock();      
       ShowBatteryPercentage(now);
       ShowChargingStatus();
+      ShowWiFiStatus();
     }      
 }
 
 
+
+//**************************************************************************
+//Setup routines
+//**************************************************************************
 void initialSetup() {
     Serial.begin(115200);
     while (!Serial) {
@@ -123,8 +152,8 @@ void initialSetup() {
     ttgo->openBL();
 
     screenSaver.SetTTGO(ttgo);
-    screenSaver.SetBrightness(255);
-    ttgo->tft->fillScreen(TFT_BLACK);
+    screenSaver.SetBrightness(0, 255);      // invoke with ficticious timestamps
+    screenSaver.SetBackground(1, TFT_BLACK);// invoke with ficticious timestamps, but different
 
     rtc = ttgo->rtc;
 
@@ -132,9 +161,13 @@ void initialSetup() {
 
     tft->setTextColor(TFT_GREEN, TFT_BLACK);
 
+    // show program name
+    tft->println("TTGO TELEMETRY UDP SERVER");
+
     // print current Cpu Speed
     tft->print("Current CPU Speed in Mhz: ");
-    tft->println(getCpuFrequencyMhz());    
+    currentCpuFrequencyMhz = getCpuFrequencyMhz();
+    tft->println(currentCpuFrequencyMhz);    
 
     // print previous clock
     tft->print("Previous clock: ");
@@ -165,18 +198,44 @@ void initialWiFiSetup() {
 
 
 void initialClockSetup() {
-    tft->print("NTP time sync: ");
+
+    tft->print("NTP time sync... ");
     //init and get the time
     configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 
     struct tm timeinfo;
     if (!getLocalTime(&timeinfo)) {
-        tft->println("Failed to obtain time, Restart in 3 seconds");
-        delay(3000);
-        esp_restart();
-        while (1);
+        tft->println("Failed, ignoring.");
+        //delay(3000);
+        //esp_restart();
+        //while (1);
+    } else {
+      // Sync local time to external RTC
+      rtc->syncToRtc();
     }
-    // Sync local time to external RTC
-    rtc->syncToRtc();
+
+    // print current time
     tft->println(rtc->formatDateTime(PCF_TIMEFORMAT_HMS));
+
 }
+
+
+// Clock Speed Routines
+void GoLowSpeed() {
+    if (currentCpuFrequencyMhz != 20) {  
+      currentCpuFrequencyMhz = 20;
+      setCpuFrequencyMhz(currentCpuFrequencyMhz);
+    }
+}
+
+void GoHighSpeed() {
+    if (currentCpuFrequencyMhz != 240) {
+      currentCpuFrequencyMhz = 240;
+      setCpuFrequencyMhz(currentCpuFrequencyMhz);
+    }
+}
+
+uint32_t GetCurrentCpuSpeedMhz() {
+  return currentCpuFrequencyMhz;
+}
+
