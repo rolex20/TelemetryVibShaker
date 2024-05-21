@@ -3,14 +3,15 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Diagnostics;
 using Microsoft.Win32;
-using System.Threading;
 using System.ServiceProcess;
 using System.Linq;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Data;
+using NAudio.Wave;
+using NAudio.CoreAudioApi;
 
 
 
@@ -29,11 +30,26 @@ namespace PerformanceMonitor
         private int webServerThreadId, dispatcherUIThread;
         private Process currentProcess;
 
+        private int maxCpuUtil, maxGpuUtil;
+        string maxCpuName;
+
+        private MediaPlayer mpCpu, mpGpu;
+
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             Properties.Settings.Default.TimerInterval = (int)nudPollingInterval.Value;
             Properties.Settings.Default.PriorityClassSelectedIndex = cmbPriorityClass.SelectedIndex;
+
+            Properties.Settings.Default.chkCpuAlarm = chkCpuAlarm.Checked;
+            Properties.Settings.Default.chkGpuAlarm = chkGpuAlarm.Checked;
+            Properties.Settings.Default.trkCpuThreshold = trkCpuThreshold.Value;
+            Properties.Settings.Default.trkGpuThreshold = trkGpuThreshold.Value;
+            Properties.Settings.Default.txtCpuAlarm = txtCpuAlarm.Text;
+            Properties.Settings.Default.txtGpuAlarm = txtGpuAlarm.Text;
+            Properties.Settings.Default.trkCpuVolume = trkCpuVolume.Value;
+            Properties.Settings.Default.trkGpuVolume = trkGpuVolume.Value;
+
             Properties.Settings.Default.Save();
         }
 
@@ -110,9 +126,74 @@ namespace PerformanceMonitor
         [DllImport("kernel32.dll")]
         public static extern IntPtr GetCurrentThread();
 
+        private void trkCpuVolume_Scroll(object sender, EventArgs e)
+        {
+            lblCpuVolume.Text = trkCpuVolume.Value.ToString();
+        }
+
+        private void trkGpuVolume_Scroll(object sender, EventArgs e)
+        {
+            lblGpuVolume.Text = trkGpuVolume.Value.ToString();
+        }
+
+        private void trkCpuThreshold_Scroll(object sender, EventArgs e)
+        {
+            lblCpuThreshold.Text = trkCpuThreshold.Value.ToString();
+        }
+
+        private void trkGpuThreshold_Scroll(object sender, EventArgs e)
+        {
+            lblGpuThreshold.Text = trkGpuThreshold.Value.ToString();
+        }
+
+        private void cmbAudioDevice1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ChangeAudioDevice(mpCpu, cmbAudioDevice1.SelectedIndex);
+            ChangeAudioDevice(mpGpu, cmbAudioDevice1.SelectedIndex);
+        }
+        
+        private void ChangeAudioDevice(MediaPlayer mp, int audioDeviceIndex)
+        {
+            if (mp!=null) mp.ChangeAudioDevice(audioDeviceIndex);
+        }
+
+        private void chkCpuAlarm_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkCpuAlarm.Checked)
+            {
+                mpCpu = new MediaPlayer(cmbAudioDevice1.SelectedIndex);
+                mpCpu.Open(txtCpuAlarm.Text);
+                mpCpu.Volume = 0.0f;
+                mpCpu.PlayLooping();
+            } else
+            {
+                mpCpu.Dispose();
+                mpCpu = null;
+            }
+        }
+
+        private void chkGpuAlarm_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkGpuAlarm.Checked)
+            {
+                mpGpu = new MediaPlayer(cmbAudioDevice1.SelectedIndex);
+                mpGpu.Open(txtGpuAlarm.Text);
+                mpGpu.Volume = 0.0f;
+                mpGpu.PlayLooping();
+            }
+            else
+            {
+                mpGpu.Dispose();
+                mpGpu = null;
+            }
+        }
+
+
+
         // Import the SetThreadIdealProcessor API
         [DllImport("kernel32.dll")]
         public static extern uint SetThreadIdealProcessor(IntPtr hThread, uint dwIdealProcessor);
+
 
         [DllImport("kernel32.dll")]
         public static extern uint GetCurrentThreadId();
@@ -159,6 +240,22 @@ namespace PerformanceMonitor
         }
         private void frmMain_Load(object sender, EventArgs e)
         {
+            chkCpuAlarm.Checked = Properties.Settings.Default.chkCpuAlarm;
+            chkGpuAlarm.Checked = Properties.Settings.Default.chkGpuAlarm;
+            trkCpuThreshold.Value = Properties.Settings.Default.trkCpuThreshold;
+            trkGpuThreshold.Value = Properties.Settings.Default.trkGpuThreshold;
+            txtCpuAlarm.Text = Properties.Settings.Default.txtCpuAlarm;
+            txtGpuAlarm.Text = Properties.Settings.Default.txtGpuAlarm;
+            trkCpuVolume.Value = Properties.Settings.Default.trkCpuVolume;
+            trkGpuVolume.Value = Properties.Settings.Default.trkGpuVolume;
+
+
+            tcTabControl.SelectedIndex = 2;
+            FillAudioDevices();
+
+            maxCpuUtil = maxGpuUtil = 0;
+            maxCpuName = String.Empty;
+
             webServerThreadId = -1;
             dispatcherUIThread = -1;
 
@@ -260,10 +357,11 @@ namespace PerformanceMonitor
             timer1.Enabled = tschkEnabled.Checked;
         }
 
-        // Function Inlining: I prefer to repeat code in this case instead of passing all parameters to the similar function
+        // Function Inlining: Only in this particular case, I prefer to repeat code in this case instead of passing all parameters to the similar function
         private void UpdateCounter(int counter, ProgressBar pb, Label lbl, string dimensional = "%")
         {
-            if ((int)lbl.Tag != counter)
+
+            if (this.WindowState != FormWindowState.Minimized && (int)lbl.Tag != counter)
             {
                 lbl.Tag = counter;
 
@@ -279,13 +377,19 @@ namespace PerformanceMonitor
 
         }
 
-        // Function Inlining: I prefer to repeat code in this case instead of passing all parameters to the similar function
+        // Function Inlining: Only in this particular case, I prefer to repeat code in this case instead of passing all parameters to the similar function
         private void UpdateCounter(PerformanceCounter counter, ProgressBar pb, Label lbl, string dimensional = "%")
         {
             float f;
+
             try
             {
                 f = counter.NextValue();
+                if (f>maxCpuUtil)
+                {
+                    maxCpuUtil = (int)f;
+                    maxCpuName = counter.CounterName;
+                }
             }
             catch (Exception ex)
             {
@@ -296,7 +400,9 @@ namespace PerformanceMonitor
 
             int v = (int)f;
 
-            if ((int)lbl.Tag != v)
+            
+            // Only update the label if it is visible in the selected tab and the value has changed
+            if (lbl.Parent == tcTabControl.SelectedTab && this.WindowState != FormWindowState.Minimized && (int)lbl.Tag != v)
             {
                 lbl.Tag = v;
 
@@ -326,7 +432,7 @@ namespace PerformanceMonitor
                 LogError(ex.Message, $"UpdateDisk({diskLabel.Name})");
             }
 
-            if ((float)diskLabel.Tag != result)
+            if (diskLabel.Parent == tcTabControl.SelectedTab && this.WindowState != FormWindowState.Minimized && (float)diskLabel.Tag != result)
             {
                 diskLabel.Text = $"{result:F1}";
 
@@ -352,6 +458,12 @@ namespace PerformanceMonitor
             {
                 case 0: // %GPU Time
                     UpdateCounter(util, pbGPU0, lblGPU0, "%");
+                    UpdateCaption(lblGpuAlarm, util);
+                    if (mpGpu == null) break;
+                    if (util >= trkGpuThreshold.Value)
+                        mpGpu.Volume = trkGpuVolume.Value / 100.0f;
+                    else
+                        mpGpu.Volume = 0.0f;
                     break;
                 default: // GPU Temperature (in degrees C)
                     UpdateCounter(temp, pbGPU0, lblGPU0, "°C");
@@ -362,69 +474,22 @@ namespace PerformanceMonitor
             UpdateCounter(fanSpeed, pbGPUFanSpeed, lblGPUFanSpeed);
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void UpdateMonitorLabels()
         {
-            stopwatch.Restart();
-
-            // update frmMain.Top position in the label only when required
-            int t = this.Top;
-            if ((int)tslblTop.Tag != t)
-            {
-                tslblTop.Tag = t;
-                tslblTop.Text = t.ToString();
-            }
-
-
-            if (tschkAutoReadY.Checked)
-                tstxtAutoMoveY.Text = tslblTop.Text;
-            
-            if (tschkAutoMoveTop.Checked && (int.TryParse(tstxtAutoMoveY.Text, out t)) && (this.Top!=t))          
-                this.Top = t;
-
-            // make the form to be always on top if required by the user
-            if (tschkAlwaysOnTop.Checked != this.TopMost) 
-                this.TopMost = tschkAlwaysOnTop.Checked;
-
-
-/*
-            if (!(bool)timer1.Tag) // only do this once
-            {
-                Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
-                if ((bool)tslbl12700K.Tag) // special flag equals True when this processor is a 12700K
-                {
-                    // Get the pseudo handle for the current thread
-                    IntPtr currentThreadHandle = GetCurrentThread();
-
-                    // Set the ideal processor for the current thread to 19.   GpuPerfCounters is assigned 18
-                    uint previousIdealProcessor = SetThreadIdealProcessor(currentThreadHandle, 19);
-                }
-                timer1.Tag = true;  // flag for one-time control in timer1_Tick()
-            }
-*/
             if (tschkShowLastThread.Checked)
             {
-                int th = (int)GetCurrentThreadId(); 
-                if ((int)tslblLastThread.Tag != th)
-                {                    
-                    tslblLastThread.Tag = th;
-                    tslblLastThread.Text = th.ToString();
-                }
-                
+                UpdateCaption(tslblLastThread, (int)GetCurrentThreadId());
             }
 
             if (tschkShowLastProcessor.Checked)
             {
-                int processorNumber = (int)GetCurrentProcessorNumber();
-                if ((int)tslblCurrentProcessor.Tag != processorNumber)
-                {
-                    tslblCurrentProcessor.Tag = processorNumber;
-                    tslblCurrentProcessor.Text = processorNumber.ToString();
-                }
+                UpdateCaption(tslblCurrentProcessor, (int)GetCurrentProcessorNumber());
             }
 
 
             UpdateGPUInfo();
 
+            maxCpuUtil = 0;
             UpdateCounter(cpuCounter0, pbCPU0, lblCPU0);
             UpdateCounter(cpuCounter1, pbCPU1, lblCPU1);
             UpdateCounter(cpuCounter2, pbCPU2, lblCPU2);
@@ -446,43 +511,64 @@ namespace PerformanceMonitor
             UpdateCounter(cpuCounter18, pbCPU18, lblCPU18);
             UpdateCounter(cpuCounter19, pbCPU19, lblCPU19);
 
+            if (mpCpu != null) {
+                if (maxCpuUtil >= trkCpuThreshold.Value)
+                    mpCpu.Volume = trkCpuVolume.Value / 100.0f;
+                else
+                    mpCpu.Volume = 0.0f;
+            }
+
+            UpdateCaption(lblCpuAlarm, maxCpuUtil);
+
             UpdateDisk(diskCounterC, lblDiskC, lblMaxDiskC);
             UpdateDisk(diskCounterN, lblDiskN, lblMaxDiskN);
             UpdateDisk(diskCounterR, lblDiskR, lblMaxDiskR);
 
-            if (ExCounter != (long)tslblExceptions.Tag)
+            UpdateCaption(tslblExceptions, ExCounter);
+         }
+
+            private void timer1_Tick(object sender, EventArgs e)
             {
-                tslblExceptions.Tag = ExCounter;
-                tslblExceptions.Text = ExCounter.ToString();
+            stopwatch.Restart();
+            timer1.Enabled = false;
+
+            // update frmMain.Top position in the label only when required
+            int t = this.Top;
+            if ((int)tslblTop.Tag != t)
+            {
+                tslblTop.Tag = t;
+                tslblTop.Text = t.ToString();
             }
 
+
+            if (tschkAutoReadY.Checked)
+                tstxtAutoMoveY.Text = tslblTop.Text;
+            
+            if (tschkAutoMoveTop.Checked && (int.TryParse(tstxtAutoMoveY.Text, out t)) && (this.Top!=t))          
+                this.Top = t;
+
+            // make the form to be always on top if required by the user
+            if (tschkAlwaysOnTop.Checked != this.TopMost) 
+                this.TopMost = tschkAlwaysOnTop.Checked;
+
+
+            UpdateMonitorLabels();
+            timer1.Enabled = true;
             stopwatch.Stop();
 
             long elapsed_ms = stopwatch.ElapsedMilliseconds;
+            UpdateCaption(tslblLoopTime, elapsed_ms);
 
-            if ((long)tslblLoopTime.Tag != elapsed_ms)
-            {
-                tslblLoopTime.Tag = elapsed_ms;
-                tslblLoopTime.Text = elapsed_ms.ToString();
-            }
-
+            
             if (elapsed_ms > (long)tslblMaxLoopTime.Tag)
             {
-                if ((bool)tslblLT.Tag) // ignore the first Max
-                    tslblMaxLoopTime.Tag = elapsed_ms; 
-                else
-                    tslblLT.Tag = true;
-
-                tslblMaxLoopTime.Text = tslblLoopTime.Text;  // update regardless of the first-time-ignore for information purposes
+                if (!(bool)tslblLT.Tag) // ignore the first Max
+                    UpdateCaption(tslblMaxLoopTime, elapsed_ms); 
+                tslblLT.Tag = true;                
             }
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            ResetMaxCounters();
-
-        }
 
         private void InitializeCounterTags()
         {
@@ -702,6 +788,52 @@ namespace PerformanceMonitor
                     txtErrors.AppendText(errorMessage);
                 }
             }
+        }
+
+        private void UpdateCaption<TControl, TValue>(TControl L, TValue value)
+            where TControl : Control
+        {
+
+            if (this.WindowState != FormWindowState.Minimized && tcTabControl.SelectedTab==L.Parent && !Equals(L.Tag, value))
+            {
+                L.Tag = value;
+                L.Text = value is float f ? $"{f:F1}" : value.ToString();
+            } 
+        }
+
+        private void UpdateCaption<TValue>(ToolStripLabel L, TValue value)
+        {
+            if (this.WindowState != FormWindowState.Minimized && !Equals(L.Tag, value))
+            {
+                L.Tag = value;
+                L.Text = value is float f ? $"{f:F1}" : value.ToString();
+            }
+        }
+
+        private void FillAudioDevices()
+        {
+
+
+            //This version has a problem is likely due to a limitation within the NAudio library. Specifically, the WaveOut.GetCapabilities method returns a ProductName that is truncated to a maximum of 31 characters
+            var enumerator = new MMDeviceEnumerator();
+            for (int n = 0; n < WaveOut.DeviceCount; n++)
+            {
+                var capabilities = WaveOut.GetCapabilities(n);
+                cmbAudioDevice1.Items.Add(capabilities.ProductName);
+
+                var device = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)[n];
+                Debug.Print(device.FriendlyName);
+            }
+            /*
+                        // Create enumerator
+                        var enumerator = new MMDeviceEnumerator();
+                        // Skip the -1 Microsoft Audio Mapper
+                        for (int n = 0; n < WaveOut.DeviceCount; n++)
+                        {
+                            var device = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)[n];
+                            cmbAudioDevice1.Items.Add($"{device.ID} - {device.InstanceId} - {device.FriendlyName}");
+                        }
+            */
         }
 
 

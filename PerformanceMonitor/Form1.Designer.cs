@@ -152,7 +152,32 @@
             this.tslblWebServer = new System.Windows.Forms.ToolStripLabel();
             this.tcTabControl = new System.Windows.Forms.TabControl();
             this.tbMonitor = new System.Windows.Forms.TabPage();
+            this.tbAlarm = new System.Windows.Forms.TabPage();
+            this.lblGpuThreshold = new System.Windows.Forms.Label();
+            this.lblCpuThreshold = new System.Windows.Forms.Label();
+            this.lblGpuAlarm = new System.Windows.Forms.Label();
+            this.lblCpuAlarm = new System.Windows.Forms.Label();
+            this.cmbAudioDevice1 = new System.Windows.Forms.ComboBox();
+            this.label33 = new System.Windows.Forms.Label();
+            this.label39 = new System.Windows.Forms.Label();
+            this.trkGpuThreshold = new System.Windows.Forms.TrackBar();
+            this.chkGpuAlarm = new System.Windows.Forms.CheckBox();
+            this.label37 = new System.Windows.Forms.Label();
+            this.trkCpuThreshold = new System.Windows.Forms.TrackBar();
+            this.chkCpuAlarm = new System.Windows.Forms.CheckBox();
+            this.lblGpuVolume = new System.Windows.Forms.Label();
+            this.label35 = new System.Windows.Forms.Label();
+            this.trkGpuVolume = new System.Windows.Forms.TrackBar();
+            this.txtGpuAlarm = new System.Windows.Forms.TextBox();
+            this.label36 = new System.Windows.Forms.Label();
+            this.lblCpuVolume = new System.Windows.Forms.Label();
+            this.label29 = new System.Windows.Forms.Label();
+            this.trkCpuVolume = new System.Windows.Forms.TrackBar();
+            this.txtCpuAlarm = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.tbSettings = new System.Windows.Forms.TabPage();
+            this.txtIPAddress = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.lbl12700KNote = new System.Windows.Forms.Label();
             this.cmbPriorityClass = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -161,12 +186,15 @@
             this.tbErrors = new System.Windows.Forms.TabPage();
             this.txtErrors = new System.Windows.Forms.TextBox();
             this.lblErrorsTitle = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.txtIPAddress = new System.Windows.Forms.TextBox();
             this.toolStrip1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.tcTabControl.SuspendLayout();
             this.tbMonitor.SuspendLayout();
+            this.tbAlarm.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trkGpuThreshold)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trkCpuThreshold)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trkGpuVolume)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trkCpuVolume)).BeginInit();
             this.tbSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudPollingInterval)).BeginInit();
             this.tbErrors.SuspendLayout();
@@ -1026,6 +1054,7 @@
             // 
             // tstxtAutoMoveY
             // 
+            this.tstxtAutoMoveY.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.tstxtAutoMoveY.Name = "tstxtAutoMoveY";
             this.tstxtAutoMoveY.Size = new System.Drawing.Size(50, 28);
             this.tstxtAutoMoveY.Text = "1100";
@@ -1310,6 +1339,7 @@
             // tcTabControl
             // 
             this.tcTabControl.Controls.Add(this.tbMonitor);
+            this.tcTabControl.Controls.Add(this.tbAlarm);
             this.tcTabControl.Controls.Add(this.tbSettings);
             this.tcTabControl.Controls.Add(this.tbErrors);
             this.tcTabControl.Location = new System.Drawing.Point(12, 46);
@@ -1409,6 +1439,254 @@
             this.tbMonitor.Text = "Monitor";
             this.tbMonitor.UseVisualStyleBackColor = true;
             // 
+            // tbAlarm
+            // 
+            this.tbAlarm.Controls.Add(this.lblGpuThreshold);
+            this.tbAlarm.Controls.Add(this.lblCpuThreshold);
+            this.tbAlarm.Controls.Add(this.lblGpuAlarm);
+            this.tbAlarm.Controls.Add(this.lblCpuAlarm);
+            this.tbAlarm.Controls.Add(this.cmbAudioDevice1);
+            this.tbAlarm.Controls.Add(this.label33);
+            this.tbAlarm.Controls.Add(this.label39);
+            this.tbAlarm.Controls.Add(this.trkGpuThreshold);
+            this.tbAlarm.Controls.Add(this.chkGpuAlarm);
+            this.tbAlarm.Controls.Add(this.label37);
+            this.tbAlarm.Controls.Add(this.trkCpuThreshold);
+            this.tbAlarm.Controls.Add(this.chkCpuAlarm);
+            this.tbAlarm.Controls.Add(this.lblGpuVolume);
+            this.tbAlarm.Controls.Add(this.label35);
+            this.tbAlarm.Controls.Add(this.trkGpuVolume);
+            this.tbAlarm.Controls.Add(this.txtGpuAlarm);
+            this.tbAlarm.Controls.Add(this.label36);
+            this.tbAlarm.Controls.Add(this.lblCpuVolume);
+            this.tbAlarm.Controls.Add(this.label29);
+            this.tbAlarm.Controls.Add(this.trkCpuVolume);
+            this.tbAlarm.Controls.Add(this.txtCpuAlarm);
+            this.tbAlarm.Controls.Add(this.label3);
+            this.tbAlarm.Location = new System.Drawing.Point(4, 22);
+            this.tbAlarm.Name = "tbAlarm";
+            this.tbAlarm.Size = new System.Drawing.Size(840, 368);
+            this.tbAlarm.TabIndex = 3;
+            this.tbAlarm.Text = "Alert";
+            this.tbAlarm.UseVisualStyleBackColor = true;
+            // 
+            // lblGpuThreshold
+            // 
+            this.lblGpuThreshold.AutoSize = true;
+            this.lblGpuThreshold.Location = new System.Drawing.Point(278, 188);
+            this.lblGpuThreshold.Name = "lblGpuThreshold";
+            this.lblGpuThreshold.Size = new System.Drawing.Size(16, 13);
+            this.lblGpuThreshold.TabIndex = 21;
+            this.lblGpuThreshold.Text = "---";
+            // 
+            // lblCpuThreshold
+            // 
+            this.lblCpuThreshold.AutoSize = true;
+            this.lblCpuThreshold.Location = new System.Drawing.Point(278, 113);
+            this.lblCpuThreshold.Name = "lblCpuThreshold";
+            this.lblCpuThreshold.Size = new System.Drawing.Size(16, 13);
+            this.lblCpuThreshold.TabIndex = 20;
+            this.lblCpuThreshold.Text = "---";
+            // 
+            // lblGpuAlarm
+            // 
+            this.lblGpuAlarm.AutoSize = true;
+            this.lblGpuAlarm.Font = new System.Drawing.Font("Microsoft Sans Serif", 34F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblGpuAlarm.ForeColor = System.Drawing.Color.YellowGreen;
+            this.lblGpuAlarm.Location = new System.Drawing.Point(392, 237);
+            this.lblGpuAlarm.Name = "lblGpuAlarm";
+            this.lblGpuAlarm.Size = new System.Drawing.Size(71, 53);
+            this.lblGpuAlarm.TabIndex = 19;
+            this.lblGpuAlarm.Tag = "GPU Engine";
+            this.lblGpuAlarm.Text = "---";
+            // 
+            // lblCpuAlarm
+            // 
+            this.lblCpuAlarm.AutoSize = true;
+            this.lblCpuAlarm.Font = new System.Drawing.Font("Microsoft Sans Serif", 34F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCpuAlarm.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.lblCpuAlarm.Location = new System.Drawing.Point(84, 237);
+            this.lblCpuAlarm.Name = "lblCpuAlarm";
+            this.lblCpuAlarm.Size = new System.Drawing.Size(71, 53);
+            this.lblCpuAlarm.TabIndex = 18;
+            this.lblCpuAlarm.Text = "---";
+            // 
+            // cmbAudioDevice1
+            // 
+            this.cmbAudioDevice1.FormattingEnabled = true;
+            this.cmbAudioDevice1.Location = new System.Drawing.Point(126, 20);
+            this.cmbAudioDevice1.Name = "cmbAudioDevice1";
+            this.cmbAudioDevice1.Size = new System.Drawing.Size(168, 21);
+            this.cmbAudioDevice1.TabIndex = 17;
+            this.cmbAudioDevice1.SelectedIndexChanged += new System.EventHandler(this.cmbAudioDevice1_SelectedIndexChanged);
+            // 
+            // label33
+            // 
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(14, 23);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(66, 13);
+            this.label33.TabIndex = 16;
+            this.label33.Text = "Sound Card:";
+            // 
+            // label39
+            // 
+            this.label39.AutoSize = true;
+            this.label39.Location = new System.Drawing.Point(123, 155);
+            this.label39.Name = "label39";
+            this.label39.Size = new System.Drawing.Size(57, 13);
+            this.label39.TabIndex = 15;
+            this.label39.Text = "Threshold:";
+            // 
+            // trkGpuThreshold
+            // 
+            this.trkGpuThreshold.Location = new System.Drawing.Point(190, 140);
+            this.trkGpuThreshold.Maximum = 100;
+            this.trkGpuThreshold.Name = "trkGpuThreshold";
+            this.trkGpuThreshold.Size = new System.Drawing.Size(104, 45);
+            this.trkGpuThreshold.SmallChange = 5;
+            this.trkGpuThreshold.TabIndex = 14;
+            this.trkGpuThreshold.TickFrequency = 10;
+            this.trkGpuThreshold.Value = 50;
+            this.trkGpuThreshold.Scroll += new System.EventHandler(this.trkGpuThreshold_Scroll);
+            // 
+            // chkGpuAlarm
+            // 
+            this.chkGpuAlarm.AutoSize = true;
+            this.chkGpuAlarm.Location = new System.Drawing.Point(17, 154);
+            this.chkGpuAlarm.Name = "chkGpuAlarm";
+            this.chkGpuAlarm.Size = new System.Drawing.Size(78, 17);
+            this.chkGpuAlarm.TabIndex = 13;
+            this.chkGpuAlarm.Text = "GPU Alarm";
+            this.chkGpuAlarm.UseVisualStyleBackColor = true;
+            this.chkGpuAlarm.CheckedChanged += new System.EventHandler(this.chkGpuAlarm_CheckedChanged);
+            // 
+            // label37
+            // 
+            this.label37.AutoSize = true;
+            this.label37.Location = new System.Drawing.Point(123, 80);
+            this.label37.Name = "label37";
+            this.label37.Size = new System.Drawing.Size(57, 13);
+            this.label37.TabIndex = 12;
+            this.label37.Text = "Threshold:";
+            // 
+            // trkCpuThreshold
+            // 
+            this.trkCpuThreshold.Location = new System.Drawing.Point(190, 65);
+            this.trkCpuThreshold.Maximum = 100;
+            this.trkCpuThreshold.Name = "trkCpuThreshold";
+            this.trkCpuThreshold.Size = new System.Drawing.Size(104, 45);
+            this.trkCpuThreshold.SmallChange = 5;
+            this.trkCpuThreshold.TabIndex = 11;
+            this.trkCpuThreshold.TickFrequency = 10;
+            this.trkCpuThreshold.Value = 50;
+            this.trkCpuThreshold.Scroll += new System.EventHandler(this.trkCpuThreshold_Scroll);
+            // 
+            // chkCpuAlarm
+            // 
+            this.chkCpuAlarm.AutoSize = true;
+            this.chkCpuAlarm.Location = new System.Drawing.Point(17, 79);
+            this.chkCpuAlarm.Name = "chkCpuAlarm";
+            this.chkCpuAlarm.Size = new System.Drawing.Size(77, 17);
+            this.chkCpuAlarm.TabIndex = 10;
+            this.chkCpuAlarm.Text = "CPU Alarm";
+            this.chkCpuAlarm.UseVisualStyleBackColor = true;
+            this.chkCpuAlarm.CheckedChanged += new System.EventHandler(this.chkCpuAlarm_CheckedChanged);
+            // 
+            // lblGpuVolume
+            // 
+            this.lblGpuVolume.AutoSize = true;
+            this.lblGpuVolume.Location = new System.Drawing.Point(799, 155);
+            this.lblGpuVolume.Name = "lblGpuVolume";
+            this.lblGpuVolume.Size = new System.Drawing.Size(16, 13);
+            this.lblGpuVolume.TabIndex = 9;
+            this.lblGpuVolume.Text = "---";
+            // 
+            // label35
+            // 
+            this.label35.AutoSize = true;
+            this.label35.Location = new System.Drawing.Point(616, 155);
+            this.label35.Name = "label35";
+            this.label35.Size = new System.Drawing.Size(45, 13);
+            this.label35.TabIndex = 8;
+            this.label35.Text = "Volume:";
+            // 
+            // trkGpuVolume
+            // 
+            this.trkGpuVolume.Location = new System.Drawing.Point(675, 140);
+            this.trkGpuVolume.Maximum = 100;
+            this.trkGpuVolume.Name = "trkGpuVolume";
+            this.trkGpuVolume.Size = new System.Drawing.Size(104, 45);
+            this.trkGpuVolume.SmallChange = 5;
+            this.trkGpuVolume.TabIndex = 7;
+            this.trkGpuVolume.TickFrequency = 10;
+            this.trkGpuVolume.Value = 50;
+            this.trkGpuVolume.Scroll += new System.EventHandler(this.trkGpuVolume_Scroll);
+            // 
+            // txtGpuAlarm
+            // 
+            this.txtGpuAlarm.Location = new System.Drawing.Point(395, 152);
+            this.txtGpuAlarm.Name = "txtGpuAlarm";
+            this.txtGpuAlarm.Size = new System.Drawing.Size(187, 20);
+            this.txtGpuAlarm.TabIndex = 6;
+            this.txtGpuAlarm.Text = "C:\\Windows\\Media\\Windows Ringout.wav";
+            // 
+            // label36
+            // 
+            this.label36.AutoSize = true;
+            this.label36.Location = new System.Drawing.Point(327, 155);
+            this.label36.Name = "label36";
+            this.label36.Size = new System.Drawing.Size(62, 13);
+            this.label36.TabIndex = 5;
+            this.label36.Text = "GPU Alarm:";
+            // 
+            // lblCpuVolume
+            // 
+            this.lblCpuVolume.AutoSize = true;
+            this.lblCpuVolume.Location = new System.Drawing.Point(799, 80);
+            this.lblCpuVolume.Name = "lblCpuVolume";
+            this.lblCpuVolume.Size = new System.Drawing.Size(16, 13);
+            this.lblCpuVolume.TabIndex = 4;
+            this.lblCpuVolume.Text = "---";
+            // 
+            // label29
+            // 
+            this.label29.AutoSize = true;
+            this.label29.Location = new System.Drawing.Point(616, 80);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(45, 13);
+            this.label29.TabIndex = 3;
+            this.label29.Text = "Volume:";
+            // 
+            // trkCpuVolume
+            // 
+            this.trkCpuVolume.Location = new System.Drawing.Point(675, 65);
+            this.trkCpuVolume.Maximum = 100;
+            this.trkCpuVolume.Name = "trkCpuVolume";
+            this.trkCpuVolume.Size = new System.Drawing.Size(104, 45);
+            this.trkCpuVolume.SmallChange = 5;
+            this.trkCpuVolume.TabIndex = 2;
+            this.trkCpuVolume.TickFrequency = 10;
+            this.trkCpuVolume.Value = 50;
+            this.trkCpuVolume.Scroll += new System.EventHandler(this.trkCpuVolume_Scroll);
+            // 
+            // txtCpuAlarm
+            // 
+            this.txtCpuAlarm.Location = new System.Drawing.Point(395, 77);
+            this.txtCpuAlarm.Name = "txtCpuAlarm";
+            this.txtCpuAlarm.Size = new System.Drawing.Size(187, 20);
+            this.txtCpuAlarm.TabIndex = 1;
+            this.txtCpuAlarm.Text = "C:\\Windows\\Media\\Windows Ringin.wav";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(327, 80);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(61, 13);
+            this.label3.TabIndex = 0;
+            this.label3.Text = "CPU Alarm:";
+            // 
             // tbSettings
             // 
             this.tbSettings.Controls.Add(this.txtIPAddress);
@@ -1425,6 +1703,23 @@
             this.tbSettings.TabIndex = 1;
             this.tbSettings.Text = "Settings";
             this.tbSettings.UseVisualStyleBackColor = true;
+            // 
+            // txtIPAddress
+            // 
+            this.txtIPAddress.Location = new System.Drawing.Point(135, 131);
+            this.txtIPAddress.Name = "txtIPAddress";
+            this.txtIPAddress.ReadOnly = true;
+            this.txtIPAddress.Size = new System.Drawing.Size(120, 20);
+            this.txtIPAddress.TabIndex = 6;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(66, 134);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(61, 13);
+            this.label2.TabIndex = 5;
+            this.label2.Text = "IP Address:";
             // 
             // lbl12700KNote
             // 
@@ -1532,23 +1827,6 @@
             this.lblErrorsTitle.TabIndex = 0;
             this.lblErrorsTitle.Text = "Errors: (only the first 100 are listed)";
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(66, 134);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(61, 13);
-            this.label2.TabIndex = 5;
-            this.label2.Text = "IP Address:";
-            // 
-            // txtIPAddress
-            // 
-            this.txtIPAddress.Location = new System.Drawing.Point(135, 131);
-            this.txtIPAddress.Name = "txtIPAddress";
-            this.txtIPAddress.ReadOnly = true;
-            this.txtIPAddress.Size = new System.Drawing.Size(120, 20);
-            this.txtIPAddress.TabIndex = 6;
-            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1559,7 +1837,7 @@
             this.Controls.Add(this.toolStrip1);
             this.Cursor = System.Windows.Forms.Cursors.Default;
             this.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "frmMain";
@@ -1574,6 +1852,12 @@
             this.tcTabControl.ResumeLayout(false);
             this.tbMonitor.ResumeLayout(false);
             this.tbMonitor.PerformLayout();
+            this.tbAlarm.ResumeLayout(false);
+            this.tbAlarm.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trkGpuThreshold)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trkCpuThreshold)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trkGpuVolume)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trkCpuVolume)).EndInit();
             this.tbSettings.ResumeLayout(false);
             this.tbSettings.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudPollingInterval)).EndInit();
@@ -1718,6 +2002,29 @@
         private System.Windows.Forms.Label lbl12700KNote;
         private System.Windows.Forms.TextBox txtIPAddress;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TabPage tbAlarm;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label29;
+        private System.Windows.Forms.TrackBar trkCpuVolume;
+        private System.Windows.Forms.TextBox txtCpuAlarm;
+        private System.Windows.Forms.Label lblCpuVolume;
+        private System.Windows.Forms.Label lblGpuVolume;
+        private System.Windows.Forms.Label label35;
+        private System.Windows.Forms.TrackBar trkGpuVolume;
+        private System.Windows.Forms.TextBox txtGpuAlarm;
+        private System.Windows.Forms.Label label36;
+        private System.Windows.Forms.CheckBox chkCpuAlarm;
+        private System.Windows.Forms.Label label37;
+        private System.Windows.Forms.TrackBar trkCpuThreshold;
+        private System.Windows.Forms.Label label39;
+        private System.Windows.Forms.TrackBar trkGpuThreshold;
+        private System.Windows.Forms.CheckBox chkGpuAlarm;
+        private System.Windows.Forms.ComboBox cmbAudioDevice1;
+        private System.Windows.Forms.Label label33;
+        private System.Windows.Forms.Label lblCpuAlarm;
+        private System.Windows.Forms.Label lblGpuAlarm;
+        private System.Windows.Forms.Label lblGpuThreshold;
+        private System.Windows.Forms.Label lblCpuThreshold;
     }
 }
 

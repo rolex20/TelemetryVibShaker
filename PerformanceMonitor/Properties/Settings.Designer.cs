@@ -46,5 +46,113 @@ namespace PerformanceMonitor.Properties {
                 this["PriorityClassSelectedIndex"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int cmbAudioDevice1 {
+            get {
+                return ((int)(this["cmbAudioDevice1"]));
+            }
+            set {
+                this["cmbAudioDevice1"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool chkCpuAlarm {
+            get {
+                return ((bool)(this["chkCpuAlarm"]));
+            }
+            set {
+                this["chkCpuAlarm"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool chkGpuAlarm {
+            get {
+                return ((bool)(this["chkGpuAlarm"]));
+            }
+            set {
+                this["chkGpuAlarm"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
+        public int trkCpuThreshold {
+            get {
+                return ((int)(this["trkCpuThreshold"]));
+            }
+            set {
+                this["trkCpuThreshold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
+        public int trkGpuThreshold {
+            get {
+                return ((int)(this["trkGpuThreshold"]));
+            }
+            set {
+                this["trkGpuThreshold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Windows\\Media\\Windows Ringin.wav")]
+        public string txtCpuAlarm {
+            get {
+                return ((string)(this["txtCpuAlarm"]));
+            }
+            set {
+                this["txtCpuAlarm"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Windows\\Media\\Windows Ringout.wav")]
+        public string txtGpuAlarm {
+            get {
+                return ((string)(this["txtGpuAlarm"]));
+            }
+            set {
+                this["txtGpuAlarm"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public int trkCpuVolume {
+            get {
+                return ((int)(this["trkCpuVolume"]));
+            }
+            set {
+                this["trkCpuVolume"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public int trkGpuVolume {
+            get {
+                return ((int)(this["trkGpuVolume"]));
+            }
+            set {
+                this["trkGpuVolume"] = value;
+            }
+        }
     }
 }
