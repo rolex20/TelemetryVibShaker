@@ -304,6 +304,9 @@ namespace WarThunderExporter
 
             cancellationTokenSource = new CancellationTokenSource();
 
+            // Minimize if required
+            if (chkAutoMinimize.Checked) this.WindowState = FormWindowState.Minimized;
+
             TimerActivateNewInterval(timer1, (int)nudFrequency.Value);
         }
 

@@ -46,6 +46,10 @@
             chkUseEfficiencyCoresOnly = new CheckBox();
             tabMonitor = new TabPage();
             panel1 = new Panel();
+            label21 = new Label();
+            lblAvgProcessingTimeWT = new Label();
+            lblAvgProcessingTime = new Label();
+            label20 = new Label();
             lblMinProcessingTimeWT = new Label();
             lblMinProcessingTime = new Label();
             label17 = new Label();
@@ -79,10 +83,7 @@
             timer1 = new System.Windows.Forms.Timer(components);
             toolStrip1 = new ToolStrip();
             tsStatus = new ToolStripLabel();
-            lblAvgProcessingTimeWT = new Label();
-            lblAvgProcessingTime = new Label();
-            label20 = new Label();
-            label21 = new Label();
+            chkAutoMinimize = new CheckBox();
             tabControl1.SuspendLayout();
             tabSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudFrequency).BeginInit();
@@ -105,6 +106,7 @@
             // 
             // tabSettings
             // 
+            tabSettings.Controls.Add(chkAutoMinimize);
             tabSettings.Controls.Add(label12);
             tabSettings.Controls.Add(txtWtUrl);
             tabSettings.Controls.Add(label5);
@@ -285,6 +287,43 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(432, 256);
             panel1.TabIndex = 2;
+            // 
+            // label21
+            // 
+            label21.AutoSize = true;
+            label21.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label21.Location = new Point(18, 143);
+            label21.Name = "label21";
+            label21.Size = new Size(183, 15);
+            label21.TabIndex = 23;
+            label21.Text = "Processing Times (milliseconds):";
+            // 
+            // lblAvgProcessingTimeWT
+            // 
+            lblAvgProcessingTimeWT.AutoSize = true;
+            lblAvgProcessingTimeWT.Location = new Point(193, 227);
+            lblAvgProcessingTimeWT.Name = "lblAvgProcessingTimeWT";
+            lblAvgProcessingTimeWT.Size = new Size(27, 15);
+            lblAvgProcessingTimeWT.TabIndex = 22;
+            lblAvgProcessingTimeWT.Text = "----";
+            // 
+            // lblAvgProcessingTime
+            // 
+            lblAvgProcessingTime.AutoSize = true;
+            lblAvgProcessingTime.Location = new Point(137, 227);
+            lblAvgProcessingTime.Name = "lblAvgProcessingTime";
+            lblAvgProcessingTime.Size = new Size(27, 15);
+            lblAvgProcessingTime.TabIndex = 21;
+            lblAvgProcessingTime.Text = "----";
+            // 
+            // label20
+            // 
+            label20.AutoSize = true;
+            label20.Location = new Point(86, 227);
+            label20.Name = "label20";
+            label20.Size = new Size(31, 15);
+            label20.TabIndex = 20;
+            label20.Text = "Avg:";
             // 
             // lblMinProcessingTimeWT
             // 
@@ -599,42 +638,15 @@
             tsStatus.Text = "Idle";
             tsStatus.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // lblAvgProcessingTimeWT
+            // chkAutoMinimize
             // 
-            lblAvgProcessingTimeWT.AutoSize = true;
-            lblAvgProcessingTimeWT.Location = new Point(193, 227);
-            lblAvgProcessingTimeWT.Name = "lblAvgProcessingTimeWT";
-            lblAvgProcessingTimeWT.Size = new Size(27, 15);
-            lblAvgProcessingTimeWT.TabIndex = 22;
-            lblAvgProcessingTimeWT.Text = "----";
-            // 
-            // lblAvgProcessingTime
-            // 
-            lblAvgProcessingTime.AutoSize = true;
-            lblAvgProcessingTime.Location = new Point(137, 227);
-            lblAvgProcessingTime.Name = "lblAvgProcessingTime";
-            lblAvgProcessingTime.Size = new Size(27, 15);
-            lblAvgProcessingTime.TabIndex = 21;
-            lblAvgProcessingTime.Text = "----";
-            // 
-            // label20
-            // 
-            label20.AutoSize = true;
-            label20.Location = new Point(86, 227);
-            label20.Name = "label20";
-            label20.Size = new Size(31, 15);
-            label20.TabIndex = 20;
-            label20.Text = "Avg:";
-            // 
-            // label21
-            // 
-            label21.AutoSize = true;
-            label21.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label21.Location = new Point(18, 143);
-            label21.Name = "label21";
-            label21.Size = new Size(183, 15);
-            label21.TabIndex = 23;
-            label21.Text = "Processing Times (milliseconds):";
+            chkAutoMinimize.AutoSize = true;
+            chkAutoMinimize.Location = new Point(10, 300);
+            chkAutoMinimize.Name = "chkAutoMinimize";
+            chkAutoMinimize.Size = new Size(162, 19);
+            chkAutoMinimize.TabIndex = 12;
+            chkAutoMinimize.Text = "Auto Minimize when start";
+            chkAutoMinimize.UseVisualStyleBackColor = true;
             // 
             // frmWarThunderTelemetry
             // 
@@ -725,5 +737,6 @@
         private Label lblAvgProcessingTime;
         private Label label20;
         private Label label21;
+        private CheckBox chkAutoMinimize;
     }
 }
