@@ -578,6 +578,10 @@ namespace TelemetryVibShaker
             // Display stats if required
             if (chkChangeToMonitor.Checked) tabs.SelectTab(5);
 
+
+            // Minimize if required
+            if (chkAutoStart.Checked) this.WindowState = FormWindowState.Minimized;
+
             // Start monitoring in UI
             timer1.Enabled = true;
         }

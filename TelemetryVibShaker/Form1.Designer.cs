@@ -692,7 +692,7 @@
             // lblCountDownTimer
             // 
             lblCountDownTimer.AutoSize = true;
-            lblCountDownTimer.Location = new Point(179, 317);
+            lblCountDownTimer.Location = new Point(250, 317);
             lblCountDownTimer.Name = "lblCountDownTimer";
             lblCountDownTimer.Size = new Size(22, 15);
             lblCountDownTimer.TabIndex = 23;
@@ -703,9 +703,9 @@
             chkAutoStart.AutoSize = true;
             chkAutoStart.Location = new Point(17, 316);
             chkAutoStart.Name = "chkAutoStart";
-            chkAutoStart.Size = new Size(151, 19);
+            chkAutoStart.Size = new Size(219, 19);
             chkAutoStart.TabIndex = 22;
-            chkAutoStart.Text = "Auto start after Loading";
+            chkAutoStart.Text = "Auto minimize && start after Loading:";
             toolTip1.SetToolTip(chkAutoStart, "Auto start Listening when the program starts");
             chkAutoStart.UseVisualStyleBackColor = true;
             // 
