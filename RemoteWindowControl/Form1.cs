@@ -407,7 +407,7 @@ namespace RemoteWindowControl
             HTML_Template = ReadFileContents(txtHTML.Text);
 
             // Minimize if required
-            this.WindowState = FormWindowState.Minimized;  
+            if (chkAutostart.Checked)  this.WindowState = FormWindowState.Minimized;  
             
             StartWebServer();
         }
