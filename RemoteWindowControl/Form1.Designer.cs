@@ -30,20 +30,6 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             tabControls = new TabControl();
-            tabMovements = new TabPage();
-            button1 = new Button();
-            textBox1 = new TextBox();
-            nudInstance = new NumericUpDown();
-            btnReadPosition = new Button();
-            btnSendChanges = new Button();
-            rbRestore = new RadioButton();
-            rbMinimize = new RadioButton();
-            rbNoChange = new RadioButton();
-            label2 = new Label();
-            txtYCoord = new TextBox();
-            cmbProcesses = new ComboBox();
-            label1 = new Label();
-            txtXCoord = new TextBox();
             tabSettings = new TabPage();
             chkUseCachedHTML = new CheckBox();
             lblCountDownTimer = new Label();
@@ -61,16 +47,16 @@
             txtIPAddress = new TextBox();
             tabDebug = new TabPage();
             txtDebug = new TextBox();
+            cmbProcesses = new ComboBox();
+            nudInstance = new NumericUpDown();
             tabControls.SuspendLayout();
-            tabMovements.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)nudInstance).BeginInit();
             tabSettings.SuspendLayout();
             tabDebug.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)nudInstance).BeginInit();
             SuspendLayout();
             // 
             // tabControls
             // 
-            tabControls.Controls.Add(tabMovements);
             tabControls.Controls.Add(tabSettings);
             tabControls.Controls.Add(tabDebug);
             tabControls.Location = new Point(21, 24);
@@ -79,152 +65,10 @@
             tabControls.Size = new Size(333, 352);
             tabControls.TabIndex = 0;
             // 
-            // tabMovements
-            // 
-            tabMovements.Controls.Add(button1);
-            tabMovements.Controls.Add(textBox1);
-            tabMovements.Controls.Add(nudInstance);
-            tabMovements.Controls.Add(btnReadPosition);
-            tabMovements.Controls.Add(btnSendChanges);
-            tabMovements.Controls.Add(rbRestore);
-            tabMovements.Controls.Add(rbMinimize);
-            tabMovements.Controls.Add(rbNoChange);
-            tabMovements.Controls.Add(label2);
-            tabMovements.Controls.Add(txtYCoord);
-            tabMovements.Controls.Add(cmbProcesses);
-            tabMovements.Controls.Add(label1);
-            tabMovements.Controls.Add(txtXCoord);
-            tabMovements.Location = new Point(4, 24);
-            tabMovements.Name = "tabMovements";
-            tabMovements.Padding = new Padding(3);
-            tabMovements.Size = new Size(325, 324);
-            tabMovements.TabIndex = 0;
-            tabMovements.Text = "Windows Control";
-            tabMovements.UseVisualStyleBackColor = true;
-            // 
-            // button1
-            // 
-            button1.Location = new Point(215, 279);
-            button1.Name = "button1";
-            button1.Size = new Size(75, 23);
-            button1.TabIndex = 12;
-            button1.Text = "Log Text";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
-            // 
-            // textBox1
-            // 
-            textBox1.Location = new Point(46, 279);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(146, 23);
-            textBox1.TabIndex = 11;
-            textBox1.Text = "Log Text";
-            // 
-            // nudInstance
-            // 
-            nudInstance.Location = new Point(215, 24);
-            nudInstance.Name = "nudInstance";
-            nudInstance.Size = new Size(60, 23);
-            nudInstance.TabIndex = 10;
-            // 
-            // btnReadPosition
-            // 
-            btnReadPosition.Location = new Point(183, 235);
-            btnReadPosition.Name = "btnReadPosition";
-            btnReadPosition.Size = new Size(107, 23);
-            btnReadPosition.TabIndex = 9;
-            btnReadPosition.Text = "Read Position";
-            btnReadPosition.UseVisualStyleBackColor = true;
-            btnReadPosition.Click += btnReadPosition_Click;
-            // 
-            // btnSendChanges
-            // 
-            btnSendChanges.Location = new Point(40, 235);
-            btnSendChanges.Name = "btnSendChanges";
-            btnSendChanges.Size = new Size(106, 23);
-            btnSendChanges.TabIndex = 8;
-            btnSendChanges.Text = "Send Changes";
-            btnSendChanges.UseVisualStyleBackColor = true;
-            btnSendChanges.Click += btnSendChanges_Click;
-            // 
-            // rbRestore
-            // 
-            rbRestore.AutoSize = true;
-            rbRestore.Location = new Point(244, 179);
-            rbRestore.Name = "rbRestore";
-            rbRestore.Size = new Size(64, 19);
-            rbRestore.TabIndex = 7;
-            rbRestore.Text = "Restore";
-            rbRestore.UseVisualStyleBackColor = true;
-            // 
-            // rbMinimize
-            // 
-            rbMinimize.AutoSize = true;
-            rbMinimize.Location = new Point(153, 179);
-            rbMinimize.Name = "rbMinimize";
-            rbMinimize.Size = new Size(74, 19);
-            rbMinimize.TabIndex = 6;
-            rbMinimize.Text = "Minimize";
-            rbMinimize.UseVisualStyleBackColor = true;
-            // 
-            // rbNoChange
-            // 
-            rbNoChange.AutoSize = true;
-            rbNoChange.Checked = true;
-            rbNoChange.Location = new Point(40, 179);
-            rbNoChange.Name = "rbNoChange";
-            rbNoChange.Size = new Size(85, 19);
-            rbNoChange.TabIndex = 5;
-            rbNoChange.TabStop = true;
-            rbNoChange.Text = "No Change";
-            rbNoChange.UseVisualStyleBackColor = true;
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new Point(35, 123);
-            label2.Name = "label2";
-            label2.Size = new Size(14, 15);
-            label2.TabIndex = 4;
-            label2.Text = "Y";
-            // 
-            // txtYCoord
-            // 
-            txtYCoord.Location = new Point(71, 120);
-            txtYCoord.Name = "txtYCoord";
-            txtYCoord.Size = new Size(100, 23);
-            txtYCoord.TabIndex = 3;
-            txtYCoord.Text = "15";
-            // 
-            // cmbProcesses
-            // 
-            cmbProcesses.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbProcesses.FormattingEnabled = true;
-            cmbProcesses.Items.AddRange(new object[] { "Calc", "Notepad", "WarThunderExporter", "TelemetryVibShaker", "FalconExporter", "PerformanceMonitor", "RemoteWindowControl", "SimConnectExporter", "HWiNFO64" });
-            cmbProcesses.Location = new Point(71, 24);
-            cmbProcesses.Name = "cmbProcesses";
-            cmbProcesses.Size = new Size(121, 23);
-            cmbProcesses.TabIndex = 2;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(35, 83);
-            label1.Name = "label1";
-            label1.Size = new Size(14, 15);
-            label1.TabIndex = 1;
-            label1.Text = "X";
-            // 
-            // txtXCoord
-            // 
-            txtXCoord.Location = new Point(71, 80);
-            txtXCoord.Name = "txtXCoord";
-            txtXCoord.Size = new Size(100, 23);
-            txtXCoord.TabIndex = 0;
-            txtXCoord.Text = "10";
-            // 
             // tabSettings
             // 
+            tabSettings.Controls.Add(nudInstance);
+            tabSettings.Controls.Add(cmbProcesses);
             tabSettings.Controls.Add(chkUseCachedHTML);
             tabSettings.Controls.Add(lblCountDownTimer);
             tabSettings.Controls.Add(chkAutostart);
@@ -262,7 +106,7 @@
             // lblCountDownTimer
             // 
             lblCountDownTimer.AutoSize = true;
-            lblCountDownTimer.Location = new Point(206, 215);
+            lblCountDownTimer.Location = new Point(287, 215);
             lblCountDownTimer.Name = "lblCountDownTimer";
             lblCountDownTimer.Size = new Size(22, 15);
             lblCountDownTimer.TabIndex = 12;
@@ -276,9 +120,9 @@
             chkAutostart.CheckState = CheckState.Checked;
             chkAutostart.Location = new Point(21, 214);
             chkAutostart.Name = "chkAutostart";
-            chkAutostart.Size = new Size(186, 19);
+            chkAutostart.Size = new Size(262, 19);
             chkAutostart.TabIndex = 11;
-            chkAutostart.Text = "Auto start web server on load: ";
+            chkAutostart.Text = "Auto Minimize and Start web server on load: ";
             chkAutostart.UseVisualStyleBackColor = true;
             // 
             // chkUseEfficiencyCoresOnly
@@ -327,7 +171,7 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(21, 24);
+            label5.Location = new Point(21, 54);
             label5.Name = "label5";
             label5.Size = new Size(116, 15);
             label5.TabIndex = 6;
@@ -336,7 +180,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(43, 65);
+            label4.Location = new Point(43, 92);
             label4.Name = "label4";
             label4.Size = new Size(94, 15);
             label4.TabIndex = 5;
@@ -345,7 +189,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(16, 106);
+            label3.Location = new Point(16, 125);
             label3.Name = "label3";
             label3.Size = new Size(121, 15);
             label3.TabIndex = 4;
@@ -354,7 +198,7 @@
             // lblLink
             // 
             lblLink.AutoSize = true;
-            lblLink.Location = new Point(153, 138);
+            lblLink.Location = new Point(153, 148);
             lblLink.Name = "lblLink";
             lblLink.Size = new Size(60, 15);
             lblLink.TabIndex = 3;
@@ -365,7 +209,7 @@
             // lblWebServerThreadId
             // 
             lblWebServerThreadId.AutoSize = true;
-            lblWebServerThreadId.Location = new Point(153, 106);
+            lblWebServerThreadId.Location = new Point(153, 125);
             lblWebServerThreadId.Name = "lblWebServerThreadId";
             lblWebServerThreadId.Size = new Size(22, 15);
             lblWebServerThreadId.TabIndex = 2;
@@ -373,7 +217,7 @@
             // 
             // txtPort
             // 
-            txtPort.Location = new Point(153, 62);
+            txtPort.Location = new Point(153, 89);
             txtPort.Name = "txtPort";
             txtPort.Size = new Size(158, 23);
             txtPort.TabIndex = 1;
@@ -382,7 +226,7 @@
             // 
             // txtIPAddress
             // 
-            txtIPAddress.Location = new Point(153, 21);
+            txtIPAddress.Location = new Point(153, 51);
             txtIPAddress.Name = "txtIPAddress";
             txtIPAddress.Size = new Size(158, 23);
             txtIPAddress.TabIndex = 0;
@@ -409,6 +253,23 @@
             txtDebug.Size = new Size(290, 297);
             txtDebug.TabIndex = 0;
             // 
+            // cmbProcesses
+            // 
+            cmbProcesses.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbProcesses.FormattingEnabled = true;
+            cmbProcesses.Items.AddRange(new object[] { "Calc", "Notepad", "WarThunderExporter", "TelemetryVibShaker", "FalconExporter", "PerformanceMonitor", "RemoteWindowControl", "SimConnectExporter", "HWiNFO64" });
+            cmbProcesses.Location = new Point(21, 10);
+            cmbProcesses.Name = "cmbProcesses";
+            cmbProcesses.Size = new Size(121, 23);
+            cmbProcesses.TabIndex = 14;
+            // 
+            // nudInstance
+            // 
+            nudInstance.Location = new Point(163, 11);
+            nudInstance.Name = "nudInstance";
+            nudInstance.Size = new Size(60, 23);
+            nudInstance.TabIndex = 15;
+            // 
             // frmMain
             // 
             AcceptButton = btnStartWebServer;
@@ -424,49 +285,35 @@
             FormClosing += frmMain_FormClosing;
             Load += frmMain_Load;
             tabControls.ResumeLayout(false);
-            tabMovements.ResumeLayout(false);
-            tabMovements.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)nudInstance).EndInit();
             tabSettings.ResumeLayout(false);
             tabSettings.PerformLayout();
             tabDebug.ResumeLayout(false);
             tabDebug.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)nudInstance).EndInit();
             ResumeLayout(false);
         }
 
         #endregion
 
         private TabControl tabControls;
-        private TabPage tabMovements;
         private TabPage tabSettings;
-        private Label label1;
-        private TextBox txtXCoord;
-        private Label label2;
-        private TextBox txtYCoord;
-        private ComboBox cmbProcesses;
-        private RadioButton rbMinimize;
-        private RadioButton rbNoChange;
-        private RadioButton rbRestore;
-        private Button btnSendChanges;
-        private Button btnReadPosition;
-        private NumericUpDown nudInstance;
         private TextBox txtIPAddress;
         private TextBox txtPort;
         private TabPage tabDebug;
         private TextBox txtDebug;
         private Label lblWebServerThreadId;
         private LinkLabel lblLink;
-        private TextBox textBox1;
         private Label label3;
         private Label label5;
         private Label label4;
         private TextBox txtHTML;
         private Label label6;
         private Button btnStartWebServer;
-        private Button button1;
         private CheckBox chkUseEfficiencyCoresOnly;
         private CheckBox chkAutostart;
         private Label lblCountDownTimer;
         private CheckBox chkUseCachedHTML;
+        private ComboBox cmbProcesses;
+        private NumericUpDown nudInstance;
     }
 }

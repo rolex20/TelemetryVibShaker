@@ -135,16 +135,7 @@ namespace RemoteWindowControl
         }
 
 
-        private void btnSendChanges_Click(object sender, EventArgs e)
-        {
-            int newstate = 0;
-            if (rbMinimize.Checked)
-                newstate = -1;
-            else if (rbRestore.Checked)
-                newstate = 1;
 
-            MoveResizeWindow(cmbProcesses.Items[cmbProcesses.SelectedIndex].ToString(), (int)nudInstance.Value, Convert.ToInt32(txtXCoord.Text), Convert.ToInt32(txtYCoord.Text), newstate);
-        }
 
         private RECT GetWindowPosition(string ProcessName, int InstanceNumber)
         {
@@ -166,19 +157,7 @@ namespace RemoteWindowControl
             return rect;
         }
 
-        private void btnReadPosition_Click(object sender, EventArgs e)
-        {
-            Process[] processes = Process.GetProcessesByName(cmbProcesses.Items[cmbProcesses.SelectedIndex].ToString());
-            IntPtr windowHandle = processes[0].MainWindowHandle;
 
-            RECT windowRect = new RECT();
-            GetWindowRect(windowHandle, out windowRect);
-            int x = windowRect.Left;
-            int y = windowRect.Top;
-
-            txtXCoord.Text = x.ToString();
-            txtYCoord.Text = y.ToString();
-        }
 
         private void StartWebServer()
         {
@@ -412,13 +391,10 @@ namespace RemoteWindowControl
             lblLink.Text = $"http://{txtIPAddress.Text}:{txtPort.Text}/";
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            LogError(textBox1.Text, "button1_Click()");
-        }
 
         private void btnStartWebServer_Click(object sender, EventArgs e)
         {
+            // Remember this could be called from another thread
             this.BeginInvoke(new Action(() => {
                 btnStartWebServer.Enabled = false;
                 txtHTML.Enabled = false;
@@ -430,6 +406,9 @@ namespace RemoteWindowControl
             //Prepare the cached copy of the HTML Template
             HTML_Template = ReadFileContents(txtHTML.Text);
 
+            // Minimize if required
+            this.WindowState = FormWindowState.Minimized;  
+            
             StartWebServer();
         }
 
