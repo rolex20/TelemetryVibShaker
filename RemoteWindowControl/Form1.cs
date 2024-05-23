@@ -241,7 +241,10 @@ namespace RemoteWindowControl
                                     parameters.TryGetValue("State", out temp);
                                     int newState = int.TryParse(temp, out int parsedValue) ? parsedValue : 0;
 
-                                    procHandle = MoveResizeWindow(processName, 0, x, y, newState);
+                                    parameters.TryGetValue("Instance", out temp);
+                                    int.TryParse(temp, out int instance);
+
+                                    procHandle = MoveResizeWindow(processName, instance, x, y, newState);
                                     footer = $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Successfully requested coordinates change to X: {x}, Y: {y}";
 
                                     RECT rect = GetWindowPosition(procHandle);
