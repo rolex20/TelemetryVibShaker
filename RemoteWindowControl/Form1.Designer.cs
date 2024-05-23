@@ -31,6 +31,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             tabControls = new TabControl();
             tabSettings = new TabPage();
+            nudInstance = new NumericUpDown();
+            cmbProcesses = new ComboBox();
             chkUseCachedHTML = new CheckBox();
             lblCountDownTimer = new Label();
             chkAutostart = new CheckBox();
@@ -47,12 +49,10 @@
             txtIPAddress = new TextBox();
             tabDebug = new TabPage();
             txtDebug = new TextBox();
-            cmbProcesses = new ComboBox();
-            nudInstance = new NumericUpDown();
             tabControls.SuspendLayout();
             tabSettings.SuspendLayout();
-            tabDebug.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudInstance).BeginInit();
+            tabDebug.SuspendLayout();
             SuspendLayout();
             // 
             // tabControls
@@ -62,7 +62,7 @@
             tabControls.Location = new Point(21, 24);
             tabControls.Name = "tabControls";
             tabControls.SelectedIndex = 0;
-            tabControls.Size = new Size(333, 352);
+            tabControls.Size = new Size(376, 352);
             tabControls.TabIndex = 0;
             // 
             // tabSettings
@@ -86,10 +86,27 @@
             tabSettings.Location = new Point(4, 24);
             tabSettings.Name = "tabSettings";
             tabSettings.Padding = new Padding(3);
-            tabSettings.Size = new Size(325, 324);
+            tabSettings.Size = new Size(368, 324);
             tabSettings.TabIndex = 1;
             tabSettings.Text = "Settings";
             tabSettings.UseVisualStyleBackColor = true;
+            // 
+            // nudInstance
+            // 
+            nudInstance.Location = new Point(163, 11);
+            nudInstance.Name = "nudInstance";
+            nudInstance.Size = new Size(60, 23);
+            nudInstance.TabIndex = 15;
+            // 
+            // cmbProcesses
+            // 
+            cmbProcesses.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbProcesses.FormattingEnabled = true;
+            cmbProcesses.Items.AddRange(new object[] { "Calc", "Notepad", "WarThunderExporter", "TelemetryVibShaker", "FalconExporter", "PerformanceMonitor", "RemoteWindowControl", "SimConnectExporter", "HWiNFO64" });
+            cmbProcesses.Location = new Point(21, 10);
+            cmbProcesses.Name = "cmbProcesses";
+            cmbProcesses.Size = new Size(121, 23);
+            cmbProcesses.TabIndex = 14;
             // 
             // chkUseCachedHTML
             // 
@@ -106,7 +123,7 @@
             // lblCountDownTimer
             // 
             lblCountDownTimer.AutoSize = true;
-            lblCountDownTimer.Location = new Point(287, 215);
+            lblCountDownTimer.Location = new Point(298, 215);
             lblCountDownTimer.Name = "lblCountDownTimer";
             lblCountDownTimer.Size = new Size(22, 15);
             lblCountDownTimer.TabIndex = 12;
@@ -155,7 +172,7 @@
             // 
             txtHTML.Location = new Point(153, 173);
             txtHTML.Name = "txtHTML";
-            txtHTML.Size = new Size(158, 23);
+            txtHTML.Size = new Size(196, 23);
             txtHTML.TabIndex = 8;
             txtHTML.Text = ".\\Remote.Control.html";
             // 
@@ -219,7 +236,7 @@
             // 
             txtPort.Location = new Point(153, 89);
             txtPort.Name = "txtPort";
-            txtPort.Size = new Size(158, 23);
+            txtPort.Size = new Size(196, 23);
             txtPort.TabIndex = 1;
             txtPort.Text = "8081";
             txtPort.TextChanged += txtPort_TextChanged;
@@ -228,7 +245,7 @@
             // 
             txtIPAddress.Location = new Point(153, 51);
             txtIPAddress.Name = "txtIPAddress";
-            txtIPAddress.Size = new Size(158, 23);
+            txtIPAddress.Size = new Size(196, 23);
             txtIPAddress.TabIndex = 0;
             txtIPAddress.Text = "192.168.1.5";
             txtIPAddress.TextChanged += txtIPAddress_TextChanged;
@@ -253,29 +270,12 @@
             txtDebug.Size = new Size(290, 297);
             txtDebug.TabIndex = 0;
             // 
-            // cmbProcesses
-            // 
-            cmbProcesses.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbProcesses.FormattingEnabled = true;
-            cmbProcesses.Items.AddRange(new object[] { "Calc", "Notepad", "WarThunderExporter", "TelemetryVibShaker", "FalconExporter", "PerformanceMonitor", "RemoteWindowControl", "SimConnectExporter", "HWiNFO64" });
-            cmbProcesses.Location = new Point(21, 10);
-            cmbProcesses.Name = "cmbProcesses";
-            cmbProcesses.Size = new Size(121, 23);
-            cmbProcesses.TabIndex = 14;
-            // 
-            // nudInstance
-            // 
-            nudInstance.Location = new Point(163, 11);
-            nudInstance.Name = "nudInstance";
-            nudInstance.Size = new Size(60, 23);
-            nudInstance.TabIndex = 15;
-            // 
             // frmMain
             // 
             AcceptButton = btnStartWebServer;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(376, 391);
+            ClientSize = new Size(409, 391);
             Controls.Add(tabControls);
             FormBorderStyle = FormBorderStyle.Fixed3D;
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -287,9 +287,9 @@
             tabControls.ResumeLayout(false);
             tabSettings.ResumeLayout(false);
             tabSettings.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)nudInstance).EndInit();
             tabDebug.ResumeLayout(false);
             tabDebug.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)nudInstance).EndInit();
             ResumeLayout(false);
         }
 
