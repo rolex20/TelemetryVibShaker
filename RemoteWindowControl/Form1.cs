@@ -342,8 +342,6 @@ namespace RemoteWindowControl
         {
             SingleInstanceChecker();
 
-            tabControls.SelectedIndex = 1;
-
             txtDebug.Tag = 0; // Used to track the number of errors detected
 
             // Restore previous location
