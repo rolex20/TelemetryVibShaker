@@ -164,8 +164,12 @@ namespace TelemetryVibShaker
             // Stop the telemetry if it is still running: kill the upd server, etc
             btnStop_Click(null, null);
 
-            Properties.Settings.Default.XCoordinate = this.Location.X;
-            Properties.Settings.Default.YCoordinate = this.Location.Y;
+
+            if (this.WindowState != FormWindowState.Minimized)
+            {
+                Properties.Settings.Default.XCoordinate = this.Location.X;
+                Properties.Settings.Default.YCoordinate = this.Location.Y;
+            }
 
             // Save the settings for all controls in the form
             SaveSettings(this);
