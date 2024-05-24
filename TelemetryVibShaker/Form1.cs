@@ -613,19 +613,14 @@ namespace TelemetryVibShaker
             UpdateValue(lblProcessingTimeUIMax, Stats.Max()); // this might be delayed by one cycle, but it's ok
             UpdateValue(lblProcessingTimeUIMin, Stats.Min());
             UpdateValue(lblProcessingTimeUIAvg, Stats.Average());
-
-
-            if (chkShowStatistics.Checked)
-            {
-                stopWatchUI.Stop();
-                Stats.AddSample(stopWatchUI.Elapsed.Milliseconds);
-            }
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
             int processorUsedForUI = 0;
-            if (chkShowStatistics.Checked)
+            bool showStatistics = chkShowStatistics.Checked;
+
+            if (showStatistics)
             {
                 stopWatchUI.Restart();
                 processorUsedForUI = (int)GetCurrentProcessorNumber();
@@ -642,64 +637,69 @@ namespace TelemetryVibShaker
             }
 
             // Statistics are updated once per second
-            if (chkShowStatistics.Checked && telemetry.IsRunning() && (tabs.SelectedIndex == 5))
+            if (showStatistics && telemetry.IsRunning() && (tabs.SelectedIndex == 5))
             {
                 this.SuspendLayout();
 
-                // Report last datagram timestamp
-                UpdateValue(lblTimestamp, telemetry.TimeStamp);
+                if (this.WindowState != FormWindowState.Minimized)
+                {
+                    // Report last datagram timestamp
+                    UpdateValue(lblTimestamp, telemetry.TimeStamp);
 
-                // Report sound effectType
-                UpdateSoundEffectStatus(soundManager.Status);
+                    // Report sound effectType
+                    UpdateSoundEffectStatus(soundManager.Status);
 
-                // Report Current Unit Type
-                UpdateValue(lblCurrentUnitType, telemetry.CurrentUnitType);
+                    // Report Current Unit Type
+                    UpdateValue(lblCurrentUnitType, telemetry.CurrentUnitType);
 
-                // Report the last AoA received
-                UpdateValue(lblLastAoA, telemetry.LastData.AoA);
+                    // Report the last AoA received
+                    UpdateValue(lblLastAoA, telemetry.LastData.AoA);
 
-                // Report datagrams per second
-                UpdateValue(lblDatagramsPerSecond, telemetry.DPS);
+                    // Report datagrams per second
+                    UpdateValue(lblDatagramsPerSecond, telemetry.DPS);
 
-                // Report speed brakes
-                UpdateValue(lblLastSpeedBrakes, telemetry.LastData.SpeedBrakes);
+                    // Report speed brakes
+                    UpdateValue(lblLastSpeedBrakes, telemetry.LastData.SpeedBrakes);
 
-                // Report flaps
-                UpdateValue(lblLastFlaps, telemetry.LastData.Flaps);
+                    // Report flaps
+                    UpdateValue(lblLastFlaps, telemetry.LastData.Flaps);
 
-                // Report speed
-                UpdateValue(lblSpeed, telemetry.LastData.Speed);
+                    // Report speed
+                    UpdateValue(lblSpeed, telemetry.LastData.Speed);
 
-                // Report G-Forces
-                UpdateValue(lblGForces, telemetry.LastData.GForces);
+                    // Report G-Forces
+                    UpdateValue(lblGForces, telemetry.LastData.GForces);
 
-                // Report Altitude Above Ground
-                UpdateValue(lblAltitude, telemetry.LastData.Altitude);
+                    // Report Altitude Above Ground
+                    UpdateValue(lblAltitude, telemetry.LastData.Altitude);
 
-                // Report gear
-                UpdateValue(lblLastGear, telemetry.LastData.Gear);
+                    // Report gear
+                    UpdateValue(lblLastGear, telemetry.LastData.Gear);
 
 
-                // Report last processor used for UDP processing
-                UpdateValue(lblLastProcessorUsedUDP, telemetry.LastProcessorUsed);
+                    // Report last processor used for UDP processing
+                    UpdateValue(lblLastProcessorUsedUDP, telemetry.LastProcessorUsed);
 
-                // Report last procesor used for UI (monitor) this function
-                UpdateValue(lblLastProcessorUsedUI, processorUsedForUI);
+                    // Report last procesor used for UI (monitor) this function
+                    UpdateValue(lblLastProcessorUsedUI, processorUsedForUI);
 
-                // Report UI ThreadID
-                UpdateValue(lblUIThreadID, (int)GetCurrentThreadId());
+                    // Report UI ThreadID
+                    UpdateValue(lblUIThreadID, (int)GetCurrentThreadId());
 
-                // Report UDP ThreadID
-                UpdateValue(lblUDPServerThread, telemetry.ThreadId);
+                    // Report UDP ThreadID
+                    UpdateValue(lblUDPServerThread, telemetry.ThreadId);
 
-                // Always calculate/Report max UDP processing time
-                UpdateValue(lblProcessingTimeUDPMax, telemetry.Stats.Max());
-                UpdateValue(lblProcessingTimeUDPMin, telemetry.Stats.Min());
-                UpdateValue(lblProcessingTimeUDPAvg, telemetry.Stats.Average());
-
+                    // Always calculate/Report max UDP processing time
+                    UpdateValue(lblProcessingTimeUDPMax, telemetry.Stats.Max());
+                    UpdateValue(lblProcessingTimeUDPMin, telemetry.Stats.Min());
+                    UpdateValue(lblProcessingTimeUDPAvg, telemetry.Stats.Average());
+                }
 
                 // Always calculate/Report max UI processing time (monitor).  This one needs to be the last                
-                UpdateMaxUIProcessingTime(); // the stopwatch is stopped here
+                UpdateMaxUIProcessingTime();
+
+                stopWatchUI.Stop();
+                Stats.AddSample(stopWatchUI.Elapsed.Milliseconds);
 
                 this.ResumeLayout();
             }
