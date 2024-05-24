@@ -87,8 +87,12 @@ namespace WarThunderExporter
         {
             txtDebug.Text = String.Empty; // We don't want to save this to Properties.Settings
 
-            Properties.Settings.Default.XCoordinate = this.Location.X;
-            Properties.Settings.Default.YCoordinate = this.Location.Y;
+
+            if (this.WindowState != FormWindowState.Minimized)
+            {
+                Properties.Settings.Default.XCoordinate = this.Location.X;
+                Properties.Settings.Default.YCoordinate = this.Location.Y;
+            }
 
             // Save the settings for all controls in the form
             SaveSettings(this);
@@ -603,7 +607,7 @@ namespace WarThunderExporter
                     }
 
                     // Update UI
-                    if (tabControl1.SelectedIndex == 1 && chkShowStatistics.Checked)
+                    if (tabControl1.SelectedIndex == 1 && chkShowStatistics.Checked && this.WindowState != FormWindowState.Minimized)
                     {
                         this.SuspendLayout();
                         UpdateCaption(tsStatus, "Connected.");
