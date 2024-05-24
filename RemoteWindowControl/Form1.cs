@@ -179,6 +179,14 @@ namespace RemoteWindowControl
             Task.Run(() => ProcessRequest());
         }
 
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, IntPtr wParam, IntPtr lParam);
+        private const UInt32 WM_CLOSE = 0x0010;
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool IsWindow(IntPtr hWnd);
+
         private async Task ProcessRequest()
         {
             while (true)
@@ -211,20 +219,32 @@ namespace RemoteWindowControl
                         parameters.TryGetValue("Process", out processName);
                         if (processName.Length > 0)
                         {
-                            LogError($"ProcessName={processName}", "ProcessRequest()");
+                            LogError($"ProcessName=[{processName}]", "ProcessRequest()");
 
                             string temp;
                             int x = 0;
                             int y = 0;
 
-
-                            if (parameters.TryGetValue("GetValues", out temp))
+                            if (parameters.TryGetValue("Exit", out temp))
+                            {
+                                LogError("Clicked Terminate for " + processName, "ProcessRequest()");
+                                Process[] processes = Process.GetProcessesByName(processName);
+                                if (processes.Length > 0)
+                                {
+                                    IntPtr hWnd = processes[0].MainWindowHandle;
+                                    SendMessage(hWnd, WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
+                                    footer = $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Successfully requested graceful-exit/kill for [{processName}]";
+                                    if (IsWindow(hWnd) && !processes[0].CloseMainWindow()) processes[0].Kill();
+                                } else
+                                    footer = $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Process Not Found [{processName}]";
+                            } 
+                            else if (parameters.TryGetValue("GetValues", out temp))
                             {
                                 LogError("Clicked GetValues for " + processName, "ProcessRequest()");
                                 RECT rect = GetWindowPosition(processName, 0);
                                 newX = rect.Left;
                                 newY = rect.Top;
-                                footer = $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Successfully requested coordinates read for {processName}";
+                                footer = $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Successfully requested coordinates read for [{processName}]";
                             }
                             else if (parameters.TryGetValue("X", out string sx) && parameters.TryGetValue("Y", out string sy))
                             {
@@ -245,7 +265,7 @@ namespace RemoteWindowControl
                                     int.TryParse(temp, out int instance);
 
                                     procHandle = MoveResizeWindow(processName, instance, x, y, newState);
-                                    footer = $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Successfully requested coordinates change to X: {x}, Y: {y}";
+                                    footer = $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Successfully requested coordinates change to X: {x}, Y: {y} for [{processName}]";
 
                                     RECT rect = GetWindowPosition(procHandle);
                                     newX = rect.Left;
@@ -400,15 +420,26 @@ namespace RemoteWindowControl
                 btnStartWebServer.Enabled = false;
                 txtHTML.Enabled = false;
 
+                // Minimize if required
+                if (chkAutostart.Checked) this.WindowState = FormWindowState.Minimized;
+
                 UpdateLink();
+
+                // Get all processes running on the local computer.
+                Process[] processList = Process.GetProcesses();
+
+                // Iterate through all the processes and print their names
+                foreach (Process proc in processList)
+                {
+                    Debug.WriteLine("Process: {0} ID: {1}", proc.ProcessName, proc.Id);
+                }
             }));
 
 
             //Prepare the cached copy of the HTML Template
             HTML_Template = ReadFileContents(txtHTML.Text);
 
-            // Minimize if required
-            if (chkAutostart.Checked)  this.WindowState = FormWindowState.Minimized;  
+            
             
             StartWebServer();
         }
@@ -429,8 +460,11 @@ namespace RemoteWindowControl
         {
             txtDebug.Text = String.Empty; // We don't want to save this to Properties.Settings
 
-            Properties.Settings.Default.XCoordinate = this.Location.X;
-            Properties.Settings.Default.YCoordinate = this.Location.Y;
+            if (this.WindowState != FormWindowState.Minimized)
+            {
+                Properties.Settings.Default.XCoordinate = this.Location.X;
+                Properties.Settings.Default.YCoordinate = this.Location.Y;
+            }
 
             // Save the settings for all controls in the form
             SaveSettings(this);

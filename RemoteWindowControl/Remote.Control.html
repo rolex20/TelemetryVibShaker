@@ -25,33 +25,34 @@
 <body>
 
 <div class="container">
-<form name="RemoteControlForm" method="POST" align="center">
-  <h2>Window Remote Movement</h2>
-  <p class="welcome-message">Use this app to move windows to other monitors when playing in VR</p>
-  
-  <!-- Combo box for options -->
-  <label for="Process">Select Process:</label>
-  {cmbProcess} 
-  
-  <br><label for="State">Select State:</label> 
-  <select name="State">
-	<option selected="selected" value="0">NoChange</option>
-	<option value="-1">Minimize</option>
-	<option value="1">Restore</option>
-  </select>  
-  
-  <!-- Text boxes for user input -->
-  <br><label for="X">New X:</label><input type='text' value="{X}" name="X" placeholder='type new X coordinates'>
-  <br><label for="Y">New Y:</label><input type='text' value="{Y}" name="Y" placeholder='type new Y coordinates'>
-   <!-- Add more text boxes here -->
-  
-  <!-- Submit buttons -->
-  <input type="submit" class="submit-btn" name="Submit" value="Submit"> 
-  <input type="submit" class="submit-btn" name="GetValues" value="GetValues">  
-  
-  <!-- Footer message -->
-  <div id="result" class="footer-message">{footer}</div>  
- </form>
+    <form name="RemoteControlForm" method="POST" align="center">
+        <h2>Window Remote Movement</h2>
+        <p class="welcome-message">Use this app to move windows to other monitors when playing in VR</p>
+
+        <!-- Combo box for options -->
+        <label for="Process">Select Process:</label>
+        {cmbProcess}
+
+
+        <br><label for="State">Select State:</label>
+        <select name="State">
+            <option selected="selected" value="0">NoChange</option>
+            <option value="-1">Minimize</option>
+            <option value="1">Restore</option>
+        </select>
+
+        <!-- Text boxes for user input -->
+        <br><label for="X">New X:</label><input type='text' value="{X}" name="X" placeholder='type new X coordinates'>
+        <br><label for="Y">New Y:</label><input type='text' value="{Y}" name="Y" placeholder='type new Y coordinates'>
+        <!-- Add more text boxes here -->
+        <!-- Submit buttons -->
+        <input type="submit" class="submit-btn" name="Submit" value="Submit">
+        <input type="submit" class="submit-btn" name="GetValues" value="GetValues">
+        <input type="submit" class="submit-btn" name="Exit" value="Terminate">
+
+        <!-- Footer message -->
+        <div id="result" class="footer-message">{footer}</div>
+    </form>
 </div>
 
 </body>
