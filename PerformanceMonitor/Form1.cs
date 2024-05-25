@@ -293,18 +293,23 @@ namespace PerformanceMonitor
             // Check if the processor name contains "Intel 12700K"
             if (processorName.Contains("12700K"))
             {
+                tslbl12700K.Tag = true;  // special tag to indicate that this is a 12700K
+                lbl12700KNote.Visible = true;
+
                 // Define the CPU affinity mask for CPUs 17 to 20
                 // CPUs are zero-indexed, so CPU 17 is represented by bit 16, and so on.
                 IntPtr affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
 
-                // Set the CPU affinity
-                currentProcess.ProcessorAffinity = affinityMask;
+                try
+                {
+                    // Set the CPU affinity
+                    currentProcess.ProcessorAffinity = affinityMask;
+                }
+                catch { } // Ignore
 
                 //gpuUtilizationCounter = new PerformanceCounter("GPU", "% GPU Time", "nvidia geforce rtx 4090(01:00)");
                 //gpuFanCounter = new PerformanceCounter("GPU", "% GPU Fan Speed", "nvidia geforce rtx 4090(01:00)");
 
-                tslbl12700K.Tag = true;  // special tag to indicate that this is a 12700K
-                lbl12700KNote.Visible = true;
             }
             else
             {

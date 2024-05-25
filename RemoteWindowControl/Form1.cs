@@ -580,8 +580,12 @@ namespace RemoteWindowControl
                     // CPUs are zero-indexed, so CPU 17 is represented by bit 16, and so on.
                     IntPtr affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
 
-                    // Set the CPU affinity
-                    currentProcess.ProcessorAffinity = affinityMask;
+                    try
+                    {
+                        // Set the CPU affinity
+                        currentProcess.ProcessorAffinity = affinityMask;
+                    }
+                    catch { } // Ignore
                 }
             }
 
