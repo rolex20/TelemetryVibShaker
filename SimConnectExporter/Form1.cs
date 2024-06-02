@@ -25,6 +25,8 @@ namespace SimConnectExporter
         private int maxProcessingTime;
         private long lastTimeStamp_ms;
 
+        private Mutex SingleInstanceMutex;
+
 
         enum DEFINITIONS
         {
@@ -363,6 +365,62 @@ namespace SimConnectExporter
             btnDisconnect.Enabled = true;
             timer1.Enabled = true;
         }
+
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
+
+        [DllImport("user32.dll")]
+        private static extern bool IsIconic(IntPtr hWnd);
+
+        private const int SW_RESTORE = 9;
+
+        private void SingleInstanceChecker()
+        {
+            SingleInstanceMutex = new Mutex(true, this.Text + "_mutex", out bool createdNew);
+            if (!createdNew)
+            {
+                BringExistingInstanceToFront();
+                ShowNotification("Another instance of this application is already running.");
+                Application.Exit();
+            }
+        }
+
+        private void BringExistingInstanceToFront()
+        {
+            Process currentProcess = Process.GetCurrentProcess();
+            foreach (Process process in Process.GetProcessesByName(currentProcess.ProcessName))
+            {
+                if (process.Id != currentProcess.Id)
+                {
+                    IntPtr handle = process.MainWindowHandle;
+                    if (IsIconic(handle))
+                    {
+                        ShowWindowAsync(handle, SW_RESTORE);
+                    }
+                    SetForegroundWindow(handle);
+                    break;
+                }
+            }
+        }
+
+        private void ShowNotification(string message)
+        {
+            NotifyIcon notifyIcon = new NotifyIcon
+            {
+                Visible = true,
+                Icon = SystemIcons.Information,
+                BalloonTipIcon = ToolTipIcon.Info,
+                BalloonTipTitle = "Application Notification",
+                BalloonTipText = message
+            };
+
+            notifyIcon.ShowBalloonTip(10000);
+        }
+
+
 
         private void frmMain_Load(object sender, EventArgs e)
         {
