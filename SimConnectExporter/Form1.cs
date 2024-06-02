@@ -424,6 +424,8 @@ namespace SimConnectExporter
 
         private void frmMain_Load(object sender, EventArgs e)
         {
+            SingleInstanceChecker();
+
             // Restore previous location
             this.Location = new Point(Properties.Settings.Default.XCoordinate, Properties.Settings.Default.YCoordinate);
 
