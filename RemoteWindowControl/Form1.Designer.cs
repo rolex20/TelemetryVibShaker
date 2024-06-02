@@ -32,7 +32,6 @@
             tabControls = new TabControl();
             tabSettings = new TabPage();
             nudInstance = new NumericUpDown();
-            cmbProcesses = new ComboBox();
             chkUseCachedHTML = new CheckBox();
             lblCountDownTimer = new Label();
             chkAutostart = new CheckBox();
@@ -49,6 +48,8 @@
             txtIPAddress = new TextBox();
             tabDebug = new TabPage();
             txtDebug = new TextBox();
+            label1 = new Label();
+            txtProgramsConfigurationFile = new TextBox();
             tabControls.SuspendLayout();
             tabSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudInstance).BeginInit();
@@ -62,13 +63,14 @@
             tabControls.Location = new Point(21, 24);
             tabControls.Name = "tabControls";
             tabControls.SelectedIndex = 0;
-            tabControls.Size = new Size(376, 352);
+            tabControls.Size = new Size(376, 362);
             tabControls.TabIndex = 0;
             // 
             // tabSettings
             // 
+            tabSettings.Controls.Add(txtProgramsConfigurationFile);
+            tabSettings.Controls.Add(label1);
             tabSettings.Controls.Add(nudInstance);
-            tabSettings.Controls.Add(cmbProcesses);
             tabSettings.Controls.Add(chkUseCachedHTML);
             tabSettings.Controls.Add(lblCountDownTimer);
             tabSettings.Controls.Add(chkAutostart);
@@ -86,27 +88,17 @@
             tabSettings.Location = new Point(4, 24);
             tabSettings.Name = "tabSettings";
             tabSettings.Padding = new Padding(3);
-            tabSettings.Size = new Size(368, 324);
+            tabSettings.Size = new Size(368, 334);
             tabSettings.TabIndex = 1;
             tabSettings.Text = "Settings";
             tabSettings.UseVisualStyleBackColor = true;
             // 
             // nudInstance
             // 
-            nudInstance.Location = new Point(163, 11);
+            nudInstance.Location = new Point(310, 16);
             nudInstance.Name = "nudInstance";
-            nudInstance.Size = new Size(60, 23);
+            nudInstance.Size = new Size(39, 23);
             nudInstance.TabIndex = 15;
-            // 
-            // cmbProcesses
-            // 
-            cmbProcesses.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbProcesses.FormattingEnabled = true;
-            cmbProcesses.Items.AddRange(new object[] { "Calc", "Notepad", "WarThunderExporter", "TelemetryVibShaker", "FalconExporter", "PerformanceMonitor", "RemoteWindowControl", "SimConnectExporter", "HWiNFO64" });
-            cmbProcesses.Location = new Point(21, 10);
-            cmbProcesses.Name = "cmbProcesses";
-            cmbProcesses.Size = new Size(121, 23);
-            cmbProcesses.TabIndex = 14;
             // 
             // chkUseCachedHTML
             // 
@@ -160,7 +152,7 @@
             // 
             // btnStartWebServer
             // 
-            btnStartWebServer.Location = new Point(185, 295);
+            btnStartWebServer.Location = new Point(223, 299);
             btnStartWebServer.Name = "btnStartWebServer";
             btnStartWebServer.Size = new Size(126, 23);
             btnStartWebServer.TabIndex = 9;
@@ -255,7 +247,7 @@
             tabDebug.Controls.Add(txtDebug);
             tabDebug.Location = new Point(4, 24);
             tabDebug.Name = "tabDebug";
-            tabDebug.Size = new Size(325, 324);
+            tabDebug.Size = new Size(368, 334);
             tabDebug.TabIndex = 2;
             tabDebug.Text = "Debug";
             tabDebug.UseVisualStyleBackColor = true;
@@ -270,12 +262,28 @@
             txtDebug.Size = new Size(290, 297);
             txtDebug.TabIndex = 0;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(37, 19);
+            label1.Name = "label1";
+            label1.Size = new Size(100, 15);
+            label1.TabIndex = 16;
+            label1.Text = "Programs Config:";
+            // 
+            // txtProgramsConfigurationFile
+            // 
+            txtProgramsConfigurationFile.Location = new Point(153, 16);
+            txtProgramsConfigurationFile.Name = "txtProgramsConfigurationFile";
+            txtProgramsConfigurationFile.Size = new Size(151, 23);
+            txtProgramsConfigurationFile.TabIndex = 17;
+            // 
             // frmMain
             // 
             AcceptButton = btnStartWebServer;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(409, 391);
+            ClientSize = new Size(409, 398);
             Controls.Add(tabControls);
             FormBorderStyle = FormBorderStyle.Fixed3D;
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -313,7 +321,8 @@
         private CheckBox chkAutostart;
         private Label lblCountDownTimer;
         private CheckBox chkUseCachedHTML;
-        private ComboBox cmbProcesses;
         private NumericUpDown nudInstance;
+        private TextBox txtProgramsConfigurationFile;
+        private Label label1;
     }
 }

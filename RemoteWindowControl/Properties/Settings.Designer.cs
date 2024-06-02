@@ -226,5 +226,17 @@ namespace RemoteWindowControl.Properties {
                 this["chkUseCachedHTML"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(".\\programsList.json")]
+        public string txtProgramsConfigurationFile {
+            get {
+                return ((string)(this["txtProgramsConfigurationFile"]));
+            }
+            set {
+                this["txtProgramsConfigurationFile"] = value;
+            }
+        }
     }
 }

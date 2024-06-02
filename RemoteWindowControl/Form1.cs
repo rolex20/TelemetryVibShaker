@@ -3,11 +3,15 @@ using System.Diagnostics;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows.Forms;
+using System.Text.Json;
+using System.Collections.Generic;
+using System.IO;
+
 
 
 namespace RemoteWindowControl
 {
+
     public partial class frmMain : Form
     {
         private Process currentProcess;
@@ -16,6 +20,7 @@ namespace RemoteWindowControl
         private int ExCounter = 0;  // Exceptions Counter
         private string HTML_Template;
         private Mutex SingleInstanceMutex;
+        private ProgramList programsList;
 
         [DllImport("kernel32.dll")]
         public static extern uint GetCurrentThreadId();
@@ -187,6 +192,42 @@ namespace RemoteWindowControl
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool IsWindow(IntPtr hWnd);
 
+
+        private void LaunchProgram(string exePath)
+        {            
+            try
+            {
+                // Extract the directory from the full file path
+                string directory = Path.GetDirectoryName(exePath);
+
+                // Prepare the process to run
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = exePath, // Set the executable file path
+                    WorkingDirectory = directory, // Set the start directory
+                    UseShellExecute = true // Use the system shell to start the process
+                };
+
+                // Start the external process
+                Process.Start(startInfo);
+            }
+            catch (Exception ex)
+            {
+                LogError($"Error launching program: {ex.Message}", "LaunchProgram()");
+            }
+        }
+        private string GetLaunchPath(string ProcessName)
+        {
+            foreach (ProgramDetails program in programsList.Programs)
+            {
+                if (program.ProcessName.Equals(ProcessName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return program.Path;
+                }
+            }
+            return String.Empty;
+        }
+
         private async Task ProcessRequest()
         {
             while (true)
@@ -246,16 +287,25 @@ namespace RemoteWindowControl
                                 newY = rect.Top;
                                 footer = $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Successfully requested coordinates read for [{processName}]";
                             }
-                            else if (parameters.TryGetValue("X", out string sx) && parameters.TryGetValue("Y", out string sy))
+                            else if (parameters.TryGetValue("Launch", out temp))
+                            {
+                                LogError($"Clicked Launch for {processName}", "ProcessRequest()");
+                                string exePath = GetLaunchPath(processName);
+                                if (exePath.Length > 0)
+                                {
+                                    LaunchProgram(exePath);
+                                }
+                            }
+                            else if (parameters.TryGetValue("X", out string sx) && parameters.TryGetValue("Y", out string sy)) // At this point the only left option is Submit new coordinates for move operation
                             {
                                 x = int.Parse(sx);
                                 y = int.Parse(sy);
                                 LogError($"X={x}, Y={y}", "ProcessRequest()");
 
 
-                                if (parameters.TryGetValue("Submit", out temp))
+                                if (parameters.TryGetValue("Move", out temp))
                                 {
-                                    LogError("Clicked Submit", "ProcessRequest()");
+                                    LogError("Clicked Move", "ProcessRequest()");
 
                                     // Check required new state: Minimized, Restore, NoChange
                                     parameters.TryGetValue("State", out temp);
@@ -271,8 +321,6 @@ namespace RemoteWindowControl
                                     newX = rect.Left;
                                     newY = rect.Top;
                                 }
-
-
                             }
 
                         }
@@ -296,11 +344,11 @@ namespace RemoteWindowControl
         {
             StringBuilder html = new StringBuilder();
             html.Append("<select name='Process' required>");
-            for (int i = 0; i < cmbProcesses.Items.Count; i++)
+
+            foreach (ProgramDetails program in programsList.Programs)
             {
-                string pname = cmbProcesses.Items[i].ToString();
-                string selected = pname.Equals(ProcessName) ? " selected " : String.Empty;
-                html.Append($"<option {selected} value='{pname}'>{pname}</option>");
+                string selected = program.ProcessName.Equals(ProcessName) ? " selected " : String.Empty;
+                html.Append($"<option {selected} value='{program.ProcessName}'>{program.FriendlyName}</option>");
             }
             html.Append("</select>");
 
@@ -412,9 +460,23 @@ namespace RemoteWindowControl
             lblLink.Text = $"http://{txtIPAddress.Text}:{txtPort.Text}/";
         }
 
+        private void LoadProgramsConfigurationFile()
+        {
+            string json = File.ReadAllText(txtProgramsConfigurationFile.Text);
+            // Deserialize the JSON into a list of ProgramInfo objects
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+            };
+
+            programsList = JsonSerializer.Deserialize<ProgramList>(json, options);
+        }
 
         private void btnStartWebServer_Click(object sender, EventArgs e)
         {
+            LoadProgramsConfigurationFile();
+
             // Remember this could be called from another thread
             this.BeginInvoke(new Action(() => {
                 btnStartWebServer.Enabled = false;
@@ -652,5 +714,16 @@ namespace RemoteWindowControl
         }
 
 
+    }
+    public class ProgramDetails
+    {
+        public string FriendlyName { get; set; }
+        public string ProcessName { get; set; }
+        public string Path { get; set; }
+    }
+
+    public class ProgramList
+    {
+        public List<ProgramDetails> Programs { get; set; }
     }
 }

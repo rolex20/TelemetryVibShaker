@@ -53,5 +53,8 @@
     <Setting Name="chkUseCachedHTML" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="txtProgramsConfigurationFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.\programs.json</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
