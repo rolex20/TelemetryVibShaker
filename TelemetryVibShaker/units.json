@@ -8,6 +8,12 @@
         "volume": 50
       },	  	
       {
+        "typeName": "f-8e_fn",
+        "AoA1": 8,
+        "AoA2": 12,
+        "volume": 50
+      },	  
+      {
         "typeName": "f_16a_block_10_iaf",
         "AoA1": 11,
         "AoA2": 14,
@@ -73,6 +79,12 @@
         "AoA2": 11,
         "volume": 50
       },
+      {
+        "typeName": "f-5c",
+        "AoA1": 8,
+        "AoA2": 11,
+        "volume": 50
+      },	  
       {
         "typeName": "kfir_c7",
         "AoA1": 8,
