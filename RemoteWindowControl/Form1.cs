@@ -135,6 +135,21 @@ namespace RemoteWindowControl
                 MinimizeWindow(windowHandle);
             else if (NewState == 1)
                 RestoreWindow(windowHandle);
+            else if (NewState == 2)
+                MaximizeWindow(windowHandle);
+
+            switch (NewState)
+            {
+                case -1:
+                    MinimizeWindow(windowHandle);
+                    break;
+                case 1:
+                    RestoreWindow(windowHandle);
+                    break;
+                case 2:
+                    MaximizeWindow(windowHandle);
+                    break;
+            }
 
             return windowHandle;
         }
