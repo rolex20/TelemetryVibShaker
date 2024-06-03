@@ -112,7 +112,6 @@ storePostDataAsJson('mission_data.json');
                     }
                 }, 10);
 				
-				document.getElementById('txtArmament').value = selectedArmament;
             }
 			
             
@@ -127,7 +126,6 @@ storePostDataAsJson('mission_data.json');
                     }
                 }, 10);
 				
-				document.getElementById('txtArmament').value = selectedEnemyArmament;
             }
 			
 			updateValue('playerSpeed', 'selectedPlayerSpeed');
@@ -313,7 +311,7 @@ storePostDataAsJson('mission_data.json');
 
 <div class="container">
     <form method="POST" align="center" action="mission1.php">
-        <h2>Dogfight Mission Generator</h2>
+        <h2><a href="mission1.php">Dogfight Mission Generator</a></h2>
         <p class="welcome-message">Select parameters and click submit to generate the mission in Israel</p>
 
 
@@ -358,9 +356,6 @@ storePostDataAsJson('mission_data.json');
 				
 		<br><label for="missionDescription">Mission Description:</label>
 		<input type="text" id="missionDescription" name="missionDescription">
-
-
-		<br><input type="text" id="txtArmament">
 		
 		
         <p><button type="submit" class="submit-btn" name="btnSubmit" value="GenerateMission">Generate Mission</button>
