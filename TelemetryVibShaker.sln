@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelemetryGenerator", "Telem
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WarThunderExporter", "WarThunderExporter\WarThunderExporter.csproj", "{0D11143B-C80A-4F8A-83C9-20CD14F49A14}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteWindowControl", "RemoteWindowControl\RemoteWindowControl.csproj", "{34AB56CB-1E07-424F-AE09-6DDC1217C157}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemoteWindowControl", "RemoteWindowControl\RemoteWindowControl.csproj", "{34AB56CB-1E07-424F-AE09-6DDC1217C157}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
