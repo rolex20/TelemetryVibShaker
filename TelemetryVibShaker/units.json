@@ -6,21 +6,27 @@
         "AoA1": 11,
         "AoA2": 15,
         "volume": 50
-      },	  	
+      },
       {
         "typeName": "f-8e_fn",
         "AoA1": 8,
         "AoA2": 12,
         "volume": 50
-      },	  
+      },
       {
         "typeName": "f_16a_block_10_iaf",
         "AoA1": 11,
         "AoA2": 14,
         "volume": 50
-      },	
+      },
       {
         "typeName": "F-16C_50",
+        "AoA1": 11,
+        "AoA2": 14,
+        "volume": 50
+      },
+      {
+        "typeName": "f_16d_block_40_barak_2",
         "AoA1": 11,
         "AoA2": 14,
         "volume": 50
@@ -42,7 +48,7 @@
         "AoA1": 8,
         "AoA2": 12,
         "volume": 50
-      },	  
+      },
       {
         "typeName": "F-15C",
         "AoA1": 9,
@@ -54,7 +60,7 @@
         "AoA1": 9,
         "AoA2": 13,
         "volume": 50
-      },	  
+      },
       {
         "typeName": "MiG-29A",
         "AoA1": 10,
@@ -84,7 +90,13 @@
         "AoA1": 8,
         "AoA2": 11,
         "volume": 50
-      },	  
+      },
+      {
+        "typeName": "f_5c_turkey",
+        "AoA1": 8,
+        "AoA2": 11,
+        "volume": 50
+      },
       {
         "typeName": "kfir_c7",
         "AoA1": 8,
@@ -102,29 +114,23 @@
         "AoA1": 8,
         "AoA2": 12,
         "volume": 50
-      },	  
+      },
       {
         "typeName": "nesher",
         "AoA1": 8,
         "AoA2": 12,
         "volume": 50
-      },	  
+      },
       {
         "typeName": "alpha_jet_e",
         "AoA1": 7,
         "AoA2": 12,
         "volume": 50
-      },	  
+      },
       {
         "typeName": "mirage_f1c_200",
         "AoA1": 8,
         "AoA2": 12,
-        "volume": 50
-      },
-      {
-        "typeName": "f_5c_turkey",
-        "AoA1": 8,
-        "AoA2": 11,
         "volume": 50
       },
       {
