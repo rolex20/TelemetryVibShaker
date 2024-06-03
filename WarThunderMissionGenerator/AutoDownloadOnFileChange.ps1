@@ -23,9 +23,9 @@ if (-NOT $isNew) {
 	Exit 
 }
 
-$WatchFile = "C:\Users\ralch\Documents\trigger.txt"
-$DownloadUrl = "https://github.com/rolex20/TelemetryVibShaker/blob/master/RemoteWindowControl/Remote.Control.html"
-$DownloadPath = "C:\Users\ralch\Documents\salida.html"
+$WatchFile = "C:\MyPrograms\wamp\www\warthunder\mission_data.json"
+$DownloadUrl = "http://localhost/warthunder/generate_mission.php"
+$DownloadPath = "C:\MyPrograms\Steam\steamapps\common\War Thunder\UserMissions\AutoMission.blk"
 
 # specify the path to the folder you want to monitor:
 $Path =  (Get-Item $WatchFile).DirectoryName
