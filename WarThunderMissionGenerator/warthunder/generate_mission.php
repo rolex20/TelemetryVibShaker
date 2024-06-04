@@ -42,7 +42,7 @@ mission_settings{
 
   mission{
     type:t="singleMission"
-    level:t="levels/air_israel.bin"
+    level:t="<?=getJsonValue($jsonObject,'terrainSelect')?>"
     environment:t="<?=getJsonValue($jsonObject,'environmentSelect')?>"
     weather:t="<?=getJsonValue($jsonObject,'weatherSelect')?>"
     locName:t="<?=getJsonValue($jsonObject,'missionName')?>"
