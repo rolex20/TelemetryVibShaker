@@ -131,13 +131,6 @@ namespace RemoteWindowControl
 
             MoveWindowToCoordinates(windowHandle, X, Y);
 
-            if (NewState == -1)
-                MinimizeWindow(windowHandle);
-            else if (NewState == 1)
-                RestoreWindow(windowHandle);
-            else if (NewState == 2)
-                MaximizeWindow(windowHandle);
-
             switch (NewState)
             {
                 case -1:
