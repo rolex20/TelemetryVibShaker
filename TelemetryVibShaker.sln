@@ -27,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WarThunderExporter", "WarTh
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemoteWindowControl", "RemoteWindowControl\RemoteWindowControl.csproj", "{34AB56CB-1E07-424F-AE09-6DDC1217C157}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicroTaskScheduler", "MicroTaskScheduler\MicroTaskScheduler.csproj", "{1C46EE4F-03CC-4A45-8A3C-EF77320996FB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -123,6 +125,14 @@ Global
 		{34AB56CB-1E07-424F-AE09-6DDC1217C157}.Release|Any CPU.Build.0 = Release|Any CPU
 		{34AB56CB-1E07-424F-AE09-6DDC1217C157}.Release|x64.ActiveCfg = Release|Any CPU
 		{34AB56CB-1E07-424F-AE09-6DDC1217C157}.Release|x64.Build.0 = Release|Any CPU
+		{1C46EE4F-03CC-4A45-8A3C-EF77320996FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C46EE4F-03CC-4A45-8A3C-EF77320996FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C46EE4F-03CC-4A45-8A3C-EF77320996FB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1C46EE4F-03CC-4A45-8A3C-EF77320996FB}.Debug|x64.Build.0 = Debug|Any CPU
+		{1C46EE4F-03CC-4A45-8A3C-EF77320996FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C46EE4F-03CC-4A45-8A3C-EF77320996FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C46EE4F-03CC-4A45-8A3C-EF77320996FB}.Release|x64.ActiveCfg = Release|Any CPU
+		{1C46EE4F-03CC-4A45-8A3C-EF77320996FB}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
