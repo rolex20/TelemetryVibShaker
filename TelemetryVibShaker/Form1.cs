@@ -161,7 +161,7 @@ namespace TelemetryVibShaker
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            // Stop the telemetry if it is still running: kill the upd server, etc
+            // StopEffects the telemetry if it is still running: kill the upd server, etc
             btnStop_Click(null, null);
 
 
@@ -354,6 +354,8 @@ namespace TelemetryVibShaker
             lblSoundStatus.Tag = SoundEffectStatus.Invalid;
             UpdateSoundEffectStatus(SoundEffectStatus.NotPlaying);
 
+            chkPlayAlarm.Enabled = true;
+
 
             if (chkAutoStart.Checked)
             {
@@ -400,7 +402,7 @@ namespace TelemetryVibShaker
             // Abort the players
             if (soundManager != null)
             {
-                soundManager.Stop();
+                soundManager.StopEffects();
                 soundManager = null;
                 UpdateSoundEffectStatus(SoundEffectStatus.NotPlaying);
             }
@@ -496,7 +498,7 @@ namespace TelemetryVibShaker
             motorControllers[TWATCH] = new MotorController("TWatch-2020V3", txtTWatchIP.Text, Int32.Parse(txtTWatchPort.Text), TWatchEffects, (chkTWatchVibrate.Checked || chkTWatchDisplayBackground.Checked));
 
             // Start playing sound effects with volume 0, this minimizes any delay when the effectType is actually needed
-            soundManager = new AoA_SoundManager(txtSoundEffect1.Text, txtSoundEffect2.Text, (float)trkVolumeMultiplier1.Value / 100.0f, (float)trkVolumeMultiplier2.Value / 100.0f, cmbAudioDevice1.SelectedIndex);
+            soundManager = new AoA_SoundManager(txtSoundEffect1.Text, txtSoundEffect2.Text, (float)trkVolumeMultiplier1.Value / 100.0f, (float)trkVolumeMultiplier2.Value / 100.0f, cmbAudioDevice1.SelectedIndex, chkPlayAlarm.Checked);
             soundManager.EnableEffect1 = chkEnableAoASoundEffects1.Checked;
             soundManager.EnableEffect2 = chkEnableAoASoundEffects2.Checked;
             UpdateSoundEffectStatus(soundManager.Status);
@@ -600,7 +602,7 @@ namespace TelemetryVibShaker
                 {
                     float f => $"{f:F1}",
                     string s => s,
-                    int s => s==int.MaxValue ? "N/A": s.ToString(),
+                    int s => s == int.MaxValue ? "N/A" : s.ToString(),
                     _ => value.ToString()
                 };
             }
@@ -628,7 +630,7 @@ namespace TelemetryVibShaker
 
 
             // check if we haven't received more telemetry so we should mute all effects            
-            if ((soundManager.SoundIsActive()) && ((Stopwatch.GetTimestamp() / Stopwatch.Frequency) - telemetry.LastSecond > trkEffectTimeout.Value))
+            if ((soundManager.EffectsAreActive()) && ((Stopwatch.GetTimestamp() / Stopwatch.Frequency) - telemetry.LastSecond > trkEffectTimeout.Value))
             {
                 soundManager.MuteEffects();
                 UpdateSoundEffectStatus(SoundEffectStatus.Canceled);
@@ -1110,6 +1112,23 @@ namespace TelemetryVibShaker
             };
 
             notifyIcon.ShowBalloonTip(10000);
+        }
+
+        private void chkPlayAlarm_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!chkPlayAlarm.Enabled) return;
+                
+            
+            if (chkPlayAlarm.Checked)
+            {
+                MediaPlayer mp = new MediaPlayer(cmbAudioDevice1.SelectedIndex);
+                mp.Open(@".\Casio Watch Alarm.wav");
+                //mp.Open(@"C:\\Windows\\Media\\Ring05.wav");
+                mp.Volume = 1.0f;
+                mp.Stop();
+                mp.Play();
+            }
+
         }
     }
 }

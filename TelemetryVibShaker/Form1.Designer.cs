@@ -74,6 +74,7 @@
             label14 = new Label();
             label12 = new Label();
             tabSettings = new TabPage();
+            chkPlayAlarm = new CheckBox();
             lblCountDownTimer = new Label();
             chkAutoStart = new CheckBox();
             nudMinAltitude = new NumericUpDown();
@@ -662,6 +663,7 @@
             // 
             // tabSettings
             // 
+            tabSettings.Controls.Add(chkPlayAlarm);
             tabSettings.Controls.Add(lblCountDownTimer);
             tabSettings.Controls.Add(chkAutoStart);
             tabSettings.Controls.Add(nudMinAltitude);
@@ -688,6 +690,18 @@
             tabSettings.TabIndex = 4;
             tabSettings.Text = "General Settings";
             tabSettings.UseVisualStyleBackColor = true;
+            // 
+            // chkPlayAlarm
+            // 
+            chkPlayAlarm.AutoSize = true;
+            chkPlayAlarm.Enabled = false;
+            chkPlayAlarm.Location = new Point(17, 288);
+            chkPlayAlarm.Name = "chkPlayAlarm";
+            chkPlayAlarm.Size = new Size(242, 19);
+            chkPlayAlarm.TabIndex = 24;
+            chkPlayAlarm.Text = "Play alarm after each 30 minutes of flight";
+            chkPlayAlarm.UseVisualStyleBackColor = true;
+            chkPlayAlarm.CheckedChanged += chkPlayAlarm_CheckedChanged;
             // 
             // lblCountDownTimer
             // 
@@ -757,7 +771,7 @@
             // 
             chkUseBackgroundProcessing.AutoSize = true;
             chkUseBackgroundProcessing.Enabled = false;
-            chkUseBackgroundProcessing.Location = new Point(17, 278);
+            chkUseBackgroundProcessing.Location = new Point(295, 8);
             chkUseBackgroundProcessing.Name = "chkUseBackgroundProcessing";
             chkUseBackgroundProcessing.Size = new Size(206, 19);
             chkUseBackgroundProcessing.TabIndex = 17;
@@ -772,7 +786,7 @@
             cmbPriorityClass.Enabled = false;
             cmbPriorityClass.FormattingEnabled = true;
             cmbPriorityClass.Items.AddRange(new object[] { "NORMAL", "BELOW NORMAL", "IDLE" });
-            cmbPriorityClass.Location = new Point(371, 276);
+            cmbPriorityClass.Location = new Point(381, 28);
             cmbPriorityClass.Name = "cmbPriorityClass";
             cmbPriorityClass.Size = new Size(121, 23);
             cmbPriorityClass.TabIndex = 15;
@@ -782,7 +796,7 @@
             // label30
             // 
             label30.AutoSize = true;
-            label30.Location = new Point(244, 279);
+            label30.Location = new Point(254, 31);
             label30.Name = "label30";
             label30.Size = new Size(121, 15);
             label30.TabIndex = 14;
@@ -1789,5 +1803,6 @@
         private Label label50;
         private CheckBox chkAutoStart;
         private Label lblCountDownTimer;
+        private CheckBox chkPlayAlarm;
     }
 }

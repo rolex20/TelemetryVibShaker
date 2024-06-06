@@ -1,5 +1,9 @@
 ﻿
 
+using System.Diagnostics;
+using System.Numerics;
+using System.Threading;
+
 namespace TelemetryVibShaker
 {
     // This is a specialized class to manage AoA sound effects
@@ -50,13 +54,19 @@ namespace TelemetryVibShaker
         private MediaPlayer mp2;    // for the non optimal sound effectType (above optimal AoA)
         private float lastVolume2; // cached volume for mp2
 
+        // Support members to play the alarm after 30 minutes of flight in each new plane
+        public bool PlayAlarm;
+        private CancellationTokenSource? cancellationPlayAlarm;
+        private MediaPlayer alarmPlayer;
+
+
 
         public void makeitsound1()
         {
             mp2.Volume = 0.8f;
         }
         
-        public AoA_SoundManager(String sound1, String sound2, float VolAmplifier1, float VolAmplifier2, int AudioDeviceIndex)
+        public AoA_SoundManager(String sound1, String sound2, float VolAmplifier1, float VolAmplifier2, int AudioDeviceIndex, bool PlayAlarm)
         {
             Status = SoundEffectStatus.NotPlaying;
 
@@ -79,10 +89,16 @@ namespace TelemetryVibShaker
             AoA1 = 360;
             AoA2 = 360;
 
+            // In case the user activates this later, let's setup all now
+            this.PlayAlarm = PlayAlarm; 
+            alarmPlayer = new MediaPlayer(AudioDeviceIndex);
+            alarmPlayer.Open(@".\Casio Watch Alarm.wav");
+            alarmPlayer.Volume = VolAmplifier1;
+
             Status = SoundEffectStatus.Ready;
         }
 
-        public void Stop()
+        public void StopEffects()
         {
             if (mp1 != null)
             {
@@ -102,7 +118,7 @@ namespace TelemetryVibShaker
             Status = SoundEffectStatus.NotPlaying;
         }
 
-        public bool SoundIsActive()
+        public bool EffectsAreActive()
         {
             return ((lastVolume1 > 0.0f) || (lastVolume2 > 0.0f));
         }
@@ -200,5 +216,46 @@ namespace TelemetryVibShaker
 
             return volumeHasChanged;
         }
+
+
+        public void ScheduleAlarm()
+        {
+            if (cancellationPlayAlarm is null)
+            {
+                cancellationPlayAlarm = new CancellationTokenSource();
+            }
+            else
+            {
+                cancellationPlayAlarm.Cancel();
+                cancellationPlayAlarm.Dispose();
+                cancellationPlayAlarm = new CancellationTokenSource();
+            }
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    while (true)
+                    {
+                        await Task.Delay(TimeSpan.FromMinutes(30), cancellationPlayAlarm.Token);
+
+                        if (!cancellationPlayAlarm.IsCancellationRequested && PlayAlarm)
+                        {
+                            alarmPlayer.Play();
+                        }
+                    }
+                }
+                catch (TaskCanceledException)
+                {
+                    // we can ignore this
+                }
+                finally
+                {
+                    // ignore for now
+                }
+            });
+        }
+
+
     }
 }

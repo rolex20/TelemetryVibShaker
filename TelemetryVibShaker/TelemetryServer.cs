@@ -30,6 +30,8 @@ namespace TelemetryVibShaker
         public int MinSpeed; // km/h (below this speed, effects won't be active)
         public int MinAltitude; // Meters above the ground (below this Altitude, effects won't be active)
 
+
+
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint GetCurrentProcessorNumber();
 
@@ -143,6 +145,7 @@ namespace TelemetryVibShaker
             for (int i = 0; i < vibMotor.Length; i++)
                 vibMotor[i].Connect();
 
+
             while (!cancelationToken && listenerUdp != null)
             {
                 try
@@ -225,7 +228,7 @@ namespace TelemetryVibShaker
                         // Update vibration-motors effects
                         for (int i = 0; i < vibMotor.Length; i++)
                             vibMotor[i].ProcessEffect(LastData);
-                    } else if (soundManager_AoA.SoundIsActive()) // if sound was active due to previous datagrams, we need to check if sound needs to be turned off now
+                    } else if (soundManager_AoA.EffectsAreActive()) // if sound was active due to previous datagrams, we need to check if sound needs to be turned off now
                     {
                         // Update the sound effects
                         soundManager_AoA.UpdateEffect(LastData.AoA);
@@ -273,8 +276,7 @@ namespace TelemetryVibShaker
 
                     }
 
-                    
-                    
+                    soundManager_AoA.ScheduleAlarm();
                 }
 
                 if (Statistics) 
