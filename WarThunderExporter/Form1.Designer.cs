@@ -32,6 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmWarThunderTelemetry));
             tabControl1 = new TabControl();
             tabSettings = new TabPage();
+            chkAutoMinimize = new CheckBox();
             label12 = new Label();
             txtWtUrl = new TextBox();
             label5 = new Label();
@@ -83,7 +84,6 @@
             timer1 = new System.Windows.Forms.Timer(components);
             toolStrip1 = new ToolStrip();
             tsStatus = new ToolStripLabel();
-            chkAutoMinimize = new CheckBox();
             tabControl1.SuspendLayout();
             tabSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudFrequency).BeginInit();
@@ -126,6 +126,16 @@
             tabSettings.TabIndex = 0;
             tabSettings.Text = "Settings";
             tabSettings.UseVisualStyleBackColor = true;
+            // 
+            // chkAutoMinimize
+            // 
+            chkAutoMinimize.AutoSize = true;
+            chkAutoMinimize.Location = new Point(10, 300);
+            chkAutoMinimize.Name = "chkAutoMinimize";
+            chkAutoMinimize.Size = new Size(221, 19);
+            chkAutoMinimize.TabIndex = 12;
+            chkAutoMinimize.Text = "Auto Start and Minimize when start...";
+            chkAutoMinimize.UseVisualStyleBackColor = true;
             // 
             // label12
             // 
@@ -637,16 +647,6 @@
             tsStatus.Tag = "empty";
             tsStatus.Text = "Idle";
             tsStatus.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // chkAutoMinimize
-            // 
-            chkAutoMinimize.AutoSize = true;
-            chkAutoMinimize.Location = new Point(10, 300);
-            chkAutoMinimize.Name = "chkAutoMinimize";
-            chkAutoMinimize.Size = new Size(162, 19);
-            chkAutoMinimize.TabIndex = 12;
-            chkAutoMinimize.Text = "Auto Minimize when start";
-            chkAutoMinimize.UseVisualStyleBackColor = true;
             // 
             // frmWarThunderTelemetry
             // 

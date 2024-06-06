@@ -64,6 +64,17 @@ namespace WarThunderExporter
             };
 
             httpClient = new HttpClient(handler);
+
+            if (chkAutoMinimize.Checked)
+            {
+                Task.Run(() => AutoStart());
+            }
+        }
+
+        private void AutoStart()
+        {
+            Thread.Sleep(20000);
+            if (chkAutoMinimize.Checked) btnStart_Click(null, null);
         }
 
         private void ProcessorCheck()
@@ -281,41 +292,46 @@ namespace WarThunderExporter
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            // Before connecting udpSender, lets make sure our int cached copy is up to date
-            nudFrequency.Tag = (int)nudFrequency.Value;
-
-            PrepareMonitorLabels();
-
-            if (!(bool)txtWtUrl.Tag) // make sure we only change this once, this is an HttpClient limitation
+            this.BeginInvoke(new Action(() =>
             {
-                string baseAddress = SanitizeURL(txtWtUrl.Text);
-                httpClient.BaseAddress = new Uri(baseAddress);
-                txtWtUrl.Tag = true; // no more changes accepted to base address
-            }
-            UpdateCaption(tsStatus, $"Connecting to [{httpClient.BaseAddress.ToString()}]...");
+                // Before connecting udpSender, lets make sure our int cached copy is up to date
+                nudFrequency.Tag = (int)nudFrequency.Value;
 
-            // Allocate the udp datagram
-            datagram = new byte[8];
-            datagram[0] = 1; // flag to indicate this is a telemetry datagram for my TelemetryVibShaker program
+                PrepareMonitorLabels();
 
-            // Prepare the UDP connection to the War Thunder Telemetry
-            ConnectUDP();
+                if (!(bool)txtWtUrl.Tag) // make sure we only change this once, this is an HttpClient limitation
+                {
+                    string baseAddress = SanitizeURL(txtWtUrl.Text);
+                    httpClient.BaseAddress = new Uri(baseAddress);
+                    txtWtUrl.Tag = true; // no more changes accepted to base address
+                }
+                UpdateCaption(tsStatus, $"Connecting to [{httpClient.BaseAddress.ToString()}]...");
 
-            // Switch to Monitor
-            if (chkChangeToMonitor.Checked) tabControl1.SelectedIndex = 1;
-            DisableChildControls(tabSettings);
-            nudFrequency.Enabled = true; // we still want to be able to change this
+                // Allocate the udp datagram
+                datagram = new byte[8];
+                datagram[0] = 1; // flag to indicate this is a telemetry datagram for my TelemetryVibShaker program
+
+                // Prepare the UDP connection to the War Thunder Telemetry
+                ConnectUDP();
+
+                // Switch to Monitor
+                if (chkChangeToMonitor.Checked) tabControl1.SelectedIndex = 1;
+                DisableChildControls(tabSettings);
+                nudFrequency.Enabled = true; // we still want to be able to change this
 
 
-            btnStop.Enabled = true;
-            btnStart.Enabled = false;
+                btnStop.Enabled = true;
+                btnStart.Enabled = false;
 
-            cancellationTokenSource = new CancellationTokenSource();
+                cancellationTokenSource = new CancellationTokenSource();
 
-            // Minimize if required
-            if (chkAutoMinimize.Checked) this.WindowState = FormWindowState.Minimized;
+                // Minimize if required
+                if (chkAutoMinimize.Checked) this.WindowState = FormWindowState.Minimized;
 
-            TimerActivateNewInterval(timer1, (int)nudFrequency.Value);
+                TimerActivateNewInterval(timer1, (int)nudFrequency.Value);
+
+            }));
+
         }
 
         private void ConnectUDP()
@@ -359,71 +375,71 @@ namespace WarThunderExporter
             UpdateCaption(tsStatus, "Operation canceled by the user.");
             DisconnectUDP();
         }
-/*
-        private void UpdateCaption(Label L, float value)
-        {
-            int twodecimals = (int)(value * 100.0f);
-            if (Convert.ToInt32(L.Tag) != twodecimals)
-            {
-                L.Tag = twodecimals;
-                L.Text = $"{value:F1}";
-                //L.Text = (value >= 0.0f) ? $"{value:F1}" : "---"; // if value<0 then it is not valid or applicable yet
-            }
-        }
+        /*
+                private void UpdateCaption(Label L, float value)
+                {
+                    int twodecimals = (int)(value * 100.0f);
+                    if (Convert.ToInt32(L.Tag) != twodecimals)
+                    {
+                        L.Tag = twodecimals;
+                        L.Text = $"{value:F1}";
+                        //L.Text = (value >= 0.0f) ? $"{value:F1}" : "---"; // if value<0 then it is not valid or applicable yet
+                    }
+                }
 
-        private void UpdateCaption(ToolStripLabel L, ulong value)
-        {
-            if (Convert.ToUInt64(L.Tag) != value)
-            {
-                L.Tag = value;
-                L.Text = value.ToString();
-                //L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
-            }
-        }
-
-
-
-        private void UpdateCaption(Label L, int value)
-        {
-            if (Convert.ToInt32(L.Tag) != value)
-            {
-                L.Tag = value;
-                L.Text = value.ToString();
-                //L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
-            }
-        }
+                private void UpdateCaption(ToolStripLabel L, ulong value)
+                {
+                    if (Convert.ToUInt64(L.Tag) != value)
+                    {
+                        L.Tag = value;
+                        L.Text = value.ToString();
+                        //L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
+                    }
+                }
 
 
 
-        private void UpdateCaption(Label L, ulong value)
-        {
-            if (Convert.ToUInt64(L.Tag) != value)
-            {
-                L.Tag = value;
-                L.Text = value.ToString();
-                //L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
-            }
-        }
+                private void UpdateCaption(Label L, int value)
+                {
+                    if (Convert.ToInt32(L.Tag) != value)
+                    {
+                        L.Tag = value;
+                        L.Text = value.ToString();
+                        //L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
+                    }
+                }
 
-        private void UpdateCaption(Label L, string value)
-        {
-            if (!L.Tag.Equals(value))
-            {
-                L.Tag = value;
-                L.Text = value;
-            }
-        }
 
-        private void UpdateCaption(ToolStripLabel L, string value)
-        {
-            if (!L.Tag.Equals(value))
-            {
-                L.Tag = value;
-                L.Text = value;
-            }
 
-        }
-*/
+                private void UpdateCaption(Label L, ulong value)
+                {
+                    if (Convert.ToUInt64(L.Tag) != value)
+                    {
+                        L.Tag = value;
+                        L.Text = value.ToString();
+                        //L.Text = (value >= 0) ? value.ToString() : "---"; // if value<0 then it is not valid or applicable yet
+                    }
+                }
+
+                private void UpdateCaption(Label L, string value)
+                {
+                    if (!L.Tag.Equals(value))
+                    {
+                        L.Tag = value;
+                        L.Text = value;
+                    }
+                }
+
+                private void UpdateCaption(ToolStripLabel L, string value)
+                {
+                    if (!L.Tag.Equals(value))
+                    {
+                        L.Tag = value;
+                        L.Text = value;
+                    }
+
+                }
+        */
         private void UpdateCaption<TControl, TValue>(TControl L, TValue value)
             where TControl : Control
         {
@@ -505,7 +521,7 @@ namespace WarThunderExporter
             // timer1.Enabled = false; // Now this is done in the caller
 
             // Avoid repetitive calls to the getter
-            bool ShowStatistics_cache = chkShowStatistics.Checked; 
+            bool ShowStatistics_cache = chkShowStatistics.Checked;
 
 
             try
@@ -513,9 +529,9 @@ namespace WarThunderExporter
 
                 // Get indicators-telemetry data from War Thunder
                 if (ShowStatistics_cache) stopWatchWarThunder.Restart(); // Measure War Thunder Response time
-                    HttpResponseMessage response2 = await httpClient.GetAsync("indicators", cancellationTokenSource.Token); //txtWtUrl
-                    response2.EnsureSuccessStatusCode();
-                    string responseBody2 = await response2.Content.ReadAsStringAsync();
+                HttpResponseMessage response2 = await httpClient.GetAsync("indicators", cancellationTokenSource.Token); //txtWtUrl
+                response2.EnsureSuccessStatusCode();
+                string responseBody2 = await response2.Content.ReadAsStringAsync();
 
                 if (ShowStatistics_cache)
                 {
@@ -550,7 +566,8 @@ namespace WarThunderExporter
                     response1.EnsureSuccessStatusCode();
                     string responseBody1 = await response1.Content.ReadAsStringAsync();
 
-                    if (ShowStatistics_cache) {
+                    if (ShowStatistics_cache)
+                    {
                         stopWatchWarThunder.Stop();
                         stopWatch.Start();
                     }
@@ -567,7 +584,7 @@ namespace WarThunderExporter
                     int flapsStatus = FindJsonValue(telemetryState, "flaps, %", 0); // telemetryState["flaps, %"].Value<int>();
                     int airBrakePct = FindJsonValue(telemetryState, "airbrake, %", 0);// telemetryState["airbrake, %"].Value<int>();
                     float angleOfAttack = FindJsonValue(telemetryState, "AoA, deg", 0.0f, 255.0f);// telemetryState["AoA, deg"].Value<float>();
-                    int gearPct = FindJsonValue(telemetryState, "gear, %", 0); 
+                    int gearPct = FindJsonValue(telemetryState, "gear, %", 0);
 
                     if (aircraftName.Equals(lastAircraftName)) // just send the telemetry for the same aircraft
                     {
@@ -703,7 +720,7 @@ namespace WarThunderExporter
                 {
                     if ((bool)lblMaxProcTimeControl.Tag) // I can reuse here
                         maxWarThunderProcessingTime = elapsed;  // this is going to be delayed by one cycle, but it's okay
-                    else 
+                    else
                         lblMaxProcTimeControl.Tag = true; // Next, time, the maxWarThunderProcessingTime will be updated
                 }
 
