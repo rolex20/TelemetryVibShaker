@@ -95,7 +95,7 @@
             label16 = new Label();
             txtListeningPort = new TextBox();
             label15 = new Label();
-            Test = new TabPage();
+            tabTest = new TabPage();
             lblTestErrMsg = new Label();
             btnTestTWatchDisplay = new Button();
             btnTestTWatchMotor = new Button();
@@ -154,6 +154,9 @@
             label23 = new Label();
             chkShowStatistics = new CheckBox();
             chkChangeToMonitor = new CheckBox();
+            tabNotFounds = new TabPage();
+            label48 = new Label();
+            lstNotFounds = new ListBox();
             btnStartListening = new Button();
             btnStop = new Button();
             openFileDialog1 = new OpenFileDialog();
@@ -176,9 +179,10 @@
             ((System.ComponentModel.ISupportInitialize)nudMinAltitude).BeginInit();
             ((System.ComponentModel.ISupportInitialize)nudMinSpeed).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trkEffectTimeout).BeginInit();
-            Test.SuspendLayout();
+            tabTest.SuspendLayout();
             tabMonitor.SuspendLayout();
             panel1.SuspendLayout();
+            tabNotFounds.SuspendLayout();
             statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -188,8 +192,9 @@
             tabs.Controls.Add(tabArduino);
             tabs.Controls.Add(tabTTGO20V3);
             tabs.Controls.Add(tabSettings);
-            tabs.Controls.Add(Test);
+            tabs.Controls.Add(tabTest);
             tabs.Controls.Add(tabMonitor);
+            tabs.Controls.Add(tabNotFounds);
             tabs.Location = new Point(24, 14);
             tabs.Name = "tabs";
             tabs.SelectedIndex = 0;
@@ -909,20 +914,20 @@
             label15.TabIndex = 0;
             label15.Text = "Listening Port:";
             // 
-            // Test
+            // tabTest
             // 
-            Test.Controls.Add(lblTestErrMsg);
-            Test.Controls.Add(btnTestTWatchDisplay);
-            Test.Controls.Add(btnTestTWatchMotor);
-            Test.Controls.Add(btnTestSoundEffect2);
-            Test.Controls.Add(btnTestSoundEffect1);
-            Test.Controls.Add(btnTestArduinoMotors);
-            Test.Location = new Point(4, 24);
-            Test.Name = "Test";
-            Test.Size = new Size(509, 384);
-            Test.TabIndex = 5;
-            Test.Text = "Test";
-            Test.UseVisualStyleBackColor = true;
+            tabTest.Controls.Add(lblTestErrMsg);
+            tabTest.Controls.Add(btnTestTWatchDisplay);
+            tabTest.Controls.Add(btnTestTWatchMotor);
+            tabTest.Controls.Add(btnTestSoundEffect2);
+            tabTest.Controls.Add(btnTestSoundEffect1);
+            tabTest.Controls.Add(btnTestArduinoMotors);
+            tabTest.Location = new Point(4, 24);
+            tabTest.Name = "tabTest";
+            tabTest.Size = new Size(509, 384);
+            tabTest.TabIndex = 5;
+            tabTest.Text = "Test";
+            tabTest.UseVisualStyleBackColor = true;
             // 
             // lblTestErrMsg
             // 
@@ -1566,6 +1571,37 @@
             chkChangeToMonitor.Text = "Automatically change to monitor tab at server start.";
             chkChangeToMonitor.UseVisualStyleBackColor = true;
             // 
+            // tabNotFounds
+            // 
+            tabNotFounds.Controls.Add(label48);
+            tabNotFounds.Controls.Add(lstNotFounds);
+            tabNotFounds.Location = new Point(4, 24);
+            tabNotFounds.Name = "tabNotFounds";
+            tabNotFounds.Size = new Size(509, 384);
+            tabNotFounds.TabIndex = 6;
+            tabNotFounds.Text = "Not Founds";
+            tabNotFounds.UseVisualStyleBackColor = true;
+            // 
+            // label48
+            // 
+            label48.AutoSize = true;
+            label48.Location = new Point(23, 16);
+            label48.Name = "label48";
+            label48.Size = new Size(201, 15);
+            label48.TabIndex = 1;
+            label48.Text = "List of fighters not found in .json file:";
+            // 
+            // lstNotFounds
+            // 
+            lstNotFounds.FormattingEnabled = true;
+            lstNotFounds.ItemHeight = 15;
+            lstNotFounds.Location = new Point(23, 47);
+            lstNotFounds.Name = "lstNotFounds";
+            lstNotFounds.Size = new Size(437, 304);
+            lstNotFounds.TabIndex = 0;
+            toolTip1.SetToolTip(lstNotFounds, "Double click an item to copy it's text to the clipboard");
+            lstNotFounds.SelectedIndexChanged += lstNotFounds_SelectedIndexChanged;
+            // 
             // btnStartListening
             // 
             btnStartListening.Location = new Point(346, 428);
@@ -1659,11 +1695,13 @@
             ((System.ComponentModel.ISupportInitialize)nudMinAltitude).EndInit();
             ((System.ComponentModel.ISupportInitialize)nudMinSpeed).EndInit();
             ((System.ComponentModel.ISupportInitialize)trkEffectTimeout).EndInit();
-            Test.ResumeLayout(false);
+            tabTest.ResumeLayout(false);
             tabMonitor.ResumeLayout(false);
             tabMonitor.PerformLayout();
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
+            tabNotFounds.ResumeLayout(false);
+            tabNotFounds.PerformLayout();
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
             ResumeLayout(false);
@@ -1765,7 +1803,7 @@
         private Label lblLastProcessorUsedUI;
         private Label lblUIThreadID;
         private Label label27;
-        private TabPage Test;
+        private TabPage tabTest;
         private Button btnTestArduinoMotors;
         private Button btnTestSoundEffect1;
         private Button btnTestSoundEffect2;
@@ -1804,5 +1842,8 @@
         private CheckBox chkAutoStart;
         private Label lblCountDownTimer;
         private CheckBox chkPlayAlarm;
+        private TabPage tabNotFounds;
+        private ListBox lstNotFounds;
+        private Label label48;
     }
 }

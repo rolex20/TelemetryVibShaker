@@ -363,7 +363,7 @@ namespace TelemetryVibShaker
             }
         }
 
-        private void  AutoStartWebServer()
+        private void AutoStartWebServer()
         {
             for (int i = 10; i >= 0; i--)
             {
@@ -592,7 +592,7 @@ namespace TelemetryVibShaker
             timer1.Enabled = true;
         }
 
-        private void UpdateValue<TControl, TValue>(TControl L, TValue value)
+        private bool UpdateValue<TControl, TValue>(TControl L, TValue value)
             where TControl : Control
         {
             if (!Equals(L.Tag, value))
@@ -605,7 +605,10 @@ namespace TelemetryVibShaker
                     int s => s == int.MaxValue ? "N/A" : s.ToString(),
                     _ => value.ToString()
                 };
+                return true;
             }
+            else
+                return false;
         }
 
 
@@ -653,6 +656,8 @@ namespace TelemetryVibShaker
 
                     // Report Current Unit Type
                     UpdateValue(lblCurrentUnitType, telemetry.CurrentUnitType);
+                    if (telemetry.LastData.AoA == 360) // unknown unit
+                        lstNotFounds.Items.Add(telemetry.CurrentUnitType);
 
                     // Report the last AoA received
                     UpdateValue(lblLastAoA, telemetry.LastData.AoA);
@@ -1117,8 +1122,8 @@ namespace TelemetryVibShaker
         private void chkPlayAlarm_CheckedChanged(object sender, EventArgs e)
         {
             if (!chkPlayAlarm.Enabled) return;
-                
-            
+
+
             if (chkPlayAlarm.Checked)
             {
                 MediaPlayer mp = new MediaPlayer(cmbAudioDevice1.SelectedIndex);
@@ -1129,6 +1134,13 @@ namespace TelemetryVibShaker
                 mp.Play();
             }
 
+        }
+
+        private void lstNotFounds_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lstNotFounds.SelectedItem is null) return;
+
+            Clipboard.SetText(lstNotFounds.SelectedItem.ToString());
         }
     }
 }
