@@ -74,7 +74,15 @@ namespace WarThunderExporter
         private void AutoStart()
         {
             Thread.Sleep(20000);
-            if (chkAutoMinimize.Checked) btnStart_Click(null, null);
+
+            this.Invoke((MethodInvoker)delegate
+            {
+                // Code here will run on the UI thread
+                // We can safely interact with UI elements
+
+                // Verify that the user hasn't aborted the autostart or clicked manually on btnStartListening
+                if (chkAutoMinimize.Checked) btnStart_Click(null, null);
+            });
         }
 
         private void ProcessorCheck()
@@ -292,8 +300,8 @@ namespace WarThunderExporter
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            this.BeginInvoke(new Action(() =>
-            {
+            //this.BeginInvoke(new Action(() =>
+            //{
                 // Before connecting udpSender, lets make sure our int cached copy is up to date
                 nudFrequency.Tag = (int)nudFrequency.Value;
 
@@ -330,7 +338,7 @@ namespace WarThunderExporter
 
                 TimerActivateNewInterval(timer1, (int)nudFrequency.Value);
 
-            }));
+            //}));
 
         }
 
