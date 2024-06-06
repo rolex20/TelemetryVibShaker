@@ -363,7 +363,7 @@ namespace TelemetryVibShaker
             }
         }
 
-        private async Task AutoStartWebServer()
+        private void  AutoStartWebServer()
         {
             for (int i = 10; i >= 0; i--)
             {
