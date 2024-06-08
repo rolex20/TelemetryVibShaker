@@ -91,7 +91,10 @@
   { "name":"su_22m3", "armament": ["su_22m3_default", "su_22m3_default_r60", "su_22m3_rocket_r60m"] },
   { "name":"lightning_f6", "armament": ["lightning_f6_default", "lightning_f6_firestreak"] },
   { "name":"fiat_g91_ys", "armament": ["fiat_g91_default", "fiat_g91ys_2xaim9"] },
-  { "name":"amx", "armament": ["amx_default", "amx_aim_9l_default"] }
+  { "name":"amx", "armament": ["amx_default", "amx_aim_9l_default"] },  
+  { "name":"saab_jas39a", "armament": ["", "saab_jas39a_default", "saab_jas39a_rockets_rb_74"] },
+  { "name":"saab_jas39c_hungary", "armament": ["", "saab_jas39c_south_africa_default", "saab_jas39c_south_africa_rockets_aim_9l_"] },  
+  { "name":"saab_jas39c_south_africa", "armament": ["", "saab_jas39c_south_africa_default", "saab_jas39c_south_africa_rockets_aim_9l_"] }
 ],
 
 "terrain": [
