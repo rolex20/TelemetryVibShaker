@@ -15,6 +15,7 @@ public class NvidiaGpu
     private uint _power;
     private uint _smClock;
     private uint _temperature;
+    private int _memory_utilization;
 
     public readonly string Name;
     public readonly string Uuid;
@@ -61,6 +62,8 @@ public class NvidiaGpu
         DeviceId = -1;
     }
 
+    public int MemoryUtilization { get { return _memory_utilization; } }
+
     //Percent of time over the past sample period during which one or more kernels was executing on the GPU
     public int Utilization { get {
             try {
@@ -68,6 +71,7 @@ public class NvidiaGpu
                 var err = Nvml.nvmlDeviceGetUtilizationRates(_device, out _utilization);
                 _utilization = (err == Nvml.nvmlReturn.NVML_SUCCESS) ? _utilization : default(Nvml.NvmlUtilization);
 
+                _memory_utilization = (int)_utilization.memory; 
                 return (int)_utilization.gpu;
             } catch
             {
@@ -82,8 +86,9 @@ public class NvidiaGpu
         get {
             try
             {
-                var err = Nvml.nvmlDeviceGetTemperature(_device, Nvml.nvmlTemperatureSensors.NVML_TEMPERATURE_GPU, out _temperature);
-                _temperature = (err == Nvml.nvmlReturn.NVML_SUCCESS) ? _temperature : 0;
+                var err = Nvml.nvmlDeviceGetFanSpeed(_device, out _fanSpeed);
+                _fanSpeed = (err == Nvml.nvmlReturn.NVML_SUCCESS) ? _fanSpeed : 0;
+
 
                 return (int)_fanSpeed;
             } catch
@@ -132,8 +137,8 @@ public class NvidiaGpu
     public int TemperatureC { get {
             try
             {
-                var err = Nvml.nvmlDeviceGetFanSpeed(_device, out _fanSpeed);
-                _fanSpeed = (err == Nvml.nvmlReturn.NVML_SUCCESS) ? _fanSpeed : 0;
+                var err = Nvml.nvmlDeviceGetTemperature(_device, Nvml.nvmlTemperatureSensors.NVML_TEMPERATURE_GPU, out _temperature);
+                _temperature = (err == Nvml.nvmlReturn.NVML_SUCCESS) ? _temperature : 0;
 
                 return (int)_temperature;
             } catch

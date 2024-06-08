@@ -1113,7 +1113,8 @@
             this.tscmbCategory.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tscmbCategory.Items.AddRange(new object[] {
             "% GPU Time",
-            "GPU Temperature (in degrees C)"});
+            "GPU Temperature (in degrees C)",
+            "Memory Utilization"});
             this.tscmbCategory.Name = "tscmbCategory";
             this.tscmbCategory.Size = new System.Drawing.Size(121, 28);
             this.tscmbCategory.ToolTipText = "Select the item to monitor for RTX 4090";

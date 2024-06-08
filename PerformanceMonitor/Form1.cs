@@ -525,10 +525,20 @@ namespace PerformanceMonitor
 
         private void UpdateGPUInfo()
         {
-            // Need to read temp too to get the fan speed
-            int util = myRTX4090.Utilization;
+            // Need to read temp too to get the fan speed??, so all updated here
             int temp = myRTX4090.TemperatureC;
-            int fanSpeed = myRTX4090.FanSpeed;
+            int fanspeed = myRTX4090.FanSpeed;
+            int util = myRTX4090.Utilization; // this also reads memory utilization
+
+            // Track max Gpu util
+            if (mpGpu != null )
+            {
+                if (util >= trkGpuThreshold.Value)
+                    mpGpu.Volume = trkGpuVolume.Value / 100.0f;
+                else
+                    mpGpu.Volume = 0.0f;
+            }
+
             ExCounter += myRTX4090.ReadResetExceptionsCounter;
 
             // update the GPU-Utilization or the GPU-Temperature
@@ -537,19 +547,17 @@ namespace PerformanceMonitor
                 case 0: // %GPU Time
                     UpdateCounter(util, pbGPU0, lblGPU0, "%");
                     UpdateCaption(lblGpuAlarm, util);
-                    if (mpGpu == null) break;
-                    if (util >= trkGpuThreshold.Value)
-                        mpGpu.Volume = trkGpuVolume.Value / 100.0f;
-                    else
-                        mpGpu.Volume = 0.0f;
                     break;
-                default: // GPU Temperature (in degrees C)
+                case 1: // GPU Temperature (in degrees C)
                     UpdateCounter(temp, pbGPU0, lblGPU0, "°C");
+                    break;
+                case 2: // Memory Utilization
+                    UpdateCounter(myRTX4090.MemoryUtilization, pbGPU0, lblGPU0, "?");
                     break;
             }
 
             // update Fan-Speed
-            UpdateCounter(fanSpeed, pbGPUFanSpeed, lblGPUFanSpeed);
+            UpdateCounter(fanspeed, pbGPUFanSpeed, lblGPUFanSpeed);
         }
 
         private void UpdateMonitorLabels()
