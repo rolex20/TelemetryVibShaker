@@ -51,6 +51,13 @@ namespace PerformanceMonitor
             Properties.Settings.Default.txtGpuAlarm = txtGpuAlarm.Text;
             Properties.Settings.Default.trkCpuVolume = trkCpuVolume.Value;
             Properties.Settings.Default.trkGpuVolume = trkGpuVolume.Value;
+            Properties.Settings.Default.tcTabControl = tcTabControl.SelectedIndex;
+
+            if (this.WindowState != FormWindowState.Minimized)
+            {
+                Properties.Settings.Default.XCoordinate = this.Location.X;
+                Properties.Settings.Default.YCoordinate = this.Location.Y;
+            }
 
             Properties.Settings.Default.Save();
         }
@@ -302,6 +309,10 @@ namespace PerformanceMonitor
         {
             SingleInstanceChecker();
 
+            // Restore previous location
+            this.Location = new Point(Properties.Settings.Default.XCoordinate, Properties.Settings.Default.YCoordinate);
+
+
             chkCpuAlarm.Checked = Properties.Settings.Default.chkCpuAlarm;
             chkGpuAlarm.Checked = Properties.Settings.Default.chkGpuAlarm;
             trkCpuThreshold.Value = Properties.Settings.Default.trkCpuThreshold;
@@ -311,8 +322,8 @@ namespace PerformanceMonitor
             trkCpuVolume.Value = Properties.Settings.Default.trkCpuVolume;
             trkGpuVolume.Value = Properties.Settings.Default.trkGpuVolume;
 
+            tcTabControl.SelectedIndex = Properties.Settings.Default.tcTabControl;
 
-            tcTabControl.SelectedIndex = 2;
             FillAudioDevices();
 
             maxCpuUtil = maxGpuUtil = 0;

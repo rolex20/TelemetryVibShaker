@@ -154,5 +154,41 @@ namespace PerformanceMonitor.Properties {
                 this["trkGpuVolume"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int tcTabControl {
+            get {
+                return ((int)(this["tcTabControl"]));
+            }
+            set {
+                this["tcTabControl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int XCoordinate {
+            get {
+                return ((int)(this["XCoordinate"]));
+            }
+            set {
+                this["XCoordinate"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int YCoordinate {
+            get {
+                return ((int)(this["YCoordinate"]));
+            }
+            set {
+                this["YCoordinate"] = value;
+            }
+        }
     }
 }
