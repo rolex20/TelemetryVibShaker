@@ -1,4 +1,8 @@
+$EfficiencyAffinity = 983040 # HyperThreading enabled
+[System.Diagnostics.Process]::GetCurrentProcess().ProcessorAffinity =  $EfficiencyAffinity
+
 $Host.UI.RawUI.WindowTitle = 'AutoDownloadFileOnChange'
+
 
 # This script monitors a specified file for changes. When the file is modified,
 # the script downloads a file from a provided URL and saves it to a designated path.
@@ -24,9 +28,10 @@ if (-NOT $isNew) {
 }
 
 $WatchFile = "C:\MyPrograms\wamp\www\warthunder\mission_data.json"
-$DownloadUrl = "http://localhost/warthunder/generate_mission.php"
-$DownloadPath = "C:\MyPrograms\Steam\steamapps\common\War Thunder\UserMissions\AutoMission.blk"
-
+$DownloadUrl1 = "http://localhost/warthunder/dogfight_setup_1.php"
+$DownloadPath1 = "C:\MyPrograms\Steam\steamapps\common\War Thunder\UserMissions\AutoDogfight_setup1.blk"
+$DownloadUrl2 = "http://localhost/warthunder/viewer_setup_1.php"
+$DownloadPath2 = "C:\MyPrograms\Steam\steamapps\common\War Thunder\UserMissions\AutoViewer_setup1.blk"
 # specify the path to the folder you want to monitor:
 $Path =  (Get-Item $WatchFile).DirectoryName
 
@@ -43,10 +48,10 @@ $AttributeFilter = [IO.NotifyFilters]::FileName, [IO.NotifyFilters]::LastWrite
 $ChangeTypes = [System.IO.WatcherChangeTypes]::Changed
 
 # specify the maximum time (in milliseconds) you want to wait for changes:
-$Timeout = 1000*3600*24
+$Timeout = 3600
 
 # define a function that gets called for every change:
-function Invoke-SomeAction
+function Invoke-WebDownload
 {
   param
   (
@@ -60,7 +65,8 @@ function Invoke-SomeAction
   Start-Sleep -Seconds 1
   $ChangeInformation | Out-String | Write-Host -ForegroundColor DarkYellow
 
-  Invoke-WebRequest -Uri $DownloadUrl -OutFile $DownloadPath
+  Invoke-WebRequest -Uri $DownloadUrl1 -OutFile $DownloadPath1
+  Invoke-WebRequest -Uri $DownloadUrl2 -OutFile $DownloadPath2
 }
 
 # use a try...finally construct to release the
@@ -91,7 +97,7 @@ try
 		continue  # continue jumps to the begining of the do{} loop
 	}
 	
-    Invoke-SomeAction -Change $result
+    Invoke-WebDownload -Change $result
     # the loop runs forever until you hit CTRL+C    
   } while ($true)
 }
