@@ -187,7 +187,7 @@ storePostDataAsJson('mission_data.json');
 
         document.addEventListener("DOMContentLoaded", function() {
             // Fetch JSON data from the server
-            fetch('warthunder.json?adsf=34df5')
+            fetch('warthunder.json?rnd=3056')
                 .then(response => response.json())
                 .then(data => {
                     const playerAircraftSelect = document.getElementById('playerAircraftSelect');

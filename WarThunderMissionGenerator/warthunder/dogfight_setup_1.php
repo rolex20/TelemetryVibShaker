@@ -250,10 +250,10 @@ units{
     bullets1:t=""
     bullets2:t=""
     bullets3:t=""
-    bulletsCount0:i=600
-    bulletsCount1:i=600
-    bulletsCount2:i=600
-    bulletsCount3:i=600
+    bulletsCount0:i=0
+    bulletsCount1:i=0
+    bulletsCount2:i=0
+    bulletsCount3:i=0
     crewSkillK:r=0
     applyAllMods:b=no
 
@@ -304,10 +304,10 @@ units{
     bullets1:t=""
     bullets2:t=""
     bullets3:t=""
-    bulletsCount0:i=500
-    bulletsCount1:i=500
-    bulletsCount2:i=500
-    bulletsCount3:i=500
+    bulletsCount0:i=0
+    bulletsCount1:i=0
+    bulletsCount2:i=0
+    bulletsCount3:i=0
     crewSkillK:r=0
     applyAllMods:b=no
 
