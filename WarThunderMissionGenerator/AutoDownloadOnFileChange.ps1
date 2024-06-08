@@ -48,25 +48,38 @@ $AttributeFilter = [IO.NotifyFilters]::FileName, [IO.NotifyFilters]::LastWrite
 $ChangeTypes = [System.IO.WatcherChangeTypes]::Changed
 
 # specify the maximum time (in milliseconds) you want to wait for changes:
-$Timeout = 3600
+$Timeout = 3600*1000
+
+# create a sound player
+$sound = New-Object System.Media.SoundPlayer;	
 
 # define a function that gets called for every change:
 function Invoke-WebDownload
 {
-  param
-  (
-    [Parameter(Mandatory)]
-    [System.IO.WaitForChangedResult]
-    $ChangeInformation
-  )
-  
-  $t = Get-Date
-  Write-Warning "Change detected: $t"
-  Start-Sleep -Seconds 1
-  $ChangeInformation | Out-String | Write-Host -ForegroundColor DarkYellow
+	param
+	(
+	[Parameter(Mandatory)]
+	[System.IO.WaitForChangedResult]
+	$ChangeInformation
+	)
 
-  Invoke-WebRequest -Uri $DownloadUrl1 -OutFile $DownloadPath1
-  Invoke-WebRequest -Uri $DownloadUrl2 -OutFile $DownloadPath2
+	$t = Get-Date
+	Write-Warning "Change detected: $t"
+	Start-Sleep -Milliseconds 300
+	$ChangeInformation | Out-String | Write-Host -ForegroundColor DarkYellow
+	
+
+	$sound.SoundLocation="C:\Windows\Media\Windows Notify.wav"
+	
+	try {
+		Invoke-WebRequest -Uri $DownloadUrl1 -OutFile $DownloadPath1 -ErrorAction Stop
+		Invoke-WebRequest -Uri $DownloadUrl2 -OutFile $DownloadPath2 -ErrorAction Stop
+		
+		} catch {
+			$sound.SoundLocation="C:\Windows\Media\Windows Critical Stop.wav"
+	}
+
+	$sound.Play()
 }
 
 # use a try...finally construct to release the
@@ -74,8 +87,7 @@ function Invoke-WebDownload
 # by pressing CTRL+C
 
 try
-{
-  Write-Warning "FileSystemWatcher is monitoring $Path"
+{  
   
   # create a filesystemwatcher object
   $watcher = New-Object -TypeName IO.FileSystemWatcher -ArgumentList $Path, $FileFilter -Property @{
@@ -83,9 +95,11 @@ try
     NotifyFilter = $AttributeFilter
   }
 
+  Write-Warning "FileSystemWatcher is monitoring $Path"	  
   # start monitoring manually in a loop:
   do
   {
+
     # wait for changes for the specified timeout
     # IMPORTANT: while the watcher is active, PowerShell cannot be stopped
     # so change the timeout to 1000ms and repeat the
@@ -94,6 +108,7 @@ try
     $result = $watcher.WaitForChanged($ChangeTypes, $Timeout)
     # if there was a timeout, continue monitoring:
     if ($result.TimedOut) { 
+	    Write-Warning "FileSystemWatcher is monitoring $Path"	  	
 		continue  # continue jumps to the begining of the do{} loop
 	}
 	
