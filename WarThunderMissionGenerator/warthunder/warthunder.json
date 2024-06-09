@@ -94,7 +94,11 @@
   { "name":"amx", "armament": ["amx_default", "amx_aim_9l_default"] },  
   { "name":"saab_jas39a", "armament": ["", "saab_jas39a_default", "saab_jas39a_rockets_rb_74"] },
   { "name":"saab_jas39c_hungary", "armament": ["", "saab_jas39c_south_africa_default", "saab_jas39c_south_africa_rockets_aim_9l_"] },  
-  { "name":"saab_jas39c_south_africa", "armament": ["", "saab_jas39c_south_africa_default", "saab_jas39c_south_africa_rockets_aim_9l_"] }
+  { "name":"saab_jas39c_south_africa", "armament": ["", "saab_jas39c_south_africa_default", "saab_jas39c_south_africa_rockets_aim_9l_"] },
+  { "name":"su_17m2", "armament": ["", "su_17m2_rocket_r60"] },
+  { "name":"su_17m4", "armament": ["", "su_17m4_rocket_r60_default"] },
+  { "name":"su_22m3", "armament": ["", "su_22m3_default_r60"] },
+  { "name":"su_27", "armament": ["", "su_27_r73"] }
 ],
 
 "terrain": [
