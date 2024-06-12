@@ -10,6 +10,8 @@ namespace WarThunderExporter
 {
     public partial class frmWarThunderTelemetry : Form
     {
+        const int RetryInterval = 1500; // Milliseconds
+
         HttpClient httpClient;
         private Process currentProcess;
         private UdpClient udpSender;
@@ -679,7 +681,7 @@ namespace WarThunderExporter
                 {
                     //if war-thunder is not sending an aircraft-type, let's force a change for the next time
                     lastAircraftName = String.Empty;
-                    TimerActivateNewInterval(timer1, 1000); // nudFrequency.Tag = (int)nudFrequency.Value
+                    TimerActivateNewInterval(timer1, RetryInterval); // nudFrequency.Tag = (int)nudFrequency.Value
                 } //if-then-else (aircraftName.Length>0)
 
 
@@ -744,7 +746,7 @@ namespace WarThunderExporter
                     if ((bool)lblMaxProcTimeControl.Tag) // I can reuse here
                         maxWarThunderProcessingTime = elapsed;  // this is going to be delayed by one cycle, but it's okay
                     else
-                        lblMaxProcTimeControl.Tag = true; // Next, time, the maxWarThunderProcessingTime will be updated
+                        lblMaxProcTimeControl.Tag = true; // Next time, the maxWarThunderProcessingTime will be updated
                 }
 
 
@@ -761,7 +763,7 @@ namespace WarThunderExporter
             {
                 UpdateCaption(tsStatus, $"[{nowTimeStamp}] {msg}");
             }
-            if (reenable) TimerActivateNewInterval(timer1, 1000);  // Wait more time before trying again
+            if (reenable) TimerActivateNewInterval(timer1, RetryInterval);  // Wait more time before trying again
         }
 
         private void TimerActivateNewInterval(System.Windows.Forms.Timer timer, int interval)
