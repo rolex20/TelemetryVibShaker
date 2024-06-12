@@ -226,19 +226,35 @@ namespace WarThunderExporter
 
         }
 
-        private void chkUseEfficiencyCoresOnly_CheckedChanged(object sender, EventArgs e)
+        // Returns True if processor is 12700K and HyperThreading is enabled and Efficient cores are enabled
+        private bool Is12700K()
         {
-            if (currentProcess == null) return;
-
-
             // Open the registry key for the processor
             RegistryKey regKey = Registry.LocalMachine.OpenSubKey("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0");
 
             // Read the processor name from the registry
             string processorName = regKey.GetValue("ProcessorNameString").ToString();
 
-            // Check if the processor name contains "Intel 12700K"
-            if (processorName.Contains("12700K"))
+            int cpuCount = 0;
+            regKey = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor");
+
+            // The number of subkeys corresponds to the number of CPUs
+            if (regKey != null) { cpuCount = regKey.SubKeyCount; }
+
+            regKey.Close();
+
+            if (processorName.Contains("12700K") && cpuCount == 20)
+                return true;
+            else 
+                return false;
+        }
+
+        private void chkUseEfficiencyCoresOnly_CheckedChanged(object sender, EventArgs e)
+        {
+            if (currentProcess == null) return;
+
+            // Change affinity to Efficient Cores in 12700K
+            if (Is12700K())
             {
                 chkUseEfficiencyCoresOnly.Visible = true;
                 if (chkUseEfficiencyCoresOnly.Checked)
@@ -257,15 +273,13 @@ namespace WarThunderExporter
                 }
             }
 
-            regKey.Close();
-
         }
 
         private void nudFrequency_ValueChanged(object sender, EventArgs e)
         {
             int v = (int)nudFrequency.Value;
             nudFrequency.Tag = v;
-            TimerActivateNewInterval(timer1, v);
+            //TimerActivateNewInterval(timer1, v); This is done automatically in the timer1
         }
 
         private void btnResetMax_Click(object sender, EventArgs e)
@@ -302,8 +316,8 @@ namespace WarThunderExporter
         {
             //this.BeginInvoke(new Action(() =>
             //{
-                btnStop.Enabled = true;
                 btnStart.Enabled = false;
+                btnStop.Enabled = true;
 
 
                 // Before connecting udpSender, lets make sure our int cached copy is up to date
@@ -524,7 +538,7 @@ namespace WarThunderExporter
         // More info here: https://github.com/lucasvmx/WarThunder-localhost-documentation
         // The function is large because timer1 has issues with async calls and because
         // I wanted to avoid inherinting all async markings to all functions.
-        // The function is large, but straightforward to understand and almost no indirection-levels required to understand it
+        // The function is large, but straightforward to understand and almost no indirection-levels of abrstraction required to understand it
         private async Task WarThunderTelemetryAsync()
         {
             // Some times there is a long wait caused by War Thunder to deliver the response
@@ -533,6 +547,7 @@ namespace WarThunderExporter
             // Avoid repetitive calls to the getter
             bool ShowStatistics_cache = chkShowStatistics.Checked;
 
+            bool normalTimerReactivation = false;
 
             try
             {
@@ -658,9 +673,7 @@ namespace WarThunderExporter
                         UpdateCaption(lblMinProcessingTimeWT, wtStats.Min());
                         this.ResumeLayout();
                     }
-
-                    TimerActivateNewInterval(timer1, (int)nudFrequency.Tag); // nudFrequency.Tag = (int)nudFrequency.Value
-
+                    normalTimerReactivation = true;
                 } //if-then (aircraftName.Length>0) 
                 else // let's try again, but let's wait 1 second
                 {
@@ -737,6 +750,7 @@ namespace WarThunderExporter
 
             }
 
+            if (normalTimerReactivation) TimerActivateNewInterval(timer1, (int)nudFrequency.Tag); // .Tag has a duplicate using int as type
         }
 
         private void RecoverFromTypicalException(string? msg, bool reenable)
