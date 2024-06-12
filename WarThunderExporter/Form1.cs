@@ -73,7 +73,7 @@ namespace WarThunderExporter
 
         private void AutoStart()
         {
-            Thread.Sleep(20000);
+            Thread.Sleep(10000);
 
             this.Invoke((MethodInvoker)delegate
             {
@@ -81,7 +81,7 @@ namespace WarThunderExporter
                 // We can safely interact with UI elements
 
                 // Verify that the user hasn't aborted the autostart or clicked manually on btnStartListening
-                if (chkAutoMinimize.Checked) btnStart_Click(null, null);
+                if (chkAutoMinimize.Checked && btnStart.Enabled) btnStart_Click(null, null);
             });
         }
 
@@ -302,6 +302,10 @@ namespace WarThunderExporter
         {
             //this.BeginInvoke(new Action(() =>
             //{
+                btnStop.Enabled = true;
+                btnStart.Enabled = false;
+
+
                 // Before connecting udpSender, lets make sure our int cached copy is up to date
                 nudFrequency.Tag = (int)nudFrequency.Value;
 
@@ -328,8 +332,6 @@ namespace WarThunderExporter
                 nudFrequency.Enabled = true; // we still want to be able to change this
 
 
-                btnStop.Enabled = true;
-                btnStart.Enabled = false;
 
                 cancellationTokenSource = new CancellationTokenSource();
 

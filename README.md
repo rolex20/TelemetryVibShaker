@@ -21,6 +21,7 @@ Arduino R4 Ethernet program (Ethernet).  Uses the Ethernet network to listen for
 ## my_ttgo_TelemetryVib_WiFi:
 LILYGO TTGO T-Watch 2020 V3 program (WiFi) Uses the WiFi network to listen for UDP packets containing the vibration intensity for the internal vibration motor available in this watch.  It is designed for the AoA, when in optimal AoA for the given player aircraft the internal motor vibrates and the screen goes Green.  (Similar to the Yellow, Green, Red Angle of Attack indicator in the F-16C that virually no one uses because is too low in the cockpit).
 
+Libs and driver used in Win11: https://github.com/rolex20/TelemetryVibShaker/releases/tag/v0.9-ttgolibs 
 
 ToDo1: Complete readme, add diagrams
 

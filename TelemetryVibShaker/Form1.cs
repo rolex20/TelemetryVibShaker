@@ -357,7 +357,7 @@ namespace TelemetryVibShaker
             chkPlayAlarm.Enabled = true;
 
 
-            if (chkAutoStart.Checked)
+            if (chkAutoStart.Checked & btnStartListening.Enabled)
             {
                 Task.Run(() => AutoStartWebServer());
             }
@@ -519,7 +519,6 @@ namespace TelemetryVibShaker
             if (!CheckFileExists(txtJSON, "JSON File")) return;
 
 
-
             // Check if the JSON file is valid
             string error = TelemetryServer.TestJSONFile(txtJSON.Text);
             if (!string.IsNullOrEmpty(error))
@@ -545,6 +544,12 @@ namespace TelemetryVibShaker
                 if (value > 65535) value = 65535;
                 txtListeningPort.Text = value.ToString();
             }
+
+            // Adjust valid operations
+            ChangeStatus(btnStartListening, false);
+            ChangeStatus(btnStop, true);
+            toolStripStatusLabel1.Text = "Listening...";
+
 
             // Prepare SoundManager, TelemetryServer, MotorControllers
             PrepareControllers();
@@ -576,10 +581,7 @@ namespace TelemetryVibShaker
             TestRoutines(false);
 
 
-            // Adjust valid operations
-            ChangeStatus(btnStartListening, false);
-            ChangeStatus(btnStop, true);
-            toolStripStatusLabel1.Text = "Listening...";
+
 
             // Display stats if required
             if (chkChangeToMonitor.Checked) tabs.SelectTab(5);
