@@ -92,7 +92,7 @@ namespace TelemetryVibShaker
             // In case the user activates this later, let's setup all now
             this.PlayAlarm = PlayAlarm; 
             alarmPlayer = new MediaPlayer(AudioDeviceIndex);
-            alarmPlayer.Open(@".\Casio Watch Alarm.wav");
+            alarmPlayer.Open(@".\StartCredit.wav");
             alarmPlayer.Volume = VolAmplifier1;
 
             Status = SoundEffectStatus.Ready;

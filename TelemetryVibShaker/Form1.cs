@@ -624,6 +624,8 @@ namespace TelemetryVibShaker
 
         private void timer1_Tick(object sender, EventArgs e)
         {
+            timer1.Enabled = false;
+
             int processorUsedForUI = 0;
             bool showStatistics = chkShowStatistics.Checked;
 
@@ -644,12 +646,10 @@ namespace TelemetryVibShaker
             }
 
             // Statistics are updated once per second
-            if (showStatistics && telemetry.IsRunning() && (tabs.SelectedIndex == 5))
-            {
-                this.SuspendLayout();
+            if (showStatistics && telemetry.IsRunning() && (tabs.SelectedIndex == 5) && (this.WindowState != FormWindowState.Minimized))
+            {                
+                    this.SuspendLayout();
 
-                if (this.WindowState != FormWindowState.Minimized)
-                {
                     // Report last datagram timestamp
                     UpdateValue(lblTimestamp, telemetry.TimeStamp);
 
@@ -701,19 +701,16 @@ namespace TelemetryVibShaker
                     UpdateValue(lblProcessingTimeUDPMax, telemetry.Stats.Max());
                     UpdateValue(lblProcessingTimeUDPMin, telemetry.Stats.Min());
                     UpdateValue(lblProcessingTimeUDPAvg, telemetry.Stats.Average());
-                }
 
-                // Always calculate/Report max UI processing time (monitor).  This one needs to be the last                
-                UpdateMaxUIProcessingTime();
-
-                stopWatchUI.Stop();
-                Stats.AddSample(stopWatchUI.Elapsed.Milliseconds);
-
-                this.ResumeLayout();
+                    // Always calculate/Report max UI processing time (monitor).  This one needs to be the last                
+                    UpdateMaxUIProcessingTime();
+                    this.ResumeLayout();
+                    
+                    stopWatchUI.Stop();
+                    Stats.AddSample(stopWatchUI.Elapsed.Milliseconds);         
             }
 
-
-
+            timer1.Enabled = true;
         }
 
         private void AllowOnlyDigits(object sender, KeyPressEventArgs e)
