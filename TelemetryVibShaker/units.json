@@ -32,6 +32,18 @@
         "volume": 50
       },
       {
+        "typeName": "mirage_2000c_s5",
+        "AoA1": 11,
+        "AoA2": 14,
+        "volume": 50
+      },
+      {
+        "typeName": "mirage_2000d_r1",
+        "AoA1": 11,
+        "AoA2": 14,
+        "volume": 50
+      },	  
+      {
         "typeName": "FA-18C_hornet",
         "AoA1": 11,
         "AoA2": 15,
