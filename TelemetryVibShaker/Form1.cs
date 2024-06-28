@@ -657,7 +657,7 @@ namespace TelemetryVibShaker
                     UpdateSoundEffectStatus(soundManager.Status);
 
                     // Report Current Unit Type                    
-                    if (UpdateValue(lblCurrentUnitType, telemetry.CurrentUnitType) && telemetry.LastData.AoA == 360) // unknown unit
+                    if (UpdateValue(lblCurrentUnitType, telemetry.CurrentUnitType) && soundManager.AoA1 == 360) // unknown unit
                         lstNotFounds.Items.Add(telemetry.CurrentUnitType);
 
                     // Report the last AoA received
