@@ -276,7 +276,7 @@ namespace TelemetryVibShaker
 
                     }
 
-                    soundManager_AoA.ScheduleAlarm();
+                    soundManager_AoA.ScheduleAlarm(); // Sound Notification now and in 30 minutes
                 }
 
                 if (Statistics) 

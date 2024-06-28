@@ -45,7 +45,7 @@ namespace TelemetryVibShaker
 
         public int AoA1;          // Optimal angle of attack.  Lower limit. (Sound Effect 1)
         public int AoA2;          // Optimal angle of attack.  Upper limit. (Sound Effect 1)
-                                    // If newAoA > AoA2 then Sound Effect 2 should be heard.
+                                  // If newAoA > AoA2 then Sound Effect 2 should be heard.
 
         private MediaPlayer mp1;    // for the optimal AoA sound effectType
         private float lastVolume1; // cached volume for mp1
@@ -65,7 +65,7 @@ namespace TelemetryVibShaker
         {
             mp2.Volume = 0.8f;
         }
-        
+
         public AoA_SoundManager(String sound1, String sound2, float VolAmplifier1, float VolAmplifier2, int AudioDeviceIndex, bool PlayAlarm)
         {
             Status = SoundEffectStatus.NotPlaying;
@@ -76,13 +76,13 @@ namespace TelemetryVibShaker
             //mp1.Volume = lastVolume1;  // redundant, below is reassigned
             VolumeAmplifier1 = VolAmplifier1;
             mp1.PlayLooping();
-            
+
             mp2 = new MediaPlayer(AudioDeviceIndex);
             mp2.Open(sound2);
             lastVolume2 = 0.0f;
             //mp2.Volume = lastVolume2;  // redundant, below is reassigned
             VolumeAmplifier2 = VolAmplifier2;
-            mp2.PlayLooping();            
+            mp2.PlayLooping();
 
 
             // Basically ignore the limits, because the unit type is not known at this point
@@ -90,7 +90,7 @@ namespace TelemetryVibShaker
             AoA2 = 360;
 
             // In case the user activates this later, let's setup all now
-            this.PlayAlarm = PlayAlarm; 
+            this.PlayAlarm = PlayAlarm;
             alarmPlayer = new MediaPlayer(AudioDeviceIndex);
             alarmPlayer.Open(@".\StartCredit.wav");
             alarmPlayer.Volume = VolAmplifier1;
@@ -160,12 +160,12 @@ namespace TelemetryVibShaker
                     {
                         lastVolume1 = newVolume;
                         newVolume *= volumeAmplifier1;
-                        mp1.Volume = newVolume;  
+                        mp1.Volume = newVolume;
                         volumeHasChanged = true;
                     }
                 }
                 else // Mute Sound Effect 1
-                {                    
+                {
                     if (lastVolume1 > 0.0f)  // Avoid calling MediaPlayer.Volume if not needed 
                     {
                         lastVolume1 = 0.0f;
@@ -231,6 +231,8 @@ namespace TelemetryVibShaker
                 cancellationPlayAlarm = new CancellationTokenSource();
             }
 
+            alarmPlayer.Play();  // Sound the notification now
+
             Task.Run(async () =>
             {
                 try
@@ -241,7 +243,7 @@ namespace TelemetryVibShaker
 
                         if (!cancellationPlayAlarm.IsCancellationRequested && PlayAlarm)
                         {
-                            alarmPlayer.Play();
+                            alarmPlayer.Play(); // And sound the notification again in 30 minutes 
                         }
                     }
                 }
