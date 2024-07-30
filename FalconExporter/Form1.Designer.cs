@@ -46,6 +46,9 @@
             this.label10 = new System.Windows.Forms.Label();
             this.tabMonitor = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label24 = new System.Windows.Forms.Label();
+            this.lblGear = new System.Windows.Forms.Label();
             this.lblTimeStamp = new System.Windows.Forms.Label();
             this.label23 = new System.Windows.Forms.Label();
             this.label22 = new System.Windows.Forms.Label();
@@ -83,9 +86,6 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.btnResetMax = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.label3 = new System.Windows.Forms.Label();
-            this.label24 = new System.Windows.Forms.Label();
-            this.lblGear = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudFrequency)).BeginInit();
@@ -151,9 +151,9 @@
             this.chkUseEfficiencyCoresOnly.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
             this.chkUseEfficiencyCoresOnly.Location = new System.Drawing.Point(20, 242);
             this.chkUseEfficiencyCoresOnly.Name = "chkUseEfficiencyCoresOnly";
-            this.chkUseEfficiencyCoresOnly.Size = new System.Drawing.Size(290, 19);
+            this.chkUseEfficiencyCoresOnly.Size = new System.Drawing.Size(321, 19);
             this.chkUseEfficiencyCoresOnly.TabIndex = 9;
-            this.chkUseEfficiencyCoresOnly.Text = "Use Efficiency cores only on Intel 12700K";
+            this.chkUseEfficiencyCoresOnly.Text = "Use Efficiency cores only on Alder/Raptor Intel";
             this.chkUseEfficiencyCoresOnly.UseVisualStyleBackColor = true;
             this.chkUseEfficiencyCoresOnly.Visible = false;
             this.chkUseEfficiencyCoresOnly.CheckedChanged += new System.EventHandler(this.chkUseEfficiencyCoresOnly_CheckedChanged);
@@ -312,6 +312,33 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(452, 156);
             this.panel1.TabIndex = 23;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(408, 94);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(15, 13);
+            this.label3.TabIndex = 31;
+            this.label3.Text = "%";
+            // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(296, 94);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(76, 13);
+            this.label24.TabIndex = 29;
+            this.label24.Text = "Speed brakes:";
+            // 
+            // lblGear
+            // 
+            this.lblGear.AutoSize = true;
+            this.lblGear.Location = new System.Drawing.Point(378, 93);
+            this.lblGear.Name = "lblGear";
+            this.lblGear.Size = new System.Drawing.Size(16, 13);
+            this.lblGear.TabIndex = 30;
+            this.lblGear.Text = "---";
             // 
             // lblTimeStamp
             // 
@@ -637,33 +664,6 @@
             this.btnResetMax.Text = "Reset Max";
             this.btnResetMax.UseVisualStyleBackColor = true;
             this.btnResetMax.Click += new System.EventHandler(this.btnResetMax_Click);
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(408, 94);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(15, 13);
-            this.label3.TabIndex = 31;
-            this.label3.Text = "%";
-            // 
-            // label24
-            // 
-            this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(296, 94);
-            this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(76, 13);
-            this.label24.TabIndex = 29;
-            this.label24.Text = "Speed brakes:";
-            // 
-            // lblGear
-            // 
-            this.lblGear.AutoSize = true;
-            this.lblGear.Location = new System.Drawing.Point(378, 93);
-            this.lblGear.Name = "lblGear";
-            this.lblGear.Size = new System.Drawing.Size(16, 13);
-            this.lblGear.TabIndex = 30;
-            this.lblGear.Text = "---";
             // 
             // frmMain
             // 
