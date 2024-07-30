@@ -8,6 +8,13 @@ using System.Text;
 
 namespace WarThunderExporter
 {
+    public enum CpuType
+    {
+        Intel_12700K,
+        Intel_14700K,
+        Other
+    }
+
     public partial class frmWarThunderTelemetry : Form
     {
         const int RetryInterval = 1500; // Milliseconds
@@ -228,54 +235,64 @@ namespace WarThunderExporter
 
         }
 
-        // Returns True if processor is 12700K and HyperThreading is enabled and Efficient cores are enabled
-        private bool Is12700K()
-        {
-            // Open the registry key for the processor
-            RegistryKey regKey = Registry.LocalMachine.OpenSubKey("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0");
-
-            // Read the processor name from the registry
-            string processorName = regKey.GetValue("ProcessorNameString").ToString();
-
-            int cpuCount = 0;
-            regKey = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor");
-
-            // The number of subkeys corresponds to the number of CPUs
-            if (regKey != null) { cpuCount = regKey.SubKeyCount; }
-
-            regKey.Close();
-
-            if (processorName.Contains("12700K") && cpuCount == 20)
-                return true;
-            else 
-                return false;
-        }
-
         private void chkUseEfficiencyCoresOnly_CheckedChanged(object sender, EventArgs e)
         {
             if (currentProcess == null) return;
 
-            // Change affinity to Efficient Cores in 12700K
-            if (Is12700K())
+            RegistryKey regKey = Registry.LocalMachine.OpenSubKey("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0");
+            string processorName = regKey.GetValue("ProcessorNameString").ToString();
+            currentProcess = Process.GetCurrentProcess();
+
+            // We need to know the number of processors available to determine if Hyperthreading and Efficient cores are enabled
+            int cpuCount = 0;
+            regKey = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor");
+            if (regKey != null)
             {
-                chkUseEfficiencyCoresOnly.Visible = true;
-                if (chkUseEfficiencyCoresOnly.Checked)
-                {
+                // The number of subkeys corresponds to the number of CPUs
+                cpuCount = regKey.SubKeyCount;
+            }
+            regKey.Close();
 
-                    // Define the CPU affinity mask for CPUs 17 to 20
-                    // CPUs are zero-indexed, so CPU 17 is represented by bit 16, and so on.
-                    IntPtr affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
 
-                    try
+            CpuType cpuType;
+            if (processorName.Contains("12700K")) cpuType = CpuType.Intel_12700K;
+            else if (processorName.Contains("14700K")) cpuType = CpuType.Intel_14700K;
+            else cpuType = CpuType.Other;
+
+            // Calculate affinity for efficient cores only
+            IntPtr affinityMask = IntPtr.Zero;
+            switch (cpuType)
+            {
+                case CpuType.Intel_12700K:
+                    if (cpuCount == 20)
                     {
-                        // Set the CPU affinity
-                        currentProcess.ProcessorAffinity = affinityMask;
+                        affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
+                        chkUseEfficiencyCoresOnly.Visible = true;
                     }
-                    catch { } // Ignore
-                }
+                    break;
+                case CpuType.Intel_14700K:
+                    if (cpuCount == 28)
+                    {
+                        affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
+                        chkUseEfficiencyCoresOnly.Visible = true;
+                    }
+                    break;
+                default:
+                    //ignore
+                    break;
             }
 
+            if (chkUseEfficiencyCoresOnly.Checked && (affinityMask != IntPtr.Zero))
+            {
+                try
+                {
+                    // Set the CPU affinity to Efficient Cores only
+                    currentProcess.ProcessorAffinity = affinityMask;
+                }
+                catch { } // Ignore
+            }
         }
+
 
         private void nudFrequency_ValueChanged(object sender, EventArgs e)
         {
