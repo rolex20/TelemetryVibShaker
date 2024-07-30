@@ -378,32 +378,49 @@ namespace PerformanceMonitor
             string processorName = regKey.GetValue("ProcessorNameString").ToString();
             currentProcess = Process.GetCurrentProcess();
 
+            // Make sure we have 20 CPUs (HyperThreading Enabled and Efficient Cores enabled in 12700K)
+            // Open the registry key for the processors
+            int cpuCount = 0;
+            regKey = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor");
+            if (regKey != null)
+            {
+                // The number of subkeys corresponds to the number of CPUs
+                cpuCount = regKey.SubKeyCount;
+            }
 
             if (processorName.Contains("12700K")) cpuType = CpuType.Intel_12700K;
             else if (processorName.Contains("14700K")) cpuType = CpuType.Intel_14700K;
             else cpuType = CpuType.Other;
+
+
 
             // Define the CPU affinity mask for CPUs 17 to 20
             // CPUs are zero-indexed, so CPU 17 is represented by bit 16, and so on.
             IntPtr affinityMask = IntPtr.Zero;
             switch (cpuType)
             {
-                case CpuType.Intel_12700K:
-                    affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
+                case CpuType.Intel_12700K:                    
                     tslblCpuType.Text = "i7-12700K";
-                    lblEfficientCoresNote.Text = "12700K" + lblEfficientCoresNote.Text;
-                    lblEfficientCoresNote.Visible = true;
-                    
-                    // Highlight my best cores
+                    if (cpuCount == 20) // Make sure HyperThreading and Efficient cores are enabled
+                    {
+                        affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
+                        lblEfficientCoresNote.Text = "12700K" + lblEfficientCoresNote.Text;
+                        lblEfficientCoresNote.Visible = true;
+                    }
+
+                    // Highlight my best cores according to my BIOS
                     label8.BorderStyle = BorderStyle.FixedSingle;
                     label12.BorderStyle = BorderStyle.FixedSingle;
                     label14.BorderStyle = BorderStyle.FixedSingle;
                     break;
-                case CpuType.Intel_14700K:
-                    affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
+                case CpuType.Intel_14700K:                    
                     tslblCpuType.Text = "i7-14700K";
-                    lblEfficientCoresNote.Text = "14700K" + lblEfficientCoresNote.Text;
-                    lblEfficientCoresNote.Visible = true;
+                    if (cpuCount == 28) // Make sure HyperThreading and Efficient cores are enabled
+                    {
+                        affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
+                        lblEfficientCoresNote.Text = "14700K" + lblEfficientCoresNote.Text;
+                        lblEfficientCoresNote.Visible = true;
+                    }
                     break;
                 default:
                     //ignore
