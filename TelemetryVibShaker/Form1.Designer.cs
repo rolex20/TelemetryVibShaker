@@ -165,6 +165,7 @@
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             btnResetMax = new Button();
+            label51 = new Label();
             tabs.SuspendLayout();
             tabNormalSoundEffects.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier2).BeginInit();
@@ -1573,6 +1574,7 @@
             // 
             // tabNotFounds
             // 
+            tabNotFounds.Controls.Add(label51);
             tabNotFounds.Controls.Add(label48);
             tabNotFounds.Controls.Add(lstNotFounds);
             tabNotFounds.Location = new Point(4, 24);
@@ -1587,9 +1589,9 @@
             label48.AutoSize = true;
             label48.Location = new Point(23, 16);
             label48.Name = "label48";
-            label48.Size = new Size(201, 15);
+            label48.Size = new Size(206, 15);
             label48.TabIndex = 1;
-            label48.Text = "List of fighters not found in .json file:";
+            label48.Text = "*List of fighters not found in .json file:";
             // 
             // lstNotFounds
             // 
@@ -1597,7 +1599,7 @@
             lstNotFounds.ItemHeight = 15;
             lstNotFounds.Location = new Point(23, 47);
             lstNotFounds.Name = "lstNotFounds";
-            lstNotFounds.Size = new Size(437, 304);
+            lstNotFounds.Size = new Size(437, 289);
             lstNotFounds.TabIndex = 0;
             toolTip1.SetToolTip(lstNotFounds, "Double click an item to copy it's text to the clipboard");
             lstNotFounds.SelectedIndexChanged += lstNotFounds_SelectedIndexChanged;
@@ -1657,6 +1659,15 @@
             btnResetMax.Text = "Reset Max";
             btnResetMax.UseVisualStyleBackColor = true;
             btnResetMax.Click += btnResetMax_Click;
+            // 
+            // label51
+            // 
+            label51.AutoSize = true;
+            label51.Location = new Point(23, 349);
+            label51.Name = "label51";
+            label51.Size = new Size(177, 15);
+            label51.TabIndex = 2;
+            label51.Text = "* Only when Statistics is enabled";
             // 
             // frmMain
             // 
@@ -1845,5 +1856,6 @@
         private TabPage tabNotFounds;
         private ListBox lstNotFounds;
         private Label label48;
+        private Label label51;
     }
 }

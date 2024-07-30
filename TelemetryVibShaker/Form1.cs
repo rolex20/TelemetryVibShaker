@@ -645,6 +645,8 @@ namespace TelemetryVibShaker
                 //logic to stop the vibration motor if they don't receive more telemetry
             }
 
+
+
             // Statistics are updated once per second
             if (showStatistics && telemetry.IsRunning() && (tabs.SelectedIndex == 5) && (this.WindowState != FormWindowState.Minimized))
             {                
