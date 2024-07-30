@@ -19,9 +19,16 @@ using System.Threading;
 
 namespace PerformanceMonitor
 {
+    public enum CpuType
+    {
+        Intel_12700K,
+        Intel_14700K,
+        Other
+    }
+
     public partial class frmMain : Form
     {
-        private PerformanceCounter cpuCounter0, cpuCounter1, cpuCounter2, cpuCounter3, cpuCounter4, cpuCounter5, cpuCounter6, cpuCounter7, cpuCounter8, cpuCounter9, cpuCounter10, cpuCounter11, cpuCounter12, cpuCounter13, cpuCounter14, cpuCounter15, cpuCounter16, cpuCounter17, cpuCounter18, cpuCounter19;
+        private PerformanceCounter cpuCounter0, cpuCounter1, cpuCounter2, cpuCounter3, cpuCounter4, cpuCounter5, cpuCounter6, cpuCounter7, cpuCounter8, cpuCounter9, cpuCounter10, cpuCounter11, cpuCounter12, cpuCounter13, cpuCounter14, cpuCounter15, cpuCounter16, cpuCounter17, cpuCounter18, cpuCounter19, cpuCounter20, cpuCounter21, cpuCounter22, cpuCounter23, cpuCounter24, cpuCounter25, cpuCounter26, cpuCounter27;
         //private PerformanceCounter gpuUtilizationCounter, gpuFanCounter;
         private Stopwatch stopwatch;
         private long ExCounter;  // Exceptions Counter
@@ -31,8 +38,9 @@ namespace PerformanceMonitor
         private HttpListener listener; // Web Server for remote control location and focus commands
         private int webServerThreadId, dispatcherUIThread;
         private Process currentProcess;
+        private CpuType cpuType;
 
-        private int maxCpuUtil, maxGpuUtil;
+        private int maxCpuUtil;
         string maxCpuName;
 
         private MediaPlayer mpCpu, mpGpu;
@@ -254,6 +262,66 @@ namespace PerformanceMonitor
         [DllImport("user32.dll")]
         private static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
 
+        private void lblCPU3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label15_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pbCPU17_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lblCPU17_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lblCPU5_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label22_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pbCPU18_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lblCPU18_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lblCPU7_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label26_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pbCPU19_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lblCPU19_Click(object sender, EventArgs e)
+        {
+
+        }
+
         [DllImport("user32.dll")]
         private static extern bool IsIconic(IntPtr hWnd);
 
@@ -304,6 +372,56 @@ namespace PerformanceMonitor
         }
 
 
+        private void AssignEfficiencyCoresOnly()
+        {
+            RegistryKey regKey = Registry.LocalMachine.OpenSubKey("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0");
+            string processorName = regKey.GetValue("ProcessorNameString").ToString();
+            currentProcess = Process.GetCurrentProcess();
+
+
+            if (processorName.Contains("12700K")) cpuType = CpuType.Intel_12700K;
+            else if (processorName.Contains("14700K")) cpuType = CpuType.Intel_14700K;
+            else cpuType = CpuType.Other;
+
+            // Define the CPU affinity mask for CPUs 17 to 20
+            // CPUs are zero-indexed, so CPU 17 is represented by bit 16, and so on.
+            IntPtr affinityMask = IntPtr.Zero;
+            switch (cpuType)
+            {
+                case CpuType.Intel_12700K:
+                    affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
+                    tslblCpuType.Text = "i7-12700K";
+                    lblEfficientCoresNote.Text = "12700K" + lblEfficientCoresNote.Text;
+                    lblEfficientCoresNote.Visible = true;
+                    
+                    // Highlight my best cores
+                    label8.BorderStyle = BorderStyle.FixedSingle;
+                    label12.BorderStyle = BorderStyle.FixedSingle;
+                    label14.BorderStyle = BorderStyle.FixedSingle;
+                    break;
+                case CpuType.Intel_14700K:
+                    affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
+                    tslblCpuType.Text = "i7-14700K";
+                    lblEfficientCoresNote.Text = "14700K" + lblEfficientCoresNote.Text;
+                    lblEfficientCoresNote.Visible = true;
+                    break;
+                default:
+                    //ignore
+                    break;
+            }
+
+            if (affinityMask != IntPtr.Zero)
+            {
+                try
+                {
+                    // Set the CPU affinity to Efficient Cores only
+                    currentProcess.ProcessorAffinity = affinityMask;
+                }
+                catch { } // Ignore
+            }
+
+            regKey.Close();
+        }
 
         private void frmMain_Load(object sender, EventArgs e)
         {
@@ -326,7 +444,7 @@ namespace PerformanceMonitor
 
             FillAudioDevices();
 
-            maxCpuUtil = maxGpuUtil = 0;
+            maxCpuUtil = 0;
             maxCpuName = String.Empty;
 
             webServerThreadId = -1;
@@ -351,46 +469,9 @@ namespace PerformanceMonitor
 
             InitializeCounterTags();
             ResetMaxCounters();
+            AssignEfficiencyCoresOnly();
 
 
-
-            // Open the registry key for the processor
-            RegistryKey regKey = Registry.LocalMachine.OpenSubKey("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0");
-
-            // Read the processor name from the registry
-            string processorName = regKey.GetValue("ProcessorNameString").ToString();
-
-            // Get the current process
-            currentProcess = Process.GetCurrentProcess();
-
-            // Check if the processor name contains "Intel 12700K"
-            if (processorName.Contains("12700K"))
-            {
-                tslbl12700K.Tag = true;  // special tag to indicate that this is a 12700K
-                lbl12700KNote.Visible = true;
-
-                // Define the CPU affinity mask for CPUs 17 to 20
-                // CPUs are zero-indexed, so CPU 17 is represented by bit 16, and so on.
-                IntPtr affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
-
-                try
-                {
-                    // Set the CPU affinity
-                    currentProcess.ProcessorAffinity = affinityMask;
-                }
-                catch { } // Ignore
-
-                //gpuUtilizationCounter = new PerformanceCounter("GPU", "% GPU Time", "nvidia geforce rtx 4090(01:00)");
-                //gpuFanCounter = new PerformanceCounter("GPU", "% GPU Fan Speed", "nvidia geforce rtx 4090(01:00)");
-
-            }
-            else
-            {
-                //gpuUtilizationCounter = new PerformanceCounter("GPU Engine", "Utilization Percentage", true);  //Generic for debugging
-                tslbl12700K.Tag = false; // special tag to indicate that this is not a 12700K
-            }
-
-            regKey.Close();
 
             // Change the priority class to the previous setting selected (NORMAL, BELOW_NORMAL or IDLE)
             cmbPriorityClass.SelectedIndex = Properties.Settings.Default.PriorityClassSelectedIndex;
@@ -398,8 +479,6 @@ namespace PerformanceMonitor
 
             // Obtain current IP Address
             txtIPAddress.Text = GetMyIPAddress();
-
-
 
             diskCounterC = new PerformanceCounter("PhysicalDisk", "Disk Bytes/sec", "0 C:", true);
             diskCounterN = new PerformanceCounter("PhysicalDisk", "Disk Bytes/sec", "1 N:", true);
@@ -425,6 +504,14 @@ namespace PerformanceMonitor
             cpuCounter17 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,17", true);
             cpuCounter18 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,18", true);
             cpuCounter19 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,19", true);
+            cpuCounter20 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,20", true);
+            cpuCounter21 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,21", true);
+            cpuCounter22 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,22", true);
+            cpuCounter23 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,23", true);
+            cpuCounter24 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,24", true);
+            cpuCounter25 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,25", true);
+            cpuCounter26 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,26", true);
+            cpuCounter27 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,27", true);
 
             StartWebServer();
 
@@ -596,6 +683,14 @@ namespace PerformanceMonitor
             UpdateCounter(cpuCounter17, pbCPU17, lblCPU17);
             UpdateCounter(cpuCounter18, pbCPU18, lblCPU18);
             UpdateCounter(cpuCounter19, pbCPU19, lblCPU19);
+            UpdateCounter(cpuCounter20, pbCPU20, lblCPU20);
+            UpdateCounter(cpuCounter21, pbCPU21, lblCPU21);
+            UpdateCounter(cpuCounter22, pbCPU22, lblCPU22);
+            UpdateCounter(cpuCounter23, pbCPU23, lblCPU23);
+            UpdateCounter(cpuCounter24, pbCPU24, lblCPU24);
+            UpdateCounter(cpuCounter25, pbCPU25, lblCPU25);
+            UpdateCounter(cpuCounter26, pbCPU26, lblCPU26);
+            UpdateCounter(cpuCounter27, pbCPU27, lblCPU27);
 
             if (mpCpu != null) {
                 if (maxCpuUtil >= trkCpuThreshold.Value)

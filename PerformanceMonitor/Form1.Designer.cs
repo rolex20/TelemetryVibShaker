@@ -114,7 +114,7 @@
             this.label38 = new System.Windows.Forms.Label();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.tslbl12700K = new System.Windows.Forms.ToolStripLabel();
+            this.tslblCpuType = new System.Windows.Forms.ToolStripLabel();
             this.tschkEnabled = new System.Windows.Forms.ToolStripButton();
             this.tsbtnResetMaxCounters = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -178,7 +178,7 @@
             this.tbSettings = new System.Windows.Forms.TabPage();
             this.txtIPAddress = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.lbl12700KNote = new System.Windows.Forms.Label();
+            this.lblEfficientCoresNote = new System.Windows.Forms.Label();
             this.cmbPriorityClass = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.nudPollingInterval = new System.Windows.Forms.NumericUpDown();
@@ -186,6 +186,30 @@
             this.tbErrors = new System.Windows.Forms.TabPage();
             this.txtErrors = new System.Windows.Forms.TextBox();
             this.lblErrorsTitle = new System.Windows.Forms.Label();
+            this.pbCPU24 = new System.Windows.Forms.ProgressBar();
+            this.lblCPU24 = new System.Windows.Forms.Label();
+            this.label40 = new System.Windows.Forms.Label();
+            this.label41 = new System.Windows.Forms.Label();
+            this.lblCPU25 = new System.Windows.Forms.Label();
+            this.pbCPU25 = new System.Windows.Forms.ProgressBar();
+            this.lblCPU20 = new System.Windows.Forms.Label();
+            this.pbCPU20 = new System.Windows.Forms.ProgressBar();
+            this.label43 = new System.Windows.Forms.Label();
+            this.lblCPU21 = new System.Windows.Forms.Label();
+            this.pbCPU21 = new System.Windows.Forms.ProgressBar();
+            this.label45 = new System.Windows.Forms.Label();
+            this.lblCPU22 = new System.Windows.Forms.Label();
+            this.pbCPU22 = new System.Windows.Forms.ProgressBar();
+            this.label47 = new System.Windows.Forms.Label();
+            this.lblCPU23 = new System.Windows.Forms.Label();
+            this.pbCPU23 = new System.Windows.Forms.ProgressBar();
+            this.label49 = new System.Windows.Forms.Label();
+            this.label42 = new System.Windows.Forms.Label();
+            this.lblCPU26 = new System.Windows.Forms.Label();
+            this.pbCPU26 = new System.Windows.Forms.ProgressBar();
+            this.label44 = new System.Windows.Forms.Label();
+            this.lblCPU27 = new System.Windows.Forms.Label();
+            this.pbCPU27 = new System.Windows.Forms.ProgressBar();
             this.toolStrip1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.tcTabControl.SuspendLayout();
@@ -210,7 +234,7 @@
             this.lblCPU.AutoSize = true;
             this.lblCPU.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCPU.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.lblCPU.Location = new System.Drawing.Point(19, 23);
+            this.lblCPU.Location = new System.Drawing.Point(11, 23);
             this.lblCPU.Name = "lblCPU";
             this.lblCPU.Size = new System.Drawing.Size(47, 13);
             this.lblCPU.TabIndex = 2;
@@ -219,17 +243,17 @@
             // pbCPU0
             // 
             this.pbCPU0.BackColor = System.Drawing.SystemColors.Control;
-            this.pbCPU0.Location = new System.Drawing.Point(70, 19);
+            this.pbCPU0.Location = new System.Drawing.Point(62, 19);
             this.pbCPU0.Name = "pbCPU0";
-            this.pbCPU0.Size = new System.Drawing.Size(156, 23);
+            this.pbCPU0.Size = new System.Drawing.Size(127, 23);
             this.pbCPU0.TabIndex = 3;
             // 
             // pbGPU0
             // 
             this.pbGPU0.Cursor = System.Windows.Forms.Cursors.Default;
-            this.pbGPU0.Location = new System.Drawing.Point(632, 189);
+            this.pbGPU0.Location = new System.Drawing.Point(789, 189);
             this.pbGPU0.Name = "pbGPU0";
-            this.pbGPU0.Size = new System.Drawing.Size(156, 23);
+            this.pbGPU0.Size = new System.Drawing.Size(127, 23);
             this.pbGPU0.TabIndex = 7;
             this.pbGPU0.Tag = "Utilization Percentage";
             // 
@@ -238,7 +262,7 @@
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label4.ForeColor = System.Drawing.Color.YellowGreen;
-            this.label4.Location = new System.Drawing.Point(565, 194);
+            this.label4.Location = new System.Drawing.Point(722, 194);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(64, 13);
             this.label4.TabIndex = 6;
@@ -249,7 +273,7 @@
             // 
             this.lblCPU0.AutoSize = true;
             this.lblCPU0.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU0.Location = new System.Drawing.Point(232, 23);
+            this.lblCPU0.Location = new System.Drawing.Point(194, 22);
             this.lblCPU0.Name = "lblCPU0";
             this.lblCPU0.Size = new System.Drawing.Size(15, 15);
             this.lblCPU0.TabIndex = 8;
@@ -259,7 +283,7 @@
             // 
             this.lblCPU1.AutoSize = true;
             this.lblCPU1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU1.Location = new System.Drawing.Point(506, 23);
+            this.lblCPU1.Location = new System.Drawing.Point(425, 23);
             this.lblCPU1.Name = "lblCPU1";
             this.lblCPU1.Size = new System.Drawing.Size(13, 13);
             this.lblCPU1.TabIndex = 11;
@@ -267,9 +291,9 @@
             // 
             // pbCPU1
             // 
-            this.pbCPU1.Location = new System.Drawing.Point(344, 19);
+            this.pbCPU1.Location = new System.Drawing.Point(295, 19);
             this.pbCPU1.Name = "pbCPU1";
-            this.pbCPU1.Size = new System.Drawing.Size(156, 23);
+            this.pbCPU1.Size = new System.Drawing.Size(127, 23);
             this.pbCPU1.TabIndex = 10;
             // 
             // label6
@@ -277,17 +301,19 @@
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label6.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.label6.Location = new System.Drawing.Point(281, 23);
+            this.label6.Location = new System.Drawing.Point(233, 23);
+            this.label6.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(62, 13);
             this.label6.TabIndex = 9;
             this.label6.Text = "CPU[1] ht";
+            this.label6.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // lblCPU2
             // 
             this.lblCPU2.AutoSize = true;
             this.lblCPU2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU2.Location = new System.Drawing.Point(232, 63);
+            this.lblCPU2.Location = new System.Drawing.Point(194, 63);
             this.lblCPU2.Name = "lblCPU2";
             this.lblCPU2.Size = new System.Drawing.Size(13, 13);
             this.lblCPU2.TabIndex = 14;
@@ -295,9 +321,9 @@
             // 
             // pbCPU2
             // 
-            this.pbCPU2.Location = new System.Drawing.Point(70, 59);
+            this.pbCPU2.Location = new System.Drawing.Point(62, 59);
             this.pbCPU2.Name = "pbCPU2";
-            this.pbCPU2.Size = new System.Drawing.Size(156, 23);
+            this.pbCPU2.Size = new System.Drawing.Size(127, 23);
             this.pbCPU2.TabIndex = 13;
             // 
             // label7
@@ -305,7 +331,7 @@
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label7.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label7.Location = new System.Drawing.Point(19, 63);
+            this.label7.Location = new System.Drawing.Point(11, 63);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(47, 13);
             this.label7.TabIndex = 12;
@@ -315,7 +341,7 @@
             // 
             this.lblCPU4.AutoSize = true;
             this.lblCPU4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU4.Location = new System.Drawing.Point(232, 107);
+            this.lblCPU4.Location = new System.Drawing.Point(194, 107);
             this.lblCPU4.Name = "lblCPU4";
             this.lblCPU4.Size = new System.Drawing.Size(13, 13);
             this.lblCPU4.TabIndex = 17;
@@ -324,20 +350,19 @@
             // pbCPU4
             // 
             this.pbCPU4.ForeColor = System.Drawing.Color.Lime;
-            this.pbCPU4.Location = new System.Drawing.Point(70, 103);
+            this.pbCPU4.Location = new System.Drawing.Point(62, 103);
             this.pbCPU4.Name = "pbCPU4";
-            this.pbCPU4.Size = new System.Drawing.Size(156, 23);
+            this.pbCPU4.Size = new System.Drawing.Size(127, 23);
             this.pbCPU4.TabIndex = 16;
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label8.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label8.Location = new System.Drawing.Point(19, 107);
+            this.label8.Location = new System.Drawing.Point(11, 107);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(49, 15);
+            this.label8.Size = new System.Drawing.Size(47, 13);
             this.label8.TabIndex = 15;
             this.label8.Text = "CPU[4]";
             // 
@@ -345,7 +370,7 @@
             // 
             this.lblCPU6.AutoSize = true;
             this.lblCPU6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU6.Location = new System.Drawing.Point(232, 150);
+            this.lblCPU6.Location = new System.Drawing.Point(194, 150);
             this.lblCPU6.Name = "lblCPU6";
             this.lblCPU6.Size = new System.Drawing.Size(13, 13);
             this.lblCPU6.TabIndex = 20;
@@ -353,9 +378,9 @@
             // 
             // pbCPU6
             // 
-            this.pbCPU6.Location = new System.Drawing.Point(70, 146);
+            this.pbCPU6.Location = new System.Drawing.Point(62, 146);
             this.pbCPU6.Name = "pbCPU6";
-            this.pbCPU6.Size = new System.Drawing.Size(156, 23);
+            this.pbCPU6.Size = new System.Drawing.Size(127, 23);
             this.pbCPU6.TabIndex = 19;
             // 
             // label10
@@ -363,7 +388,7 @@
             this.label10.AutoSize = true;
             this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label10.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label10.Location = new System.Drawing.Point(19, 150);
+            this.label10.Location = new System.Drawing.Point(11, 150);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(47, 13);
             this.label10.TabIndex = 18;
@@ -373,7 +398,7 @@
             // 
             this.lblCPU8.AutoSize = true;
             this.lblCPU8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU8.Location = new System.Drawing.Point(232, 193);
+            this.lblCPU8.Location = new System.Drawing.Point(194, 193);
             this.lblCPU8.Name = "lblCPU8";
             this.lblCPU8.Size = new System.Drawing.Size(13, 13);
             this.lblCPU8.TabIndex = 23;
@@ -382,20 +407,19 @@
             // pbCPU8
             // 
             this.pbCPU8.ForeColor = System.Drawing.Color.Lime;
-            this.pbCPU8.Location = new System.Drawing.Point(70, 189);
+            this.pbCPU8.Location = new System.Drawing.Point(62, 189);
             this.pbCPU8.Name = "pbCPU8";
-            this.pbCPU8.Size = new System.Drawing.Size(156, 23);
+            this.pbCPU8.Size = new System.Drawing.Size(127, 23);
             this.pbCPU8.TabIndex = 22;
             // 
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label12.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label12.Location = new System.Drawing.Point(19, 193);
+            this.label12.Location = new System.Drawing.Point(11, 193);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(49, 15);
+            this.label12.Size = new System.Drawing.Size(47, 13);
             this.label12.TabIndex = 21;
             this.label12.Text = "CPU[8]";
             // 
@@ -403,7 +427,7 @@
             // 
             this.lblCPU10.AutoSize = true;
             this.lblCPU10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU10.Location = new System.Drawing.Point(232, 234);
+            this.lblCPU10.Location = new System.Drawing.Point(194, 234);
             this.lblCPU10.Name = "lblCPU10";
             this.lblCPU10.Size = new System.Drawing.Size(13, 13);
             this.lblCPU10.TabIndex = 26;
@@ -412,20 +436,19 @@
             // pbCPU10
             // 
             this.pbCPU10.ForeColor = System.Drawing.Color.Lime;
-            this.pbCPU10.Location = new System.Drawing.Point(70, 230);
+            this.pbCPU10.Location = new System.Drawing.Point(62, 230);
             this.pbCPU10.Name = "pbCPU10";
-            this.pbCPU10.Size = new System.Drawing.Size(156, 23);
+            this.pbCPU10.Size = new System.Drawing.Size(127, 23);
             this.pbCPU10.TabIndex = 25;
             // 
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label14.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label14.Location = new System.Drawing.Point(12, 235);
+            this.label14.Location = new System.Drawing.Point(4, 235);
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(56, 15);
+            this.label14.Size = new System.Drawing.Size(54, 13);
             this.label14.TabIndex = 24;
             this.label14.Text = "CPU[10]";
             // 
@@ -433,7 +456,7 @@
             // 
             this.lblCPU12.AutoSize = true;
             this.lblCPU12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU12.Location = new System.Drawing.Point(232, 279);
+            this.lblCPU12.Location = new System.Drawing.Point(194, 279);
             this.lblCPU12.Name = "lblCPU12";
             this.lblCPU12.Size = new System.Drawing.Size(13, 13);
             this.lblCPU12.TabIndex = 29;
@@ -441,9 +464,9 @@
             // 
             // pbCPU12
             // 
-            this.pbCPU12.Location = new System.Drawing.Point(70, 275);
+            this.pbCPU12.Location = new System.Drawing.Point(62, 275);
             this.pbCPU12.Name = "pbCPU12";
-            this.pbCPU12.Size = new System.Drawing.Size(156, 23);
+            this.pbCPU12.Size = new System.Drawing.Size(127, 23);
             this.pbCPU12.TabIndex = 28;
             // 
             // label16
@@ -451,7 +474,7 @@
             this.label16.AutoSize = true;
             this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label16.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label16.Location = new System.Drawing.Point(12, 279);
+            this.label16.Location = new System.Drawing.Point(4, 279);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(54, 13);
             this.label16.TabIndex = 27;
@@ -461,7 +484,7 @@
             // 
             this.lblCPU14.AutoSize = true;
             this.lblCPU14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU14.Location = new System.Drawing.Point(232, 323);
+            this.lblCPU14.Location = new System.Drawing.Point(194, 323);
             this.lblCPU14.Name = "lblCPU14";
             this.lblCPU14.Size = new System.Drawing.Size(13, 13);
             this.lblCPU14.TabIndex = 32;
@@ -469,9 +492,9 @@
             // 
             // pbCPU14
             // 
-            this.pbCPU14.Location = new System.Drawing.Point(70, 319);
+            this.pbCPU14.Location = new System.Drawing.Point(62, 319);
             this.pbCPU14.Name = "pbCPU14";
-            this.pbCPU14.Size = new System.Drawing.Size(156, 23);
+            this.pbCPU14.Size = new System.Drawing.Size(127, 23);
             this.pbCPU14.TabIndex = 31;
             // 
             // label18
@@ -479,7 +502,7 @@
             this.label18.AutoSize = true;
             this.label18.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label18.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.label18.Location = new System.Drawing.Point(12, 324);
+            this.label18.Location = new System.Drawing.Point(4, 324);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(54, 13);
             this.label18.TabIndex = 30;
@@ -489,17 +512,18 @@
             // 
             this.lblCPU3.AutoSize = true;
             this.lblCPU3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU3.Location = new System.Drawing.Point(506, 63);
+            this.lblCPU3.Location = new System.Drawing.Point(426, 63);
             this.lblCPU3.Name = "lblCPU3";
             this.lblCPU3.Size = new System.Drawing.Size(13, 13);
             this.lblCPU3.TabIndex = 35;
             this.lblCPU3.Text = "--";
+            this.lblCPU3.Click += new System.EventHandler(this.lblCPU3_Click);
             // 
             // pbCPU3
             // 
-            this.pbCPU3.Location = new System.Drawing.Point(344, 59);
+            this.pbCPU3.Location = new System.Drawing.Point(295, 59);
             this.pbCPU3.Name = "pbCPU3";
-            this.pbCPU3.Size = new System.Drawing.Size(156, 23);
+            this.pbCPU3.Size = new System.Drawing.Size(127, 23);
             this.pbCPU3.TabIndex = 34;
             // 
             // label20
@@ -507,7 +531,7 @@
             this.label20.AutoSize = true;
             this.label20.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label20.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.label20.Location = new System.Drawing.Point(281, 63);
+            this.label20.Location = new System.Drawing.Point(232, 63);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(62, 13);
             this.label20.TabIndex = 33;
@@ -517,17 +541,18 @@
             // 
             this.lblCPU5.AutoSize = true;
             this.lblCPU5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU5.Location = new System.Drawing.Point(506, 107);
+            this.lblCPU5.Location = new System.Drawing.Point(426, 107);
             this.lblCPU5.Name = "lblCPU5";
             this.lblCPU5.Size = new System.Drawing.Size(13, 13);
             this.lblCPU5.TabIndex = 38;
             this.lblCPU5.Text = "--";
+            this.lblCPU5.Click += new System.EventHandler(this.lblCPU5_Click);
             // 
             // pbCPU5
             // 
-            this.pbCPU5.Location = new System.Drawing.Point(344, 103);
+            this.pbCPU5.Location = new System.Drawing.Point(295, 103);
             this.pbCPU5.Name = "pbCPU5";
-            this.pbCPU5.Size = new System.Drawing.Size(156, 23);
+            this.pbCPU5.Size = new System.Drawing.Size(127, 23);
             this.pbCPU5.TabIndex = 37;
             // 
             // label9
@@ -535,7 +560,7 @@
             this.label9.AutoSize = true;
             this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label9.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.label9.Location = new System.Drawing.Point(281, 107);
+            this.label9.Location = new System.Drawing.Point(232, 107);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(62, 13);
             this.label9.TabIndex = 36;
@@ -545,17 +570,18 @@
             // 
             this.lblCPU7.AutoSize = true;
             this.lblCPU7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU7.Location = new System.Drawing.Point(506, 150);
+            this.lblCPU7.Location = new System.Drawing.Point(426, 150);
             this.lblCPU7.Name = "lblCPU7";
             this.lblCPU7.Size = new System.Drawing.Size(13, 13);
             this.lblCPU7.TabIndex = 41;
             this.lblCPU7.Text = "--";
+            this.lblCPU7.Click += new System.EventHandler(this.lblCPU7_Click);
             // 
             // pbCPU7
             // 
-            this.pbCPU7.Location = new System.Drawing.Point(344, 146);
+            this.pbCPU7.Location = new System.Drawing.Point(295, 146);
             this.pbCPU7.Name = "pbCPU7";
-            this.pbCPU7.Size = new System.Drawing.Size(156, 23);
+            this.pbCPU7.Size = new System.Drawing.Size(127, 23);
             this.pbCPU7.TabIndex = 40;
             // 
             // label13
@@ -563,7 +589,7 @@
             this.label13.AutoSize = true;
             this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label13.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.label13.Location = new System.Drawing.Point(281, 150);
+            this.label13.Location = new System.Drawing.Point(232, 150);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(62, 13);
             this.label13.TabIndex = 39;
@@ -573,7 +599,7 @@
             // 
             this.lblCPU9.AutoSize = true;
             this.lblCPU9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU9.Location = new System.Drawing.Point(506, 193);
+            this.lblCPU9.Location = new System.Drawing.Point(426, 193);
             this.lblCPU9.Name = "lblCPU9";
             this.lblCPU9.Size = new System.Drawing.Size(13, 13);
             this.lblCPU9.TabIndex = 44;
@@ -581,9 +607,9 @@
             // 
             // pbCPU9
             // 
-            this.pbCPU9.Location = new System.Drawing.Point(344, 189);
+            this.pbCPU9.Location = new System.Drawing.Point(295, 189);
             this.pbCPU9.Name = "pbCPU9";
-            this.pbCPU9.Size = new System.Drawing.Size(156, 23);
+            this.pbCPU9.Size = new System.Drawing.Size(127, 23);
             this.pbCPU9.TabIndex = 43;
             // 
             // label17
@@ -591,7 +617,7 @@
             this.label17.AutoSize = true;
             this.label17.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label17.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.label17.Location = new System.Drawing.Point(281, 193);
+            this.label17.Location = new System.Drawing.Point(232, 193);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(62, 13);
             this.label17.TabIndex = 42;
@@ -601,7 +627,7 @@
             // 
             this.lblCPU11.AutoSize = true;
             this.lblCPU11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU11.Location = new System.Drawing.Point(506, 234);
+            this.lblCPU11.Location = new System.Drawing.Point(426, 234);
             this.lblCPU11.Name = "lblCPU11";
             this.lblCPU11.Size = new System.Drawing.Size(13, 13);
             this.lblCPU11.TabIndex = 47;
@@ -609,9 +635,9 @@
             // 
             // pbCPU11
             // 
-            this.pbCPU11.Location = new System.Drawing.Point(344, 230);
+            this.pbCPU11.Location = new System.Drawing.Point(295, 230);
             this.pbCPU11.Name = "pbCPU11";
-            this.pbCPU11.Size = new System.Drawing.Size(156, 23);
+            this.pbCPU11.Size = new System.Drawing.Size(127, 23);
             this.pbCPU11.TabIndex = 46;
             // 
             // label21
@@ -619,7 +645,7 @@
             this.label21.AutoSize = true;
             this.label21.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label21.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.label21.Location = new System.Drawing.Point(274, 234);
+            this.label21.Location = new System.Drawing.Point(225, 234);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(69, 13);
             this.label21.TabIndex = 45;
@@ -629,7 +655,7 @@
             // 
             this.lblCPU13.AutoSize = true;
             this.lblCPU13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU13.Location = new System.Drawing.Point(506, 279);
+            this.lblCPU13.Location = new System.Drawing.Point(425, 279);
             this.lblCPU13.Name = "lblCPU13";
             this.lblCPU13.Size = new System.Drawing.Size(13, 13);
             this.lblCPU13.TabIndex = 50;
@@ -637,9 +663,9 @@
             // 
             // pbCPU13
             // 
-            this.pbCPU13.Location = new System.Drawing.Point(344, 275);
+            this.pbCPU13.Location = new System.Drawing.Point(295, 275);
             this.pbCPU13.Name = "pbCPU13";
-            this.pbCPU13.Size = new System.Drawing.Size(156, 23);
+            this.pbCPU13.Size = new System.Drawing.Size(127, 23);
             this.pbCPU13.TabIndex = 49;
             // 
             // label23
@@ -647,7 +673,7 @@
             this.label23.AutoSize = true;
             this.label23.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label23.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.label23.Location = new System.Drawing.Point(274, 279);
+            this.label23.Location = new System.Drawing.Point(225, 279);
             this.label23.Name = "label23";
             this.label23.Size = new System.Drawing.Size(69, 13);
             this.label23.TabIndex = 48;
@@ -657,7 +683,7 @@
             // 
             this.lblCPU15.AutoSize = true;
             this.lblCPU15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU15.Location = new System.Drawing.Point(506, 323);
+            this.lblCPU15.Location = new System.Drawing.Point(425, 323);
             this.lblCPU15.Name = "lblCPU15";
             this.lblCPU15.Size = new System.Drawing.Size(13, 13);
             this.lblCPU15.TabIndex = 53;
@@ -665,9 +691,9 @@
             // 
             // pbCPU15
             // 
-            this.pbCPU15.Location = new System.Drawing.Point(344, 319);
+            this.pbCPU15.Location = new System.Drawing.Point(295, 319);
             this.pbCPU15.Name = "pbCPU15";
-            this.pbCPU15.Size = new System.Drawing.Size(156, 23);
+            this.pbCPU15.Size = new System.Drawing.Size(127, 23);
             this.pbCPU15.TabIndex = 52;
             // 
             // label25
@@ -675,7 +701,7 @@
             this.label25.AutoSize = true;
             this.label25.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label25.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.label25.Location = new System.Drawing.Point(274, 323);
+            this.label25.Location = new System.Drawing.Point(225, 323);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(69, 13);
             this.label25.TabIndex = 51;
@@ -685,7 +711,7 @@
             // 
             this.lblCPU16.AutoSize = true;
             this.lblCPU16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU16.Location = new System.Drawing.Point(794, 23);
+            this.lblCPU16.Location = new System.Drawing.Point(669, 23);
             this.lblCPU16.Name = "lblCPU16";
             this.lblCPU16.Size = new System.Drawing.Size(13, 13);
             this.lblCPU16.TabIndex = 56;
@@ -693,9 +719,9 @@
             // 
             // pbCPU16
             // 
-            this.pbCPU16.Location = new System.Drawing.Point(632, 19);
+            this.pbCPU16.Location = new System.Drawing.Point(536, 19);
             this.pbCPU16.Name = "pbCPU16";
-            this.pbCPU16.Size = new System.Drawing.Size(156, 23);
+            this.pbCPU16.Size = new System.Drawing.Size(127, 23);
             this.pbCPU16.TabIndex = 55;
             // 
             // label11
@@ -703,7 +729,7 @@
             this.label11.AutoSize = true;
             this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label11.ForeColor = System.Drawing.Color.Blue;
-            this.label11.Location = new System.Drawing.Point(562, 23);
+            this.label11.Location = new System.Drawing.Point(466, 23);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(69, 13);
             this.label11.TabIndex = 54;
@@ -713,91 +739,100 @@
             // 
             this.lblCPU17.AutoSize = true;
             this.lblCPU17.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU17.Location = new System.Drawing.Point(794, 63);
+            this.lblCPU17.Location = new System.Drawing.Point(669, 63);
             this.lblCPU17.Name = "lblCPU17";
             this.lblCPU17.Size = new System.Drawing.Size(13, 13);
             this.lblCPU17.TabIndex = 59;
             this.lblCPU17.Text = "--";
+            this.lblCPU17.Click += new System.EventHandler(this.lblCPU17_Click);
             // 
             // pbCPU17
             // 
-            this.pbCPU17.Location = new System.Drawing.Point(632, 59);
+            this.pbCPU17.Location = new System.Drawing.Point(536, 59);
             this.pbCPU17.Name = "pbCPU17";
-            this.pbCPU17.Size = new System.Drawing.Size(156, 23);
+            this.pbCPU17.Size = new System.Drawing.Size(127, 23);
             this.pbCPU17.TabIndex = 58;
+            this.pbCPU17.Click += new System.EventHandler(this.pbCPU17_Click);
             // 
             // label15
             // 
             this.label15.AutoSize = true;
             this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label15.ForeColor = System.Drawing.Color.Blue;
-            this.label15.Location = new System.Drawing.Point(562, 63);
+            this.label15.Location = new System.Drawing.Point(466, 63);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(69, 13);
             this.label15.TabIndex = 57;
             this.label15.Text = "CPU[17] ef";
+            this.label15.Click += new System.EventHandler(this.label15_Click);
             // 
             // lblCPU18
             // 
             this.lblCPU18.AutoSize = true;
             this.lblCPU18.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU18.Location = new System.Drawing.Point(794, 107);
+            this.lblCPU18.Location = new System.Drawing.Point(669, 107);
             this.lblCPU18.Name = "lblCPU18";
             this.lblCPU18.Size = new System.Drawing.Size(13, 13);
             this.lblCPU18.TabIndex = 62;
             this.lblCPU18.Text = "--";
+            this.lblCPU18.Click += new System.EventHandler(this.lblCPU18_Click);
             // 
             // pbCPU18
             // 
-            this.pbCPU18.Location = new System.Drawing.Point(632, 103);
+            this.pbCPU18.Location = new System.Drawing.Point(536, 103);
             this.pbCPU18.Name = "pbCPU18";
-            this.pbCPU18.Size = new System.Drawing.Size(156, 23);
+            this.pbCPU18.Size = new System.Drawing.Size(127, 23);
             this.pbCPU18.TabIndex = 61;
+            this.pbCPU18.Click += new System.EventHandler(this.pbCPU18_Click);
             // 
             // label22
             // 
             this.label22.AutoSize = true;
             this.label22.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label22.ForeColor = System.Drawing.Color.Blue;
-            this.label22.Location = new System.Drawing.Point(562, 107);
+            this.label22.Location = new System.Drawing.Point(466, 107);
             this.label22.Name = "label22";
             this.label22.Size = new System.Drawing.Size(69, 13);
             this.label22.TabIndex = 60;
             this.label22.Text = "CPU[18] ef";
+            this.label22.Click += new System.EventHandler(this.label22_Click);
             // 
             // lblCPU19
             // 
             this.lblCPU19.AutoSize = true;
             this.lblCPU19.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU19.Location = new System.Drawing.Point(794, 150);
+            this.lblCPU19.Location = new System.Drawing.Point(669, 150);
             this.lblCPU19.Name = "lblCPU19";
             this.lblCPU19.Size = new System.Drawing.Size(13, 13);
             this.lblCPU19.TabIndex = 65;
             this.lblCPU19.Text = "--";
+            this.lblCPU19.Click += new System.EventHandler(this.lblCPU19_Click);
             // 
             // pbCPU19
             // 
-            this.pbCPU19.Location = new System.Drawing.Point(632, 146);
+            this.pbCPU19.Location = new System.Drawing.Point(536, 146);
             this.pbCPU19.Name = "pbCPU19";
-            this.pbCPU19.Size = new System.Drawing.Size(156, 23);
+            this.pbCPU19.Size = new System.Drawing.Size(127, 23);
             this.pbCPU19.TabIndex = 64;
+            this.pbCPU19.Click += new System.EventHandler(this.pbCPU19_Click);
             // 
             // label26
             // 
             this.label26.AutoSize = true;
             this.label26.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label26.ForeColor = System.Drawing.Color.Blue;
-            this.label26.Location = new System.Drawing.Point(562, 150);
+            this.label26.Location = new System.Drawing.Point(466, 150);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(69, 13);
             this.label26.TabIndex = 63;
             this.label26.Text = "CPU[19] ef";
+            this.label26.Click += new System.EventHandler(this.label26_Click);
             // 
             // lblGPU0
             // 
             this.lblGPU0.AutoSize = true;
             this.lblGPU0.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblGPU0.Location = new System.Drawing.Point(794, 195);
+            this.lblGPU0.Location = new System.Drawing.Point(922, 195);
             this.lblGPU0.Name = "lblGPU0";
             this.lblGPU0.Size = new System.Drawing.Size(22, 13);
             this.lblGPU0.TabIndex = 66;
@@ -807,7 +842,7 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(574, 275);
+            this.label5.Location = new System.Drawing.Point(711, 274);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(44, 15);
             this.label5.TabIndex = 67;
@@ -817,7 +852,7 @@
             // 
             this.lblDiskC.AutoSize = true;
             this.lblDiskC.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDiskC.Location = new System.Drawing.Point(631, 275);
+            this.lblDiskC.Location = new System.Drawing.Point(768, 274);
             this.lblDiskC.Name = "lblDiskC";
             this.lblDiskC.Size = new System.Drawing.Size(23, 15);
             this.lblDiskC.TabIndex = 68;
@@ -827,7 +862,7 @@
             // 
             this.lblMaxDiskC.AutoSize = true;
             this.lblMaxDiskC.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMaxDiskC.Location = new System.Drawing.Point(714, 275);
+            this.lblMaxDiskC.Location = new System.Drawing.Point(851, 274);
             this.lblMaxDiskC.Name = "lblMaxDiskC";
             this.lblMaxDiskC.Size = new System.Drawing.Size(23, 15);
             this.lblMaxDiskC.TabIndex = 70;
@@ -838,7 +873,7 @@
             // 
             this.label24.AutoSize = true;
             this.label24.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label24.Location = new System.Drawing.Point(678, 275);
+            this.label24.Location = new System.Drawing.Point(815, 274);
             this.label24.Name = "label24";
             this.label24.Size = new System.Drawing.Size(34, 15);
             this.label24.TabIndex = 69;
@@ -848,7 +883,7 @@
             // 
             this.label27.AutoSize = true;
             this.label27.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label27.Location = new System.Drawing.Point(759, 275);
+            this.label27.Location = new System.Drawing.Point(896, 274);
             this.label27.Name = "label27";
             this.label27.Size = new System.Drawing.Size(36, 15);
             this.label27.TabIndex = 71;
@@ -858,7 +893,7 @@
             // 
             this.label28.AutoSize = true;
             this.label28.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label28.Location = new System.Drawing.Point(759, 301);
+            this.label28.Location = new System.Drawing.Point(896, 300);
             this.label28.Name = "label28";
             this.label28.Size = new System.Drawing.Size(36, 15);
             this.label28.TabIndex = 76;
@@ -868,7 +903,7 @@
             // 
             this.lblMaxDiskN.AutoSize = true;
             this.lblMaxDiskN.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMaxDiskN.Location = new System.Drawing.Point(714, 301);
+            this.lblMaxDiskN.Location = new System.Drawing.Point(851, 300);
             this.lblMaxDiskN.Name = "lblMaxDiskN";
             this.lblMaxDiskN.Size = new System.Drawing.Size(23, 15);
             this.lblMaxDiskN.TabIndex = 75;
@@ -879,7 +914,7 @@
             // 
             this.label30.AutoSize = true;
             this.label30.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label30.Location = new System.Drawing.Point(678, 301);
+            this.label30.Location = new System.Drawing.Point(815, 300);
             this.label30.Name = "label30";
             this.label30.Size = new System.Drawing.Size(34, 15);
             this.label30.TabIndex = 74;
@@ -889,7 +924,7 @@
             // 
             this.lblDiskN.AutoSize = true;
             this.lblDiskN.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDiskN.Location = new System.Drawing.Point(631, 301);
+            this.lblDiskN.Location = new System.Drawing.Point(768, 300);
             this.lblDiskN.Name = "lblDiskN";
             this.lblDiskN.Size = new System.Drawing.Size(23, 15);
             this.lblDiskN.TabIndex = 73;
@@ -899,7 +934,7 @@
             // 
             this.label32.AutoSize = true;
             this.label32.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label32.Location = new System.Drawing.Point(574, 301);
+            this.label32.Location = new System.Drawing.Point(711, 300);
             this.label32.Name = "label32";
             this.label32.Size = new System.Drawing.Size(45, 15);
             this.label32.TabIndex = 72;
@@ -909,7 +944,7 @@
             // 
             this.label19.AutoSize = true;
             this.label19.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label19.Location = new System.Drawing.Point(759, 327);
+            this.label19.Location = new System.Drawing.Point(896, 326);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(36, 15);
             this.label19.TabIndex = 81;
@@ -919,7 +954,7 @@
             // 
             this.lblMaxDiskR.AutoSize = true;
             this.lblMaxDiskR.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMaxDiskR.Location = new System.Drawing.Point(714, 327);
+            this.lblMaxDiskR.Location = new System.Drawing.Point(851, 326);
             this.lblMaxDiskR.Name = "lblMaxDiskR";
             this.lblMaxDiskR.Size = new System.Drawing.Size(23, 15);
             this.lblMaxDiskR.TabIndex = 80;
@@ -930,7 +965,7 @@
             // 
             this.label31.AutoSize = true;
             this.label31.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label31.Location = new System.Drawing.Point(678, 327);
+            this.label31.Location = new System.Drawing.Point(815, 326);
             this.label31.Name = "label31";
             this.label31.Size = new System.Drawing.Size(34, 15);
             this.label31.TabIndex = 79;
@@ -940,7 +975,7 @@
             // 
             this.lblDiskR.AutoSize = true;
             this.lblDiskR.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDiskR.Location = new System.Drawing.Point(631, 327);
+            this.lblDiskR.Location = new System.Drawing.Point(768, 326);
             this.lblDiskR.Name = "lblDiskR";
             this.lblDiskR.Size = new System.Drawing.Size(23, 15);
             this.lblDiskR.TabIndex = 78;
@@ -950,7 +985,7 @@
             // 
             this.label34.AutoSize = true;
             this.label34.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label34.Location = new System.Drawing.Point(574, 327);
+            this.label34.Location = new System.Drawing.Point(711, 326);
             this.label34.Name = "label34";
             this.label34.Size = new System.Drawing.Size(44, 15);
             this.label34.TabIndex = 77;
@@ -960,7 +995,7 @@
             // 
             this.lblGPUFanSpeed.AutoSize = true;
             this.lblGPUFanSpeed.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblGPUFanSpeed.Location = new System.Drawing.Point(794, 236);
+            this.lblGPUFanSpeed.Location = new System.Drawing.Point(922, 236);
             this.lblGPUFanSpeed.Name = "lblGPUFanSpeed";
             this.lblGPUFanSpeed.Size = new System.Drawing.Size(13, 13);
             this.lblGPUFanSpeed.TabIndex = 97;
@@ -968,9 +1003,9 @@
             // 
             // pbGPUFanSpeed
             // 
-            this.pbGPUFanSpeed.Location = new System.Drawing.Point(632, 230);
+            this.pbGPUFanSpeed.Location = new System.Drawing.Point(789, 230);
             this.pbGPUFanSpeed.Name = "pbGPUFanSpeed";
-            this.pbGPUFanSpeed.Size = new System.Drawing.Size(156, 23);
+            this.pbGPUFanSpeed.Size = new System.Drawing.Size(127, 23);
             this.pbGPUFanSpeed.TabIndex = 96;
             this.pbGPUFanSpeed.Tag = "Utilization Percentage";
             // 
@@ -979,7 +1014,7 @@
             this.label38.AutoSize = true;
             this.label38.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label38.ForeColor = System.Drawing.Color.YellowGreen;
-            this.label38.Location = new System.Drawing.Point(588, 234);
+            this.label38.Location = new System.Drawing.Point(745, 234);
             this.label38.Name = "label38";
             this.label38.Size = new System.Drawing.Size(41, 13);
             this.label38.TabIndex = 95;
@@ -995,7 +1030,7 @@
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tslbl12700K,
+            this.tslblCpuType,
             this.tschkEnabled,
             this.tsbtnResetMaxCounters,
             this.toolStripSeparator1,
@@ -1010,18 +1045,18 @@
             this.toolStripButton1});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(874, 28);
+            this.toolStrip1.Size = new System.Drawing.Size(984, 28);
             this.toolStrip1.TabIndex = 104;
             this.toolStrip1.Text = "toolStrip1";
             // 
-            // tslbl12700K
+            // tslblCpuType
             // 
-            this.tslbl12700K.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tslbl12700K.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
-            this.tslbl12700K.Name = "tslbl12700K";
-            this.tslbl12700K.Size = new System.Drawing.Size(110, 25);
-            this.tslbl12700K.Text = "i7-12700K";
-            this.tslbl12700K.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.tslblCpuType.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tslblCpuType.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.tslblCpuType.Name = "tslblCpuType";
+            this.tslblCpuType.Size = new System.Drawing.Size(24, 25);
+            this.tslblCpuType.Text = "?";
+            this.tslblCpuType.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // tschkEnabled
             // 
@@ -1162,7 +1197,7 @@
             this.tslblWebServer});
             this.toolStrip2.Location = new System.Drawing.Point(0, 457);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(874, 25);
+            this.toolStrip2.Size = new System.Drawing.Size(984, 25);
             this.toolStrip2.TabIndex = 108;
             this.toolStrip2.Text = "toolStrip2";
             // 
@@ -1346,11 +1381,35 @@
             this.tcTabControl.Location = new System.Drawing.Point(12, 46);
             this.tcTabControl.Name = "tcTabControl";
             this.tcTabControl.SelectedIndex = 0;
-            this.tcTabControl.Size = new System.Drawing.Size(848, 394);
+            this.tcTabControl.Size = new System.Drawing.Size(960, 394);
             this.tcTabControl.TabIndex = 109;
             // 
             // tbMonitor
             // 
+            this.tbMonitor.Controls.Add(this.label44);
+            this.tbMonitor.Controls.Add(this.lblCPU27);
+            this.tbMonitor.Controls.Add(this.pbCPU27);
+            this.tbMonitor.Controls.Add(this.label42);
+            this.tbMonitor.Controls.Add(this.lblCPU26);
+            this.tbMonitor.Controls.Add(this.pbCPU26);
+            this.tbMonitor.Controls.Add(this.lblCPU23);
+            this.tbMonitor.Controls.Add(this.pbCPU23);
+            this.tbMonitor.Controls.Add(this.label49);
+            this.tbMonitor.Controls.Add(this.lblCPU22);
+            this.tbMonitor.Controls.Add(this.pbCPU22);
+            this.tbMonitor.Controls.Add(this.label47);
+            this.tbMonitor.Controls.Add(this.lblCPU21);
+            this.tbMonitor.Controls.Add(this.pbCPU21);
+            this.tbMonitor.Controls.Add(this.label45);
+            this.tbMonitor.Controls.Add(this.lblCPU20);
+            this.tbMonitor.Controls.Add(this.pbCPU20);
+            this.tbMonitor.Controls.Add(this.label43);
+            this.tbMonitor.Controls.Add(this.label41);
+            this.tbMonitor.Controls.Add(this.lblCPU25);
+            this.tbMonitor.Controls.Add(this.pbCPU25);
+            this.tbMonitor.Controls.Add(this.label40);
+            this.tbMonitor.Controls.Add(this.lblCPU24);
+            this.tbMonitor.Controls.Add(this.pbCPU24);
             this.tbMonitor.Controls.Add(this.pbCPU0);
             this.tbMonitor.Controls.Add(this.label4);
             this.tbMonitor.Controls.Add(this.lblCPU);
@@ -1435,7 +1494,7 @@
             this.tbMonitor.Location = new System.Drawing.Point(4, 22);
             this.tbMonitor.Name = "tbMonitor";
             this.tbMonitor.Padding = new System.Windows.Forms.Padding(3);
-            this.tbMonitor.Size = new System.Drawing.Size(840, 368);
+            this.tbMonitor.Size = new System.Drawing.Size(952, 368);
             this.tbMonitor.TabIndex = 0;
             this.tbMonitor.Text = "Monitor";
             this.tbMonitor.UseVisualStyleBackColor = true;
@@ -1466,7 +1525,7 @@
             this.tbAlarm.Controls.Add(this.label3);
             this.tbAlarm.Location = new System.Drawing.Point(4, 22);
             this.tbAlarm.Name = "tbAlarm";
-            this.tbAlarm.Size = new System.Drawing.Size(840, 368);
+            this.tbAlarm.Size = new System.Drawing.Size(952, 368);
             this.tbAlarm.TabIndex = 3;
             this.tbAlarm.Text = "Alert";
             this.tbAlarm.UseVisualStyleBackColor = true;
@@ -1692,7 +1751,7 @@
             // 
             this.tbSettings.Controls.Add(this.txtIPAddress);
             this.tbSettings.Controls.Add(this.label2);
-            this.tbSettings.Controls.Add(this.lbl12700KNote);
+            this.tbSettings.Controls.Add(this.lblEfficientCoresNote);
             this.tbSettings.Controls.Add(this.cmbPriorityClass);
             this.tbSettings.Controls.Add(this.label1);
             this.tbSettings.Controls.Add(this.nudPollingInterval);
@@ -1700,7 +1759,7 @@
             this.tbSettings.Location = new System.Drawing.Point(4, 22);
             this.tbSettings.Name = "tbSettings";
             this.tbSettings.Padding = new System.Windows.Forms.Padding(3);
-            this.tbSettings.Size = new System.Drawing.Size(840, 368);
+            this.tbSettings.Size = new System.Drawing.Size(952, 368);
             this.tbSettings.TabIndex = 1;
             this.tbSettings.Text = "Settings";
             this.tbSettings.UseVisualStyleBackColor = true;
@@ -1722,17 +1781,18 @@
             this.label2.TabIndex = 5;
             this.label2.Text = "IP Address:";
             // 
-            // lbl12700KNote
+            // lblEfficientCoresNote
             // 
-            this.lbl12700KNote.AutoSize = true;
-            this.lbl12700KNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbl12700KNote.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
-            this.lbl12700KNote.Location = new System.Drawing.Point(26, 197);
-            this.lbl12700KNote.Name = "lbl12700KNote";
-            this.lbl12700KNote.Size = new System.Drawing.Size(268, 13);
-            this.lbl12700KNote.TabIndex = 4;
-            this.lbl12700KNote.Text = "12700K detected:   Using only efficient cores ";
-            this.lbl12700KNote.Visible = false;
+            this.lblEfficientCoresNote.AutoSize = true;
+            this.lblEfficientCoresNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblEfficientCoresNote.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.lblEfficientCoresNote.Location = new System.Drawing.Point(26, 197);
+            this.lblEfficientCoresNote.Name = "lblEfficientCoresNote";
+            this.lblEfficientCoresNote.Size = new System.Drawing.Size(225, 13);
+            this.lblEfficientCoresNote.TabIndex = 4;
+            this.lblEfficientCoresNote.Tag = "";
+            this.lblEfficientCoresNote.Text = " detected:   Using only efficient cores ";
+            this.lblEfficientCoresNote.Visible = false;
             // 
             // cmbPriorityClass
             // 
@@ -1828,11 +1888,235 @@
             this.lblErrorsTitle.TabIndex = 0;
             this.lblErrorsTitle.Text = "Errors: (only the first 100 are listed)";
             // 
+            // pbCPU24
+            // 
+            this.pbCPU24.Location = new System.Drawing.Point(789, 19);
+            this.pbCPU24.Name = "pbCPU24";
+            this.pbCPU24.Size = new System.Drawing.Size(127, 23);
+            this.pbCPU24.TabIndex = 98;
+            // 
+            // lblCPU24
+            // 
+            this.lblCPU24.AutoSize = true;
+            this.lblCPU24.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCPU24.Location = new System.Drawing.Point(919, 24);
+            this.lblCPU24.Name = "lblCPU24";
+            this.lblCPU24.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU24.TabIndex = 99;
+            this.lblCPU24.Text = "--";
+            // 
+            // label40
+            // 
+            this.label40.AutoSize = true;
+            this.label40.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label40.ForeColor = System.Drawing.Color.Blue;
+            this.label40.Location = new System.Drawing.Point(714, 24);
+            this.label40.Name = "label40";
+            this.label40.Size = new System.Drawing.Size(69, 13);
+            this.label40.TabIndex = 100;
+            this.label40.Text = "CPU[24] ef";
+            // 
+            // label41
+            // 
+            this.label41.AutoSize = true;
+            this.label41.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label41.ForeColor = System.Drawing.Color.Blue;
+            this.label41.Location = new System.Drawing.Point(714, 64);
+            this.label41.Name = "label41";
+            this.label41.Size = new System.Drawing.Size(69, 13);
+            this.label41.TabIndex = 103;
+            this.label41.Text = "CPU[25] ef";
+            // 
+            // lblCPU25
+            // 
+            this.lblCPU25.AutoSize = true;
+            this.lblCPU25.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCPU25.Location = new System.Drawing.Point(919, 64);
+            this.lblCPU25.Name = "lblCPU25";
+            this.lblCPU25.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU25.TabIndex = 102;
+            this.lblCPU25.Text = "--";
+            // 
+            // pbCPU25
+            // 
+            this.pbCPU25.Location = new System.Drawing.Point(789, 59);
+            this.pbCPU25.Name = "pbCPU25";
+            this.pbCPU25.Size = new System.Drawing.Size(127, 23);
+            this.pbCPU25.TabIndex = 101;
+            // 
+            // lblCPU20
+            // 
+            this.lblCPU20.AutoSize = true;
+            this.lblCPU20.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCPU20.Location = new System.Drawing.Point(669, 193);
+            this.lblCPU20.Name = "lblCPU20";
+            this.lblCPU20.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU20.TabIndex = 106;
+            this.lblCPU20.Text = "--";
+            // 
+            // pbCPU20
+            // 
+            this.pbCPU20.Location = new System.Drawing.Point(536, 189);
+            this.pbCPU20.Name = "pbCPU20";
+            this.pbCPU20.Size = new System.Drawing.Size(127, 23);
+            this.pbCPU20.TabIndex = 105;
+            // 
+            // label43
+            // 
+            this.label43.AutoSize = true;
+            this.label43.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label43.ForeColor = System.Drawing.Color.Blue;
+            this.label43.Location = new System.Drawing.Point(466, 193);
+            this.label43.Name = "label43";
+            this.label43.Size = new System.Drawing.Size(69, 13);
+            this.label43.TabIndex = 104;
+            this.label43.Text = "CPU[20] ef";
+            // 
+            // lblCPU21
+            // 
+            this.lblCPU21.AutoSize = true;
+            this.lblCPU21.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCPU21.Location = new System.Drawing.Point(669, 234);
+            this.lblCPU21.Name = "lblCPU21";
+            this.lblCPU21.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU21.TabIndex = 109;
+            this.lblCPU21.Text = "--";
+            // 
+            // pbCPU21
+            // 
+            this.pbCPU21.Location = new System.Drawing.Point(536, 230);
+            this.pbCPU21.Name = "pbCPU21";
+            this.pbCPU21.Size = new System.Drawing.Size(127, 23);
+            this.pbCPU21.TabIndex = 108;
+            // 
+            // label45
+            // 
+            this.label45.AutoSize = true;
+            this.label45.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label45.ForeColor = System.Drawing.Color.Blue;
+            this.label45.Location = new System.Drawing.Point(466, 234);
+            this.label45.Name = "label45";
+            this.label45.Size = new System.Drawing.Size(69, 13);
+            this.label45.TabIndex = 107;
+            this.label45.Text = "CPU[21] ef";
+            // 
+            // lblCPU22
+            // 
+            this.lblCPU22.AutoSize = true;
+            this.lblCPU22.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCPU22.Location = new System.Drawing.Point(669, 279);
+            this.lblCPU22.Name = "lblCPU22";
+            this.lblCPU22.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU22.TabIndex = 112;
+            this.lblCPU22.Text = "--";
+            // 
+            // pbCPU22
+            // 
+            this.pbCPU22.Location = new System.Drawing.Point(536, 275);
+            this.pbCPU22.Name = "pbCPU22";
+            this.pbCPU22.Size = new System.Drawing.Size(127, 23);
+            this.pbCPU22.TabIndex = 111;
+            // 
+            // label47
+            // 
+            this.label47.AutoSize = true;
+            this.label47.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label47.ForeColor = System.Drawing.Color.Blue;
+            this.label47.Location = new System.Drawing.Point(466, 279);
+            this.label47.Name = "label47";
+            this.label47.Size = new System.Drawing.Size(69, 13);
+            this.label47.TabIndex = 110;
+            this.label47.Text = "CPU[22] ef";
+            // 
+            // lblCPU23
+            // 
+            this.lblCPU23.AutoSize = true;
+            this.lblCPU23.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCPU23.Location = new System.Drawing.Point(669, 323);
+            this.lblCPU23.Name = "lblCPU23";
+            this.lblCPU23.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU23.TabIndex = 115;
+            this.lblCPU23.Text = "--";
+            // 
+            // pbCPU23
+            // 
+            this.pbCPU23.Location = new System.Drawing.Point(536, 319);
+            this.pbCPU23.Name = "pbCPU23";
+            this.pbCPU23.Size = new System.Drawing.Size(127, 23);
+            this.pbCPU23.TabIndex = 114;
+            // 
+            // label49
+            // 
+            this.label49.AutoSize = true;
+            this.label49.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label49.ForeColor = System.Drawing.Color.Blue;
+            this.label49.Location = new System.Drawing.Point(466, 323);
+            this.label49.Name = "label49";
+            this.label49.Size = new System.Drawing.Size(69, 13);
+            this.label49.TabIndex = 113;
+            this.label49.Text = "CPU[23] ef";
+            // 
+            // label42
+            // 
+            this.label42.AutoSize = true;
+            this.label42.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label42.ForeColor = System.Drawing.Color.Blue;
+            this.label42.Location = new System.Drawing.Point(714, 108);
+            this.label42.Name = "label42";
+            this.label42.Size = new System.Drawing.Size(69, 13);
+            this.label42.TabIndex = 118;
+            this.label42.Text = "CPU[26] ef";
+            // 
+            // lblCPU26
+            // 
+            this.lblCPU26.AutoSize = true;
+            this.lblCPU26.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCPU26.Location = new System.Drawing.Point(919, 108);
+            this.lblCPU26.Name = "lblCPU26";
+            this.lblCPU26.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU26.TabIndex = 117;
+            this.lblCPU26.Text = "--";
+            // 
+            // pbCPU26
+            // 
+            this.pbCPU26.Location = new System.Drawing.Point(789, 103);
+            this.pbCPU26.Name = "pbCPU26";
+            this.pbCPU26.Size = new System.Drawing.Size(127, 23);
+            this.pbCPU26.TabIndex = 116;
+            // 
+            // label44
+            // 
+            this.label44.AutoSize = true;
+            this.label44.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label44.ForeColor = System.Drawing.Color.Blue;
+            this.label44.Location = new System.Drawing.Point(714, 151);
+            this.label44.Name = "label44";
+            this.label44.Size = new System.Drawing.Size(69, 13);
+            this.label44.TabIndex = 121;
+            this.label44.Text = "CPU[27] ef";
+            // 
+            // lblCPU27
+            // 
+            this.lblCPU27.AutoSize = true;
+            this.lblCPU27.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCPU27.Location = new System.Drawing.Point(919, 151);
+            this.lblCPU27.Name = "lblCPU27";
+            this.lblCPU27.Size = new System.Drawing.Size(13, 13);
+            this.lblCPU27.TabIndex = 120;
+            this.lblCPU27.Text = "--";
+            // 
+            // pbCPU27
+            // 
+            this.pbCPU27.Location = new System.Drawing.Point(789, 146);
+            this.pbCPU27.Name = "pbCPU27";
+            this.pbCPU27.Size = new System.Drawing.Size(127, 23);
+            this.pbCPU27.TabIndex = 119;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(874, 482);
+            this.ClientSize = new System.Drawing.Size(984, 482);
             this.Controls.Add(this.tcTabControl);
             this.Controls.Add(this.toolStrip2);
             this.Controls.Add(this.toolStrip1);
@@ -1954,7 +2238,7 @@
         private System.Windows.Forms.Label label38;
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.ToolStripLabel tslbl12700K;
+        private System.Windows.Forms.ToolStripLabel tslblCpuType;
         private System.Windows.Forms.ToolStripButton tschkEnabled;
         private System.Windows.Forms.ToolStripButton tsbtnResetMaxCounters;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
@@ -2000,7 +2284,7 @@
         private System.Windows.Forms.TabPage tbErrors;
         private System.Windows.Forms.TextBox txtErrors;
         private System.Windows.Forms.Label lblErrorsTitle;
-        private System.Windows.Forms.Label lbl12700KNote;
+        private System.Windows.Forms.Label lblEfficientCoresNote;
         private System.Windows.Forms.TextBox txtIPAddress;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TabPage tbAlarm;
@@ -2026,6 +2310,30 @@
         private System.Windows.Forms.Label lblGpuAlarm;
         private System.Windows.Forms.Label lblGpuThreshold;
         private System.Windows.Forms.Label lblCpuThreshold;
+        private System.Windows.Forms.Label label40;
+        private System.Windows.Forms.Label lblCPU24;
+        private System.Windows.Forms.ProgressBar pbCPU24;
+        private System.Windows.Forms.Label label41;
+        private System.Windows.Forms.Label lblCPU25;
+        private System.Windows.Forms.ProgressBar pbCPU25;
+        private System.Windows.Forms.Label lblCPU23;
+        private System.Windows.Forms.ProgressBar pbCPU23;
+        private System.Windows.Forms.Label label49;
+        private System.Windows.Forms.Label lblCPU22;
+        private System.Windows.Forms.ProgressBar pbCPU22;
+        private System.Windows.Forms.Label label47;
+        private System.Windows.Forms.Label lblCPU21;
+        private System.Windows.Forms.ProgressBar pbCPU21;
+        private System.Windows.Forms.Label label45;
+        private System.Windows.Forms.Label lblCPU20;
+        private System.Windows.Forms.ProgressBar pbCPU20;
+        private System.Windows.Forms.Label label43;
+        private System.Windows.Forms.Label label44;
+        private System.Windows.Forms.Label lblCPU27;
+        private System.Windows.Forms.ProgressBar pbCPU27;
+        private System.Windows.Forms.Label label42;
+        private System.Windows.Forms.Label lblCPU26;
+        private System.Windows.Forms.ProgressBar pbCPU26;
     }
 }
 
