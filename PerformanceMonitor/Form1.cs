@@ -378,8 +378,7 @@ namespace PerformanceMonitor
             string processorName = regKey.GetValue("ProcessorNameString").ToString();
             currentProcess = Process.GetCurrentProcess();
 
-            // Make sure we have 20 CPUs (HyperThreading Enabled and Efficient Cores enabled in 12700K)
-            // Open the registry key for the processors
+            // We need to know the number of processors available to determine if Hyperthreading and Efficient cores are enabled
             int cpuCount = 0;
             regKey = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor");
             if (regKey != null)
