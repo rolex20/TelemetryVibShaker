@@ -8,6 +8,12 @@ using System.Media;
 
 namespace MicroTaskScheduler
 {
+    public enum CpuType
+    {
+        Intel_12700K,
+        Intel_14700K,
+        Other
+    }
 
 
     public partial class MicroTaskSchedulerService : ServiceBase
@@ -21,6 +27,61 @@ namespace MicroTaskScheduler
         {
             InitializeComponent();
         }
+
+        private void chkUseEfficiencyCoresOnly_CheckedChanged(object sender, EventArgs e)
+        {            
+            RegistryKey regKey = Registry.LocalMachine.OpenSubKey("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0");
+            string processorName = regKey.GetValue("ProcessorNameString").ToString();
+
+            // We need to know the number of processors available to determine if Hyperthreading and Efficient cores are enabled
+            int cpuCount = 0;
+            regKey = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor");
+            if (regKey != null)
+            {
+                // The number of subkeys corresponds to the number of CPUs
+                cpuCount = regKey.SubKeyCount;
+            }
+            regKey.Close();
+
+
+            CpuType cpuType;
+            if (processorName.Contains("12700K")) cpuType = CpuType.Intel_12700K;
+            else if (processorName.Contains("14700K")) cpuType = CpuType.Intel_14700K;
+            else cpuType = CpuType.Other;
+
+            // Calculate affinity for efficient cores only
+            IntPtr affinityMask = IntPtr.Zero;
+            switch (cpuType)
+            {
+                case CpuType.Intel_12700K:
+                    if (cpuCount == 20)
+                    {
+                        affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
+                    }
+                    break;
+                case CpuType.Intel_14700K:
+                    if (cpuCount == 28)
+                    {
+                        affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
+                    }
+                    break;
+                default:
+                    //ignore
+                    break;
+            }
+
+            if (affinityMask != IntPtr.Zero)
+            {
+                try
+                {
+                    // Set the CPU affinity to Efficient Cores only
+                    Process currentProcess = Process.GetCurrentProcess();
+                    currentProcess.ProcessorAffinity = affinityMask;
+                }
+                catch { } // Ignore
+            }
+        }
+
 
         private void AssignEfficiencyCoresOnly()
         {
