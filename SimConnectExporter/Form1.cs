@@ -75,7 +75,7 @@ namespace SimConnectExporter
         private static extern ulong GetTickCount64();
 
 
-        private int GetSimConnectPeriod()
+        private SIMCONNECT_PERIOD GetSimConnectPeriod()
         {
             switch (cmbSimConnectPeriod.Text)
             {
@@ -84,7 +84,7 @@ namespace SimConnectExporter
                 case "SIMCONNECT_PERIOD_SIM_FRAME":
                     return SIMCONNECT_PERIOD.SIM_FRAME;
                 case "SIMCONNECT_PERIOD_SECOND":
-                    return SIMCONNECT_PERIOD_SECOND;
+                    return SIMCONNECT_PERIOD.SECOND;
                 default:
                     return SIMCONNECT_PERIOD.VISUAL_FRAME; // just to remove compiler warning
             }
@@ -118,7 +118,7 @@ namespace SimConnectExporter
                 ConnectUDP();
 
                 // Request data from SimConnect
-                int period = GetSimConnectPeriod();
+                SIMCONNECT_PERIOD period = GetSimConnectPeriod();
                 //simconnect.RequestDataOnSimObject(REQUESTS.Request1, DEFINITIONS.Struct1, SimConnect.SIMCONNECT_OBJECT_ID_USER, SIMCONNECT_PERIOD.VISUAL_FRAME, SIMCONNECT_DATA_REQUEST_FLAG.CHANGED, 0, 0, 0);
                 simconnect.RequestDataOnSimObject(REQUESTS.Request1, DEFINITIONS.Struct1, SimConnect.SIMCONNECT_OBJECT_ID_USER, period, SIMCONNECT_DATA_REQUEST_FLAG.CHANGED, 0, 0, 0);
 

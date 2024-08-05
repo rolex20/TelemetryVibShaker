@@ -32,6 +32,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             tabs = new TabControl();
             Settings = new TabPage();
+            cmbSimConnectPeriod = new ComboBox();
+            label13 = new Label();
             label12 = new Label();
             label8 = new Label();
             nudFrequency = new NumericUpDown();
@@ -88,8 +90,6 @@
             btnDisconnect = new Button();
             btnResetMax = new Button();
             timer1 = new System.Windows.Forms.Timer(components);
-            cmbSimConnectPeriod = new ComboBox();
-            label13 = new Label();
             tabs.SuspendLayout();
             Settings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudFrequency).BeginInit();
@@ -132,6 +132,26 @@
             Settings.TabIndex = 0;
             Settings.Text = "Settings";
             Settings.UseVisualStyleBackColor = true;
+            // 
+            // cmbSimConnectPeriod
+            // 
+            cmbSimConnectPeriod.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbSimConnectPeriod.FormattingEnabled = true;
+            cmbSimConnectPeriod.Items.AddRange(new object[] { "SIMCONNECT_PERIOD_VISUAL_FRAME", "SIMCONNECT_PERIOD_SIM_FRAME", "SIMCONNECT_PERIOD_SECOND" });
+            cmbSimConnectPeriod.Location = new Point(152, 186);
+            cmbSimConnectPeriod.Name = "cmbSimConnectPeriod";
+            cmbSimConnectPeriod.Size = new Size(234, 23);
+            cmbSimConnectPeriod.TabIndex = 27;
+            // 
+            // label13
+            // 
+            label13.AutoSize = true;
+            label13.Location = new Point(24, 189);
+            label13.Name = "label13";
+            label13.Size = new Size(112, 15);
+            label13.TabIndex = 26;
+            label13.Text = "SimConnect Period:";
+            label13.TextAlign = ContentAlignment.TopRight;
             // 
             // label12
             // 
@@ -281,7 +301,7 @@
             Monitor.Location = new Point(4, 24);
             Monitor.Name = "Monitor";
             Monitor.Padding = new Padding(3);
-            Monitor.Size = new Size(461, 250);
+            Monitor.Size = new Size(461, 290);
             Monitor.TabIndex = 1;
             Monitor.Text = "Monitor";
             Monitor.UseVisualStyleBackColor = true;
@@ -608,7 +628,7 @@
             tbGForces.Controls.Add(chkTrackGForces);
             tbGForces.Location = new Point(4, 24);
             tbGForces.Name = "tbGForces";
-            tbGForces.Size = new Size(461, 250);
+            tbGForces.Size = new Size(461, 290);
             tbGForces.TabIndex = 2;
             tbGForces.Text = "G Forces Tracker";
             tbGForces.UseVisualStyleBackColor = true;
@@ -666,7 +686,7 @@
             btnConnect.Name = "btnConnect";
             btnConnect.Size = new Size(75, 23);
             btnConnect.TabIndex = 1;
-            btnConnect.Text = "Connect";
+            btnConnect.Text = "&Connect";
             btnConnect.UseVisualStyleBackColor = true;
             btnConnect.Click += btnConnect_Click;
             // 
@@ -694,7 +714,7 @@
             btnDisconnect.Name = "btnDisconnect";
             btnDisconnect.Size = new Size(75, 23);
             btnDisconnect.TabIndex = 3;
-            btnDisconnect.Text = "Disconnect";
+            btnDisconnect.Text = "&Disconnect";
             btnDisconnect.UseVisualStyleBackColor = true;
             btnDisconnect.Click += btnDisconnect_Click;
             // 
@@ -704,7 +724,7 @@
             btnResetMax.Name = "btnResetMax";
             btnResetMax.Size = new Size(75, 23);
             btnResetMax.TabIndex = 4;
-            btnResetMax.Text = "Reset Max";
+            btnResetMax.Text = "&Reset Max";
             btnResetMax.UseVisualStyleBackColor = true;
             btnResetMax.Click += btnResetMax_Click;
             // 
@@ -712,26 +732,6 @@
             // 
             timer1.Interval = 1500;
             timer1.Tick += timer1_Tick;
-            // 
-            // cmbSimConnectPeriod
-            // 
-            cmbSimConnectPeriod.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbSimConnectPeriod.FormattingEnabled = true;
-            cmbSimConnectPeriod.Items.AddRange(new object[] { "SIMCONNECT_PERIOD_VISUAL_FRAME", "SIMCONNECT_PERIOD_SIM_FRAME", "SIMCONNECT_PERIOD_SECOND" });
-            cmbSimConnectPeriod.Location = new Point(152, 186);
-            cmbSimConnectPeriod.Name = "cmbSimConnectPeriod";
-            cmbSimConnectPeriod.Size = new Size(155, 23);
-            cmbSimConnectPeriod.TabIndex = 27;
-            // 
-            // label13
-            // 
-            label13.AutoSize = true;
-            label13.Location = new Point(24, 189);
-            label13.Name = "label13";
-            label13.Size = new Size(112, 15);
-            label13.TabIndex = 26;
-            label13.Text = "SimConnect Period:";
-            label13.TextAlign = ContentAlignment.TopRight;
             // 
             // frmMain
             // 
