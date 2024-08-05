@@ -88,6 +88,8 @@
             btnDisconnect = new Button();
             btnResetMax = new Button();
             timer1 = new System.Windows.Forms.Timer(components);
+            cmbSimConnectPeriod = new ComboBox();
+            label13 = new Label();
             tabs.SuspendLayout();
             Settings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudFrequency).BeginInit();
@@ -105,11 +107,13 @@
             tabs.Location = new Point(12, 24);
             tabs.Name = "tabs";
             tabs.SelectedIndex = 0;
-            tabs.Size = new Size(469, 278);
+            tabs.Size = new Size(469, 318);
             tabs.TabIndex = 0;
             // 
             // Settings
             // 
+            Settings.Controls.Add(cmbSimConnectPeriod);
+            Settings.Controls.Add(label13);
             Settings.Controls.Add(label12);
             Settings.Controls.Add(label8);
             Settings.Controls.Add(nudFrequency);
@@ -124,7 +128,7 @@
             Settings.Location = new Point(4, 24);
             Settings.Name = "Settings";
             Settings.Padding = new Padding(3);
-            Settings.Size = new Size(461, 250);
+            Settings.Size = new Size(461, 290);
             Settings.TabIndex = 0;
             Settings.Text = "Settings";
             Settings.UseVisualStyleBackColor = true;
@@ -164,7 +168,7 @@
             chkUseEfficiencyCoresOnly.AutoSize = true;
             chkUseEfficiencyCoresOnly.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Bold, GraphicsUnit.Point);
             chkUseEfficiencyCoresOnly.ForeColor = Color.FromArgb(91, 155, 213);
-            chkUseEfficiencyCoresOnly.Location = new Point(13, 214);
+            chkUseEfficiencyCoresOnly.Location = new Point(13, 252);
             chkUseEfficiencyCoresOnly.Name = "chkUseEfficiencyCoresOnly";
             chkUseEfficiencyCoresOnly.Size = new Size(260, 19);
             chkUseEfficiencyCoresOnly.TabIndex = 22;
@@ -176,12 +180,13 @@
             // chkUseBackgroundProcessing
             // 
             chkUseBackgroundProcessing.AutoSize = true;
-            chkUseBackgroundProcessing.Location = new Point(13, 187);
+            chkUseBackgroundProcessing.Location = new Point(13, 225);
             chkUseBackgroundProcessing.Name = "chkUseBackgroundProcessing";
             chkUseBackgroundProcessing.Size = new Size(206, 19);
             chkUseBackgroundProcessing.TabIndex = 21;
             chkUseBackgroundProcessing.Text = "Use background processing mode";
             chkUseBackgroundProcessing.UseVisualStyleBackColor = true;
+            chkUseBackgroundProcessing.Visible = false;
             chkUseBackgroundProcessing.CheckedChanged += chkUseBackgroundProcessing_CheckedChanged;
             // 
             // cmbPriorityClass
@@ -657,7 +662,7 @@
             // 
             // btnConnect
             // 
-            btnConnect.Location = new Point(321, 316);
+            btnConnect.Location = new Point(321, 353);
             btnConnect.Name = "btnConnect";
             btnConnect.Size = new Size(75, 23);
             btnConnect.TabIndex = 1;
@@ -668,7 +673,7 @@
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new ToolStripItem[] { tsStatusBar1 });
-            statusStrip1.Location = new Point(0, 358);
+            statusStrip1.Location = new Point(0, 391);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(493, 22);
             statusStrip1.TabIndex = 2;
@@ -685,7 +690,7 @@
             // btnDisconnect
             // 
             btnDisconnect.Enabled = false;
-            btnDisconnect.Location = new Point(402, 316);
+            btnDisconnect.Location = new Point(402, 353);
             btnDisconnect.Name = "btnDisconnect";
             btnDisconnect.Size = new Size(75, 23);
             btnDisconnect.TabIndex = 3;
@@ -695,7 +700,7 @@
             // 
             // btnResetMax
             // 
-            btnResetMax.Location = new Point(16, 316);
+            btnResetMax.Location = new Point(16, 353);
             btnResetMax.Name = "btnResetMax";
             btnResetMax.Size = new Size(75, 23);
             btnResetMax.TabIndex = 4;
@@ -708,11 +713,31 @@
             timer1.Interval = 1500;
             timer1.Tick += timer1_Tick;
             // 
+            // cmbSimConnectPeriod
+            // 
+            cmbSimConnectPeriod.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbSimConnectPeriod.FormattingEnabled = true;
+            cmbSimConnectPeriod.Items.AddRange(new object[] { "SIMCONNECT_PERIOD_VISUAL_FRAME", "SIMCONNECT_PERIOD_SIM_FRAME", "SIMCONNECT_PERIOD_SECOND" });
+            cmbSimConnectPeriod.Location = new Point(152, 186);
+            cmbSimConnectPeriod.Name = "cmbSimConnectPeriod";
+            cmbSimConnectPeriod.Size = new Size(155, 23);
+            cmbSimConnectPeriod.TabIndex = 27;
+            // 
+            // label13
+            // 
+            label13.AutoSize = true;
+            label13.Location = new Point(24, 189);
+            label13.Name = "label13";
+            label13.Size = new Size(112, 15);
+            label13.TabIndex = 26;
+            label13.Text = "SimConnect Period:";
+            label13.TextAlign = ContentAlignment.TopRight;
+            // 
             // frmMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(493, 380);
+            ClientSize = new Size(493, 413);
             Controls.Add(btnResetMax);
             Controls.Add(btnDisconnect);
             Controls.Add(statusStrip1);
@@ -801,5 +826,7 @@
         private Label label10;
         private Label label11;
         private Label label12;
+        private ComboBox cmbSimConnectPeriod;
+        private Label label13;
     }
 }
