@@ -787,7 +787,7 @@ namespace PerformanceMonitor
             
             if (elapsed_ms > (long)tslblMaxLoopTime.Tag)
             {
-                if (!(bool)tslblLT.Tag) // ignore the first Max
+                if ((bool)tslblLT.Tag) // ignore the first Max
                     UpdateCaption(tslblMaxLoopTime, elapsed_ms); 
                 tslblLT.Tag = true;                
             }
