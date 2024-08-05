@@ -210,6 +210,10 @@
             this.tbErrors = new System.Windows.Forms.TabPage();
             this.txtErrors = new System.Windows.Forms.TextBox();
             this.lblErrorsTitle = new System.Windows.Forms.Label();
+            this.lblCpuAbovePct = new System.Windows.Forms.Label();
+            this.label48 = new System.Windows.Forms.Label();
+            this.label50 = new System.Windows.Forms.Label();
+            this.lblGpuAbovePct = new System.Windows.Forms.Label();
             this.toolStrip1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.tcTabControl.SuspendLayout();
@@ -1728,6 +1732,10 @@
             // 
             // tbAlarm
             // 
+            this.tbAlarm.Controls.Add(this.lblGpuAbovePct);
+            this.tbAlarm.Controls.Add(this.label50);
+            this.tbAlarm.Controls.Add(this.label48);
+            this.tbAlarm.Controls.Add(this.lblCpuAbovePct);
             this.tbAlarm.Controls.Add(this.lblGpuThreshold);
             this.tbAlarm.Controls.Add(this.lblCpuThreshold);
             this.tbAlarm.Controls.Add(this.lblGpuAlarm);
@@ -1780,7 +1788,7 @@
             this.lblGpuAlarm.AutoSize = true;
             this.lblGpuAlarm.Font = new System.Drawing.Font("Microsoft Sans Serif", 34F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblGpuAlarm.ForeColor = System.Drawing.Color.YellowGreen;
-            this.lblGpuAlarm.Location = new System.Drawing.Point(392, 237);
+            this.lblGpuAlarm.Location = new System.Drawing.Point(321, 225);
             this.lblGpuAlarm.Name = "lblGpuAlarm";
             this.lblGpuAlarm.Size = new System.Drawing.Size(71, 53);
             this.lblGpuAlarm.TabIndex = 19;
@@ -1792,7 +1800,7 @@
             this.lblCpuAlarm.AutoSize = true;
             this.lblCpuAlarm.Font = new System.Drawing.Font("Microsoft Sans Serif", 34F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCpuAlarm.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
-            this.lblCpuAlarm.Location = new System.Drawing.Point(84, 237);
+            this.lblCpuAlarm.Location = new System.Drawing.Point(117, 225);
             this.lblCpuAlarm.Name = "lblCpuAlarm";
             this.lblCpuAlarm.Size = new System.Drawing.Size(71, 53);
             this.lblCpuAlarm.TabIndex = 18;
@@ -2115,6 +2123,47 @@
             this.lblErrorsTitle.TabIndex = 0;
             this.lblErrorsTitle.Text = "Errors: (only the first 100 are listed)";
             // 
+            // lblCpuAbovePct
+            // 
+            this.lblCpuAbovePct.AutoSize = true;
+            this.lblCpuAbovePct.Font = new System.Drawing.Font("Microsoft Sans Serif", 34F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCpuAbovePct.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.lblCpuAbovePct.Location = new System.Drawing.Point(117, 304);
+            this.lblCpuAbovePct.Name = "lblCpuAbovePct";
+            this.lblCpuAbovePct.Size = new System.Drawing.Size(71, 53);
+            this.lblCpuAbovePct.TabIndex = 22;
+            this.lblCpuAbovePct.Text = "---";
+            // 
+            // label48
+            // 
+            this.label48.AutoSize = true;
+            this.label48.Location = new System.Drawing.Point(17, 247);
+            this.label48.Name = "label48";
+            this.label48.Size = new System.Drawing.Size(63, 13);
+            this.label48.TabIndex = 23;
+            this.label48.Text = "Utilization %";
+            // 
+            // label50
+            // 
+            this.label50.AutoSize = true;
+            this.label50.Location = new System.Drawing.Point(31, 326);
+            this.label50.Name = "label50";
+            this.label50.Size = new System.Drawing.Size(49, 13);
+            this.label50.TabIndex = 24;
+            this.label50.Text = "Above %";
+            // 
+            // lblGpuAbovePct
+            // 
+            this.lblGpuAbovePct.AutoSize = true;
+            this.lblGpuAbovePct.Font = new System.Drawing.Font("Microsoft Sans Serif", 34F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblGpuAbovePct.ForeColor = System.Drawing.Color.YellowGreen;
+            this.lblGpuAbovePct.Location = new System.Drawing.Point(321, 304);
+            this.lblGpuAbovePct.Name = "lblGpuAbovePct";
+            this.lblGpuAbovePct.Size = new System.Drawing.Size(71, 53);
+            this.lblGpuAbovePct.TabIndex = 25;
+            this.lblGpuAbovePct.Tag = "GPU Engine";
+            this.lblGpuAbovePct.Text = "---";
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -2337,6 +2386,10 @@
         private System.Windows.Forms.Label label42;
         private System.Windows.Forms.Label lblCPU26;
         private System.Windows.Forms.ProgressBar pbCPU26;
+        private System.Windows.Forms.Label label48;
+        private System.Windows.Forms.Label lblCpuAbovePct;
+        private System.Windows.Forms.Label lblGpuAbovePct;
+        private System.Windows.Forms.Label label50;
     }
 }
 

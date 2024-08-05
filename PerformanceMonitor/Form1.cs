@@ -45,6 +45,17 @@ namespace PerformanceMonitor
 
         private MediaPlayer mpCpu, mpGpu;
 
+        private float TotalTicks, TotalCpuTicksAboveThreshold, TotalGpuTicksAboveThreshold;
+
+        private void ResetTicksCounters()
+        {
+            TotalTicks = 0.0f;
+            TotalCpuTicksAboveThreshold = 0.0f;
+            TotalGpuTicksAboveThreshold = 0.0f;
+            lblCpuAbovePct.Tag = -1.0f;
+            lblGpuAbovePct.Tag = -1.0f;
+        }
+
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -136,6 +147,8 @@ namespace PerformanceMonitor
         {
             //timer1.Enabled = chkEnabled.Checked;
             timer1.Enabled = tschkEnabled.Checked;
+
+            if (timer1.Enabled) { ResetTicksCounters(); }
         }
 
 
@@ -240,6 +253,8 @@ namespace PerformanceMonitor
 
             tslblExceptions.Tag = 0L;
             ExCounter = 0L;
+
+            ResetTicksCounters();
         }
 
         private string GetMyIPAddress()
@@ -443,6 +458,8 @@ namespace PerformanceMonitor
         {
             SingleInstanceChecker();
 
+            ResetTicksCounters();
+
             // Restore previous location
             this.Location = new Point(Properties.Settings.Default.XCoordinate, Properties.Settings.Default.YCoordinate);
 
@@ -637,10 +654,14 @@ namespace PerformanceMonitor
             if (mpGpu != null )
             {
                 if (util >= trkGpuThreshold.Value)
+                {
                     mpGpu.Volume = trkGpuVolume.Value / 100.0f;
+                    TotalGpuTicksAboveThreshold += timer1.Interval;                    
+                }
                 else
                     mpGpu.Volume = 0.0f;
             }
+            UpdateCaption(lblGpuAbovePct, TotalGpuTicksAboveThreshold / TotalTicks, "%");
 
             ExCounter += myRTX4090.ReadResetExceptionsCounter;
 
@@ -649,7 +670,7 @@ namespace PerformanceMonitor
             {
                 case 0: // %GPU Time
                     UpdateCounter(util, pbGPU0, lblGPU0, "%");
-                    UpdateCaption(lblGpuAlarm, util);
+                    UpdateCaption(lblGpuAlarm, util, "%");
                     break;
                 case 1: // GPU Temperature (in degrees C)
                     UpdateCounter(temp, pbGPU0, lblGPU0, "°C");
@@ -665,6 +686,9 @@ namespace PerformanceMonitor
 
         private void UpdateMonitorLabels()
         {
+            float incrementalTicks = timer1.Interval;
+            TotalTicks += incrementalTicks;
+
             if (tschkShowLastThread.Checked)
             {
                 UpdateCaption(tslblLastThread, (int)GetCurrentThreadId());
@@ -710,12 +734,16 @@ namespace PerformanceMonitor
 
             if (mpCpu != null) {
                 if (maxCpuUtil >= trkCpuThreshold.Value)
+                {
                     mpCpu.Volume = trkCpuVolume.Value / 100.0f;
+                    TotalCpuTicksAboveThreshold += incrementalTicks;                    
+                } 
                 else
                     mpCpu.Volume = 0.0f;
             }
+            UpdateCaption(lblCpuAbovePct, TotalCpuTicksAboveThreshold / TotalTicks, "%");
 
-            UpdateCaption(lblCpuAlarm, maxCpuUtil);
+            UpdateCaption(lblCpuAlarm, maxCpuUtil, "%");
 
             UpdateDisk(diskCounterC, lblDiskC, lblMaxDiskC);
             UpdateDisk(diskCounterN, lblDiskN, lblMaxDiskN);
@@ -987,23 +1015,23 @@ namespace PerformanceMonitor
             }
         }
 
-        private void UpdateCaption<TControl, TValue>(TControl L, TValue value)
+        private void UpdateCaption<TControl, TValue>(TControl L, TValue value, string dimensional = "")
             where TControl : Control
         {
 
             if (this.WindowState != FormWindowState.Minimized && tcTabControl.SelectedTab==L.Parent && !Equals(L.Tag, value))
             {
                 L.Tag = value;
-                L.Text = value is float f ? $"{f:F1}" : value.ToString();
+                L.Text = (value is float f ? $"{f:F1}" : value.ToString()) + dimensional;
             } 
         }
 
-        private void UpdateCaption<TValue>(ToolStripLabel L, TValue value)
+        private void UpdateCaption<TValue>(ToolStripLabel L, TValue value, string dimensional = "")
         {
             if (this.WindowState != FormWindowState.Minimized && !Equals(L.Tag, value))
             {
                 L.Tag = value;
-                L.Text = value is float f ? $"{f:F1}" : value.ToString();
+                L.Text = (value is float f ? $"{f:F1}" : value.ToString()) + dimensional;
             }
         }
 
