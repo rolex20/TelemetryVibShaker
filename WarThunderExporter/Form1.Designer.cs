@@ -245,9 +245,9 @@
             chkUseEfficiencyCoresOnly.ForeColor = Color.FromArgb(91, 155, 213);
             chkUseEfficiencyCoresOnly.Location = new Point(10, 273);
             chkUseEfficiencyCoresOnly.Name = "chkUseEfficiencyCoresOnly";
-            chkUseEfficiencyCoresOnly.Size = new Size(290, 19);
+            chkUseEfficiencyCoresOnly.Size = new Size(260, 19);
             chkUseEfficiencyCoresOnly.TabIndex = 0;
-            chkUseEfficiencyCoresOnly.Text = "Use Efficiency cores only on Intel 12700K";
+            chkUseEfficiencyCoresOnly.Text = " detected:  Use Efficiency cores only.";
             chkUseEfficiencyCoresOnly.UseVisualStyleBackColor = true;
             chkUseEfficiencyCoresOnly.Visible = false;
             chkUseEfficiencyCoresOnly.CheckedChanged += chkUseEfficiencyCoresOnly_CheckedChanged;

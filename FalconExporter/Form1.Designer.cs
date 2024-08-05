@@ -151,9 +151,9 @@
             this.chkUseEfficiencyCoresOnly.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
             this.chkUseEfficiencyCoresOnly.Location = new System.Drawing.Point(20, 242);
             this.chkUseEfficiencyCoresOnly.Name = "chkUseEfficiencyCoresOnly";
-            this.chkUseEfficiencyCoresOnly.Size = new System.Drawing.Size(321, 19);
+            this.chkUseEfficiencyCoresOnly.Size = new System.Drawing.Size(260, 19);
             this.chkUseEfficiencyCoresOnly.TabIndex = 9;
-            this.chkUseEfficiencyCoresOnly.Text = "Use Efficiency cores only on Alder/Raptor Intel";
+            this.chkUseEfficiencyCoresOnly.Text = " detected:  Use Efficiency cores only.";
             this.chkUseEfficiencyCoresOnly.UseVisualStyleBackColor = true;
             this.chkUseEfficiencyCoresOnly.Visible = false;
             this.chkUseEfficiencyCoresOnly.CheckedChanged += new System.EventHandler(this.chkUseEfficiencyCoresOnly_CheckedChanged);

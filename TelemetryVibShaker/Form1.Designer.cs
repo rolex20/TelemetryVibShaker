@@ -155,6 +155,7 @@
             chkShowStatistics = new CheckBox();
             chkChangeToMonitor = new CheckBox();
             tabNotFounds = new TabPage();
+            label51 = new Label();
             label48 = new Label();
             lstNotFounds = new ListBox();
             btnStartListening = new Button();
@@ -165,7 +166,6 @@
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             btnResetMax = new Button();
-            label51 = new Label();
             tabs.SuspendLayout();
             tabNormalSoundEffects.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier2).BeginInit();
@@ -766,9 +766,9 @@
             chkUseEfficiencyCoresOnly.ForeColor = Color.FromArgb(91, 155, 213);
             chkUseEfficiencyCoresOnly.Location = new Point(17, 341);
             chkUseEfficiencyCoresOnly.Name = "chkUseEfficiencyCoresOnly";
-            chkUseEfficiencyCoresOnly.Size = new Size(290, 19);
+            chkUseEfficiencyCoresOnly.Size = new Size(260, 19);
             chkUseEfficiencyCoresOnly.TabIndex = 18;
-            chkUseEfficiencyCoresOnly.Text = "Use Efficiency cores only on Intel 12700K";
+            chkUseEfficiencyCoresOnly.Text = " detected:  Use Efficiency cores only.";
             chkUseEfficiencyCoresOnly.UseVisualStyleBackColor = true;
             chkUseEfficiencyCoresOnly.Visible = false;
             chkUseEfficiencyCoresOnly.CheckedChanged += chkUseEfficiencyCoresOnly_CheckedChanged;
@@ -1584,6 +1584,15 @@
             tabNotFounds.Text = "Not Founds";
             tabNotFounds.UseVisualStyleBackColor = true;
             // 
+            // label51
+            // 
+            label51.AutoSize = true;
+            label51.Location = new Point(23, 349);
+            label51.Name = "label51";
+            label51.Size = new Size(177, 15);
+            label51.TabIndex = 2;
+            label51.Text = "* Only when Statistics is enabled";
+            // 
             // label48
             // 
             label48.AutoSize = true;
@@ -1659,15 +1668,6 @@
             btnResetMax.Text = "Reset Max";
             btnResetMax.UseVisualStyleBackColor = true;
             btnResetMax.Click += btnResetMax_Click;
-            // 
-            // label51
-            // 
-            label51.AutoSize = true;
-            label51.Location = new Point(23, 349);
-            label51.Name = "label51";
-            label51.Size = new Size(177, 15);
-            label51.TabIndex = 2;
-            label51.Text = "* Only when Statistics is enabled";
             // 
             // frmMain
             // 

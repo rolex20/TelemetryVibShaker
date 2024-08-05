@@ -31,6 +31,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             tabControls = new TabControl();
             tabSettings = new TabPage();
+            txtProgramsConfigurationFile = new TextBox();
+            label1 = new Label();
             nudInstance = new NumericUpDown();
             chkUseCachedHTML = new CheckBox();
             lblCountDownTimer = new Label();
@@ -48,8 +50,6 @@
             txtIPAddress = new TextBox();
             tabDebug = new TabPage();
             txtDebug = new TextBox();
-            label1 = new Label();
-            txtProgramsConfigurationFile = new TextBox();
             tabControls.SuspendLayout();
             tabSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudInstance).BeginInit();
@@ -92,6 +92,22 @@
             tabSettings.TabIndex = 1;
             tabSettings.Text = "Settings";
             tabSettings.UseVisualStyleBackColor = true;
+            // 
+            // txtProgramsConfigurationFile
+            // 
+            txtProgramsConfigurationFile.Location = new Point(153, 16);
+            txtProgramsConfigurationFile.Name = "txtProgramsConfigurationFile";
+            txtProgramsConfigurationFile.Size = new Size(151, 23);
+            txtProgramsConfigurationFile.TabIndex = 17;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(37, 19);
+            label1.Name = "label1";
+            label1.Size = new Size(100, 15);
+            label1.TabIndex = 16;
+            label1.Text = "Programs Config:";
             // 
             // nudInstance
             // 
@@ -143,9 +159,9 @@
             chkUseEfficiencyCoresOnly.ForeColor = Color.FromArgb(91, 155, 213);
             chkUseEfficiencyCoresOnly.Location = new Point(21, 265);
             chkUseEfficiencyCoresOnly.Name = "chkUseEfficiencyCoresOnly";
-            chkUseEfficiencyCoresOnly.Size = new Size(290, 19);
+            chkUseEfficiencyCoresOnly.Size = new Size(260, 19);
             chkUseEfficiencyCoresOnly.TabIndex = 10;
-            chkUseEfficiencyCoresOnly.Text = "Use Efficiency cores only on Intel 12700K";
+            chkUseEfficiencyCoresOnly.Text = " detected:  Use Efficiency cores only.";
             chkUseEfficiencyCoresOnly.UseVisualStyleBackColor = true;
             chkUseEfficiencyCoresOnly.Visible = false;
             chkUseEfficiencyCoresOnly.CheckedChanged += chkUseEfficiencyCoresOnly_CheckedChanged;
@@ -261,22 +277,6 @@
             txtDebug.ScrollBars = ScrollBars.Both;
             txtDebug.Size = new Size(290, 297);
             txtDebug.TabIndex = 0;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(37, 19);
-            label1.Name = "label1";
-            label1.Size = new Size(100, 15);
-            label1.TabIndex = 16;
-            label1.Text = "Programs Config:";
-            // 
-            // txtProgramsConfigurationFile
-            // 
-            txtProgramsConfigurationFile.Location = new Point(153, 16);
-            txtProgramsConfigurationFile.Name = "txtProgramsConfigurationFile";
-            txtProgramsConfigurationFile.Size = new Size(151, 23);
-            txtProgramsConfigurationFile.TabIndex = 17;
             // 
             // frmMain
             // 

@@ -666,6 +666,7 @@ namespace RemoteWindowControl
                     if (cpuCount == 20)
                     {
                         affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
+                        chkUseEfficiencyCoresOnly.Text = "14700K" + chkUseEfficiencyCoresOnly.Text;
                         chkUseEfficiencyCoresOnly.Visible = true;
                     }
                     break;
@@ -673,6 +674,7 @@ namespace RemoteWindowControl
                     if (cpuCount == 28)
                     {
                         affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
+                        chkUseEfficiencyCoresOnly.Text = "14700K" + chkUseEfficiencyCoresOnly.Text;
                         chkUseEfficiencyCoresOnly.Visible = true;
                     }
                     break;
