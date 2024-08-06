@@ -203,6 +203,7 @@
             this.txtCpuAlarm = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.tbSettings = new System.Windows.Forms.TabPage();
+            this.label51 = new System.Windows.Forms.Label();
             this.label46 = new System.Windows.Forms.Label();
             this.cmbProcessorCounter = new System.Windows.Forms.ComboBox();
             this.txtIPAddress = new System.Windows.Forms.TextBox();
@@ -215,7 +216,6 @@
             this.tbErrors = new System.Windows.Forms.TabPage();
             this.txtErrors = new System.Windows.Forms.TextBox();
             this.lblErrorsTitle = new System.Windows.Forms.Label();
-            this.label51 = new System.Windows.Forms.Label();
             this.toolStrip1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.tcTabControl.SuspendLayout();
@@ -2033,6 +2033,15 @@
             this.tbSettings.Text = "Settings";
             this.tbSettings.UseVisualStyleBackColor = true;
             // 
+            // label51
+            // 
+            this.label51.AutoSize = true;
+            this.label51.Location = new System.Drawing.Point(261, 127);
+            this.label51.Name = "label51";
+            this.label51.Size = new System.Drawing.Size(175, 13);
+            this.label51.TabIndex = 9;
+            this.label51.Text = "* Web IPC_PipeServer deprecated.";
+            // 
             // label46
             // 
             this.label46.AutoSize = true;
@@ -2049,6 +2058,11 @@
             this.cmbProcessorCounter.Items.AddRange(new object[] {
             "% Processor Utility",
             "% Processor Time",
+            "% Interrupt Time",
+            "% DPC Time",
+            "% Privileged Time",
+            "% User Time",
+            "% Idle Time",
             "% Performance Limit",
             "% Privileged Utility",
             "% Processor Performance",
@@ -2056,12 +2070,7 @@
             "% Priority Time",
             "% C3 Time",
             "% C2 Time",
-            "% C1 Time",
-            "% Idle Time",
-            "% Interrupt Time",
-            "% DPC Time",
-            "% Privileged Time",
-            "% User Time"});
+            "% C1 Time"});
             this.cmbProcessorCounter.Location = new System.Drawing.Point(136, 163);
             this.cmbProcessorCounter.Name = "cmbProcessorCounter";
             this.cmbProcessorCounter.Size = new System.Drawing.Size(183, 21);
@@ -2192,15 +2201,6 @@
             this.lblErrorsTitle.Size = new System.Drawing.Size(168, 13);
             this.lblErrorsTitle.TabIndex = 0;
             this.lblErrorsTitle.Text = "Errors: (only the first 100 are listed)";
-            // 
-            // label51
-            // 
-            this.label51.AutoSize = true;
-            this.label51.Location = new System.Drawing.Point(261, 127);
-            this.label51.Name = "label51";
-            this.label51.Size = new System.Drawing.Size(131, 13);
-            this.label51.TabIndex = 9;
-            this.label51.Text = "* Web Server deprecated.";
             // 
             // frmMain
             // 

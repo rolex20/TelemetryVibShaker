@@ -14,6 +14,8 @@ using NAudio.Wave;
 using NAudio.CoreAudioApi;
 using System.Drawing;
 using System.Threading;
+using System.IO.Pipes;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 
 
@@ -35,8 +37,12 @@ namespace PerformanceMonitor
         private PerformanceCounter diskCounterC, diskCounterN, diskCounterR;
         private NvidiaGpu myRTX4090;
 
-        private HttpListener listener; // Web Server for remote control location and focus commands
+        private HttpListener listener; // Web IPC_PipeServer for remote control location and focus commands
         private int webServerThreadId, dispatcherUIThread;
+
+        private Thread serverThread;  // IPC_PipeServer Thread for pipes interprocess communications
+        private CancellationTokenSource pipeCancellationTokenSource;
+
         private Process currentProcess;
         private CpuType cpuType;
 
@@ -59,6 +65,7 @@ namespace PerformanceMonitor
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            pipeCancellationTokenSource.Cancel();
             // Save all user settings
 
             Properties.Settings.Default.TimerInterval = (int)nudPollingInterval.Value;
@@ -577,6 +584,11 @@ namespace PerformanceMonitor
             // No longer using web server, not its pipes
             // StartWebServer(); 
 
+            // Start Interprocess communication server using named pipes using a different thread
+            pipeCancellationTokenSource = new CancellationTokenSource();
+            Thread serverThread = new Thread(() => IPC_PipeServer(pipeCancellationTokenSource.Token));
+            serverThread.IsBackground = true;
+            serverThread.Start();
 
 
             stopwatch = new Stopwatch();
@@ -584,6 +596,87 @@ namespace PerformanceMonitor
             nudPollingInterval.Value = Properties.Settings.Default.TimerInterval;
             timer1.Interval = (int)nudPollingInterval.Value;
             timer1.Enabled = tschkEnabled.Checked;
+        }
+
+        // When playing in VR I can't conveniently switch to performance monitor to change settings
+        // Instead I user RemoteWindowControl to send IPC pipe messages to PerformanceMonitor
+        // This way I can change tabs, restart the counters or monitor a different CPU counter
+        private async void IPC_PipeServer(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                using (NamedPipeServerStream pipeServer = new NamedPipeServerStream("PerformanceMonitorCommandsPipe", PipeDirection.In))
+                {
+                    Debug.WriteLine("Named pipe server started. Waiting for connection...");
+
+                    // Wait for a client to connect
+                    await pipeServer.WaitForConnectionAsync(cancellationToken);
+                    Debug.WriteLine("Client connected.");
+
+                    int lines = 0;
+                    using (StreamReader reader = new StreamReader(pipeServer))
+                    {
+                        string command;
+                        string result = "OK";
+                        while ((command = await reader.ReadLineAsync()) != null)
+                        {
+                            this.Invoke(new Action(() =>
+                            {
+
+                                switch (command)
+                                {
+                                    case "MONITOR":
+                                        tcTabControl.SelectTab("tbMonitor");
+                                        break;
+                                    case "ALERTS":
+                                        tcTabControl.SelectTab("tbAlarm");
+                                        break;
+                                    case "SETTINGS":
+                                        tcTabControl.SelectTab("tbSettings");
+                                        break;
+                                    case "ERRORS":
+                                        tcTabControl.SelectTab("tbErrors");
+                                        break;
+                                    case "RESTART_COUNTERS":
+                                        tsbtnResetMaxCounters_Click(null, null);
+                                        break;
+                                    case "GPU_UTILIZATION":
+                                        tscmbCategory.SelectedIndex = 0;
+                                        break;
+                                    case "GPU_TEMPERATURE":
+                                        tscmbCategory.SelectedIndex = 1;
+                                        break;
+                                    case "GPU_MEMORY_UTILIZATION":
+                                        tscmbCategory.SelectedIndex = 2;
+                                        break;
+                                    case "CYCLE_CPU_ALARM":
+                                        chkCpuAlarm.Checked = !chkCpuAlarm.Checked;
+                                        break;
+                                    case "PROCESSOR_UTILITY":
+                                        cmbProcessorCounter.SelectedIndex = 0;
+                                        break;
+                                    case "PROCESSOR TIME":
+                                        cmbProcessorCounter.SelectedIndex = 1;
+                                        break;
+                                    case "INTERRUPT TIME":
+                                        cmbProcessorCounter.SelectedIndex = 2;
+                                        break;
+                                    case "DPC TIME":
+                                        cmbProcessorCounter.SelectedIndex = 3;
+                                        break;
+
+                                    default:
+                                        result = "Unknown command";
+                                        break;
+                                }
+                                string info = $"Received command #${++lines}):[{command}][{result}]";
+                                LogError(info, "PipeServer", true);
+
+                            }));
+                        }
+                    }
+                }
+            }
         }
 
         // Function Inlining: Only in this particular case, I prefer to repeat code in this case instead of passing all parameters to the similar function
@@ -985,7 +1078,7 @@ namespace PerformanceMonitor
             string marked = (this.TopMost ? "checked" : String.Empty);
             string responseString = $@"
                 <html>
-                <head><title>Performance Monitor Light - Web Server</title>
+                <head><title>Performance Monitor Light - Web IPC_PipeServer</title>
                 <link rel=""stylesheet"" href=""https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/styles/24b6bbbc.site-ltr.css "">
                 </head>
                 <body leftmargin='10' topmargin='10'>
@@ -1011,7 +1104,7 @@ namespace PerformanceMonitor
 
                         <input type='submit' value='Submit' />
                     </form>
-                    <hr>{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Web Server ThreadID: {webServerThreadId.ToString()} Dispatcher ThreadID: {dispatcherUIThread}
+                    <hr>{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Web IPC_PipeServer ThreadID: {webServerThreadId.ToString()} Dispatcher ThreadID: {dispatcherUIThread}
                 </body>
                 </html>";
 
@@ -1024,14 +1117,14 @@ namespace PerformanceMonitor
             response.Close();
         }
 
-        private void LogError(string message, string function)
+        private void LogError(string message, string function, bool forced = false)
         {
-            if (ExCounter <= 100) // Only log the first 100 errors
+            if (forced || ExCounter <= 100) // Only log the first 100 errors
             {
                 // Get the current timestamp
                 string timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
 
-                // Format the error message with the timestamp
+                // Format the error command with the timestamp
                 string errorMessage = $"[{timestamp}] [{function}] {message}{Environment.NewLine}";
 
                 // Check if the action is being called from a thread other than the UI thread
