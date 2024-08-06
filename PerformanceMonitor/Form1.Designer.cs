@@ -149,7 +149,6 @@
             this.tsYCoordLabel = new System.Windows.Forms.ToolStripLabel();
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
-            this.tslblWebServer = new System.Windows.Forms.ToolStripLabel();
             this.tcTabControl = new System.Windows.Forms.TabControl();
             this.tbMonitor = new System.Windows.Forms.TabPage();
             this.label44 = new System.Windows.Forms.Label();
@@ -177,6 +176,10 @@
             this.lblCPU24 = new System.Windows.Forms.Label();
             this.pbCPU24 = new System.Windows.Forms.ProgressBar();
             this.tbAlarm = new System.Windows.Forms.TabPage();
+            this.lblGpuAbovePct = new System.Windows.Forms.Label();
+            this.label50 = new System.Windows.Forms.Label();
+            this.label48 = new System.Windows.Forms.Label();
+            this.lblCpuAbovePct = new System.Windows.Forms.Label();
             this.lblGpuThreshold = new System.Windows.Forms.Label();
             this.lblCpuThreshold = new System.Windows.Forms.Label();
             this.lblGpuAlarm = new System.Windows.Forms.Label();
@@ -200,6 +203,8 @@
             this.txtCpuAlarm = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.tbSettings = new System.Windows.Forms.TabPage();
+            this.label46 = new System.Windows.Forms.Label();
+            this.cmbProcessorCounter = new System.Windows.Forms.ComboBox();
             this.txtIPAddress = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.lblEfficientCoresNote = new System.Windows.Forms.Label();
@@ -210,10 +215,7 @@
             this.tbErrors = new System.Windows.Forms.TabPage();
             this.txtErrors = new System.Windows.Forms.TextBox();
             this.lblErrorsTitle = new System.Windows.Forms.Label();
-            this.lblCpuAbovePct = new System.Windows.Forms.Label();
-            this.label48 = new System.Windows.Forms.Label();
-            this.label50 = new System.Windows.Forms.Label();
-            this.lblGpuAbovePct = new System.Windows.Forms.Label();
+            this.label51 = new System.Windows.Forms.Label();
             this.toolStrip1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.tcTabControl.SuspendLayout();
@@ -771,7 +773,6 @@
             this.label15.Size = new System.Drawing.Size(69, 13);
             this.label15.TabIndex = 57;
             this.label15.Text = "CPU[17] ef";
-            this.label15.Click += new System.EventHandler(this.label15_Click);
             // 
             // lblCPU18
             // 
@@ -802,7 +803,6 @@
             this.label22.Size = new System.Drawing.Size(69, 13);
             this.label22.TabIndex = 60;
             this.label22.Text = "CPU[18] ef";
-            this.label22.Click += new System.EventHandler(this.label22_Click);
             // 
             // lblCPU19
             // 
@@ -833,7 +833,6 @@
             this.label26.Size = new System.Drawing.Size(69, 13);
             this.label26.TabIndex = 63;
             this.label26.Text = "CPU[19] ef";
-            this.label26.Click += new System.EventHandler(this.label26_Click);
             // 
             // lblGPU0
             // 
@@ -1200,8 +1199,7 @@
             this.tslblTop,
             this.tsYCoordLabel,
             this.toolStripSeparator7,
-            this.toolStripSeparator8,
-            this.tslblWebServer});
+            this.toolStripSeparator8});
             this.toolStrip2.Location = new System.Drawing.Point(0, 457);
             this.toolStrip2.Name = "toolStrip2";
             this.toolStrip2.Size = new System.Drawing.Size(984, 25);
@@ -1370,14 +1368,6 @@
             // 
             this.toolStripSeparator8.Name = "toolStripSeparator8";
             this.toolStripSeparator8.Size = new System.Drawing.Size(6, 25);
-            // 
-            // tslblWebServer
-            // 
-            this.tslblWebServer.Name = "tslblWebServer";
-            this.tslblWebServer.Size = new System.Drawing.Size(51, 22);
-            this.tslblWebServer.Text = "WS:8080";
-            this.tslblWebServer.ToolTipText = "Port where the web server is listening for remote control commands.  IP=192.168.1" +
-    ".5";
             // 
             // tcTabControl
             // 
@@ -1765,6 +1755,47 @@
             this.tbAlarm.Text = "Alert";
             this.tbAlarm.UseVisualStyleBackColor = true;
             // 
+            // lblGpuAbovePct
+            // 
+            this.lblGpuAbovePct.AutoSize = true;
+            this.lblGpuAbovePct.Font = new System.Drawing.Font("Microsoft Sans Serif", 34F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblGpuAbovePct.ForeColor = System.Drawing.Color.YellowGreen;
+            this.lblGpuAbovePct.Location = new System.Drawing.Point(321, 304);
+            this.lblGpuAbovePct.Name = "lblGpuAbovePct";
+            this.lblGpuAbovePct.Size = new System.Drawing.Size(71, 53);
+            this.lblGpuAbovePct.TabIndex = 25;
+            this.lblGpuAbovePct.Tag = "GPU Engine";
+            this.lblGpuAbovePct.Text = "---";
+            // 
+            // label50
+            // 
+            this.label50.AutoSize = true;
+            this.label50.Location = new System.Drawing.Point(17, 326);
+            this.label50.Name = "label50";
+            this.label50.Size = new System.Drawing.Size(78, 13);
+            this.label50.TabIndex = 24;
+            this.label50.Text = "Above 100% %";
+            // 
+            // label48
+            // 
+            this.label48.AutoSize = true;
+            this.label48.Location = new System.Drawing.Point(31, 246);
+            this.label48.Name = "label48";
+            this.label48.Size = new System.Drawing.Size(63, 13);
+            this.label48.TabIndex = 23;
+            this.label48.Text = "Utilization %";
+            // 
+            // lblCpuAbovePct
+            // 
+            this.lblCpuAbovePct.AutoSize = true;
+            this.lblCpuAbovePct.Font = new System.Drawing.Font("Microsoft Sans Serif", 34F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCpuAbovePct.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.lblCpuAbovePct.Location = new System.Drawing.Point(117, 304);
+            this.lblCpuAbovePct.Name = "lblCpuAbovePct";
+            this.lblCpuAbovePct.Size = new System.Drawing.Size(71, 53);
+            this.lblCpuAbovePct.TabIndex = 22;
+            this.lblCpuAbovePct.Text = "---";
+            // 
             // lblGpuThreshold
             // 
             this.lblGpuThreshold.AutoSize = true;
@@ -1984,6 +2015,9 @@
             // 
             // tbSettings
             // 
+            this.tbSettings.Controls.Add(this.label51);
+            this.tbSettings.Controls.Add(this.label46);
+            this.tbSettings.Controls.Add(this.cmbProcessorCounter);
             this.tbSettings.Controls.Add(this.txtIPAddress);
             this.tbSettings.Controls.Add(this.label2);
             this.tbSettings.Controls.Add(this.lblEfficientCoresNote);
@@ -1999,9 +2033,45 @@
             this.tbSettings.Text = "Settings";
             this.tbSettings.UseVisualStyleBackColor = true;
             // 
+            // label46
+            // 
+            this.label46.AutoSize = true;
+            this.label46.Location = new System.Drawing.Point(30, 166);
+            this.label46.Name = "label46";
+            this.label46.Size = new System.Drawing.Size(97, 13);
+            this.label46.TabIndex = 8;
+            this.label46.Text = "Processor Counter:";
+            // 
+            // cmbProcessorCounter
+            // 
+            this.cmbProcessorCounter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbProcessorCounter.FormattingEnabled = true;
+            this.cmbProcessorCounter.Items.AddRange(new object[] {
+            "% Processor Utility",
+            "% Processor Time",
+            "% Performance Limit",
+            "% Privileged Utility",
+            "% Processor Performance",
+            "% of Maximum Frequency",
+            "% Priority Time",
+            "% C3 Time",
+            "% C2 Time",
+            "% C1 Time",
+            "% Idle Time",
+            "% Interrupt Time",
+            "% DPC Time",
+            "% Privileged Time",
+            "% User Time"});
+            this.cmbProcessorCounter.Location = new System.Drawing.Point(136, 163);
+            this.cmbProcessorCounter.Name = "cmbProcessorCounter";
+            this.cmbProcessorCounter.Size = new System.Drawing.Size(183, 21);
+            this.cmbProcessorCounter.TabIndex = 7;
+            this.cmbProcessorCounter.SelectedIndexChanged += new System.EventHandler(this.cmbProcessorCounter_SelectedIndexChanged);
+            // 
             // txtIPAddress
             // 
-            this.txtIPAddress.Location = new System.Drawing.Point(135, 131);
+            this.txtIPAddress.Enabled = false;
+            this.txtIPAddress.Location = new System.Drawing.Point(136, 124);
             this.txtIPAddress.Name = "txtIPAddress";
             this.txtIPAddress.ReadOnly = true;
             this.txtIPAddress.Size = new System.Drawing.Size(120, 20);
@@ -2010,7 +2080,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(66, 134);
+            this.label2.Location = new System.Drawing.Point(66, 127);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(61, 13);
             this.label2.TabIndex = 5;
@@ -2021,7 +2091,7 @@
             this.lblEfficientCoresNote.AutoSize = true;
             this.lblEfficientCoresNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblEfficientCoresNote.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
-            this.lblEfficientCoresNote.Location = new System.Drawing.Point(26, 197);
+            this.lblEfficientCoresNote.Location = new System.Drawing.Point(26, 214);
             this.lblEfficientCoresNote.Name = "lblEfficientCoresNote";
             this.lblEfficientCoresNote.Size = new System.Drawing.Size(225, 13);
             this.lblEfficientCoresNote.TabIndex = 4;
@@ -2037,7 +2107,7 @@
             "NORMAL",
             "BELOW NORMAL",
             "IDLE"});
-            this.cmbPriorityClass.Location = new System.Drawing.Point(134, 85);
+            this.cmbPriorityClass.Location = new System.Drawing.Point(135, 80);
             this.cmbPriorityClass.Name = "cmbPriorityClass";
             this.cmbPriorityClass.Size = new System.Drawing.Size(121, 21);
             this.cmbPriorityClass.TabIndex = 3;
@@ -2046,7 +2116,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(58, 88);
+            this.label1.Location = new System.Drawing.Point(60, 83);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(69, 13);
             this.label1.TabIndex = 2;
@@ -2123,46 +2193,14 @@
             this.lblErrorsTitle.TabIndex = 0;
             this.lblErrorsTitle.Text = "Errors: (only the first 100 are listed)";
             // 
-            // lblCpuAbovePct
+            // label51
             // 
-            this.lblCpuAbovePct.AutoSize = true;
-            this.lblCpuAbovePct.Font = new System.Drawing.Font("Microsoft Sans Serif", 34F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCpuAbovePct.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
-            this.lblCpuAbovePct.Location = new System.Drawing.Point(117, 304);
-            this.lblCpuAbovePct.Name = "lblCpuAbovePct";
-            this.lblCpuAbovePct.Size = new System.Drawing.Size(71, 53);
-            this.lblCpuAbovePct.TabIndex = 22;
-            this.lblCpuAbovePct.Text = "---";
-            // 
-            // label48
-            // 
-            this.label48.AutoSize = true;
-            this.label48.Location = new System.Drawing.Point(17, 247);
-            this.label48.Name = "label48";
-            this.label48.Size = new System.Drawing.Size(63, 13);
-            this.label48.TabIndex = 23;
-            this.label48.Text = "Utilization %";
-            // 
-            // label50
-            // 
-            this.label50.AutoSize = true;
-            this.label50.Location = new System.Drawing.Point(31, 326);
-            this.label50.Name = "label50";
-            this.label50.Size = new System.Drawing.Size(49, 13);
-            this.label50.TabIndex = 24;
-            this.label50.Text = "Above %";
-            // 
-            // lblGpuAbovePct
-            // 
-            this.lblGpuAbovePct.AutoSize = true;
-            this.lblGpuAbovePct.Font = new System.Drawing.Font("Microsoft Sans Serif", 34F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblGpuAbovePct.ForeColor = System.Drawing.Color.YellowGreen;
-            this.lblGpuAbovePct.Location = new System.Drawing.Point(321, 304);
-            this.lblGpuAbovePct.Name = "lblGpuAbovePct";
-            this.lblGpuAbovePct.Size = new System.Drawing.Size(71, 53);
-            this.lblGpuAbovePct.TabIndex = 25;
-            this.lblGpuAbovePct.Tag = "GPU Engine";
-            this.lblGpuAbovePct.Text = "---";
+            this.label51.AutoSize = true;
+            this.label51.Location = new System.Drawing.Point(261, 127);
+            this.label51.Name = "label51";
+            this.label51.Size = new System.Drawing.Size(131, 13);
+            this.label51.TabIndex = 9;
+            this.label51.Text = "* Web Server deprecated.";
             // 
             // frmMain
             // 
@@ -2325,7 +2363,6 @@
         private System.Windows.Forms.ToolStripButton tsbtnRecenter;
         private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
-        private System.Windows.Forms.ToolStripLabel tslblWebServer;
         private System.Windows.Forms.TabControl tcTabControl;
         private System.Windows.Forms.TabPage tbMonitor;
         private System.Windows.Forms.TabPage tbSettings;
@@ -2390,6 +2427,9 @@
         private System.Windows.Forms.Label lblCpuAbovePct;
         private System.Windows.Forms.Label lblGpuAbovePct;
         private System.Windows.Forms.Label label50;
+        private System.Windows.Forms.Label label46;
+        private System.Windows.Forms.ComboBox cmbProcessorCounter;
+        private System.Windows.Forms.Label label51;
     }
 }
 

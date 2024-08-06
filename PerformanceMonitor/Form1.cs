@@ -59,6 +59,8 @@ namespace PerformanceMonitor
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            // Save all user settings
+
             Properties.Settings.Default.TimerInterval = (int)nudPollingInterval.Value;
             Properties.Settings.Default.PriorityClassSelectedIndex = cmbPriorityClass.SelectedIndex;
 
@@ -71,6 +73,9 @@ namespace PerformanceMonitor
             Properties.Settings.Default.trkCpuVolume = trkCpuVolume.Value;
             Properties.Settings.Default.trkGpuVolume = trkGpuVolume.Value;
             Properties.Settings.Default.tcTabControl = tcTabControl.SelectedIndex;
+            Properties.Settings.Default.cmbProcessorCounter = cmbProcessorCounter.SelectedIndex;
+
+
 
             if (this.WindowState != FormWindowState.Minimized)
             {
@@ -282,10 +287,7 @@ namespace PerformanceMonitor
 
         }
 
-        private void label15_Click(object sender, EventArgs e)
-        {
 
-        }
 
         private void pbCPU17_Click(object sender, EventArgs e)
         {
@@ -297,15 +299,49 @@ namespace PerformanceMonitor
 
         }
 
+        private void cmbProcessorCounter_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            bool prevValue = timer1.Enabled;
+            timer1.Enabled = false;
+            Thread.Sleep(1000);
+
+            cpuCounter0 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString().ToString(), "0,0", true);
+            cpuCounter1 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,1", true);
+            cpuCounter2 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,2", true);
+            cpuCounter3 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,3", true);
+            cpuCounter4 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,4", true);
+            cpuCounter5 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,5", true);
+            cpuCounter6 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,6", true);
+            cpuCounter7 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,7", true);
+            cpuCounter8 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,8", true);
+            cpuCounter9 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,9", true);
+            cpuCounter10 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,10", true);
+            cpuCounter11 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,11", true);
+            cpuCounter12 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,12", true);
+            cpuCounter13 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,13", true);
+            cpuCounter14 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,14", true);
+            cpuCounter15 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,15", true);
+            cpuCounter16 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,16", true);
+            cpuCounter17 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,17", true);
+            cpuCounter18 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,18", true);
+            cpuCounter19 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,19", true);
+            cpuCounter20 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,20", true);
+            cpuCounter21 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,21", true);
+            cpuCounter22 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,22", true);
+            cpuCounter23 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,23", true);
+            cpuCounter24 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,24", true);
+            cpuCounter25 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,25", true);
+            cpuCounter26 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,26", true);
+            cpuCounter27 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,27", true);
+
+            timer1.Enabled = prevValue;
+        }
+
         private void lblCPU5_Click(object sender, EventArgs e)
         {
 
         }
 
-        private void label22_Click(object sender, EventArgs e)
-        {
-
-        }
 
         private void pbCPU18_Click(object sender, EventArgs e)
         {
@@ -466,12 +502,24 @@ namespace PerformanceMonitor
 
             chkCpuAlarm.Checked = Properties.Settings.Default.chkCpuAlarm;
             chkGpuAlarm.Checked = Properties.Settings.Default.chkGpuAlarm;
+            
             trkCpuThreshold.Value = Properties.Settings.Default.trkCpuThreshold;
+            lblCpuThreshold.Text = trkCpuThreshold.Value.ToString();
+            
             trkGpuThreshold.Value = Properties.Settings.Default.trkGpuThreshold;
+            lblGpuThreshold.Text = trkGpuThreshold.Value.ToString();
+
             txtCpuAlarm.Text = Properties.Settings.Default.txtCpuAlarm;
             txtGpuAlarm.Text = Properties.Settings.Default.txtGpuAlarm;
+
             trkCpuVolume.Value = Properties.Settings.Default.trkCpuVolume;
+            lblCpuVolume.Text = trkCpuVolume.Value.ToString();
+
             trkGpuVolume.Value = Properties.Settings.Default.trkGpuVolume;
+            lblGpuVolume.Text = trkGpuVolume.Value.ToString();
+
+            
+
 
             tcTabControl.SelectedIndex = Properties.Settings.Default.tcTabControl;
 
@@ -510,6 +558,9 @@ namespace PerformanceMonitor
             cmbPriorityClass.SelectedIndex = Properties.Settings.Default.PriorityClassSelectedIndex;
 
 
+
+
+
             // Obtain current IP Address
             txtIPAddress.Text = GetMyIPAddress();
 
@@ -517,36 +568,16 @@ namespace PerformanceMonitor
             diskCounterN = new PerformanceCounter("PhysicalDisk", "Disk Bytes/sec", "1 N:", true);
             diskCounterR = new PerformanceCounter("PhysicalDisk", "Disk Bytes/sec", "2 R:", true);
 
-            cpuCounter0 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,0", true);
-            cpuCounter1 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,1", true);
-            cpuCounter2 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,2", true);
-            cpuCounter3 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,3", true);
-            cpuCounter4 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,4", true);
-            cpuCounter5 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,5", true);
-            cpuCounter6 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,6", true);
-            cpuCounter7 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,7", true);
-            cpuCounter8 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,8", true);
-            cpuCounter9 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,9", true);
-            cpuCounter10 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,10", true);
-            cpuCounter11 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,11", true);
-            cpuCounter12 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,12", true);
-            cpuCounter13 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,13", true);
-            cpuCounter14 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,14", true);
-            cpuCounter15 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,15", true);
-            cpuCounter16 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,16", true);
-            cpuCounter17 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,17", true);
-            cpuCounter18 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,18", true);
-            cpuCounter19 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,19", true);
-            cpuCounter20 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,20", true);
-            cpuCounter21 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,21", true);
-            cpuCounter22 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,22", true);
-            cpuCounter23 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,23", true);
-            cpuCounter24 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,24", true);
-            cpuCounter25 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,25", true);
-            cpuCounter26 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,26", true);
-            cpuCounter27 = new PerformanceCounter("Processor Information", "% Processor Utility", "0,27", true);
+            // Load the previous selected Processor Counter
+            // The following call will provoke a call to cmbProcessorCounter_SelectedIndexChanged
+            // which in turn initializes all cpuCounters
+            cmbProcessorCounter.SelectedIndex = Properties.Settings.Default.cmbProcessorCounter;
 
-            StartWebServer();
+
+            // No longer using web server, not its pipes
+            // StartWebServer(); 
+
+
 
             stopwatch = new Stopwatch();
 
