@@ -653,13 +653,13 @@ namespace PerformanceMonitor
                                     case "PROCESSOR_UTILITY":
                                         cmbProcessorCounter.SelectedIndex = 0;
                                         break;
-                                    case "PROCESSOR TIME":
+                                    case "PROCESSOR_TIME":
                                         cmbProcessorCounter.SelectedIndex = 1;
                                         break;
-                                    case "INTERRUPT TIME":
+                                    case "INTERRUPT_TIME":
                                         cmbProcessorCounter.SelectedIndex = 2;
                                         break;
-                                    case "DPC TIME":
+                                    case "DPC_TIME":
                                         cmbProcessorCounter.SelectedIndex = 3;
                                         break;
 
