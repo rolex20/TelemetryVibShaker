@@ -15,7 +15,7 @@ using NAudio.CoreAudioApi;
 using System.Drawing;
 using System.Threading;
 using System.IO.Pipes;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
+//using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 
 
@@ -344,6 +344,7 @@ namespace PerformanceMonitor
             timer1.Enabled = prevValue;
         }
 
+
         private void lblCPU5_Click(object sender, EventArgs e)
         {
 
@@ -365,10 +366,7 @@ namespace PerformanceMonitor
 
         }
 
-        private void label26_Click(object sender, EventArgs e)
-        {
 
-        }
 
         private void pbCPU19_Click(object sender, EventArgs e)
         {
