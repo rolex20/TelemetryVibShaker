@@ -662,6 +662,15 @@ namespace PerformanceMonitor
                                     case "DPC_TIME":
                                         cmbProcessorCounter.SelectedIndex = 3;
                                         break;
+                                    case "MINIMIZE":
+                                        this.WindowState = FormWindowState.Minimized;
+                                        break;
+                                    case "RESTORE":
+                                        this.WindowState = FormWindowState.Normal;
+                                        break;
+                                    case "ALIGN_LEFT":
+                                        this.Location = new Point(-1700, this.Location.Y);
+                                        break;
 
                                     default:
                                         result = "Unknown command";
