@@ -28,7 +28,7 @@ namespace MicroTaskScheduler
             InitializeComponent();
         }
 
-        private void chkUseEfficiencyCoresOnly_CheckedChanged(object sender, EventArgs e)
+        private void AssignEfficiencyCoresOnly()
         {            
             RegistryKey regKey = Registry.LocalMachine.OpenSubKey("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0");
             string processorName = regKey.GetValue("ProcessorNameString").ToString();
@@ -83,7 +83,7 @@ namespace MicroTaskScheduler
         }
 
 
-        private void AssignEfficiencyCoresOnly()
+        private void AssignEfficiencyCoresOnlyOld()
         {
             Process currentProcess = Process.GetCurrentProcess();
 
