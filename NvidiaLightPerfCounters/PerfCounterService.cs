@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
+using System.IO.Pipes;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.ServiceProcess;
@@ -65,7 +67,9 @@ namespace NvidiaLightPerfCounters
 
         private CancellationTokenSource _cancel;
 
-        private readonly int _updateIntervalMsec;
+        private Thread pipeServerThread;  // Thread for pipe IPC
+
+        private int _updateIntervalMsec;
         private readonly bool _usePcieIdInDeviceName;
 
         // Import the GetCurrentThread API
@@ -188,15 +192,26 @@ namespace NvidiaLightPerfCounters
 
             _totalCounters.Add(new TotalGpuCounter(new PerformanceCounter(CategoryName, GpuTemperature, Total, false), d => d.TemperatureC));
 
+            
+            
+            _cancel = new CancellationTokenSource();
+
+            
+            // Start Interprocess communication server using named pipes using a different thread
+            pipeServerThread = new Thread(() => IPC_PipeServer(_cancel.Token));
+            pipeServerThread.IsBackground = true;
+            pipeServerThread.Start();
+
+
             _counterThread = new Thread(UpdateCounters)
             {
                 IsBackground = true,
-                Priority = ThreadPriority.Lowest,
+                Priority = ThreadPriority.Normal,
                 Name = "CounterUpdateThread"
             };
-            _cancel = new CancellationTokenSource();
             _counterThread.Start();
         }
+
 
         protected override void OnContinue()
         {
@@ -214,37 +229,7 @@ namespace NvidiaLightPerfCounters
 
         private void UpdateCounters(object p)
         {
-            // Open the registry key for the processor
-            RegistryKey regKey = Registry.LocalMachine.OpenSubKey("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0");
-
-            // Read the processor name from the registry
-            string processorName = regKey.GetValue("ProcessorNameString").ToString();
-
-            // Get the current process
-            Process process = Process.GetCurrentProcess();
-
-            // Set Priority to BelowNormal
-            process.PriorityClass = ProcessPriorityClass.BelowNormal;
-            Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
-
-            // Check if the processor name contains "Intel 12700K"
-            if (processorName.Contains("12700K"))
-            {
-                // Define the CPU affinity mask for CPUs 17 to 20
-                // CPUs are zero-indexed, so CPU 17 is represented by bit 16, and so on.
-                IntPtr affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
-
-                // Set the CPU affinity
-                process.ProcessorAffinity = affinityMask;
-
-                // Get the pseudo handle for the current thread
-                IntPtr currentThreadHandle = GetCurrentThread();
-
-                // Set the ideal processor for the current thread to 18.  19 is for my Performance Monitor Light
-                uint previousIdealProcessor = SetThreadIdealProcessor(currentThreadHandle, 18);
-
-            }
-            regKey.Close();
+            AssignEfficiencyCoresOnly();
 
 
             while (!_cancel.Token.IsCancellationRequested)
@@ -264,5 +249,107 @@ namespace NvidiaLightPerfCounters
                     break;
             }
         }
+
+        // Receives/process Interval change requests via IPC pipes
+        private async void IPC_PipeServer(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                using (NamedPipeServerStream pipeServer = new NamedPipeServerStream("NvidiaLightPerfCountersPipeCommands", PipeDirection.In))
+                {
+                    await pipeServer.WaitForConnectionAsync(cancellationToken);
+
+                    using (StreamReader reader = new StreamReader(pipeServer))
+                    {
+                        string newIntervalMsec;
+                        while ((newIntervalMsec = await reader.ReadLineAsync()) != null)
+                        {
+                            int result;
+
+                            if (int.TryParse(newIntervalMsec, out result) && result >= 20 && result <= 1000)
+                            {
+                                _updateIntervalMsec = result;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        public enum CpuType
+        {
+            Intel_12700K,
+            Intel_14700K,
+            Other
+        }
+
+        private void AssignEfficiencyCoresOnly()
+        {
+            RegistryKey regKey = Registry.LocalMachine.OpenSubKey("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0");
+            string processorName = regKey.GetValue("ProcessorNameString").ToString();
+
+            // We need to know the number of processors available to determine if Hyperthreading and Efficient cores are enabled
+            int cpuCount = 0;
+            regKey = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor");
+            if (regKey != null)
+            {
+                // The number of subkeys corresponds to the number of CPUs
+                cpuCount = regKey.SubKeyCount;
+            }
+            regKey.Close();
+
+
+            CpuType cpuType;
+            if (processorName.Contains("12700K")) cpuType = CpuType.Intel_12700K;
+            else if (processorName.Contains("14700K")) cpuType = CpuType.Intel_14700K;
+            else cpuType = CpuType.Other;
+
+            // Calculate affinity for efficient cores only
+            IntPtr affinityMask = IntPtr.Zero;
+            switch (cpuType)
+            {
+                case CpuType.Intel_12700K:
+                    if (cpuCount == 20)
+                    {
+                        affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
+                    }
+                    break;
+                case CpuType.Intel_14700K:
+                    if (cpuCount == 28)
+                    {
+                        affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
+                    }
+                    break;
+                default:
+                    //ignore
+                    break;
+            }
+
+            // Set the CPU affinity to Efficient Cores only
+            Process currentProcess = Process.GetCurrentProcess();
+
+            if (affinityMask != IntPtr.Zero)
+            {
+                try
+                {
+                    currentProcess.ProcessorAffinity = affinityMask;
+
+                }
+                catch { } // Ignore
+            }
+
+            currentProcess.PriorityClass = ProcessPriorityClass.BelowNormal;
+            Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
+
+            // Get the pseudo handle for the current thread
+            IntPtr currentThreadHandle = GetCurrentThread();
+
+            // Set the ideal processor for the current thread to 18.  19 is for my Performance Monitor Light
+            uint previousIdealProcessor = SetThreadIdealProcessor(currentThreadHandle, 18);
+
+        }
+
     }
 }

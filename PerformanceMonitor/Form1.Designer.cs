@@ -2038,9 +2038,9 @@
             this.label51.AutoSize = true;
             this.label51.Location = new System.Drawing.Point(261, 127);
             this.label51.Name = "label51";
-            this.label51.Size = new System.Drawing.Size(175, 13);
+            this.label51.Size = new System.Drawing.Size(128, 13);
             this.label51.TabIndex = 9;
-            this.label51.Text = "* Web IPC_PipeServer deprecated.";
+            this.label51.Text = "* WebServer deprecated.";
             // 
             // label46
             // 

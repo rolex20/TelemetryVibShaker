@@ -65,6 +65,8 @@ namespace PerformanceMonitor
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            UpdateGpuInterval(1000); // No longer need lower intervals 
+
             pipeCancellationTokenSource.Cancel();
             // Save all user settings
 
@@ -144,6 +146,47 @@ namespace PerformanceMonitor
         private void nudPollingInterval_ValueChanged(object sender, EventArgs e)
         {
             timer1.Interval = (int)nudPollingInterval.Value;
+            UpdateGpuInterval(timer1.Interval);
+        }
+
+        private string GetDateTimeStamp()
+        {
+            return $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} ";
+        }
+
+
+        // Send IPC pipe command to NvidiaLightPerfCounters-SERVICE to update the refresh interval
+        private void UpdateGpuInterval(int newInterval)
+        {
+
+            try
+            {
+                using (var pipeClient = new NamedPipeClientStream(".", "NvidiaLightPerfCountersPipeCommands", PipeDirection.Out))
+                {
+                    pipeClient.Connect(1000);
+                    using (var writer = new StreamWriter(pipeClient))
+                    {
+                        writer.WriteLine(newInterval.ToString());
+                        writer.Flush();
+                        writer.Close();
+                    }
+                    pipeClient.Close();
+
+                }
+            }
+            catch (IOException ex)
+            {
+                LogError($"{GetDateTimeStamp()}An I/O error occurred: " + ex.Message, $"UpdateGpuInterval({newInterval})");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                LogError($"{GetDateTimeStamp()}Access is denied: " + ex.Message, $"UpdateGpuInterval({newInterval})");
+            }
+            catch (Exception ex)
+            {
+                LogError($"{GetDateTimeStamp()}An unexpected error occurred: " + ex.Message, $"UpdateGpuInterval({newInterval})");
+            }
+
         }
 
         private void tstxtAutoMoveY_KeyPress(object sender, KeyPressEventArgs e)
@@ -310,7 +353,7 @@ namespace PerformanceMonitor
         {
             bool prevValue = timer1.Enabled;
             timer1.Enabled = false;
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
 
             cpuCounter0 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString().ToString(), "0,0", true);
             cpuCounter1 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,1", true);
@@ -442,6 +485,8 @@ namespace PerformanceMonitor
                 // The number of subkeys corresponds to the number of CPUs
                 cpuCount = regKey.SubKeyCount;
             }
+            regKey.Close();
+
 
             if (processorName.Contains("12700K")) cpuType = CpuType.Intel_12700K;
             else if (processorName.Contains("14700K")) cpuType = CpuType.Intel_14700K;
@@ -491,8 +536,12 @@ namespace PerformanceMonitor
                 }
                 catch { } // Ignore
             }
+            // Get the pseudo handle for the current thread
+            IntPtr currentThreadHandle = GetCurrentThread();
 
-            regKey.Close();
+            // Set the ideal processor for the current thread to 19.  18 is for my NvidiaLightPerfCounters Service
+            uint previousIdealProcessor = SetThreadIdealProcessor(currentThreadHandle, 19);
+
         }
 
         private void frmMain_Load(object sender, EventArgs e)
@@ -673,10 +722,10 @@ namespace PerformanceMonitor
                                         break;
 
                                     default:
-                                        result = "Unknown command";
+                                        result = "Unknown newInterval";
                                         break;
                                 }
-                                string info = $"Received command #${++lines}):[{command}][{result}]";
+                                string info = $"Received newInterval #${++lines}):[{command}][{result}]";
                                 LogError(info, "PipeServer", true);
 
                             }));
@@ -1131,7 +1180,7 @@ namespace PerformanceMonitor
                 // Get the current timestamp
                 string timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
 
-                // Format the error command with the timestamp
+                // Format the error newInterval with the timestamp
                 string errorMessage = $"[{timestamp}] [{function}] {message}{Environment.NewLine}";
 
                 // Check if the action is being called from a thread other than the UI thread
