@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Pipes;
 
 
 
@@ -280,7 +281,13 @@ namespace RemoteWindowControl
                             int x = 0;
                             int y = 0;
 
-                            if (parameters.TryGetValue("Exit", out temp))
+                            if (parameters.TryGetValue("Command", out temp))
+                            {
+                                LogError("Clicked Command for " + processName, "ProcessRequest()");
+                                parameters.TryGetValue("PipeCommand", out temp);
+                                footer = SendCommand(temp);
+                            }
+                            else if (parameters.TryGetValue("Exit", out temp))
                             {
                                 LogError("Clicked Terminate for " + processName, "ProcessRequest()");
                                 Process[] processes = Process.GetProcessesByName(processName);
@@ -352,6 +359,59 @@ namespace RemoteWindowControl
                 SendResponse(response, HTML);
 
             }
+        }
+
+        private string getDateTimeStamp()
+        {
+            return $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} ";
+        }
+
+        private string SendCommand(string command)
+        {
+            if (string.IsNullOrEmpty(command) || !command.Contains('|'))
+            {
+                return $"{getDateTimeStamp()}Invalid pipe command [{command}]"; 
+            }
+
+            string[] values = command.Split('|');
+            if ( values.Length!=2 || string.IsNullOrEmpty(values[0]) || string.IsNullOrEmpty(values[1]) )
+            {
+                return $"{getDateTimeStamp()}Missing part for pipe command [{command}]";
+            }
+               
+            string pipeName = values[0];
+            string message = values[1];
+
+            try
+            {
+                using (var pipeClient = new NamedPipeClientStream(".", pipeName, PipeDirection.Out))
+                {
+                    pipeClient.Connect(5000);
+                    using (var writer = new StreamWriter(pipeClient))
+                    {
+                        writer.WriteLine(message);
+                        writer.Flush();
+                        writer.Close();
+                    }
+                    pipeClient.Close();
+
+                }
+            }
+            catch (IOException ex)
+            {
+                return($"{getDateTimeStamp()}An I/O error occurred: " + ex.Message);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return($"{getDateTimeStamp()}Access is denied: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return($"{getDateTimeStamp()}An unexpected error occurred: " + ex.Message);
+            }
+
+
+            return $"{getDateTimeStamp()}Pipe Command Sent [{command}]"; 
         }
 
         private string GetHtmlProcessCombo(string ProcessName)

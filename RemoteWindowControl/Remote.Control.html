@@ -25,39 +25,59 @@
 <body>
 
 <div class="container">
-<form name="RemoteControlForm" method="POST" align="center">
-  <h2>Window Remote Movement</h2>
-  <p class="welcome-message">Use this app to move windows to other monitors when playing in VR</p>
-  
-  <!-- Combo box for options -->
-  <label for="Process">Select Process:</label>
-  {cmbProcess} 
-  
-  <br><label for="Instance">Select Instance:</label>
-  <input type='text' name='Instance' value='0' placeholder='type process instance #'>
-  
-  <br><label for="State">Select State:</label> 
-  <select name="State">
-	<option selected="selected" value="0">NoChange</option>
-	<option value="-1">Minimize</option>
-	<option value="1">Restore</option>
-	<option value="2">Maximize</option>
-  </select>  
-  
-  <!-- Text boxes for user input -->
-  <br><label for="X">New X:</label><input type='text' value="{X}" name="X" placeholder='type new X coordinates'>
-  <br><label for="Y">New Y:</label><input type='text' value="{Y}" name="Y" placeholder='type new Y coordinates'>
-   <!-- Add more text boxes here -->
-  
-  <!-- Submit buttons -->
-  <input type="submit" class="submit-btn" name="Move" value="Apply Changes"><br><br>
-  <input type="submit" class="submit-btn" name="GetValues" value="GetValues">
-  <input type="submit" class="submit-btn" name="Exit" value="Terminate">
-  <input type="submit" class="submit-btn" name="Launch" value="Launch">  
-  
-  <!-- Footer message -->
-  <div id="result" class="footer-message">{footer}</div>  
- </form>
+	<form name="RemoteControlForm" method="POST" align="center">
+		<h2>Window Remote Movement</h2>
+		<p class="welcome-message">Use this app to move windows to other monitors when playing in VR</p>
+
+		<!-- Combo box for options -->
+		<label for="Process">Select Process:</label>
+		{cmbProcess}
+
+		<br><label for="Instance">Select Instance:</label>
+		<input type='text' name='Instance' value='0' placeholder='type process instance #'>
+
+		<br><label for="State">Select State:</label>
+		<select name="State">
+			<option selected="selected" value="0">NoChange</option>
+			<option value="-1">Minimize</option>
+			<option value="1">Restore</option>
+			<option value="2">Maximize</option>
+		</select>
+
+		<br><label for="PipeCommand">Select Command:</label>
+		<select name="PipeCommand">
+			<option selected="selected" value="0">[SELECT COMMAND]</option>
+			<option value="PerformanceMonitorCommandsPipe|CYCLE_CPU_ALARM">Performance Monitor: CYCLE_CPU_ALARM</option>
+			<option value="PerformanceMonitorCommandsPipe|PROCESSOR_UTILITY">Performance Monitor: PROCESSOR_UTILITY</option>
+			<option value="PerformanceMonitorCommandsPipe|PROCESSOR_TIME">Performance Monitor: PROCESSOR_TIME</option>
+			<option value="PerformanceMonitorCommandsPipe|INTERRUPT_TIME">Performance Monitor: INTERRUPT_TIME</option>
+			<option value="PerformanceMonitorCommandsPipe|DPC_TIME">Performance Monitor: DPC_TIME</option>
+			<option value="PerformanceMonitorCommandsPipe|GPU_UTILIZATION">Performance Monitor: GPU_UTILIZATION</option>
+			<option value="PerformanceMonitorCommandsPipe|GPU_TEMPERATURE">Performance Monitor: GPU_TEMPERATURE</option>
+			<option value="PerformanceMonitorCommandsPipe|GPU_MEMORY_UTILIZATION">Performance Monitor: GPU_MEMORY_UTILIZATION</option>
+			<option value="PerformanceMonitorCommandsPipe|MONITOR">Performance Monitor: MONITOR</option>
+			<option value="PerformanceMonitorCommandsPipe|ALERTS">Performance Monitor: ALERTS</option>
+			<option value="PerformanceMonitorCommandsPipe|SETTINGS">Performance Monitor: SETTINGS</option>
+			<option value="PerformanceMonitorCommandsPipe|ERRORS">Performance Monitor: ERRORS</option>
+			<option value="PerformanceMonitorCommandsPipe|RESTART_COUNTERS">Performance Monitor: RESTART_COUNTERS</option>
+		</select>
+
+
+		<!-- Text boxes for user input -->
+		<br><label for="X">New X:</label><input type='text' value="{X}" name="X" placeholder='type new X coordinates'>
+		<br><label for="Y">New Y:</label><input type='text' value="{Y}" name="Y" placeholder='type new Y coordinates'>
+		<!-- Add more text boxes here -->
+		<!-- Submit buttons -->
+		<input type="submit" class="submit-btn" name="Move" value="Apply Changes"><br><br>
+		<input type="submit" class="submit-btn" name="GetValues" value="GetValues">
+		<input type="submit" class="submit-btn" name="Exit" value="Terminate">
+		<input type="submit" class="submit-btn" name="Launch" value="Launch">
+		<input type="submit" class="submit-btn" name="Command" value="Command">
+
+
+		<!-- Footer message -->
+		<div id="result" class="footer-message">{footer}</div>
+	</form>
 </div>
 
 </body>
