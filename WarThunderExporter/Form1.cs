@@ -119,6 +119,12 @@ namespace WarThunderExporter
 
                                 switch (command)
                                 {
+                                    case "INTERVAL_100":
+                                        nudFrequency.Value = 100;
+                                        break;
+                                    case "INTERVAL_50":
+                                        nudFrequency.Value = 50;
+                                        break;
                                     case "MONITOR":
                                         tabControl1.SelectTab("tabMonitor");
                                         break;
