@@ -40,7 +40,7 @@ namespace PerformanceMonitor
         private HttpListener listener; // Web IPC_PipeServer for remote control location and focus commands
         private int webServerThreadId, dispatcherUIThread;
 
-        private Thread serverThread;  // IPC_PipeServer Thread for pipes interprocess communications
+        private Thread pipeServerThread;  // IPC_PipeServer Thread for pipes interprocess communications
         private CancellationTokenSource pipeCancellationTokenSource;
 
         private Process currentProcess;
@@ -584,9 +584,9 @@ namespace PerformanceMonitor
 
             // Start Interprocess communication server using named pipes using a different thread
             pipeCancellationTokenSource = new CancellationTokenSource();
-            Thread serverThread = new Thread(() => IPC_PipeServer(pipeCancellationTokenSource.Token));
-            serverThread.IsBackground = true;
-            serverThread.Start();
+            pipeServerThread = new Thread(() => IPC_PipeServer(pipeCancellationTokenSource.Token));
+            pipeServerThread.IsBackground = true;
+            pipeServerThread.Start();
 
 
             stopwatch = new Stopwatch();
