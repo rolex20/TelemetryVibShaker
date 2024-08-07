@@ -27,7 +27,7 @@
 <div class="container">
 	<form name="RemoteControlForm" method="POST" align="center">
 		<h2>Window Remote Movement</h2>
-		<p class="welcome-message">Use this app to move windows to other monitors when playing in VR</p>
+		<p class="welcome-message">Use this app to <a href="#lblMove">move</a> windows or send <a href="#lblCommand">commands</a> when playing in VR</p>
 
 		<!-- Combo box for options -->
 		<label for="Process">Select Process:</label>
@@ -44,9 +44,25 @@
 			<option value="2">Maximize</option>
 		</select>
 
-		<br><label for="PipeCommand">Select Command:</label>
+
+		<!-- Text boxes for user input -->
+		<br><label id="lblMove" for="X">New X:</label><input type='text' value="{X}" name="X" placeholder='type new X coordinates'>
+		<br><label for="Y">New Y:</label><input type='text' value="{Y}" name="Y" placeholder='type new Y coordinates'>
+		<!-- Add more text boxes here -->
+		<!-- Submit buttons -->
+		<input type="submit" class="submit-btn" name="Move" value="Apply Changes">
+		<input type="submit" class="submit-btn" name="MakeForeground" value="Make Foreground"><br><br>
+		<input type="submit" class="submit-btn" name="GetValues" value="GetValues">
+		<input type="submit" class="submit-btn" name="Exit" value="Terminate">
+		<input type="submit" class="submit-btn" name="Launch" value="Launch">
+		
+		
+		
+		<p><br><label id="lblCommand" for="PipeCommand">Select Command:</label>
 		<select name="PipeCommand">
 			<option selected="selected" value="0">[SELECT COMMAND]</option>
+			<option value="PerformanceMonitorCommandsPipe|CYCLE_CPU_ALARM">[PERFORMANCE MONITOR]</option>
+			
 			<option value="PerformanceMonitorCommandsPipe|CYCLE_CPU_ALARM">Performance Monitor: CYCLE_CPU_ALARM</option>
 			<option value="PerformanceMonitorCommandsPipe|PROCESSOR_UTILITY">Performance Monitor: PROCESSOR_UTILITY</option>
 			<option value="PerformanceMonitorCommandsPipe|PROCESSOR_TIME">Performance Monitor: PROCESSOR_TIME</option>
@@ -64,6 +80,7 @@
 			<option value="PerformanceMonitorCommandsPipe|RESTORE">Performance Monitor: RESTORE</option>
 			<option value="PerformanceMonitorCommandsPipe|ALIGN_LEFT">Performance Monitor: ALIGN_LEFT</option>
 
+			<option value="PerformanceMonitorCommandsPipe|CYCLE_CPU_ALARM">[TELEMETRY VIB SHAKER]</option>
 			<option value="TelemetryVibShakerPipeCommands|MONITOR">TelemetryVibShaker: MONITOR</option>
 			<option value="TelemetryVibShakerPipeCommands|NOT_FOUNDS">TelemetryVibShaker: NOT_FOUNDS</option>
 			<option value="TelemetryVibShakerPipeCommands|SETTINGS">TelemetryVibShaker: SETTINGS</option>
@@ -74,11 +91,12 @@
 			<option value="TelemetryVibShakerPipeCommands|RESTORE">TelemetryVibShaker: RESTORE</option>
 			<option value="TelemetryVibShakerPipeCommands|ALIGN_LEFT">TelemetryVibShaker: ALIGN_LEFT</option>
 
+			<option value="PerformanceMonitorCommandsPipe|CYCLE_CPU_ALARM">[WAR THUNDER EXPORTER]</option>
 			<option value="WarThunderExporterPipeCommands|MONITOR">WarThunderExporter: MONITOR</option>
 			<option value="WarThunderExporterPipeCommands|CYCLE_STATISTICS">WarThunderExporter: CYCLE_STATISTICS</option>
 			<option value="WarThunderExporterPipeCommands|SETTINGS">WarThunderExporter: SETTINGS</option>
 			<option value="WarThunderExporterPipeCommands|INTERVAL_100">WarThunderExporter: INTERVAL_100</option>
-			<option value="WarThunderExporterPipeCommands|INTERVAL_50">WarThunderExporter: INTERVAL_50/option>
+			<option value="WarThunderExporterPipeCommands|INTERVAL_50">WarThunderExporter: INTERVAL_50</option>
 			<option value="WarThunderExporterPipeCommands|STOP">WarThunderExporter: STOP</option>
 			<option value="WarThunderExporterPipeCommands|START">WarThunderExporter: START</option>
 			<option value="WarThunderExporterPipeCommands|NOT_FOUNDS">WarThunderExporter: NOT_FOUNDS</option>
@@ -86,6 +104,7 @@
 			<option value="WarThunderExporterPipeCommands|RESTORE">WarThunderExporter: RESTORE</option>
 			<option value="WarThunderExporterPipeCommands|ALIGN_LEFT">WarThunderExporter: ALIGN_LEFT</option>
 
+			<option value="PerformanceMonitorCommandsPipe|CYCLE_CPU_ALARM">[SIM CONNECT EXPORTER]</option>
 			<option value="SimConnectExporterPipeCommands|MONITOR">SimConnectExporter: MONITOR</option>
 			<option value="SimConnectExporterPipeCommands|CYCLE_STATISTICS">SimConnectExporter: CYCLE_STATISTICS</option>
 			<option value="SimConnectExporterPipeCommands|SHOW_GFORCES">SimConnectExporter: SHOW_GFORCES</option>
@@ -98,18 +117,8 @@
 
 		</select>
 
-
-		<!-- Text boxes for user input -->
-		<br><label for="X">New X:</label><input type='text' value="{X}" name="X" placeholder='type new X coordinates'>
-		<br><label for="Y">New Y:</label><input type='text' value="{Y}" name="Y" placeholder='type new Y coordinates'>
-		<!-- Add more text boxes here -->
-		<!-- Submit buttons -->
-		<input type="submit" class="submit-btn" name="Move" value="Apply Changes"><br><br>
-		<input type="submit" class="submit-btn" name="GetValues" value="GetValues">
-		<input type="submit" class="submit-btn" name="Exit" value="Terminate">
-		<input type="submit" class="submit-btn" name="Launch" value="Launch">
+		
 		<input type="submit" class="submit-btn" name="Command" value="Command">
-		<input type="submit" class="submit-btn" name="MakeForeground" value="Make Foreground">
 
 
 		<!-- Footer message -->

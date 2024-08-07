@@ -295,11 +295,11 @@ namespace RemoteWindowControl
                                 {
                                     IntPtr hWnd = processes[0].MainWindowHandle;
                                     SendMessage(hWnd, WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
-                                    footer = $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Successfully requested graceful-exit/kill for [{processName}]";
+                                    footer = $"{GetDateTimeStamp()} Successfully requested graceful-exit/kill for [{processName}]";
                                     if (IsWindow(hWnd) && !processes[0].CloseMainWindow()) processes[0].Kill();
                                 }
                                 else
-                                    footer = $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Process Not Found [{processName}]";
+                                    footer = $"{GetDateTimeStamp()} Process Not Found [{processName}]";
                             }
                             else if (parameters.TryGetValue("MakeForeground", out temp))
                             {
@@ -318,17 +318,17 @@ namespace RemoteWindowControl
 
                                         // Bring the window to the foreground
                                         SetForegroundWindow(hWnd);
-                                        footer = $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Successfully requested SetForegroundWindow [{processName}]";
+                                        footer = $"{GetDateTimeStamp()} Successfully requested SetForegroundWindow [{processName}]";
                                     }
                                     else
                                     {
-                                        string msg = $"{processName} does not have a MainWindowHandle";
+                                        string msg = $"{GetDateTimeStamp()}{processName} does not have a MainWindowHandle";
                                         LogError(msg, "MakeForeground");
                                         footer = msg;
                                     }
                                 }
                                 else
-                                    footer = $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Process Not Found [{processName}]";
+                                    footer = $"{GetDateTimeStamp()} Process Not Found [{processName}]";
                             }
                             else if (parameters.TryGetValue("GetValues", out temp))
                             {
@@ -336,7 +336,7 @@ namespace RemoteWindowControl
                                 RECT rect = GetWindowPosition(processName, 0);
                                 newX = rect.Left;
                                 newY = rect.Top;
-                                footer = $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Successfully requested coordinates read for [{processName}]";
+                                footer = $"{GetDateTimeStamp()} Successfully requested coordinates read for [{processName}]";
                             }
                             else if (parameters.TryGetValue("Launch", out temp))
                             {
@@ -366,7 +366,7 @@ namespace RemoteWindowControl
                                     int.TryParse(temp, out int instance);
 
                                     procHandle = MoveResizeWindow(processName, instance, x, y, newState);
-                                    footer = $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Successfully requested coordinates change to X: {x}, Y: {y} for [{processName}]";
+                                    footer = $"{GetDateTimeStamp()} Successfully requested coordinates change to X: {x}, Y: {y} for [{processName}]";
 
                                     RECT rect = GetWindowPosition(procHandle);
                                     newX = rect.Left;
@@ -416,7 +416,7 @@ namespace RemoteWindowControl
             {
                 using (var pipeClient = new NamedPipeClientStream(".", pipeName, PipeDirection.Out))
                 {
-                    pipeClient.Connect(5000);
+                    pipeClient.Connect(1000);
                     using (var writer = new StreamWriter(pipeClient))
                     {
                         writer.WriteLine(message);

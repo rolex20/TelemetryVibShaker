@@ -210,6 +210,7 @@
             txtDestinationPort.Name = "txtDestinationPort";
             txtDestinationPort.Size = new Size(177, 23);
             txtDestinationPort.TabIndex = 4;
+            txtDestinationPort.KeyPress += txtDestinationPort_KeyPress;
             // 
             // label2
             // 

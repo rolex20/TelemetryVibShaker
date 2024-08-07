@@ -428,43 +428,43 @@ namespace WarThunderExporter
         {
             //this.BeginInvoke(new Action(() =>
             //{
-                btnStart.Enabled = false;
-                btnStop.Enabled = true;
+            btnStart.Enabled = false;
+            btnStop.Enabled = true;
 
 
-                // Before connecting udpSender, lets make sure our int cached copy is up to date
-                nudFrequency.Tag = (int)nudFrequency.Value;
+            // Before connecting udpSender, lets make sure our int cached copy is up to date
+            nudFrequency.Tag = (int)nudFrequency.Value;
 
-                PrepareMonitorLabels();
+            PrepareMonitorLabels();
 
-                if (!(bool)txtWtUrl.Tag) // make sure we only change this once, this is an HttpClient limitation
-                {
-                    string baseAddress = SanitizeURL(txtWtUrl.Text);
-                    httpClient.BaseAddress = new Uri(baseAddress);
-                    txtWtUrl.Tag = true; // no more changes accepted to base address
-                }
-                UpdateCaption(tsStatus, $"Connecting to [{httpClient.BaseAddress.ToString()}]...");
+            if (!(bool)txtWtUrl.Tag) // make sure we only change this once, this is an HttpClient limitation
+            {
+                string baseAddress = SanitizeURL(txtWtUrl.Text);
+                httpClient.BaseAddress = new Uri(baseAddress);
+                txtWtUrl.Tag = true; // no more changes accepted to base address
+            }
+            UpdateCaption(tsStatus, $"Connecting to [{httpClient.BaseAddress.ToString()}]...");
 
-                // Allocate the udp datagram
-                datagram = new byte[8];
-                datagram[0] = 1; // flag to indicate this is a telemetry datagram for my TelemetryVibShaker program
+            // Allocate the udp datagram
+            datagram = new byte[8];
+            datagram[0] = 1; // flag to indicate this is a telemetry datagram for my TelemetryVibShaker program
 
-                // Prepare the UDP connection to the War Thunder Telemetry
-                ConnectUDP();
+            // Prepare the UDP connection to the War Thunder Telemetry
+            ConnectUDP();
 
-                // Switch to Monitor
-                if (chkChangeToMonitor.Checked) tabControl1.SelectedIndex = 1;
-                DisableChildControls(tabSettings);
-                nudFrequency.Enabled = true; // we still want to be able to change this
+            // Switch to Monitor
+            if (chkChangeToMonitor.Checked) tabControl1.SelectedIndex = 1;
+            DisableChildControls(tabSettings);
+            nudFrequency.Enabled = true; // we still want to be able to change this
 
 
 
-                cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource = new CancellationTokenSource();
 
-                // Minimize if required
-                if (chkAutoMinimize.Checked) this.WindowState = FormWindowState.Minimized;
+            // Minimize if required
+            if (chkAutoMinimize.Checked) this.WindowState = FormWindowState.Minimized;
 
-                TimerActivateNewInterval(timer1, (int)nudFrequency.Value);
+            TimerActivateNewInterval(timer1, (int)nudFrequency.Value);
 
             //}));
 
@@ -961,6 +961,19 @@ namespace WarThunderExporter
             };
 
             notifyIcon.ShowBalloonTip(10000);
+        }
+
+        private void AllowOnlyDigits(object sender, KeyPressEventArgs e)
+        {
+            // Only allow numbers
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+                e.Handled = true;
+        }
+
+
+        private void txtDestinationPort_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            AllowOnlyDigits(sender, e);
         }
     }
 }
