@@ -46,6 +46,26 @@
       "path": "C:\\Users\\ralch\\source\\repos\\rolex20\\TelemetryVibShaker\\SimConnectExporter\\bin\\Release\\net7.0-windows\\SimConnectExporter.exe"
     },
     {
+      "friendlyName": "DCS World",
+      "processName": "dcs",
+      "path": "something"
+    },
+    {
+      "friendlyName": "Microsoft Flight Simulator",
+      "processName": "FlightSimulator",
+      "path": "something"
+    },
+    {
+      "friendlyName": "War Thunder",
+      "processName": "aces",
+      "path": "something"
+    },
+    {
+      "friendlyName": "Falcon BMS",
+      "processName": "falcon",
+      "path": "something"
+    },
+    {
       "friendlyName": "HWiNFO64",
       "processName": "HWiNFO64",
       "path": "C:\\Program Files\\HWiNFO64\\HWiNFO64.EXE"

@@ -6,6 +6,7 @@ using System.Text;
 using System.Diagnostics;
 using Microsoft.Win32;
 using System.Windows.Forms;
+using System.IO.Pipes;
 
 
 namespace SimConnectExporter
@@ -31,8 +32,14 @@ namespace SimConnectExporter
         private Stopwatch? stopWatch;
         private int maxProcessingTime;
         private long lastTimeStamp_ms;
+        private long lastSecond = -1;
+        private long callsPerSecond;
 
         private Mutex SingleInstanceMutex;
+
+        private Thread pipeServerThread;  // IPC_PipeServer Thread for pipes interprocess communications
+        private CancellationTokenSource pipeCancellationTokenSource;
+
 
 
         enum DEFINITIONS
@@ -174,6 +181,17 @@ namespace SimConnectExporter
             // result is in milliseconds
             long currentTimeStamp_ms = (long)GetTickCount64();
 
+            long second = currentTimeStamp_ms / 1000L;
+            if (lastSecond == second)
+            {
+                callsPerSecond++;
+            } 
+            else
+            {
+                callsPerSecond = 0;
+                lastSecond = second;
+            }
+
             if (currentTimeStamp_ms - lastTimeStamp_ms < nudFrequency.Value)
                 return; // Skip this telemetry
 
@@ -263,6 +281,7 @@ namespace SimConnectExporter
                     UpdateValue(lblGforce, (int)sd.gForce);
                     UpdateValue(lblMaxGForce, maxGForce);
                     UpdateValue(lblProcessingTimeUDP, maxProcessingTime);
+                    UpdateValue(lblCallbacksPerSec, callsPerSecond);
                     this.ResumeLayout();
                 }
                 
@@ -472,7 +491,85 @@ namespace SimConnectExporter
             ProcessorCheck();
 
             tsStatusBar1.Text = "Idle";
+
+            // Start Interprocess communication server using named pipes using a different thread
+            pipeCancellationTokenSource = new CancellationTokenSource();
+            pipeServerThread = new Thread(() => IPC_PipeServer(pipeCancellationTokenSource.Token));
+            pipeServerThread.IsBackground = true;
+            pipeServerThread.Start();
+
         }
+
+        // When playing in VR I can't conveniently switch to performance monitor to change settings
+        // Instead I user RemoteWindowControl to send IPC pipe messages to WarThunderExporter
+        // This way I can change settings more conveniently using a web browser in my phone
+        private async void IPC_PipeServer(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                using (NamedPipeServerStream pipeServer = new NamedPipeServerStream("SimConnectExporterPipeCommands", PipeDirection.In))
+                {
+                    Debug.WriteLine("Named pipe server started. Waiting for connection...");
+
+                    // Wait for a client to connect
+                    await pipeServer.WaitForConnectionAsync(cancellationToken);
+                    Debug.WriteLine("Client connected.");
+
+                    int lines = 0;
+                    using (StreamReader reader = new StreamReader(pipeServer))
+                    {
+                        string command;
+                        string result = "OK";
+                        while ((command = await reader.ReadLineAsync()) != null)
+                        {
+                            this.Invoke(new Action(() =>
+                            {
+
+                                switch (command)
+                                {
+                                    case "MONITOR":
+                                        tabs.SelectTab("Monitor");
+                                        break;
+                                    case "SHOW_GFORCES":
+                                        chkTrackGForces.Checked = !chkTrackGForces.Checked;
+                                        tabs.SelectTab("tbGForces");
+                                        break;
+                                    case "SETTINGS":
+                                        tabs.SelectTab("Settings");
+                                        break;
+                                    case "STOP":
+                                        if (btnDisconnect.Enabled) btnDisconnect_Click(null, null);
+                                        break;
+                                    case "START":
+                                        if (btnConnect.Enabled) btnConnect_Click(null, null);
+                                        break;
+                                    case "CYCLE_STATISTICS":
+                                        chkShowStatistics.Checked = !chkShowStatistics.Checked;
+                                        break;
+                                    case "MINIMIZE":
+                                        this.WindowState = FormWindowState.Minimized;
+                                        break;
+                                    case "RESTORE":
+                                        this.WindowState = FormWindowState.Normal;
+                                        break;
+                                    case "ALIGN_LEFT":
+                                        this.Location = new Point(-1700, this.Location.Y);
+                                        break;
+                                    default:
+                                        result = "Unknown command";
+                                        break;
+                                }
+                                string info = $"Received command #${++lines}):[{command}][{result}]";
+                                Debug.WriteLine(info);
+                                //LogError(info, "PipeServer", true);
+
+                            }));
+                        }
+                    }
+                }
+            }
+        }
+
 
         private void ProcessorCheck()
         {
@@ -584,6 +681,8 @@ namespace SimConnectExporter
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            pipeCancellationTokenSource.Cancel();
+
             Properties.Settings.Default.XCoordinate = this.Location.X;
             Properties.Settings.Default.YCoordinate = this.Location.Y;
 

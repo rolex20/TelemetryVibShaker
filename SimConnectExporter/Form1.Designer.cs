@@ -90,6 +90,8 @@
             btnDisconnect = new Button();
             btnResetMax = new Button();
             timer1 = new System.Windows.Forms.Timer(components);
+            lblCallbacksPerSec = new Label();
+            label15 = new Label();
             tabs.SuspendLayout();
             Settings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudFrequency).BeginInit();
@@ -266,6 +268,8 @@
             // 
             // Monitor
             // 
+            Monitor.Controls.Add(lblCallbacksPerSec);
+            Monitor.Controls.Add(label15);
             Monitor.Controls.Add(label11);
             Monitor.Controls.Add(label10);
             Monitor.Controls.Add(lblMaxGForce);
@@ -445,7 +449,7 @@
             // lblTimestamp
             // 
             lblTimestamp.AutoSize = true;
-            lblTimestamp.Location = new Point(395, 100);
+            lblTimestamp.Location = new Point(170, 253);
             lblTimestamp.Name = "lblTimestamp";
             lblTimestamp.Size = new Size(27, 15);
             lblTimestamp.TabIndex = 45;
@@ -455,7 +459,7 @@
             // label31
             // 
             label31.AutoSize = true;
-            label31.Location = new Point(320, 100);
+            label31.Location = new Point(95, 253);
             label31.Name = "label31";
             label31.Size = new Size(69, 15);
             label31.TabIndex = 44;
@@ -733,6 +737,26 @@
             timer1.Interval = 1500;
             timer1.Tick += timer1_Tick;
             // 
+            // lblCallbacksPerSec
+            // 
+            lblCallbacksPerSec.AutoSize = true;
+            lblCallbacksPerSec.Location = new Point(395, 253);
+            lblCallbacksPerSec.Name = "lblCallbacksPerSec";
+            lblCallbacksPerSec.Size = new Size(27, 15);
+            lblCallbacksPerSec.TabIndex = 59;
+            lblCallbacksPerSec.Tag = "-1";
+            lblCallbacksPerSec.Text = "----";
+            // 
+            // label15
+            // 
+            label15.AutoSize = true;
+            label15.Location = new Point(307, 253);
+            label15.Name = "label15";
+            label15.Size = new Size(82, 15);
+            label15.TabIndex = 58;
+            label15.Text = "Callbacks/sec:";
+            label15.TextAlign = ContentAlignment.TopRight;
+            // 
             // frmMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -828,5 +852,7 @@
         private Label label12;
         private ComboBox cmbSimConnectPeriod;
         private Label label13;
+        private Label lblCallbacksPerSec;
+        private Label label15;
     }
 }

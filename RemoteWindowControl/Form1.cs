@@ -299,7 +299,35 @@ namespace RemoteWindowControl
                                     if (IsWindow(hWnd) && !processes[0].CloseMainWindow()) processes[0].Kill();
                                 } else
                                     footer = $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Process Not Found [{processName}]";
-                            } 
+                            }
+                            else if (parameters.TryGetValue("MakeForeground", out temp))
+                            {
+                                LogError("Clicked Make Foreground for " + processName, "ProcessRequest()");
+                                Process[] processes = Process.GetProcessesByName(processName);
+                                if (processes.Length > 0)
+                                {
+                                    IntPtr hWnd = processes[0].MainWindowHandle;
+                                    if (hWnd != IntPtr.Zero)
+                                    {
+                                        // Restore the window if it is minimized
+                                        if (IsIconic(hWnd))
+                                        {
+                                            ShowWindowAsync(hWnd, SW_RESTORE);
+                                        }
+
+                                        // Bring the window to the foreground
+                                        SetForegroundWindow(hWnd);
+                                        footer = $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Successfully requested SetForegroundWindow [{processName}]";
+                                    } else
+                                    {
+                                        string msg = $"{processName} does not have a MainWindowHandle";
+                                        LogError(msg, "MakeForeground");
+                                        footer = msg ;
+                                    }
+                                }
+                                else
+                                    footer = $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Process Not Found [{processName}]";
+                            }
                             else if (parameters.TryGetValue("GetValues", out temp))
                             {
                                 LogError("Clicked GetValues for " + processName, "ProcessRequest()");
