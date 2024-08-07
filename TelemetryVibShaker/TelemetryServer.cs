@@ -55,7 +55,14 @@ namespace TelemetryVibShaker
         private string lastErrorMsg;
         public string LastErrorMsg { get { return lastErrorMsg; } }
 
-
+        
+        // With this property now I can efficiently track NotFounds
+        private bool unitHasChanged = true;
+        public bool UnitHaschanged {  get { 
+                bool retValue = unitHasChanged;
+                unitHasChanged = false;
+                return retValue; 
+            } }
 
         public void Abort()
         {
@@ -239,6 +246,7 @@ namespace TelemetryVibShaker
                 }
                 else  // If not, then datagram received must be an aircraft type name
                 {
+                    unitHasChanged = true;
                     string datagram = Encoding.ASCII.GetString(receiveData, 0, receiveData.Length);
                     var unit = jsonRoot.units.unit.FirstOrDefault(u => u.typeName == datagram);
                     CurrentUnitType = datagram;

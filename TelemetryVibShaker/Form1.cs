@@ -730,7 +730,9 @@ namespace TelemetryVibShaker
                 //logic to stop the vibration motor if they don't receive more telemetry
             }
 
-
+            // Track Not Founds
+            if (telemetry.UnitHaschanged && soundManager.AoA1 == 360)
+                lstNotFounds.Items.Add(telemetry.CurrentUnitType);
 
             // Statistics are updated once per second
             if (showStatistics && telemetry.IsRunning() && (tabs.SelectedIndex == 5) && (this.WindowState != FormWindowState.Minimized))
@@ -743,9 +745,8 @@ namespace TelemetryVibShaker
                     // Report sound effectType
                     UpdateSoundEffectStatus(soundManager.Status);
 
-                    // Report Current Unit Type                    
-                    if (UpdateValue(lblCurrentUnitType, telemetry.CurrentUnitType) && soundManager.AoA1 == 360) // unknown unit
-                        lstNotFounds.Items.Add(telemetry.CurrentUnitType);
+                    // Report Current Unit Type
+                    UpdateValue(lblCurrentUnitType, telemetry.CurrentUnitType);
 
                     // Report the last AoA received
                     UpdateValue(lblLastAoA, telemetry.LastData.AoA);

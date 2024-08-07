@@ -1592,6 +1592,7 @@
             label51.Size = new Size(177, 15);
             label51.TabIndex = 2;
             label51.Text = "* Only when Statistics is enabled";
+            label51.Visible = false;
             // 
             // label48
             // 
