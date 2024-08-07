@@ -391,7 +391,7 @@ namespace RemoteWindowControl
             }
         }
 
-        private string getDateTimeStamp()
+        private string GetDateTimeStamp()
         {
             return $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} ";
         }
@@ -400,13 +400,13 @@ namespace RemoteWindowControl
         {
             if (string.IsNullOrEmpty(command) || !command.Contains('|'))
             {
-                return $"{getDateTimeStamp()}Invalid pipe command [{command}]";
+                return $"{GetDateTimeStamp()}Invalid pipe command [{command}]";
             }
 
             string[] values = command.Split('|');
             if (values.Length != 2 || string.IsNullOrEmpty(values[0]) || string.IsNullOrEmpty(values[1]))
             {
-                return $"{getDateTimeStamp()}Missing part for pipe command [{command}]";
+                return $"{GetDateTimeStamp()}Missing part for pipe command [{command}]";
             }
 
             string pipeName = values[0];
@@ -429,19 +429,19 @@ namespace RemoteWindowControl
             }
             catch (IOException ex)
             {
-                return ($"{getDateTimeStamp()}An I/O error occurred: " + ex.Message);
+                return ($"{GetDateTimeStamp()}An I/O error occurred: " + ex.Message);
             }
             catch (UnauthorizedAccessException ex)
             {
-                return ($"{getDateTimeStamp()}Access is denied: " + ex.Message);
+                return ($"{GetDateTimeStamp()}Access is denied: " + ex.Message);
             }
             catch (Exception ex)
             {
-                return ($"{getDateTimeStamp()}An unexpected error occurred: " + ex.Message);
+                return ($"{GetDateTimeStamp()}An unexpected error occurred: " + ex.Message);
             }
 
 
-            return $"{getDateTimeStamp()}Pipe Command Sent [{command}]";
+            return $"{GetDateTimeStamp()}Pipe Command Sent [{command}]";
         }
 
         private string GetHtmlProcessCombo(string ProcessName)
