@@ -209,7 +209,7 @@ namespace RemoteWindowControl
 
 
         private void LaunchProgram(string exePath)
-        {            
+        {
             try
             {
                 // Extract the directory from the full file path
@@ -297,7 +297,8 @@ namespace RemoteWindowControl
                                     SendMessage(hWnd, WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
                                     footer = $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Successfully requested graceful-exit/kill for [{processName}]";
                                     if (IsWindow(hWnd) && !processes[0].CloseMainWindow()) processes[0].Kill();
-                                } else
+                                }
+                                else
                                     footer = $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Process Not Found [{processName}]";
                             }
                             else if (parameters.TryGetValue("MakeForeground", out temp))
@@ -318,11 +319,12 @@ namespace RemoteWindowControl
                                         // Bring the window to the foreground
                                         SetForegroundWindow(hWnd);
                                         footer = $"{DateTime.Now.ToString("[dd/MM/yyyy HH:mm:ss]")} Successfully requested SetForegroundWindow [{processName}]";
-                                    } else
+                                    }
+                                    else
                                     {
                                         string msg = $"{processName} does not have a MainWindowHandle";
                                         LogError(msg, "MakeForeground");
-                                        footer = msg ;
+                                        footer = msg;
                                     }
                                 }
                                 else
@@ -398,15 +400,15 @@ namespace RemoteWindowControl
         {
             if (string.IsNullOrEmpty(command) || !command.Contains('|'))
             {
-                return $"{getDateTimeStamp()}Invalid pipe command [{command}]"; 
+                return $"{getDateTimeStamp()}Invalid pipe command [{command}]";
             }
 
             string[] values = command.Split('|');
-            if ( values.Length!=2 || string.IsNullOrEmpty(values[0]) || string.IsNullOrEmpty(values[1]) )
+            if (values.Length != 2 || string.IsNullOrEmpty(values[0]) || string.IsNullOrEmpty(values[1]))
             {
                 return $"{getDateTimeStamp()}Missing part for pipe command [{command}]";
             }
-               
+
             string pipeName = values[0];
             string message = values[1];
 
@@ -427,19 +429,19 @@ namespace RemoteWindowControl
             }
             catch (IOException ex)
             {
-                return($"{getDateTimeStamp()}An I/O error occurred: " + ex.Message);
+                return ($"{getDateTimeStamp()}An I/O error occurred: " + ex.Message);
             }
             catch (UnauthorizedAccessException ex)
             {
-                return($"{getDateTimeStamp()}Access is denied: " + ex.Message);
+                return ($"{getDateTimeStamp()}Access is denied: " + ex.Message);
             }
             catch (Exception ex)
             {
-                return($"{getDateTimeStamp()}An unexpected error occurred: " + ex.Message);
+                return ($"{getDateTimeStamp()}An unexpected error occurred: " + ex.Message);
             }
 
 
-            return $"{getDateTimeStamp()}Pipe Command Sent [{command}]"; 
+            return $"{getDateTimeStamp()}Pipe Command Sent [{command}]";
         }
 
         private string GetHtmlProcessCombo(string ProcessName)
@@ -540,7 +542,7 @@ namespace RemoteWindowControl
             lblCountDownTimer.BeginInvoke(new Action(() => { lblCountDownTimer.Text = String.Empty; }));
 
             // Verify that the user hasn't aborted the autostart or clicked manually on btnStartWebServer
-            if (chkAutostart.Checked && btnStartWebServer.Enabled) 
+            if (chkAutostart.Checked && btnStartWebServer.Enabled)
                 btnStartWebServer_Click(null, null);
         }
 
@@ -580,7 +582,8 @@ namespace RemoteWindowControl
             LoadProgramsConfigurationFile();
 
             // Remember this could be called from another thread
-            this.BeginInvoke(new Action(() => {
+            this.BeginInvoke(new Action(() =>
+            {
                 btnStartWebServer.Enabled = false;
                 txtHTML.Enabled = false;
 
@@ -603,8 +606,8 @@ namespace RemoteWindowControl
             //Prepare the cached copy of the HTML Template
             HTML_Template = ReadFileContents(txtHTML.Text);
 
-            
-            
+
+
             StartWebServer();
         }
 
@@ -844,7 +847,74 @@ namespace RemoteWindowControl
             Process.Start(processInfo);
         }
 
+        // Importing necessary Win32 API functions
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern IntPtr OpenProcess(uint processAccess, bool bInheritHandle, int processId);
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern bool SetPriorityClass(IntPtr hProcess, uint dwPriorityClass);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern IntPtr GetPriorityClass(IntPtr hProcess);
+
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern uint GetLastError();
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern bool CloseHandle(IntPtr hObject);
+
+        // Constants for process access and priority class
+        const uint PROCESS_SET_INFORMATION = 0x0200;
+        const uint PROCESS_MODE_BACKGROUND_BEGIN = 0x00100000;
+        const uint PROCESS_QUERY_INFORMATION = 0x0400;
+
+
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Get the process ID of notepad
+                Process[] processes = Process.GetProcessesByName("notepad");
+                if (processes.Length == 0)
+                {
+                    Console.WriteLine("Notepad is not running.");
+                    return;
+                }
+
+                int processId = processes[0].Id;
+
+                // Open the process with the required access
+                IntPtr hProcess = OpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_SET_INFORMATION, false, processId);
+                if (hProcess == IntPtr.Zero)
+                {
+                    Console.WriteLine("Failed to open process. Error: " + GetLastError());
+                    return;
+                }
+                // Set the process priority class
+                uint error = 0;
+                if (!SetPriorityClass(hProcess, PROCESS_MODE_BACKGROUND_BEGIN))
+                {
+                    error = GetLastError();
+                    Console.WriteLine("Failed to set process priority class. Error: " + error);
+                    Console.WriteLine("Error description: " + new System.ComponentModel.Win32Exception((int)error).Message);
+                }
+                else
+                {
+                    Console.WriteLine("Process priority class set to background mode.");
+                }
+                LogError($"Notepad.Id={processId}.  Handle used for SetPriorityClass: {hProcess}", $"GetLastError={error}");
+
+                // Close the process handle
+                CloseHandle(hProcess);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred: " + ex.Message);
+            }
+
+        }
     }
     public class ProgramDetails
     {

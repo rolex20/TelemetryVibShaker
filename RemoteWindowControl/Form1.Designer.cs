@@ -50,6 +50,7 @@
             txtIPAddress = new TextBox();
             tabDebug = new TabPage();
             txtDebug = new TextBox();
+            button1 = new Button();
             tabControls.SuspendLayout();
             tabSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudInstance).BeginInit();
@@ -278,12 +279,23 @@
             txtDebug.Size = new Size(290, 297);
             txtDebug.TabIndex = 0;
             // 
+            // button1
+            // 
+            button1.Location = new Point(294, 16);
+            button1.Name = "button1";
+            button1.Size = new Size(75, 23);
+            button1.TabIndex = 1;
+            button1.Text = "button1";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
             // frmMain
             // 
             AcceptButton = btnStartWebServer;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(409, 398);
+            Controls.Add(button1);
             Controls.Add(tabControls);
             FormBorderStyle = FormBorderStyle.Fixed3D;
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -324,5 +336,6 @@
         private NumericUpDown nudInstance;
         private TextBox txtProgramsConfigurationFile;
         private Label label1;
+        private Button button1;
     }
 }
