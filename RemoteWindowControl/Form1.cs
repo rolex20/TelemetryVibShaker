@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
+using System.Media;
 
 
 
@@ -184,9 +185,6 @@ namespace RemoteWindowControl
             listener = new HttpListener();
             string prefix = $"http://{txtIPAddress.Text}:{txtPort.Text}/";
             listener.Prefixes.Add(prefix);
-            //listener.Prefixes.Add("http://perfmon:8080/");
-            //listener.Prefixes.Add("http://192.168.1.5:8080/"); // remove this line when debugging
-            //listener.Prefixes.Add("http://localhost:8080/");
             try
             {
                 listener.Start();
@@ -194,6 +192,8 @@ namespace RemoteWindowControl
             catch (Exception ex)
             {
                 ExCounter++;
+                SystemSounds.Beep.Play();
+                tabControls.SelectTab("tabDebug");
                 LogError(ex.Message, "StartWebServer{ listener.Start(); }");
             }
             Task.Run(() => ProcessRequest());
@@ -256,7 +256,7 @@ namespace RemoteWindowControl
                 lblWebServerThreadId.BeginInvoke(new Action(() => { lblWebServerThreadId.Text = webServerThreadId.ToString(); }));
 
 
-                string footer = "Ready";
+                string footer = $"{GetDateTimeStamp()}Ready";
                 int newX = 0;
                 int newY = 0;
                 string processName = String.Empty;

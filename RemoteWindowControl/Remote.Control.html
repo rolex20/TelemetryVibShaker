@@ -26,7 +26,7 @@
 
 <div class="container">
 	<form name="RemoteControlForm" method="POST" align="center">
-		<h2>Window Remote Movement</h2>
+		<a href="#" onclick="window.location.href = window.location.href.split('?')[0];"><h2>Window Remote Movement</h2></a>
 		<p class="welcome-message">Use this app to <a href="#lblMove">move</a> windows or send <a href="#lblCommand">commands</a> when playing in VR</p>
 
 		<!-- Combo box for options -->
@@ -61,7 +61,7 @@
 		<p><br><label id="lblCommand" for="PipeCommand">Select Command:</label>
 		<select name="PipeCommand">
 			<option selected="selected" value="0">[SELECT COMMAND]</option>
-			<option value="PerformanceMonitorCommandsPipe|CYCLE_CPU_ALARM">[PERFORMANCE MONITOR]</option>
+			<option value="0">[PERFORMANCE MONITOR]</option>
 			
 			<option value="PerformanceMonitorCommandsPipe|CYCLE_CPU_ALARM">Performance Monitor: CYCLE_CPU_ALARM</option>
 			<option value="PerformanceMonitorCommandsPipe|PROCESSOR_UTILITY">Performance Monitor: PROCESSOR_UTILITY</option>
@@ -80,7 +80,7 @@
 			<option value="PerformanceMonitorCommandsPipe|RESTORE">Performance Monitor: RESTORE</option>
 			<option value="PerformanceMonitorCommandsPipe|ALIGN_LEFT">Performance Monitor: ALIGN_LEFT</option>
 
-			<option value="PerformanceMonitorCommandsPipe|CYCLE_CPU_ALARM">[TELEMETRY VIB SHAKER]</option>
+			<option value="0">[TELEMETRY VIB SHAKER]</option>
 			<option value="TelemetryVibShakerPipeCommands|MONITOR">TelemetryVibShaker: MONITOR</option>
 			<option value="TelemetryVibShakerPipeCommands|NOT_FOUNDS">TelemetryVibShaker: NOT_FOUNDS</option>
 			<option value="TelemetryVibShakerPipeCommands|SETTINGS">TelemetryVibShaker: SETTINGS</option>
@@ -91,7 +91,7 @@
 			<option value="TelemetryVibShakerPipeCommands|RESTORE">TelemetryVibShaker: RESTORE</option>
 			<option value="TelemetryVibShakerPipeCommands|ALIGN_LEFT">TelemetryVibShaker: ALIGN_LEFT</option>
 
-			<option value="PerformanceMonitorCommandsPipe|CYCLE_CPU_ALARM">[WAR THUNDER EXPORTER]</option>
+			<option value="0">[WAR THUNDER EXPORTER]</option>
 			<option value="WarThunderExporterPipeCommands|MONITOR">WarThunderExporter: MONITOR</option>
 			<option value="WarThunderExporterPipeCommands|CYCLE_STATISTICS">WarThunderExporter: CYCLE_STATISTICS</option>
 			<option value="WarThunderExporterPipeCommands|SETTINGS">WarThunderExporter: SETTINGS</option>
@@ -104,7 +104,7 @@
 			<option value="WarThunderExporterPipeCommands|RESTORE">WarThunderExporter: RESTORE</option>
 			<option value="WarThunderExporterPipeCommands|ALIGN_LEFT">WarThunderExporter: ALIGN_LEFT</option>
 
-			<option value="PerformanceMonitorCommandsPipe|CYCLE_CPU_ALARM">[SIM CONNECT EXPORTER]</option>
+			<option value="0">[SIM CONNECT EXPORTER]</option>
 			<option value="SimConnectExporterPipeCommands|MONITOR">SimConnectExporter: MONITOR</option>
 			<option value="SimConnectExporterPipeCommands|CYCLE_STATISTICS">SimConnectExporter: CYCLE_STATISTICS</option>
 			<option value="SimConnectExporterPipeCommands|SHOW_GFORCES">SimConnectExporter: SHOW_GFORCES</option>
