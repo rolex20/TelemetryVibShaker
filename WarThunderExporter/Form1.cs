@@ -4,6 +4,8 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
 using System.Text;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.IO.Pipes;
 
 
 namespace WarThunderExporter
@@ -32,6 +34,10 @@ namespace WarThunderExporter
         private CancellationTokenSource cancellationTokenSource;
         private SimpleStatsCalculator internalStats = new SimpleStatsCalculator();
         private SimpleStatsCalculator wtStats = new SimpleStatsCalculator();
+
+        private Thread pipeServerThread;  // IPC_PipeServer Thread for pipes interprocess communications
+        private CancellationTokenSource pipeCancellationTokenSource;
+
 
 
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -71,14 +77,90 @@ namespace WarThunderExporter
                 UseProxy = false, // Disable proxy
                 //PooledConnectionLifetime = TimeSpan.FromMinutes(10) // Set pooled connection lifetime};
             };
-
             httpClient = new HttpClient(handler);
+
+            // Start Interprocess communication server using named pipes using a different thread
+            pipeCancellationTokenSource = new CancellationTokenSource();
+            pipeServerThread = new Thread(() => IPC_PipeServer(pipeCancellationTokenSource.Token));
+            pipeServerThread.IsBackground = true;
+            pipeServerThread.Start();
+
 
             if (chkAutoMinimize.Checked)
             {
                 Task.Run(() => AutoStart());
             }
         }
+
+        // When playing in VR I can't conveniently switch to performance monitor to change settings
+        // Instead I user RemoteWindowControl to send IPC pipe messages to WarThunderExporter
+        // This way I can change settings more conveniently using a web browser in my phone
+        private async void IPC_PipeServer(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                using (NamedPipeServerStream pipeServer = new NamedPipeServerStream("WarThunderExporterPipeCommands", PipeDirection.In))
+                {
+                    Debug.WriteLine("Named pipe server started. Waiting for connection...");
+
+                    // Wait for a client to connect
+                    await pipeServer.WaitForConnectionAsync(cancellationToken);
+                    Debug.WriteLine("Client connected.");
+
+                    int lines = 0;
+                    using (StreamReader reader = new StreamReader(pipeServer))
+                    {
+                        string command;
+                        string result = "OK";
+                        while ((command = await reader.ReadLineAsync()) != null)
+                        {
+                            this.Invoke(new Action(() =>
+                            {
+
+                                switch (command)
+                                {
+                                    case "MONITOR":
+                                        tabControl1.SelectTab("tabMonitor");
+                                        break;
+                                    case "DEBUG":
+                                        tabControl1.SelectTab("tabDebug");
+                                        break;
+                                    case "SETTINGS":
+                                        tabControl1.SelectTab("tabSettings");
+                                        break;
+                                    case "STOP":
+                                        if (btnStop.Enabled) btnStop_Click(null, null);
+                                        break;
+                                    case "START":
+                                        if (btnStart.Enabled) btnStart_Click(null, null);
+                                        break;
+                                    case "CYCLE_STATISTICS":
+                                        chkShowStatistics.Checked = !chkShowStatistics.Checked;
+                                        break;
+                                    case "MINIMIZE":
+                                        this.WindowState = FormWindowState.Minimized;
+                                        break;
+                                    case "RESTORE":
+                                        this.WindowState = FormWindowState.Normal;
+                                        break;
+                                    case "ALIGN_LEFT":
+                                        this.Location = new Point(-1700, this.Location.Y);
+                                        break;
+                                    default:
+                                        result = "Unknown command";
+                                        break;
+                                }
+                                string info = $"Received command #${++lines}):[{command}][{result}]";
+                                Debug.WriteLine(info);
+                                //LogError(info, "PipeServer", true);
+
+                            }));
+                        }
+                    }
+                }
+            }
+        }
+
 
         private void AutoStart()
         {
@@ -113,6 +195,9 @@ namespace WarThunderExporter
 
         private void frmWarThunderTelemetry_FormClosing(object sender, FormClosingEventArgs e)
         {
+            pipeCancellationTokenSource.Cancel();
+
+
             txtDebug.Text = String.Empty; // We don't want to save this to Properties.Settings
 
 
