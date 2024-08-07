@@ -194,7 +194,9 @@ namespace RemoteWindowControl
                 ExCounter++;
                 SystemSounds.Beep.Play();
                 tabControls.SelectTab("tabDebug");
-                LogError(ex.Message, "StartWebServer{ listener.Start(); }");
+                string functionName = "StartWebServer{ listener.Start(); }";
+                LogError(ex.Message, functionName);
+                LogError("For permission issues, run the command: [netsh http add urlacl url=http://+:8080/ user=YourUserName]", functionName);
             }
             Task.Run(() => ProcessRequest());
         }
