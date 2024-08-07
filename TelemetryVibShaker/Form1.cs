@@ -5,6 +5,8 @@ using System.Net;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using NAudio.CoreAudioApi;
+using System.IO.Pipes;
+using System.Windows.Forms;
 
 
 namespace TelemetryVibShaker
@@ -31,6 +33,10 @@ namespace TelemetryVibShaker
         private SimpleStatsCalculator Stats = new SimpleStatsCalculator();  // milliseconds elapsed in processing the monitor-update-cycle in Timer1 (UI)
         private Stopwatch? stopWatchUI;  // used to measure processing time in Timer1 (updating the UI)
         private Process? currentProcess;
+
+        private Thread pipeServerThread;  // IPC_PipeServer Thread for pipes interprocess communications
+        private CancellationTokenSource pipeCancellationTokenSource;
+
 
         private const uint PROCESS_MODE_BACKGROUND_BEGIN = 0x00100000;
         private const uint PROCESS_MODE_BACKGROUND_END = 0x00200000;
@@ -169,6 +175,8 @@ namespace TelemetryVibShaker
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            pipeCancellationTokenSource.Cancel();
+
             // StopEffects the telemetry if it is still running: kill the upd server, etc
             btnStop_Click(null, null);
 
@@ -364,14 +372,83 @@ namespace TelemetryVibShaker
 
             chkPlayAlarm.Enabled = true;
 
+            // Start Interprocess communication server using named pipes using a different thread
+            pipeCancellationTokenSource = new CancellationTokenSource();
+            pipeServerThread = new Thread(() => IPC_PipeServer(pipeCancellationTokenSource.Token));
+            pipeServerThread.IsBackground = true;
+            pipeServerThread.Start();
+
+
 
             if (chkAutoStart.Checked & btnStartListening.Enabled)
             {
-                Task.Run(() => AutoStartWebServer());
+                Task.Run(() => AutoStartTelemetryVibShaker());
             }
         }
 
-        private void AutoStartWebServer()
+
+        // When playing in VR I can't conveniently switch to performance monitor to change settings
+        // Instead I user RemoteWindowControl to send IPC pipe messages to TelemetryVibShaker
+        // This way I can change settings more conveniently using a web browser in my phone
+        private async void IPC_PipeServer(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                using (NamedPipeServerStream pipeServer = new NamedPipeServerStream("TelemetryVibShakerPipeCommands", PipeDirection.In))
+                {
+                    Debug.WriteLine("Named pipe server started. Waiting for connection...");
+
+                    // Wait for a client to connect
+                    await pipeServer.WaitForConnectionAsync(cancellationToken);
+                    Debug.WriteLine("Client connected.");
+
+                    int lines = 0;
+                    using (StreamReader reader = new StreamReader(pipeServer))
+                    {
+                        string command;
+                        string result = "OK";
+                        while ((command = await reader.ReadLineAsync()) != null)
+                        {
+                            this.Invoke(new Action(() =>
+                            {
+
+                                switch (command)
+                                {
+                                    case "MONITOR":
+                                        tabs.SelectTab("tabMonitor");
+                                        break;
+                                    case "NOT_FOUNDS":
+                                        tabs.SelectTab("tabNotFounds");
+                                        break;
+                                    case "SETTINGS":
+                                        tabs.SelectTab("tabSettings");
+                                        break;
+                                    case "STOP":
+                                        if (btnStop.Enabled) btnStop_Click(null, null);
+                                        break;
+                                    case "START":
+                                        if (btnStartListening.Enabled) btnStartListening_Click(null, null);
+                                        break;
+                                    case "CYCLE_STATISTICS":
+                                        chkShowStatistics.Checked = !chkShowStatistics.Checked;
+                                        break;
+                                    default:
+                                        result = "Unknown command";
+                                        break;
+                                }
+                                string info = $"Received command #${++lines}):[{command}][{result}]";
+                                Debug.WriteLine(info);
+                                //LogError(info, "PipeServer", true);
+
+                            }));
+                        }
+                    }
+                }
+            }
+        }
+
+
+        private void AutoStartTelemetryVibShaker()
         {
             for (int i = 10; i >= 0; i--)
             {
