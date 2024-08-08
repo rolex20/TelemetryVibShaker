@@ -349,40 +349,54 @@ namespace PerformanceMonitor
 
         }
 
+        private void frmMain_DpiChanged(object sender, DpiChangedEventArgs e)
+        {
+            tstxtAutoMoveY.Text = Location.X.ToString();
+            LogError("Occurs when form is moved to a monitor with a different resolution and scaling level, or when form's monitor scaling level is changed in the Windows settings.", "DpiChanged()", true);
+        }
+
+        private void frmMain_LocationChanged(object sender, EventArgs e)
+        {
+            tstxtAutoMoveY.Text = Location.X.ToString();
+            LogError("Event raised when the value of the Location property is changed on Control.", "LocationChanged()", true);
+        }
+
         private void cmbProcessorCounter_SelectedIndexChanged(object sender, EventArgs e)
         {
             bool prevValue = timer1.Enabled;
             timer1.Enabled = false;
             Thread.Sleep(500);
 
-            cpuCounter0 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString().ToString(), "0,0", true);
-            cpuCounter1 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,1", true);
-            cpuCounter2 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,2", true);
-            cpuCounter3 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,3", true);
-            cpuCounter4 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,4", true);
-            cpuCounter5 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,5", true);
-            cpuCounter6 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,6", true);
-            cpuCounter7 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,7", true);
-            cpuCounter8 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,8", true);
-            cpuCounter9 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,9", true);
-            cpuCounter10 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,10", true);
-            cpuCounter11 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,11", true);
-            cpuCounter12 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,12", true);
-            cpuCounter13 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,13", true);
-            cpuCounter14 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,14", true);
-            cpuCounter15 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,15", true);
-            cpuCounter16 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,16", true);
-            cpuCounter17 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,17", true);
-            cpuCounter18 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,18", true);
-            cpuCounter19 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,19", true);
-            cpuCounter20 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,20", true);
-            cpuCounter21 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,21", true);
-            cpuCounter22 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,22", true);
-            cpuCounter23 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,23", true);
-            cpuCounter24 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,24", true);
-            cpuCounter25 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,25", true);
-            cpuCounter26 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,26", true);
-            cpuCounter27 = new PerformanceCounter("Processor Information", cmbProcessorCounter.SelectedItem.ToString(), "0,27", true);
+            const string CategoryName = "Processor Information";
+            string CounterName = cmbProcessorCounter.SelectedItem.ToString();
+            cpuCounter0 = new PerformanceCounter(CategoryName, CounterName, "0,0", true);
+            cpuCounter1 = new PerformanceCounter(CategoryName, CounterName, "0,1", true);
+            cpuCounter2 = new PerformanceCounter(CategoryName, CounterName, "0,2", true);
+            cpuCounter3 = new PerformanceCounter(CategoryName, CounterName, "0,3", true);
+            cpuCounter4 = new PerformanceCounter(CategoryName, CounterName, "0,4", true);
+            cpuCounter5 = new PerformanceCounter(CategoryName, CounterName, "0,5", true);
+            cpuCounter6 = new PerformanceCounter(CategoryName, CounterName, "0,6", true);
+            cpuCounter7 = new PerformanceCounter(CategoryName, CounterName, "0,7", true);
+            cpuCounter8 = new PerformanceCounter(CategoryName, CounterName, "0,8", true);
+            cpuCounter9 = new PerformanceCounter(CategoryName, CounterName, "0,9", true);
+            cpuCounter10 = new PerformanceCounter(CategoryName, CounterName, "0,10", true);
+            cpuCounter11 = new PerformanceCounter(CategoryName, CounterName, "0,11", true);
+            cpuCounter12 = new PerformanceCounter(CategoryName, CounterName, "0,12", true);
+            cpuCounter13 = new PerformanceCounter(CategoryName, CounterName, "0,13", true);
+            cpuCounter14 = new PerformanceCounter(CategoryName, CounterName, "0,14", true);
+            cpuCounter15 = new PerformanceCounter(CategoryName, CounterName, "0,15", true);
+            cpuCounter16 = new PerformanceCounter(CategoryName, CounterName, "0,16", true);
+            cpuCounter17 = new PerformanceCounter(CategoryName, CounterName, "0,17", true);
+            cpuCounter18 = new PerformanceCounter(CategoryName, CounterName, "0,18", true);
+            cpuCounter19 = new PerformanceCounter(CategoryName, CounterName, "0,19", true);
+            cpuCounter20 = new PerformanceCounter(CategoryName, CounterName, "0,20", true);
+            cpuCounter21 = new PerformanceCounter(CategoryName, CounterName, "0,21", true);
+            cpuCounter22 = new PerformanceCounter(CategoryName, CounterName, "0,22", true);
+            cpuCounter23 = new PerformanceCounter(CategoryName, CounterName, "0,23", true);
+            cpuCounter24 = new PerformanceCounter(CategoryName, CounterName, "0,24", true);
+            cpuCounter25 = new PerformanceCounter(CategoryName, CounterName, "0,25", true);
+            cpuCounter26 = new PerformanceCounter(CategoryName, CounterName, "0,26", true);
+            cpuCounter27 = new PerformanceCounter(CategoryName, CounterName, "0,27", true);
 
             timer1.Enabled = prevValue;
         }

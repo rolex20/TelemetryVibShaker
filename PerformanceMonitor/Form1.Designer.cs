@@ -2220,6 +2220,8 @@
             this.Text = "Performance Monitor Light for 12700K @ Galvatron";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
             this.Load += new System.EventHandler(this.frmMain_Load);
+            this.DpiChanged += new System.Windows.Forms.DpiChangedEventHandler(this.frmMain_DpiChanged);
+            this.LocationChanged += new System.EventHandler(this.frmMain_LocationChanged);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.toolStrip2.ResumeLayout(false);
