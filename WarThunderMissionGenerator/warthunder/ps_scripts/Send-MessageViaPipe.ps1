@@ -24,4 +24,6 @@
 
 #You can use this function like this:
 
-Send-MessageViaPipe -pipeName "MyPipe" -message "Hello, World!"
+#Send-MessageViaPipe -pipeName "MyPipe" -message "Hello, World!"
+
+Send-MessageViaPipe -pipeName "WarThunderExporterPipeCommands" -message "MONITOR"
