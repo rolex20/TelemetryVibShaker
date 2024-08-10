@@ -18,7 +18,7 @@ function Get-NewFileName {
 
 
 function Watchdog_Operations {
-    $watchdog_json = Include-Script "watchdog.json" "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\ps_scripts" "C:\Users\ralch"
+    $watchdog_json = Include-Script "watchdog.json" "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts" "C:\Users\ralch"
     $tmp_json = Get-NewFileName -FilePath $command_file -NewExtension "tmp"
 
 
@@ -28,7 +28,7 @@ function Watchdog_Operations {
         # Wait-Event waits for a second and stays responsive to events
         # Start-Sleep in contrast would NOT work and ignore incoming events
 
-        Wait-Event -Timeout 60
+        Wait-Event -Timeout 300 # Check every five minutes
 
 
         if (Test-Path "watchdog.txt") { Remove-Item "watchdog.txt" }

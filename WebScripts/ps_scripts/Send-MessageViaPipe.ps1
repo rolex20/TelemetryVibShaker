@@ -1,4 +1,4 @@
-﻿. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1" #Don't forget to include this file, when testing individually
+﻿"C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1" #Don't forget to include this file, when testing individually
 
 function Send-MessageViaPipe {
     param (
@@ -33,4 +33,4 @@ function Send-MessageViaPipe {
 #Send-MessageViaPipe -pipeName "WarThunderExporterPipeCommands" -message "MONITOR"
 #Send-MessageViaPipe -pipeName "WarThunderExporterPipeCommands" -message "CYCLE_STATISTICS"
 
-Send-MessageViaPipe -pipeName "TelemetryVibShakerPipeCommands" -message "CYCLE_STATISTICS"
+#Send-MessageViaPipe -pipeName "TelemetryVibShakerPipeCommands" -message "CYCLE_STATISTICS"

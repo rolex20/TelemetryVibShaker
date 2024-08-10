@@ -5,7 +5,7 @@
 ### SET FOLDER TO WATCH + FILES TO WATCH + SUBFOLDERS YES/NO
     $filewatcher = New-Object System.IO.FileSystemWatcher
     #Mention the folder to monitor
-    $filewatcher.Path = "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator"
+    $filewatcher.Path = "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts"
     $filewatcher.Filter = "command.json"
     #include subdirectories $true/$false
     $filewatcher.IncludeSubdirectories = $true

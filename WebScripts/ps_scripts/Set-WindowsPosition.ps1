@@ -1,4 +1,4 @@
-﻿#. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\ps_scripts\Write-VerboseDebug.ps1" #Don't forget to include this file for independent testing
+﻿#. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1" #Don't forget to include this file for independent testing
 
 function Set-WindowPosition {
     param (

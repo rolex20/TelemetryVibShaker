@@ -17,10 +17,10 @@ function Get-RenamesWatcher($WatchFile, $Action)
 # Example utilization
 
 <#
-. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\ps_scripts\Write-VerboseDebug.ps1"
+. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1"
 
 $writeaction1 = {
-    . "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\ps_scripts\Write-VerboseDebug.ps1"
+    . "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1"
     $path = $Event.SourceEventArgs.FullPath
     $changeType = $Event.SourceEventArgs.ChangeType
     $formattedTimestamp = $(Get-Date).ToString("yyyy-MM-dd HH:mm:ss.fffffff")
@@ -32,7 +32,7 @@ $writeaction1 = {
 }    
 
 $writeaction2 = { 
-    . "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\ps_scripts\Write-VerboseDebug.ps1"
+    . "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1"
     $path = $Event.SourceEventArgs.FullPath
     $changeType = $Event.SourceEventArgs.ChangeType
     $formattedTimestamp = $(Get-Date).ToString("yyyy-MM-dd HH:mm:ss.fffffff")
@@ -44,7 +44,7 @@ $writeaction2 = {
 }    
 
 
-$command1 = Get-RenamesWatcher "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\command.json" $writeaction1
+$command1 = Get-RenamesWatcher "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\command.json" $writeaction1
 $command2 = Get-RenamesWatcher "C:\wamp\www\warthunder\mission_data.json" $writeaction2
 
 

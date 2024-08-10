@@ -1,31 +1,35 @@
-﻿. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\ps_scripts\Include-Script.ps1"
+﻿. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
 
 <#
-. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\ps_scripts\Write-VerboseDebug.ps1"
-. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\ps_scripts\Set-ForegroundProcess.ps1"
-. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\ps_scripts\Set-Minimize.ps1"
-. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\ps_scripts\Send-MessageViaPipe.ps1"
-. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\ps_scripts\Set-WindowsPosition.ps1"
-. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\ps_scripts\Get-WindowLocation.ps1"
+. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1"
+. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Set-ForegroundProcess.ps1"
+. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Set-Minimize.ps1"
+. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Send-MessageViaPipe.ps1"
+. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Set-WindowsPosition.ps1"
+. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Get-WindowLocation.ps1"
 #>
 
 
-$include_file = Include-Script "Write-VerboseDebug.ps1" "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\ps_scripts" "C:\Users\ralch"
+
+$search_paths = @("C:\MyPrograms\MyApps\TelemetryVibShaker\WebScripts", "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts")
+
+
+$include_file = Include-Script -FileName "Write-VerboseDebug.ps1" -Directories $search_paths
 . $include_file
 
-$include_file = Include-Script "Set-ForegroundProcess.ps1" "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\ps_scripts" "C:\Users\ralch"
+$include_file = Include-Script -FileName "Set-ForegroundProcess.ps1" -Directories $search_paths
 . $include_file
 
-$include_file = Include-Script "Set-Minimize.ps1" "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\ps_scripts" "C:\Users\ralch"
+$include_file = Include-Script -FileName "Set-Minimize.ps1" -Directories $search_paths
 . $include_file
 
-$include_file = Include-Script "Send-MessageViaPipe.ps1" "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\ps_scripts" "C:\Users\ralch"
+$include_file = Include-Script -FileName "Send-MessageViaPipe.ps1" -Directories $search_paths
 . $include_file
 
-$include_file = Include-Script "Set-WindowsPosition.ps1" "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\ps_scripts" "C:\Users\ralch"
+$include_file = Include-Script -FileName "Set-WindowsPosition.ps1" -Directories $search_paths
 . $include_file
 
-$include_file = Include-Script "Get-WindowLocation.ps1" "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\ps_scripts" "C:\Users\ralch"
+$include_file = Include-Script -FileName "Get-WindowLocation.ps1" -Directories $search_paths
 . $include_file
 
 <#
@@ -102,7 +106,7 @@ function Process-CommandFromJson {
 <#
 
 
-cd C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\ps_scripts
+cd C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts
 
 
 if (Test-Path "command.json") { Remove-Item command.json }

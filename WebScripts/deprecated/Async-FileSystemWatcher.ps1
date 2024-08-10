@@ -1,7 +1,7 @@
 ﻿# https://powershell.one/tricks/filesystem/filesystemwatcher
 
 # find the path to the desktop folder:
-$desktop = "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator"
+$desktop = "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts"
 
 # specify the path to the folder you want to monitor:
 $Path = $desktop

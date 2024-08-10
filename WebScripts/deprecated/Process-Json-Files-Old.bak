@@ -1,4 +1,4 @@
-﻿#. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\warthunder\ps_scripts\Write-VerboseDebug.ps1"
+﻿#. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\warthunder\ps_scripts\Write-VerboseDebug.ps1"
 function Write-VerboseDebug {
     param (
         [datetime]$Timestamp,
@@ -53,7 +53,7 @@ $DownloadUrl2 = "http://localhost/warthunder/viewer_setup_1.php" # This is a pre
 $DownloadPath2 = "C:\MyPrograms\Steam\steamapps\common\War Thunder\UserMissions\AutoViewer_setup1.blk"
 
 
-$WatchFile2 = "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\command.json"
+$WatchFile2 = "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\command.json"
 
 
 # specify the paths to the folders you want to monitor:
