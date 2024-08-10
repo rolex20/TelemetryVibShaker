@@ -21,7 +21,13 @@ function storePostDataAsJson($filename) {
 	$formattedJsonData = $jsonData;
 
     // Write formatted JSON data to the specified file
-    file_put_contents($filename, $formattedJsonData);
+	// Remember the powershell filesystem watcher is listening for renaming events
+	// This way I avoid filesystem bouncing/flapping/etc
+	$temp = "file.tmp"
+    file_put_contents($temp, $formattedJsonData);
+    if (file_exists($filename)) { unlink($filename); }	
+	rename($temp, $filename)
+	
 }
 
 storePostDataAsJson('mission_data.json');
