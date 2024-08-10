@@ -441,6 +441,11 @@ namespace TelemetryVibShaker
                                     case "ALIGN_LEFT":
                                         this.Location = new Point(-1700, this.Location.Y);
                                         break;
+                                    case "FOREGROUND":
+                                        this.BringToFront();
+                                        this.Focus();
+                                        break;
+
                                     default:
                                         result = "Unknown command";
                                         break;
