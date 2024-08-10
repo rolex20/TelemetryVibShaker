@@ -1,3 +1,5 @@
+#Deprecado: No funciono bien con dos
+
 $EfficiencyAffinity = 983040 # HyperThreading enabled
 [System.Diagnostics.Process]::GetCurrentProcess().ProcessorAffinity =  $EfficiencyAffinity
 
@@ -28,9 +30,9 @@ if (-NOT $isNew) {
 }
 
 $WatchFile = "C:\MyPrograms\wamp\www\warthunder\mission_data.json"
-$DownloadUrl1 = "http://localhost/warthunder/dogfight_setup_1.php"
+$DownloadUrl1 = "http://localhost/warthunder/dogfight_setup_1.php" # This is the actual mission
 $DownloadPath1 = "C:\MyPrograms\Steam\steamapps\common\War Thunder\UserMissions\AutoDogfight_setup1.blk"
-$DownloadUrl2 = "http://localhost/warthunder/viewer_setup_1.php"
+$DownloadUrl2 = "http://localhost/warthunder/viewer_setup_1.php" # This is a pre-viewer for the AI planes to see if they have the right armament/ordinance
 $DownloadPath2 = "C:\MyPrograms\Steam\steamapps\common\War Thunder\UserMissions\AutoViewer_setup1.blk"
 # specify the path to the folder you want to monitor:
 $Path =  (Get-Item $WatchFile).DirectoryName

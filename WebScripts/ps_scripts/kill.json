@@ -1,0 +1,6 @@
+{
+    "command_type": "KILL",
+    "parameters": {
+        "processName": "Notepad"
+    }
+}

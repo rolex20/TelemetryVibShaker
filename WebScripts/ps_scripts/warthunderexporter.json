@@ -1,0 +1,7 @@
+{
+    "command_type": "FOREGROUND",
+    "parameters": {
+        "processName": "WarThunderExporter",
+        "instance": 0
+    }
+}

@@ -1,0 +1,8 @@
+{
+    "command_type": "GET-LOCATION",
+    "parameters": {
+        "processName": "WarThunderExporter",
+        "instance": 0,
+        "outfile": "C:\\Users\\ralch\\source\\repos\\rolex20\\TelemetryVibShaker\\WarThunderMissionGenerator\\ps_scripts\\command.out"
+    }
+}

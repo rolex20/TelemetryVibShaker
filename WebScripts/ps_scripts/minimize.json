@@ -1,0 +1,8 @@
+{
+    "command_type": "MINIMIZE",
+    "parameters": {
+        "processName": "Notepad",
+        "instance": 0
+
+    }
+}

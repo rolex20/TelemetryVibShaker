@@ -1,0 +1,7 @@
+{
+    "command_type": "FOREGROUND",
+    "parameters": {
+        "processName": "Notepad",
+        "instance": 0
+    }
+}

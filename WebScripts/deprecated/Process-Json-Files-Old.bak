@@ -1,0 +1,191 @@
+﻿#. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\warthunder\ps_scripts\Write-VerboseDebug.ps1"
+function Write-VerboseDebug {
+    param (
+        [datetime]$Timestamp,
+        [string]$Title,
+        [string]$Message,
+        [string]$ForegroundColor = "White"  # Default color is White
+    )
+
+    $formattedTimestamp = $Timestamp.ToString("yyyy-MM-dd HH:mm:ss.fffffff")
+    $output = "[{0,-16}] [{1,-10}] [{2}]" -f $formattedTimestamp, $Title, $Message
+
+    if ($ForegroundColor -eq "Red") {
+        [console]::beep(1000, 500)  # Play system error sound
+    }
+
+    Write-Host $output -ForegroundColor $ForegroundColor
+}
+
+
+
+$EfficiencyAffinity = 983040 # HyperThreading enabled
+#[System.Diagnostics.Process]::GetCurrentProcess().ProcessorAffinity =  $EfficiencyAffinity
+
+$Host.UI.RawUI.WindowTitle = 'Process-Json-Files'
+
+# This script monitors specified files for changes. When a file is modified,
+# the script downloads files from provided URLs and saves them to designated paths.
+# The script then sleeps for a set duration and repeats the process, waiting
+# for the next modification on the watch files.
+
+# First, make sure this is the only instance running.
+
+# Define the name of the mutex, to prevent other instances
+$mutexName = "Global\AutoDownloadOnFileChange"
+
+# Initialize the variable that will be used to check if the mutex is new
+$isNew = $false
+
+# Create the Mutex
+$mutex = New-Object System.Threading.Mutex($false, $mutexName, [ref]$isNew)
+
+if (-NOT $isNew) { 
+    Write-Host -ForegroundColor Red "There is another instance of this script already running."
+    Start-Sleep -Seconds 5
+    Exit 
+}
+
+$WatchFile1 = "C:\wamp\www\warthunder\mission_data.json"
+$DownloadUrl1 = "http://localhost/warthunder/dogfight_setup_1.php" # This is the actual mission
+$DownloadPath1 = "C:\MyPrograms\Steam\steamapps\common\War Thunder\UserMissions\AutoDogfight_setup1.blk"
+$DownloadUrl2 = "http://localhost/warthunder/viewer_setup_1.php" # This is a pre-viewer for the AI planes to see if they have the right armament/ordinance
+$DownloadPath2 = "C:\MyPrograms\Steam\steamapps\common\War Thunder\UserMissions\AutoViewer_setup1.blk"
+
+
+$WatchFile2 = "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WarThunderMissionGenerator\command.json"
+
+
+# specify the paths to the folders you want to monitor:
+$Path1 = (Get-Item $WatchFile1).DirectoryName
+$Path2 = (Get-Item $WatchFile2).DirectoryName
+
+# specify which files you want to monitor, could be *.txt, etc
+$FileFilter1 = (Get-Item $WatchFile1).Name
+$FileFilter2 = (Get-Item $WatchFile2).Name
+
+# specify whether you want to monitor subfolders as well:
+$IncludeSubfolders = $false
+
+# specify the file or folder properties you want to monitor:
+$AttributeFilter = [IO.NotifyFilters]::FileName, [IO.NotifyFilters]::LastWrite 
+
+# specify the type of changes you want to monitor:
+$ChangeTypes = [System.IO.WatcherChangeTypes]::Changed
+
+# specify the maximum time (in milliseconds) you want to wait for changes:
+$Timeout = 3600*1000
+
+# create a sound player
+$sound = New-Object System.Media.SoundPlayer;    
+
+$first_time_write_fix = $true
+function Just-AckChange
+{
+    param
+    (
+        [Parameter(Mandatory)]
+        [System.IO.WaitForChangedResult]
+        $ChangeInformation
+    )
+
+
+    $change_type = $ChangeInformation.ChangeType
+    $change_name = $ChangeInformation.Name
+    Write-VerboseDebug -Timestamp (Get-Date) -Title "WATCHER2" -Message "ChangeType=$change_type, ChangeName=$change_name"
+}
+
+# define a function that gets called for every change:
+function Invoke-WebDownload
+{
+    param
+    (
+        [Parameter(Mandatory)]
+        [System.IO.WaitForChangedResult]
+        $ChangeInformation
+    )
+
+    $t = Get-Date
+    Write-Warning "Change detected: $t"
+    Start-Sleep -Milliseconds 300
+    $ChangeInformation | Out-String | Write-Host -ForegroundColor DarkYellow
+
+    $sound.SoundLocation="C:\Windows\Media\Windows Notify.wav"
+    
+    try {
+        Invoke-WebRequest -Uri $DownloadUrl1 -OutFile $DownloadPath1 -ErrorAction Stop
+        Invoke-WebRequest -Uri $DownloadUrl2 -OutFile $DownloadPath2 -ErrorAction Stop
+        
+    } catch {
+        $sound.SoundLocation="C:\Windows\Media\Windows Critical Stop.wav"
+    }
+
+    $sound.Play()
+}
+
+# use a try...finally construct to release the
+# filesystemwatcher once the loop is aborted
+# by pressing CTRL+C
+
+$first_time_write_fix = $true
+try
+{  
+    # create filesystemwatcher objects
+    $watcher1 = New-Object -TypeName IO.FileSystemWatcher -ArgumentList $Path1, $FileFilter1 -Property @{
+        IncludeSubdirectories = $IncludeSubfolders
+        NotifyFilter = $AttributeFilter
+    }
+
+    $watcher2 = New-Object -TypeName IO.FileSystemWatcher -ArgumentList $Path2, $FileFilter2 -Property @{
+        IncludeSubdirectories = $IncludeSubfolders
+        NotifyFilter = $AttributeFilter
+    }
+
+    Write-Warning "FileSystemWatcher is monitoring $Path1 and $Path2"      
+    # start monitoring manually in a loop:
+    do
+    {
+        # wait for changes for the specified timeout
+        # IMPORTANT: while the watcher is active, PowerShell cannot be stopped
+        # so change the timeout to 1000ms and repeat the
+        # monitoring in a loop if you want to have the chance to abort the
+        # script every second.
+        $result1 = $watcher1.WaitForChanged($ChangeTypes, $Timeout)
+        $result2 = $watcher2.WaitForChanged($ChangeTypes, $Timeout)
+
+        if ($first_time_write_fix) { 
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "FIRST TIME FIX" -Message " OK"
+            $first_time_write_fix = $false
+        }
+
+
+        # if there was a timeout, continue monitoring:
+        if ($result1.TimedOut -and $result2.TimedOut) { 
+            Write-Warning "FileSystemWatcher is monitoring $Path1 and $Path2"        
+            continue  # continue jumps to the beginning of the do{} loop
+        }
+        
+        if (-not $result1.TimedOut) {
+            Invoke-WebDownload -Change $result1
+        }
+        
+        if (-not $result2.TimedOut) {
+            Just-AckChange -Change $result2
+        }
+
+        Write-Host "Hello"
+
+        # the loop runs forever until you hit CTRL+C    
+    } while ($true)
+}
+finally
+{
+    # release the watchers and free their memory:
+    Write-Warning 'Disposing FileSystemWatchers.'  
+    $watcher1.Dispose()
+    $watcher2.Dispose()
+    
+    # Release the mutex
+    $mutex.ReleaseMutex()
+    $mutex.Close()  
+}

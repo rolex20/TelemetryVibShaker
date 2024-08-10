@@ -1,0 +1,7 @@
+{
+    "command_type": "PIPE",
+    "parameters": {
+        "pipename": "WarThunderExporterPipeCommands",
+        "message": "MONITOR"
+    }
+}

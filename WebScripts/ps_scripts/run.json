@@ -1,0 +1,7 @@
+{
+    "command_type": "RUN",
+    "parameters": {
+        "program": "notepad.exe",
+        "parameter1": "something"
+    }
+}

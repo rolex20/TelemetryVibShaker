@@ -1,0 +1,9 @@
+{
+    "command_type": "CHANGE_LOCATION",
+    "parameters": {
+        "processName": "WarThunderExporter",
+        "instance": 0,
+        "x": 100,
+        "y": 100
+    }
+}
