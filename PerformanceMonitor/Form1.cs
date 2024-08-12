@@ -57,7 +57,7 @@ namespace PerformanceMonitor
 
         private float TotalTicks, TotalCpuTicksAboveThreshold, TotalGpuTicksAboveThreshold;
 
-        private static bool topMost = false; // to fix .TopMost bug
+        private bool topMost = false; // to fix .TopMost bug
 
         private void ResetTicksCounters()
         {
