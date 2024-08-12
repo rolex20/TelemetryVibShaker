@@ -166,5 +166,17 @@ namespace SimConnectExporter.Properties {
                 this["cmbSimConnectPeriod"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool chkAutoMinimize {
+            get {
+                return ((bool)(this["chkAutoMinimize"]));
+            }
+            set {
+                this["chkAutoMinimize"] = value;
+            }
+        }
     }
 }

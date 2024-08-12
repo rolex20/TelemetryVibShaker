@@ -46,6 +46,8 @@
             label1 = new Label();
             txtDestinationHostname = new TextBox();
             Monitor = new TabPage();
+            lblCallbacksPerSec = new Label();
+            label15 = new Label();
             label11 = new Label();
             label10 = new Label();
             lblMaxGForce = new Label();
@@ -90,8 +92,7 @@
             btnDisconnect = new Button();
             btnResetMax = new Button();
             timer1 = new System.Windows.Forms.Timer(components);
-            lblCallbacksPerSec = new Label();
-            label15 = new Label();
+            chkAutoMinimize = new CheckBox();
             tabs.SuspendLayout();
             Settings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudFrequency).BeginInit();
@@ -109,11 +110,12 @@
             tabs.Location = new Point(12, 24);
             tabs.Name = "tabs";
             tabs.SelectedIndex = 0;
-            tabs.Size = new Size(469, 318);
+            tabs.Size = new Size(469, 349);
             tabs.TabIndex = 0;
             // 
             // Settings
             // 
+            Settings.Controls.Add(chkAutoMinimize);
             Settings.Controls.Add(cmbSimConnectPeriod);
             Settings.Controls.Add(label13);
             Settings.Controls.Add(label12);
@@ -130,7 +132,7 @@
             Settings.Location = new Point(4, 24);
             Settings.Name = "Settings";
             Settings.Padding = new Padding(3);
-            Settings.Size = new Size(461, 290);
+            Settings.Size = new Size(461, 321);
             Settings.TabIndex = 0;
             Settings.Text = "Settings";
             Settings.UseVisualStyleBackColor = true;
@@ -190,7 +192,7 @@
             chkUseEfficiencyCoresOnly.AutoSize = true;
             chkUseEfficiencyCoresOnly.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Bold, GraphicsUnit.Point);
             chkUseEfficiencyCoresOnly.ForeColor = Color.FromArgb(91, 155, 213);
-            chkUseEfficiencyCoresOnly.Location = new Point(13, 252);
+            chkUseEfficiencyCoresOnly.Location = new Point(13, 276);
             chkUseEfficiencyCoresOnly.Name = "chkUseEfficiencyCoresOnly";
             chkUseEfficiencyCoresOnly.Size = new Size(260, 19);
             chkUseEfficiencyCoresOnly.TabIndex = 22;
@@ -202,6 +204,7 @@
             // chkUseBackgroundProcessing
             // 
             chkUseBackgroundProcessing.AutoSize = true;
+            chkUseBackgroundProcessing.Enabled = false;
             chkUseBackgroundProcessing.Location = new Point(13, 225);
             chkUseBackgroundProcessing.Name = "chkUseBackgroundProcessing";
             chkUseBackgroundProcessing.Size = new Size(206, 19);
@@ -309,6 +312,26 @@
             Monitor.TabIndex = 1;
             Monitor.Text = "Monitor";
             Monitor.UseVisualStyleBackColor = true;
+            // 
+            // lblCallbacksPerSec
+            // 
+            lblCallbacksPerSec.AutoSize = true;
+            lblCallbacksPerSec.Location = new Point(395, 253);
+            lblCallbacksPerSec.Name = "lblCallbacksPerSec";
+            lblCallbacksPerSec.Size = new Size(27, 15);
+            lblCallbacksPerSec.TabIndex = 59;
+            lblCallbacksPerSec.Tag = "-1";
+            lblCallbacksPerSec.Text = "----";
+            // 
+            // label15
+            // 
+            label15.AutoSize = true;
+            label15.Location = new Point(307, 253);
+            label15.Name = "label15";
+            label15.Size = new Size(82, 15);
+            label15.TabIndex = 58;
+            label15.Text = "Callbacks/sec:";
+            label15.TextAlign = ContentAlignment.TopRight;
             // 
             // label11
             // 
@@ -686,7 +709,7 @@
             // 
             // btnConnect
             // 
-            btnConnect.Location = new Point(321, 353);
+            btnConnect.Location = new Point(321, 379);
             btnConnect.Name = "btnConnect";
             btnConnect.Size = new Size(75, 23);
             btnConnect.TabIndex = 1;
@@ -697,7 +720,7 @@
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new ToolStripItem[] { tsStatusBar1 });
-            statusStrip1.Location = new Point(0, 391);
+            statusStrip1.Location = new Point(0, 428);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(493, 22);
             statusStrip1.TabIndex = 2;
@@ -714,7 +737,7 @@
             // btnDisconnect
             // 
             btnDisconnect.Enabled = false;
-            btnDisconnect.Location = new Point(402, 353);
+            btnDisconnect.Location = new Point(402, 379);
             btnDisconnect.Name = "btnDisconnect";
             btnDisconnect.Size = new Size(75, 23);
             btnDisconnect.TabIndex = 3;
@@ -724,7 +747,7 @@
             // 
             // btnResetMax
             // 
-            btnResetMax.Location = new Point(16, 353);
+            btnResetMax.Location = new Point(16, 379);
             btnResetMax.Name = "btnResetMax";
             btnResetMax.Size = new Size(75, 23);
             btnResetMax.TabIndex = 4;
@@ -737,31 +760,21 @@
             timer1.Interval = 1500;
             timer1.Tick += timer1_Tick;
             // 
-            // lblCallbacksPerSec
+            // chkAutoMinimize
             // 
-            lblCallbacksPerSec.AutoSize = true;
-            lblCallbacksPerSec.Location = new Point(395, 253);
-            lblCallbacksPerSec.Name = "lblCallbacksPerSec";
-            lblCallbacksPerSec.Size = new Size(27, 15);
-            lblCallbacksPerSec.TabIndex = 59;
-            lblCallbacksPerSec.Tag = "-1";
-            lblCallbacksPerSec.Text = "----";
-            // 
-            // label15
-            // 
-            label15.AutoSize = true;
-            label15.Location = new Point(307, 253);
-            label15.Name = "label15";
-            label15.Size = new Size(82, 15);
-            label15.TabIndex = 58;
-            label15.Text = "Callbacks/sec:";
-            label15.TextAlign = ContentAlignment.TopRight;
+            chkAutoMinimize.AutoSize = true;
+            chkAutoMinimize.Location = new Point(13, 251);
+            chkAutoMinimize.Name = "chkAutoMinimize";
+            chkAutoMinimize.Size = new Size(265, 19);
+            chkAutoMinimize.TabIndex = 28;
+            chkAutoMinimize.Text = "Auto Start and Minimize at program startup...";
+            chkAutoMinimize.UseVisualStyleBackColor = true;
             // 
             // frmMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(493, 413);
+            ClientSize = new Size(493, 450);
             Controls.Add(btnResetMax);
             Controls.Add(btnDisconnect);
             Controls.Add(statusStrip1);
@@ -854,5 +867,6 @@
         private Label label13;
         private Label lblCallbacksPerSec;
         private Label label15;
+        private CheckBox chkAutoMinimize;
     }
 }

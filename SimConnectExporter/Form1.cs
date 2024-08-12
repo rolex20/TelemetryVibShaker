@@ -488,8 +488,6 @@ namespace SimConnectExporter
             LoadSettings(this);
 
 
-            ProcessorCheck();
-
             tsStatusBar1.Text = "Idle";
 
             // Start Interprocess communication server using named pipes using a different thread
@@ -498,7 +496,31 @@ namespace SimConnectExporter
             pipeServerThread.IsBackground = true;
             pipeServerThread.Start();
 
+            ProcessorCheck();
+
+
+            if (chkAutoMinimize.Checked)
+            {
+                Task.Run(() => AutoStart());
+            }
+
+
         }
+
+        private void AutoStart()
+        {
+            Thread.Sleep(7000);
+
+            this.Invoke((MethodInvoker)delegate
+            {
+                // Code here will run on the UI thread
+                // We can safely interact with UI elements
+
+                // Verify that the user hasn't aborted the autostart or clicked manually on btnStartListening
+                if (chkAutoMinimize.Checked && btnConnect.Enabled) btnConnect_Click(null, null);
+            });
+        }
+
 
         // When playing in VR I can't conveniently switch to performance monitor to change settings
         // Instead I user RemoteWindowControl to send IPC pipe messages to WarThunderExporter
