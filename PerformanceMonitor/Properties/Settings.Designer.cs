@@ -202,5 +202,17 @@ namespace PerformanceMonitor.Properties {
                 this["cmbProcessorCounter"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
+        public int trkMonitorBottleneckThreshold {
+            get {
+                return ((int)(this["trkMonitorBottleneckThreshold"]));
+            }
+            set {
+                this["trkMonitorBottleneckThreshold"] = value;
+            }
+        }
     }
 }

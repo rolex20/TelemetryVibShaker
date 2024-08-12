@@ -1874,7 +1874,6 @@
             this.trkGpuThreshold.Maximum = 100;
             this.trkGpuThreshold.Name = "trkGpuThreshold";
             this.trkGpuThreshold.Size = new System.Drawing.Size(104, 45);
-            this.trkGpuThreshold.SmallChange = 5;
             this.trkGpuThreshold.TabIndex = 14;
             this.trkGpuThreshold.TickFrequency = 10;
             this.trkGpuThreshold.Value = 50;
@@ -1906,7 +1905,6 @@
             this.trkCpuThreshold.Maximum = 100;
             this.trkCpuThreshold.Name = "trkCpuThreshold";
             this.trkCpuThreshold.Size = new System.Drawing.Size(104, 45);
-            this.trkCpuThreshold.SmallChange = 5;
             this.trkCpuThreshold.TabIndex = 11;
             this.trkCpuThreshold.TickFrequency = 10;
             this.trkCpuThreshold.Value = 50;
@@ -2234,10 +2232,9 @@
             this.trkMonitorBottleneckThreshold.Maximum = 100;
             this.trkMonitorBottleneckThreshold.Name = "trkMonitorBottleneckThreshold";
             this.trkMonitorBottleneckThreshold.Size = new System.Drawing.Size(104, 45);
-            this.trkMonitorBottleneckThreshold.SmallChange = 5;
             this.trkMonitorBottleneckThreshold.TabIndex = 21;
             this.trkMonitorBottleneckThreshold.TickFrequency = 10;
-            this.trkMonitorBottleneckThreshold.Value = 50;
+            this.trkMonitorBottleneckThreshold.Value = 90;
             this.trkMonitorBottleneckThreshold.Scroll += new System.EventHandler(this.trkMonitorBottleneckThreshold_Scroll);
             // 
             // frmMain

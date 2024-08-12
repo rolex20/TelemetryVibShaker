@@ -84,6 +84,7 @@ namespace PerformanceMonitor
             Properties.Settings.Default.chkGpuAlarm = chkGpuAlarm.Checked;
             Properties.Settings.Default.trkCpuThreshold = trkCpuThreshold.Value;
             Properties.Settings.Default.trkGpuThreshold = trkGpuThreshold.Value;
+            Properties.Settings.Default.trkMonitorBottleneckThreshold = trkMonitorBottleneckThreshold.Value;
             Properties.Settings.Default.txtCpuAlarm = txtCpuAlarm.Text;
             Properties.Settings.Default.txtGpuAlarm = txtGpuAlarm.Text;
             Properties.Settings.Default.trkCpuVolume = trkCpuVolume.Value;
@@ -423,7 +424,7 @@ namespace PerformanceMonitor
 
         private void trkMonitorBottleneckThreshold_Scroll(object sender, EventArgs e)
         {
-            lblMonitorBottleneckThreshold.Text = trkMonitorBottleneckThreshold.Value.ToString() + "%";
+            UpdatePercentageTrackers(trkMonitorBottleneckThreshold, lblMonitorBottleneckThreshold, null);
         }
 
         private void tbSettings_Click(object sender, EventArgs e)
@@ -605,6 +606,9 @@ namespace PerformanceMonitor
             
             trkGpuThreshold.Value = Properties.Settings.Default.trkGpuThreshold;
             UpdatePercentageTrackers(trkGpuThreshold, lblGpuThreshold, null);
+
+            trkMonitorBottleneckThreshold.Value = Properties.Settings.Default.trkMonitorBottleneckThreshold;
+            UpdatePercentageTrackers(trkMonitorBottleneckThreshold, lblMonitorBottleneckThreshold, null);
 
             txtCpuAlarm.Text = Properties.Settings.Default.txtCpuAlarm;
             txtGpuAlarm.Text = Properties.Settings.Default.txtGpuAlarm;
@@ -832,41 +836,42 @@ namespace PerformanceMonitor
         // Function Inlining: Only in this particular case, I prefer to repeat code in this case instead of passing all parameters to the similar function
         private void UpdateCounter(PerformanceCounter counter, ProgressBar pb, Label lbl, string dimensional = "%")
         {
-            float f;
+            float counterValue;
 
             try
             {
-                f = counter.NextValue();
-                if (f>maxCpuUtil)
+                counterValue = counter.NextValue();
+                if (counterValue>maxCpuUtil)
                 {
-                    maxCpuUtil = (int)f;
+                    maxCpuUtil = (int)counterValue;
                     maxCpuName = counter.CounterName;
                 }
             }
             catch (Exception ex)
             {
-                f = 0.0f;
+                counterValue = 0.0f;
                 ExCounter++;
                 LogError(ex.Message, $"UpdateCounter({pb.Name})");
             }
 
-            int v = (int)f;
+            int v = (int)counterValue;
 
             
             // Only update the label if it is visible in the selected tab and the value has changed
             if (lbl.Parent == tcTabControl.SelectedTab && this.WindowState != FormWindowState.Minimized && (int)lbl.Tag != v)
             {
                 lbl.Tag = v;
+                float threshold= (float) trkMonitorBottleneckThreshold.Tag; // this is is the same as trkMonitorBottleneckThreshold.Value but float cached
 
-                // Let's notify with red when counter >= 80 to denote possible bottleneck
-                System.Drawing.Color color = f <= 80.0f ? (System.Drawing.Color)pb.Tag : System.Drawing.Color.Red;
+                // Let's notify with red when counter >= trkMonitorBottleneckThreshold.Value to denote possible bottleneck
+                System.Drawing.Color color = counterValue < threshold ? (System.Drawing.Color)pb.Tag : System.Drawing.Color.Red;
                 if (pb.ForeColor != color) pb.ForeColor = color;
                 pb.Value = v <= 100 ? v : 100;
 
 
-                color = f <= 100.0f ? System.Drawing.Color.Black : System.Drawing.Color.Red;
+                color = counterValue < threshold ? System.Drawing.Color.Black : System.Drawing.Color.Red;
                 if (lbl.ForeColor != color) lbl.ForeColor = color;
-                lbl.Text = $"{f:F1}{dimensional}";
+                lbl.Text = $"{counterValue:F1}{dimensional}";
             }
         }
 
