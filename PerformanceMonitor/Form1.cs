@@ -68,7 +68,9 @@ namespace PerformanceMonitor
             UpdateGpuInterval(1000); // No longer need lower intervals 
 
             pipeCancellationTokenSource.Cancel();
-            // Save all user settings
+            
+            
+            // Save relevant user settings
 
             Properties.Settings.Default.TimerInterval = (int)nudPollingInterval.Value;
             Properties.Settings.Default.PriorityClassSelectedIndex = cmbPriorityClass.SelectedIndex;
@@ -712,6 +714,9 @@ namespace PerformanceMonitor
                                         break;
                                     case "CYCLE_CPU_ALARM":
                                         chkCpuAlarm.Checked = !chkCpuAlarm.Checked;
+                                        break;
+                                    case "CYCLE_GPU_ALARM":
+                                        chkGpuAlarm.Checked = !chkCpuAlarm.Checked;
                                         break;
                                     case "PROCESSOR_UTILITY":
                                         cmbProcessorCounter.SelectedIndex = 0;
