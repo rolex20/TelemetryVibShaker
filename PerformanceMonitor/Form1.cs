@@ -890,7 +890,7 @@ namespace PerformanceMonitor
                 else
                     mpGpu.Volume = 0.0f;
             }
-            UpdateCaption(lblGpuAbovePct, TotalGpuTicksAboveThreshold / TotalTicks, "%");
+            UpdateCaption(lblGpuAbovePct, (TotalGpuTicksAboveThreshold / TotalTicks) * 100.0f, "%");
 
             ExCounter += myRTX4090.ReadResetExceptionsCounter;
 
@@ -970,7 +970,7 @@ namespace PerformanceMonitor
                 else
                     mpCpu.Volume = 0.0f;
             }
-            UpdateCaption(lblCpuAbovePct, TotalCpuTicksAboveThreshold / TotalTicks, "%");
+            UpdateCaption(lblCpuAbovePct, (TotalCpuTicksAboveThreshold / TotalTicks) * 100.0f, "%");
 
             UpdateCaption(lblCpuAlarm, maxCpuUtil, "%");
 
