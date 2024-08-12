@@ -683,16 +683,11 @@ namespace PerformanceMonitor
             myRTX4090 = new NvidiaGpu(0);
 
             InitializeCounterTags();
-            ResetMaxCounters();
-            AssignEfficiencyCoresOnly();
-
+            ResetMaxCounters();            
 
 
             // Change the priority class to the previous setting selected (NORMAL, BELOW_NORMAL or IDLE)
             cmbPriorityClass.SelectedIndex = Properties.Settings.Default.PriorityClassSelectedIndex;
-
-
-
 
 
             // Obtain current IP Address
@@ -722,6 +717,8 @@ namespace PerformanceMonitor
 
             nudPollingInterval.Value = Properties.Settings.Default.TimerInterval;
             timer1.Interval = (int)nudPollingInterval.Value;
+
+            AssignEfficiencyCoresOnly();
             timer1.Enabled = tschkEnabled.Checked;
         }
 
@@ -1096,8 +1093,10 @@ namespace PerformanceMonitor
             if (tschkAlwaysOnTop.Checked != this.TopMost) 
                 this.TopMost = tschkAlwaysOnTop.Checked;
 
-
+            // Main call to update counters
             UpdateMonitorLabels();
+
+
             timer1.Enabled = true;
             stopwatch.Stop();
 
