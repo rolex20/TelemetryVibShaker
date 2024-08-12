@@ -228,11 +228,13 @@ namespace PerformanceMonitor
         private void trkCpuThreshold_Scroll(object sender, EventArgs e)
         {
             lblCpuThreshold.Text = trkCpuThreshold.Value.ToString();
+            trkCpuThreshold.Tag = (float)trkCpuThreshold.Value; //cached float conversion
         }
 
         private void trkGpuThreshold_Scroll(object sender, EventArgs e)
         {
             lblGpuThreshold.Text = trkGpuThreshold.Value.ToString();
+            trkGpuThreshold.Tag = (float)trkGpuThreshold.Value; //cached float conversion
         }
 
         private void cmbAudioDevice1_SelectedIndexChanged(object sender, EventArgs e)
@@ -872,6 +874,18 @@ namespace PerformanceMonitor
 
         }
 
+        private void SmartUpdateColor(Label labelDest, Color OriginalColor, Color NewColor, float Percentage, float Threshold)
+        {
+            // Changing colors is more expensive than checking if color change is needed
+            if (Percentage>=Threshold && labelDest.ForeColor != NewColor)
+            {
+                labelDest.ForeColor = NewColor;
+            } else if (Percentage < Threshold && labelDest.ForeColor != OriginalColor)
+            {
+                labelDest.ForeColor= OriginalColor;
+            }
+        }
+        
         private void UpdateGPUInfo()
         {
             // Need to read temp too to get the fan speed??, so all updated here
@@ -890,7 +904,11 @@ namespace PerformanceMonitor
                 else
                     mpGpu.Volume = 0.0f;
             }
-            UpdateCaption(lblGpuAbovePct, (TotalGpuTicksAboveThreshold / TotalTicks) * 100.0f, "%");
+
+            float abovePct = (TotalGpuTicksAboveThreshold / TotalTicks) * 100.0f;
+            SmartUpdateColor(lblGpuAbovePct, lblGpuAlarm.ForeColor, Color.Red, abovePct, (float)trkGpuThreshold.Tag);
+            UpdateCaption(lblGpuAbovePct, abovePct, "%");
+
 
             ExCounter += myRTX4090.ReadResetExceptionsCounter;
 
@@ -915,7 +933,7 @@ namespace PerformanceMonitor
 
         private void UpdateMonitorLabels()
         {
-            float incrementalTicks = timer1.Interval;
+            float incrementalTicks = timer1.Interval; 
             TotalTicks += incrementalTicks;
 
             if (tschkShowLastThread.Checked)
@@ -970,7 +988,9 @@ namespace PerformanceMonitor
                 else
                     mpCpu.Volume = 0.0f;
             }
-            UpdateCaption(lblCpuAbovePct, (TotalCpuTicksAboveThreshold / TotalTicks) * 100.0f, "%");
+            float abovePct = (TotalCpuTicksAboveThreshold / TotalTicks) * 100.0f;
+            SmartUpdateColor(lblCpuAbovePct, lblCpuAlarm.ForeColor, Color.Red, abovePct, (float)trkCpuThreshold.Tag);
+            UpdateCaption(lblCpuAbovePct, abovePct, "%");
 
             UpdateCaption(lblCpuAlarm, maxCpuUtil, "%");
 
@@ -1251,7 +1271,7 @@ namespace PerformanceMonitor
             if (this.WindowState != FormWindowState.Minimized && tcTabControl.SelectedTab==L.Parent && !Equals(L.Tag, value))
             {
                 L.Tag = value;
-                L.Text = (value is float f ? $"{f:F1}" : value.ToString()) + dimensional;
+                L.Text = (value is float f ? $"{f:F1}" : value.ToString()) + dimensional;                
             } 
         }
 
