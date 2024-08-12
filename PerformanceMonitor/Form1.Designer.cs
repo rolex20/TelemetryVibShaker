@@ -203,6 +203,9 @@
             this.txtCpuAlarm = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.tbSettings = new System.Windows.Forms.TabPage();
+            this.lblMonitorBottleneckThreshold = new System.Windows.Forms.Label();
+            this.label53 = new System.Windows.Forms.Label();
+            this.trkMonitorBottleneckThreshold = new System.Windows.Forms.TrackBar();
             this.label51 = new System.Windows.Forms.Label();
             this.label46 = new System.Windows.Forms.Label();
             this.cmbProcessorCounter = new System.Windows.Forms.ComboBox();
@@ -216,9 +219,10 @@
             this.tbErrors = new System.Windows.Forms.TabPage();
             this.txtErrors = new System.Windows.Forms.TextBox();
             this.lblErrorsTitle = new System.Windows.Forms.Label();
-            this.lblMonitorBottleneckThreshold = new System.Windows.Forms.Label();
-            this.label53 = new System.Windows.Forms.Label();
-            this.trkMonitorBottleneckThreshold = new System.Windows.Forms.TrackBar();
+            this.tslblIdealProcessorLabel = new System.Windows.Forms.ToolStripLabel();
+            this.tslblIdealProcessor = new System.Windows.Forms.ToolStripLabel();
+            this.chkReassignIdealProcessor = new System.Windows.Forms.CheckBox();
+            this.lblReassignIdealProcessor = new System.Windows.Forms.Label();
             this.toolStrip1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.tcTabControl.SuspendLayout();
@@ -229,9 +233,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.trkGpuVolume)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trkCpuVolume)).BeginInit();
             this.tbSettings.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trkMonitorBottleneckThreshold)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudPollingInterval)).BeginInit();
             this.tbErrors.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trkMonitorBottleneckThreshold)).BeginInit();
             this.SuspendLayout();
             // 
             // timer1
@@ -1192,6 +1196,8 @@
             this.toolStripLabel4,
             this.tslblExceptions,
             this.toolStripSeparator5,
+            this.tslblIdealProcessorLabel,
+            this.tslblIdealProcessor,
             this.tschkShowLastProcessor,
             this.tslblLP,
             this.tslblCurrentProcessor,
@@ -2017,6 +2023,8 @@
             // 
             // tbSettings
             // 
+            this.tbSettings.Controls.Add(this.lblReassignIdealProcessor);
+            this.tbSettings.Controls.Add(this.chkReassignIdealProcessor);
             this.tbSettings.Controls.Add(this.lblMonitorBottleneckThreshold);
             this.tbSettings.Controls.Add(this.label53);
             this.tbSettings.Controls.Add(this.trkMonitorBottleneckThreshold);
@@ -2039,10 +2047,39 @@
             this.tbSettings.UseVisualStyleBackColor = true;
             this.tbSettings.Click += new System.EventHandler(this.tbSettings_Click);
             // 
+            // lblMonitorBottleneckThreshold
+            // 
+            this.lblMonitorBottleneckThreshold.AutoSize = true;
+            this.lblMonitorBottleneckThreshold.Location = new System.Drawing.Point(269, 220);
+            this.lblMonitorBottleneckThreshold.Name = "lblMonitorBottleneckThreshold";
+            this.lblMonitorBottleneckThreshold.Size = new System.Drawing.Size(16, 13);
+            this.lblMonitorBottleneckThreshold.TabIndex = 23;
+            this.lblMonitorBottleneckThreshold.Text = "---";
+            // 
+            // label53
+            // 
+            this.label53.AutoSize = true;
+            this.label53.Location = new System.Drawing.Point(24, 220);
+            this.label53.Name = "label53";
+            this.label53.Size = new System.Drawing.Size(118, 13);
+            this.label53.TabIndex = 22;
+            this.label53.Text = "Monitor Red Threshold:";
+            // 
+            // trkMonitorBottleneckThreshold
+            // 
+            this.trkMonitorBottleneckThreshold.Location = new System.Drawing.Point(159, 204);
+            this.trkMonitorBottleneckThreshold.Maximum = 100;
+            this.trkMonitorBottleneckThreshold.Name = "trkMonitorBottleneckThreshold";
+            this.trkMonitorBottleneckThreshold.Size = new System.Drawing.Size(104, 45);
+            this.trkMonitorBottleneckThreshold.TabIndex = 21;
+            this.trkMonitorBottleneckThreshold.TickFrequency = 10;
+            this.trkMonitorBottleneckThreshold.Value = 90;
+            this.trkMonitorBottleneckThreshold.Scroll += new System.EventHandler(this.trkMonitorBottleneckThreshold_Scroll);
+            // 
             // label51
             // 
             this.label51.AutoSize = true;
-            this.label51.Location = new System.Drawing.Point(261, 127);
+            this.label51.Location = new System.Drawing.Point(285, 127);
             this.label51.Name = "label51";
             this.label51.Size = new System.Drawing.Size(128, 13);
             this.label51.TabIndex = 9;
@@ -2051,7 +2088,7 @@
             // label46
             // 
             this.label46.AutoSize = true;
-            this.label46.Location = new System.Drawing.Point(30, 166);
+            this.label46.Location = new System.Drawing.Point(45, 166);
             this.label46.Name = "label46";
             this.label46.Size = new System.Drawing.Size(97, 13);
             this.label46.TabIndex = 8;
@@ -2077,16 +2114,16 @@
             "% C3 Time",
             "% C2 Time",
             "% C1 Time"});
-            this.cmbProcessorCounter.Location = new System.Drawing.Point(136, 163);
+            this.cmbProcessorCounter.Location = new System.Drawing.Point(160, 163);
             this.cmbProcessorCounter.Name = "cmbProcessorCounter";
-            this.cmbProcessorCounter.Size = new System.Drawing.Size(278, 21);
+            this.cmbProcessorCounter.Size = new System.Drawing.Size(300, 21);
             this.cmbProcessorCounter.TabIndex = 7;
             this.cmbProcessorCounter.SelectedIndexChanged += new System.EventHandler(this.cmbProcessorCounter_SelectedIndexChanged);
             // 
             // txtIPAddress
             // 
             this.txtIPAddress.Enabled = false;
-            this.txtIPAddress.Location = new System.Drawing.Point(136, 124);
+            this.txtIPAddress.Location = new System.Drawing.Point(160, 124);
             this.txtIPAddress.Name = "txtIPAddress";
             this.txtIPAddress.ReadOnly = true;
             this.txtIPAddress.Size = new System.Drawing.Size(120, 20);
@@ -2095,7 +2132,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(66, 127);
+            this.label2.Location = new System.Drawing.Point(81, 127);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(61, 13);
             this.label2.TabIndex = 5;
@@ -2106,7 +2143,7 @@
             this.lblEfficientCoresNote.AutoSize = true;
             this.lblEfficientCoresNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblEfficientCoresNote.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
-            this.lblEfficientCoresNote.Location = new System.Drawing.Point(60, 287);
+            this.lblEfficientCoresNote.Location = new System.Drawing.Point(75, 310);
             this.lblEfficientCoresNote.Name = "lblEfficientCoresNote";
             this.lblEfficientCoresNote.Size = new System.Drawing.Size(225, 13);
             this.lblEfficientCoresNote.TabIndex = 4;
@@ -2122,7 +2159,7 @@
             "NORMAL",
             "BELOW NORMAL",
             "IDLE"});
-            this.cmbPriorityClass.Location = new System.Drawing.Point(135, 80);
+            this.cmbPriorityClass.Location = new System.Drawing.Point(159, 80);
             this.cmbPriorityClass.Name = "cmbPriorityClass";
             this.cmbPriorityClass.Size = new System.Drawing.Size(121, 21);
             this.cmbPriorityClass.TabIndex = 3;
@@ -2131,7 +2168,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(60, 83);
+            this.label1.Location = new System.Drawing.Point(75, 83);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(69, 13);
             this.label1.TabIndex = 2;
@@ -2145,7 +2182,7 @@
             0,
             0,
             0});
-            this.nudPollingInterval.Location = new System.Drawing.Point(135, 36);
+            this.nudPollingInterval.Location = new System.Drawing.Point(159, 36);
             this.nudPollingInterval.Maximum = new decimal(new int[] {
             5000,
             0,
@@ -2169,7 +2206,7 @@
             // lblPollingInterval
             // 
             this.lblPollingInterval.AutoSize = true;
-            this.lblPollingInterval.Location = new System.Drawing.Point(26, 38);
+            this.lblPollingInterval.Location = new System.Drawing.Point(41, 38);
             this.lblPollingInterval.Name = "lblPollingInterval";
             this.lblPollingInterval.Size = new System.Drawing.Size(101, 13);
             this.lblPollingInterval.TabIndex = 0;
@@ -2184,7 +2221,7 @@
             this.tbErrors.Name = "tbErrors";
             this.tbErrors.Size = new System.Drawing.Size(952, 368);
             this.tbErrors.TabIndex = 2;
-            this.tbErrors.Text = "Errors";
+            this.tbErrors.Text = "Log";
             this.tbErrors.UseVisualStyleBackColor = true;
             // 
             // txtErrors
@@ -2208,34 +2245,39 @@
             this.lblErrorsTitle.TabIndex = 0;
             this.lblErrorsTitle.Text = "Errors: (only the first 100 are listed)";
             // 
-            // lblMonitorBottleneckThreshold
+            // tslblIdealProcessorLabel
             // 
-            this.lblMonitorBottleneckThreshold.AutoSize = true;
-            this.lblMonitorBottleneckThreshold.Location = new System.Drawing.Point(245, 220);
-            this.lblMonitorBottleneckThreshold.Name = "lblMonitorBottleneckThreshold";
-            this.lblMonitorBottleneckThreshold.Size = new System.Drawing.Size(16, 13);
-            this.lblMonitorBottleneckThreshold.TabIndex = 23;
-            this.lblMonitorBottleneckThreshold.Text = "---";
+            this.tslblIdealProcessorLabel.Name = "tslblIdealProcessorLabel";
+            this.tslblIdealProcessorLabel.Size = new System.Drawing.Size(92, 22);
+            this.tslblIdealProcessorLabel.Text = "Ideal Processor: ";
             // 
-            // label53
+            // tslblIdealProcessor
             // 
-            this.label53.AutoSize = true;
-            this.label53.Location = new System.Drawing.Point(9, 220);
-            this.label53.Name = "label53";
-            this.label53.Size = new System.Drawing.Size(118, 13);
-            this.label53.TabIndex = 22;
-            this.label53.Text = "Monitor Red Threshold:";
+            this.tslblIdealProcessor.Name = "tslblIdealProcessor";
+            this.tslblIdealProcessor.Size = new System.Drawing.Size(22, 22);
+            this.tslblIdealProcessor.Text = "---";
             // 
-            // trkMonitorBottleneckThreshold
+            // chkReassignIdealProcessor
             // 
-            this.trkMonitorBottleneckThreshold.Location = new System.Drawing.Point(135, 204);
-            this.trkMonitorBottleneckThreshold.Maximum = 100;
-            this.trkMonitorBottleneckThreshold.Name = "trkMonitorBottleneckThreshold";
-            this.trkMonitorBottleneckThreshold.Size = new System.Drawing.Size(104, 45);
-            this.trkMonitorBottleneckThreshold.TabIndex = 21;
-            this.trkMonitorBottleneckThreshold.TickFrequency = 10;
-            this.trkMonitorBottleneckThreshold.Value = 90;
-            this.trkMonitorBottleneckThreshold.Scroll += new System.EventHandler(this.trkMonitorBottleneckThreshold_Scroll);
+            this.chkReassignIdealProcessor.AutoSize = true;
+            this.chkReassignIdealProcessor.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.chkReassignIdealProcessor.Enabled = false;
+            this.chkReassignIdealProcessor.Location = new System.Drawing.Point(27, 270);
+            this.chkReassignIdealProcessor.Name = "chkReassignIdealProcessor";
+            this.chkReassignIdealProcessor.Size = new System.Drawing.Size(149, 17);
+            this.chkReassignIdealProcessor.TabIndex = 25;
+            this.chkReassignIdealProcessor.Text = "Reassign Ideal Processor:";
+            this.chkReassignIdealProcessor.UseVisualStyleBackColor = true;
+            this.chkReassignIdealProcessor.CheckedChanged += new System.EventHandler(this.chkReassignIdealProcessor_CheckedChanged);
+            // 
+            // lblReassignIdealProcessor
+            // 
+            this.lblReassignIdealProcessor.AutoSize = true;
+            this.lblReassignIdealProcessor.Location = new System.Drawing.Point(190, 271);
+            this.lblReassignIdealProcessor.Name = "lblReassignIdealProcessor";
+            this.lblReassignIdealProcessor.Size = new System.Drawing.Size(73, 13);
+            this.lblReassignIdealProcessor.TabIndex = 26;
+            this.lblReassignIdealProcessor.Text = "* 14700K only";
             // 
             // frmMain
             // 
@@ -2272,10 +2314,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.trkCpuVolume)).EndInit();
             this.tbSettings.ResumeLayout(false);
             this.tbSettings.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trkMonitorBottleneckThreshold)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudPollingInterval)).EndInit();
             this.tbErrors.ResumeLayout(false);
             this.tbErrors.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trkMonitorBottleneckThreshold)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -2471,6 +2513,10 @@
         private System.Windows.Forms.Label lblMonitorBottleneckThreshold;
         private System.Windows.Forms.Label label53;
         private System.Windows.Forms.TrackBar trkMonitorBottleneckThreshold;
+        private System.Windows.Forms.ToolStripLabel tslblIdealProcessorLabel;
+        private System.Windows.Forms.ToolStripLabel tslblIdealProcessor;
+        private System.Windows.Forms.CheckBox chkReassignIdealProcessor;
+        private System.Windows.Forms.Label lblReassignIdealProcessor;
     }
 }
 

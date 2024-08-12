@@ -50,5 +50,8 @@
     <Setting Name="trkMonitorBottleneckThreshold" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">90</Value>
     </Setting>
+    <Setting Name="chkReassignIdealProcessor" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

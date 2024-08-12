@@ -16,6 +16,7 @@ using System.Drawing;
 using System.Threading;
 using System.IO.Pipes;
 using System.Windows.Forms.VisualStyles;
+using IdealProcessorEnhanced;
 //using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 
@@ -46,8 +47,10 @@ namespace PerformanceMonitor
 
         private Process currentProcess;
         private CpuType cpuType;
+        private uint maxProcessorNumber = 0;
+        private bool needToCallSetNewIdealProcessor = true;
 
-        private int maxCpuUtil;
+        private int maxCpuUtil; // Maximum recorded CPU utilization
         string maxCpuName;
 
         private MediaPlayer mpCpu, mpGpu;
@@ -91,6 +94,7 @@ namespace PerformanceMonitor
             Properties.Settings.Default.trkGpuVolume = trkGpuVolume.Value;
             Properties.Settings.Default.tcTabControl = tcTabControl.SelectedIndex;
             Properties.Settings.Default.cmbProcessorCounter = cmbProcessorCounter.SelectedIndex;
+            Properties.Settings.Default.chkReassignIdealProcessor = chkReassignIdealProcessor.Checked;
 
 
 
@@ -437,6 +441,10 @@ namespace PerformanceMonitor
 
         }
 
+        private void chkReassignIdealProcessor_CheckedChanged(object sender, EventArgs e)
+        {
+            needToCallSetNewIdealProcessor = true; // this needs to beed done from the Timer.Tick() thread
+        }
 
         private void pbCPU18_Click(object sender, EventArgs e)
         {
@@ -514,6 +522,34 @@ namespace PerformanceMonitor
             notifyIcon.ShowBalloonTip(10000);
         }
 
+        private void SetNewIdealProcessor(uint maxProcNumber)
+        {
+            if (maxProcNumber <= 0)
+            {
+                LogError("Invalid MaxProcessorNumber", "$SetNewIdealProcessor({maxProcNumber})");
+                return;
+            }
+
+
+            // My Intel 14700K has 8 performance cores and 12 efficiency cores.
+            // CPU numbers 0-15 are performance
+            // CPU numbers 16-27 are efficiency
+            ProcessorAssigner assigner = new ProcessorAssigner(maxProcNumber);
+            uint newIdealProcessor = assigner.GetNextProcessor();
+
+            IntPtr currentThreadHandle = GetCurrentThread();
+            int previousProcessor = (int)SetThreadIdealProcessor(currentThreadHandle, newIdealProcessor);
+
+            if (previousProcessor <0 || (previousProcessor > maxProcNumber))
+            {
+                LogError("Failed to set Ideal Processor", "$SetNewIdealProcessor({maxProcNumber})");
+                tslblIdealProcessor.Text = "ERR";
+                return;
+            }
+
+            UpdateCaption(tslblIdealProcessor, (int)newIdealProcessor);
+        }
+
 
         private void AssignEfficiencyCoresOnly()
         {
@@ -564,6 +600,8 @@ namespace PerformanceMonitor
                         affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
                         lblEfficientCoresNote.Text = "14700K" + lblEfficientCoresNote.Text;
                         lblEfficientCoresNote.Visible = true;
+                        chkReassignIdealProcessor.Enabled = true;
+                        maxProcessorNumber = 27;
                     }
                     break;
                 default:
@@ -580,11 +618,6 @@ namespace PerformanceMonitor
                 }
                 catch { } // Ignore
             }
-            // Get the pseudo handle for the current thread
-            IntPtr currentThreadHandle = GetCurrentThread();
-
-            // Set the ideal processor for the current thread to 19.  18 is for my NvidiaLightPerfCounters Service
-            uint previousIdealProcessor = SetThreadIdealProcessor(currentThreadHandle, 19);
 
         }
 
@@ -597,6 +630,8 @@ namespace PerformanceMonitor
             // Restore previous location
             this.Location = new Point(Properties.Settings.Default.XCoordinate, Properties.Settings.Default.YCoordinate);
 
+
+            // Restore user preferences
 
             chkCpuAlarm.Checked = Properties.Settings.Default.chkCpuAlarm;
             chkGpuAlarm.Checked = Properties.Settings.Default.chkGpuAlarm;
@@ -619,8 +654,7 @@ namespace PerformanceMonitor
             trkGpuVolume.Value = Properties.Settings.Default.trkGpuVolume;
             lblGpuVolume.Text = trkGpuVolume.Value.ToString();
 
-            
-
+            chkReassignIdealProcessor.Checked = Properties.Settings.Default.chkReassignIdealProcessor;
 
             tcTabControl.SelectedIndex = Properties.Settings.Default.tcTabControl;
 
@@ -647,7 +681,6 @@ namespace PerformanceMonitor
             tslblLastThread.Tag = 0; // used to keep track of the last thread used to avoid update in timer1
 
             myRTX4090 = new NvidiaGpu(0);
-
 
             InitializeCounterTags();
             ResetMaxCounters();
@@ -864,12 +897,12 @@ namespace PerformanceMonitor
                 float threshold= (float) trkMonitorBottleneckThreshold.Tag; // this is is the same as trkMonitorBottleneckThreshold.Value but float cached
 
                 // Let's notify with red when counter >= trkMonitorBottleneckThreshold.Value to denote possible bottleneck
-                System.Drawing.Color color = counterValue < threshold ? (System.Drawing.Color)pb.Tag : System.Drawing.Color.Red;
+                Color color = counterValue < threshold ? (Color)pb.Tag : Color.Red;
                 if (pb.ForeColor != color) pb.ForeColor = color;
                 pb.Value = v <= 100 ? v : 100;
 
 
-                color = counterValue < threshold ? System.Drawing.Color.Black : System.Drawing.Color.Red;
+                color = counterValue < threshold ? Color.Black : Color.Red;
                 if (lbl.ForeColor != color) lbl.ForeColor = color;
                 lbl.Text = $"{counterValue:F1}{dimensional}";
             }
@@ -960,11 +993,18 @@ namespace PerformanceMonitor
 
         private void UpdateMonitorLabels()
         {
+            if (chkReassignIdealProcessor.Enabled && chkReassignIdealProcessor.Checked && needToCallSetNewIdealProcessor)
+            {
+                needToCallSetNewIdealProcessor = false;
+                SetNewIdealProcessor(maxProcessorNumber); // This one also displays the new ideal processor
+            }
+
             float incrementalTicks = timer1.Interval; 
             TotalTicks += incrementalTicks;
 
             if (tschkShowLastThread.Checked)
             {
+                
                 UpdateCaption(tslblLastThread, (int)GetCurrentThreadId());
             }
 
@@ -1035,6 +1075,7 @@ namespace PerformanceMonitor
             {
             stopwatch.Restart();
             timer1.Enabled = false;
+
 
             // update frmMain.Top position in the label only when required
             int t = this.Top;

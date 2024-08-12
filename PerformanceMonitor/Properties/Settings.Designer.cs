@@ -214,5 +214,17 @@ namespace PerformanceMonitor.Properties {
                 this["trkMonitorBottleneckThreshold"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool chkReassignIdealProcessor {
+            get {
+                return ((bool)(this["chkReassignIdealProcessor"]));
+            }
+            set {
+                this["chkReassignIdealProcessor"] = value;
+            }
+        }
     }
 }
