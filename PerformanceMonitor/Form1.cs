@@ -53,6 +53,8 @@ namespace PerformanceMonitor
 
         private float TotalTicks, TotalCpuTicksAboveThreshold, TotalGpuTicksAboveThreshold;
 
+        private static bool topMost = false; // to fix .TopMost bug
+
         private void ResetTicksCounters()
         {
             TotalTicks = 0.0f;
@@ -666,15 +668,14 @@ namespace PerformanceMonitor
         // This way I can change tabs, restart the counters or monitor a different CPU counter
         private async void IPC_PipeServer(CancellationToken cancellationToken)
         {
+            bool need_to_close = false;
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 using (NamedPipeServerStream pipeServer = new NamedPipeServerStream("PerformanceMonitorCommandsPipe", PipeDirection.In))
                 {
-                    Debug.WriteLine("Named pipe server started. Waiting for connection...");
-
                     // Wait for a client to connect
                     await pipeServer.WaitForConnectionAsync(cancellationToken);
-                    Debug.WriteLine("Client connected.");
 
                     int lines = 0;
                     using (StreamReader reader = new StreamReader(pipeServer))
@@ -683,6 +684,7 @@ namespace PerformanceMonitor
                         string result = "OK";
                         while ((command = await reader.ReadLineAsync()) != null)
                         {
+                            // We need to execute the following code on a thread that can modify form objects/properties
                             this.Invoke(new Action(() =>
                             {
 
@@ -736,19 +738,35 @@ namespace PerformanceMonitor
                                     case "RESTORE":
                                         this.WindowState = FormWindowState.Normal;
                                         break;
-                                    case "ALIGN_LEFT":
-                                        this.Location = new Point(-1700, this.Location.Y);
-                                        break;
                                     case "FOREGROUND":
                                         this.BringToFront();
                                         this.Focus();
                                         break;
-
+                                    case string s when s.StartsWith("ALIGN_LEFT"):
+                                        if (s.Length > 10)
+                                        {
+                                            string new_position = s.Substring(10);
+                                            int x;
+                                            if (int.TryParse(new_position, out x))
+                                                this.Location = new Point(x, this.Location.Y);
+                                        }
+                                        break;
+                                    case "TOPMOST":
+                                        // The following doesn't work, had to fix with local copy
+                                        // this.TopMost = !(this.TopMost);
+                                        topMost = !topMost;
+                                        this.TopMost = topMost;
+                                        result = "Now .TopMost=" + this.TopMost.ToString();
+                                        break;
+                                    case "CLOSE":
+                                        need_to_close = true;
+                                        pipeCancellationTokenSource.Cancel();
+                                        break;
                                     default:
-                                        result = "Unknown newInterval";
+                                        result = "Unknown command";
                                         break;
                                 }
-                                string info = $"Received newInterval #${++lines}):[{command}][{result}]";
+                                string info = $"Received command #${++lines}):[{command}][{result}]";
                                 LogError(info, "PipeServer", true);
 
                             }));
@@ -756,6 +774,14 @@ namespace PerformanceMonitor
                     }
                 }
             }
+
+
+            // We need to execute the following code on a thread that can modify form objects/properties
+            if (need_to_close) this.Invoke(new Action(() =>
+            {
+                this.Close();
+            }));
+
         }
 
         // Function Inlining: Only in this particular case, I prefer to repeat code in this case instead of passing all parameters to the similar function
