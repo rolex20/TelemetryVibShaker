@@ -123,7 +123,7 @@
             this.tschkAutoReadY = new System.Windows.Forms.ToolStripButton();
             this.tschkAlwaysOnTop = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
+            this.toolStrip4090Label = new System.Windows.Forms.ToolStripLabel();
             this.tscmbCategory = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
@@ -216,6 +216,9 @@
             this.tbErrors = new System.Windows.Forms.TabPage();
             this.txtErrors = new System.Windows.Forms.TextBox();
             this.lblErrorsTitle = new System.Windows.Forms.Label();
+            this.lblMonitorBottleneckThreshold = new System.Windows.Forms.Label();
+            this.label53 = new System.Windows.Forms.Label();
+            this.trkMonitorBottleneckThreshold = new System.Windows.Forms.TrackBar();
             this.toolStrip1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.tcTabControl.SuspendLayout();
@@ -228,6 +231,7 @@
             this.tbSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudPollingInterval)).BeginInit();
             this.tbErrors.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trkMonitorBottleneckThreshold)).BeginInit();
             this.SuspendLayout();
             // 
             // timer1
@@ -1045,7 +1049,7 @@
             this.tschkAutoReadY,
             this.tschkAlwaysOnTop,
             this.toolStripSeparator2,
-            this.toolStripLabel2,
+            this.toolStrip4090Label,
             this.tscmbCategory,
             this.toolStripSeparator3,
             this.toolStripButton1});
@@ -1140,14 +1144,14 @@
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(6, 28);
             // 
-            // toolStripLabel2
+            // toolStrip4090Label
             // 
-            this.toolStripLabel2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.toolStripLabel2.ForeColor = System.Drawing.Color.YellowGreen;
-            this.toolStripLabel2.Name = "toolStripLabel2";
-            this.toolStripLabel2.Size = new System.Drawing.Size(62, 25);
-            this.toolStripLabel2.Text = "RTX 4090";
-            this.toolStripLabel2.ToolTipText = "nvidia geforce rtx 4090(01:00)";
+            this.toolStrip4090Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.toolStrip4090Label.ForeColor = System.Drawing.Color.YellowGreen;
+            this.toolStrip4090Label.Name = "toolStrip4090Label";
+            this.toolStrip4090Label.Size = new System.Drawing.Size(62, 25);
+            this.toolStrip4090Label.Text = "RTX 4090";
+            this.toolStrip4090Label.ToolTipText = "nvidia geforce rtx 4090(01:00)";
             // 
             // tscmbCategory
             // 
@@ -2015,6 +2019,9 @@
             // 
             // tbSettings
             // 
+            this.tbSettings.Controls.Add(this.lblMonitorBottleneckThreshold);
+            this.tbSettings.Controls.Add(this.label53);
+            this.tbSettings.Controls.Add(this.trkMonitorBottleneckThreshold);
             this.tbSettings.Controls.Add(this.label51);
             this.tbSettings.Controls.Add(this.label46);
             this.tbSettings.Controls.Add(this.cmbProcessorCounter);
@@ -2032,6 +2039,7 @@
             this.tbSettings.TabIndex = 1;
             this.tbSettings.Text = "Settings";
             this.tbSettings.UseVisualStyleBackColor = true;
+            this.tbSettings.Click += new System.EventHandler(this.tbSettings_Click);
             // 
             // label51
             // 
@@ -2073,7 +2081,7 @@
             "% C1 Time"});
             this.cmbProcessorCounter.Location = new System.Drawing.Point(136, 163);
             this.cmbProcessorCounter.Name = "cmbProcessorCounter";
-            this.cmbProcessorCounter.Size = new System.Drawing.Size(183, 21);
+            this.cmbProcessorCounter.Size = new System.Drawing.Size(278, 21);
             this.cmbProcessorCounter.TabIndex = 7;
             this.cmbProcessorCounter.SelectedIndexChanged += new System.EventHandler(this.cmbProcessorCounter_SelectedIndexChanged);
             // 
@@ -2100,7 +2108,7 @@
             this.lblEfficientCoresNote.AutoSize = true;
             this.lblEfficientCoresNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblEfficientCoresNote.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
-            this.lblEfficientCoresNote.Location = new System.Drawing.Point(26, 214);
+            this.lblEfficientCoresNote.Location = new System.Drawing.Point(60, 287);
             this.lblEfficientCoresNote.Name = "lblEfficientCoresNote";
             this.lblEfficientCoresNote.Size = new System.Drawing.Size(225, 13);
             this.lblEfficientCoresNote.TabIndex = 4;
@@ -2202,6 +2210,36 @@
             this.lblErrorsTitle.TabIndex = 0;
             this.lblErrorsTitle.Text = "Errors: (only the first 100 are listed)";
             // 
+            // lblMonitorBottleneckThreshold
+            // 
+            this.lblMonitorBottleneckThreshold.AutoSize = true;
+            this.lblMonitorBottleneckThreshold.Location = new System.Drawing.Point(245, 220);
+            this.lblMonitorBottleneckThreshold.Name = "lblMonitorBottleneckThreshold";
+            this.lblMonitorBottleneckThreshold.Size = new System.Drawing.Size(16, 13);
+            this.lblMonitorBottleneckThreshold.TabIndex = 23;
+            this.lblMonitorBottleneckThreshold.Text = "---";
+            // 
+            // label53
+            // 
+            this.label53.AutoSize = true;
+            this.label53.Location = new System.Drawing.Point(9, 220);
+            this.label53.Name = "label53";
+            this.label53.Size = new System.Drawing.Size(118, 13);
+            this.label53.TabIndex = 22;
+            this.label53.Text = "Monitor Red Threshold:";
+            // 
+            // trkMonitorBottleneckThreshold
+            // 
+            this.trkMonitorBottleneckThreshold.Location = new System.Drawing.Point(135, 204);
+            this.trkMonitorBottleneckThreshold.Maximum = 100;
+            this.trkMonitorBottleneckThreshold.Name = "trkMonitorBottleneckThreshold";
+            this.trkMonitorBottleneckThreshold.Size = new System.Drawing.Size(104, 45);
+            this.trkMonitorBottleneckThreshold.SmallChange = 5;
+            this.trkMonitorBottleneckThreshold.TabIndex = 21;
+            this.trkMonitorBottleneckThreshold.TickFrequency = 10;
+            this.trkMonitorBottleneckThreshold.Value = 50;
+            this.trkMonitorBottleneckThreshold.Scroll += new System.EventHandler(this.trkMonitorBottleneckThreshold_Scroll);
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -2240,6 +2278,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudPollingInterval)).EndInit();
             this.tbErrors.ResumeLayout(false);
             this.tbErrors.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trkMonitorBottleneckThreshold)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -2338,7 +2377,7 @@
         private System.Windows.Forms.ToolStripButton tschkAutoMoveTop;
         private System.Windows.Forms.ToolStripButton tschkAutoReadY;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripLabel toolStripLabel2;
+        private System.Windows.Forms.ToolStripLabel toolStrip4090Label;
         private System.Windows.Forms.ToolStripButton tschkAlwaysOnTop;
         private System.Windows.Forms.ToolStripComboBox tscmbCategory;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
@@ -2432,6 +2471,9 @@
         private System.Windows.Forms.Label label46;
         private System.Windows.Forms.ComboBox cmbProcessorCounter;
         private System.Windows.Forms.Label label51;
+        private System.Windows.Forms.Label lblMonitorBottleneckThreshold;
+        private System.Windows.Forms.Label label53;
+        private System.Windows.Forms.TrackBar trkMonitorBottleneckThreshold;
     }
 }
 

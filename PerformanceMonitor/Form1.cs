@@ -15,6 +15,7 @@ using NAudio.CoreAudioApi;
 using System.Drawing;
 using System.Threading;
 using System.IO.Pipes;
+using System.Windows.Forms.VisualStyles;
 //using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 
@@ -67,8 +68,10 @@ namespace PerformanceMonitor
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            UpdateGpuInterval(1000); // No longer need lower intervals 
+            //No longer using a service to get Gpu counters
+            //UpdateGpuInterval(1000); // No longer need lower intervals 
 
+            timer1.Enabled = false;
             pipeCancellationTokenSource.Cancel();
             
             
@@ -159,6 +162,7 @@ namespace PerformanceMonitor
         }
 
 
+        // Deprecated, not called anymore: NvidiaLightPerfCounters-SERVICE not used anymore
         // Send IPC pipe command to NvidiaLightPerfCounters-SERVICE to update the refresh interval
         private void UpdateGpuInterval(int newInterval)
         {
@@ -225,16 +229,26 @@ namespace PerformanceMonitor
             lblGpuVolume.Text = trkGpuVolume.Value.ToString();
         }
 
+        private void UpdatePercentageTrackers(TrackBar trackBar, Label label, int ? newValue )
+        {
+            if (newValue.HasValue)
+            {
+                trackBar.Value = newValue.Value;
+            }
+
+            label.Text = trackBar.Value.ToString() + "%";
+            trackBar.Tag = (float)trackBar.Value;
+
+        }
+
         private void trkCpuThreshold_Scroll(object sender, EventArgs e)
         {
-            lblCpuThreshold.Text = trkCpuThreshold.Value.ToString();
-            trkCpuThreshold.Tag = (float)trkCpuThreshold.Value; //cached float conversion
+            UpdatePercentageTrackers(trkCpuThreshold, lblCpuThreshold, null);
         }
 
         private void trkGpuThreshold_Scroll(object sender, EventArgs e)
         {
-            lblGpuThreshold.Text = trkGpuThreshold.Value.ToString();
-            trkGpuThreshold.Tag = (float)trkGpuThreshold.Value; //cached float conversion
+            UpdatePercentageTrackers(trkGpuThreshold, lblGpuThreshold, null);
         }
 
         private void cmbAudioDevice1_SelectedIndexChanged(object sender, EventArgs e)
@@ -407,6 +421,15 @@ namespace PerformanceMonitor
             timer1.Enabled = prevValue;
         }
 
+        private void trkMonitorBottleneckThreshold_Scroll(object sender, EventArgs e)
+        {
+            lblMonitorBottleneckThreshold.Text = trkMonitorBottleneckThreshold.Value.ToString() + "%";
+        }
+
+        private void tbSettings_Click(object sender, EventArgs e)
+        {
+
+        }
 
         private void lblCPU5_Click(object sender, EventArgs e)
         {
@@ -578,10 +601,10 @@ namespace PerformanceMonitor
             chkGpuAlarm.Checked = Properties.Settings.Default.chkGpuAlarm;
             
             trkCpuThreshold.Value = Properties.Settings.Default.trkCpuThreshold;
-            lblCpuThreshold.Text = trkCpuThreshold.Value.ToString();
+            UpdatePercentageTrackers(trkCpuThreshold, lblCpuThreshold, null);
             
             trkGpuThreshold.Value = Properties.Settings.Default.trkGpuThreshold;
-            lblGpuThreshold.Text = trkGpuThreshold.Value.ToString();
+            UpdatePercentageTrackers(trkGpuThreshold, lblGpuThreshold, null);
 
             txtCpuAlarm.Text = Properties.Settings.Default.txtCpuAlarm;
             txtGpuAlarm.Text = Properties.Settings.Default.txtGpuAlarm;
@@ -606,7 +629,7 @@ namespace PerformanceMonitor
             dispatcherUIThread = -1;
 
             timer1.Enabled = false;
-            timer1.Tag = false; // flag for one-time control in timer1_Tick()
+            timer1.Tag = false; // flag for one-time control in timer1_Tick(), only needed once
 
             tscmbCategory.Tag = false;  // flag to avoid changing the GpuPerfCounter the first time
             tscmbCategory.SelectedIndex = 0;  // otherwise, the combo will appear empty
@@ -893,21 +916,21 @@ namespace PerformanceMonitor
             int fanspeed = myRTX4090.FanSpeed;
             int util = myRTX4090.Utilization; // this also reads memory utilization
 
-            // Track max Gpu util
-            if (mpGpu != null )
+            // Always Track max Gpu util (alarms)
+            float newVolume = 0.0f; // mute the alarm if not above threshold
+            if (util >= trkGpuThreshold.Value)
             {
-                if (util >= trkGpuThreshold.Value)
-                {
-                    mpGpu.Volume = trkGpuVolume.Value / 100.0f;
-                    TotalGpuTicksAboveThreshold += timer1.Interval;                    
-                }
-                else
-                    mpGpu.Volume = 0.0f;
+                newVolume = trkGpuVolume.Value / 100.0f;
+                TotalGpuTicksAboveThreshold += timer1.Interval;
             }
+            if (mpGpu != null) mpGpu.Volume = newVolume;
 
             float abovePct = (TotalGpuTicksAboveThreshold / TotalTicks) * 100.0f;
-            SmartUpdateColor(lblGpuAbovePct, lblGpuAlarm.ForeColor, Color.Red, abovePct, (float)trkGpuThreshold.Tag);
+            SmartUpdateColor(lblGpuAbovePct, toolStrip4090Label.ForeColor, Color.Red, abovePct, (float)trkGpuThreshold.Tag);
             UpdateCaption(lblGpuAbovePct, abovePct, "%");
+
+            SmartUpdateColor(lblGpuAlarm, toolStrip4090Label.ForeColor, Color.Red, util, (float)trkGpuThreshold.Tag);
+            UpdateCaption(lblGpuAlarm, util, "%");
 
 
             ExCounter += myRTX4090.ReadResetExceptionsCounter;
@@ -917,7 +940,6 @@ namespace PerformanceMonitor
             {
                 case 0: // %GPU Time
                     UpdateCounter(util, pbGPU0, lblGPU0, "%");
-                    UpdateCaption(lblGpuAlarm, util, "%");
                     break;
                 case 1: // GPU Temperature (in degrees C)
                     UpdateCounter(temp, pbGPU0, lblGPU0, "°C");
@@ -979,19 +1001,22 @@ namespace PerformanceMonitor
             UpdateCounter(cpuCounter26, pbCPU26, lblCPU26);
             UpdateCounter(cpuCounter27, pbCPU27, lblCPU27);
 
-            if (mpCpu != null) {
-                if (maxCpuUtil >= trkCpuThreshold.Value)
-                {
-                    mpCpu.Volume = trkCpuVolume.Value / 100.0f;
-                    TotalCpuTicksAboveThreshold += incrementalTicks;                    
-                } 
-                else
-                    mpCpu.Volume = 0.0f;
-            }
-            float abovePct = (TotalCpuTicksAboveThreshold / TotalTicks) * 100.0f;
-            SmartUpdateColor(lblCpuAbovePct, lblCpuAlarm.ForeColor, Color.Red, abovePct, (float)trkCpuThreshold.Tag);
-            UpdateCaption(lblCpuAbovePct, abovePct, "%");
 
+            // Always Track max Cpu util (alarms)
+            float newVolume = 0.0f; // mute the alarm if not above threshold
+            if (maxCpuUtil >= trkCpuThreshold.Value)
+            {
+                newVolume = trkCpuVolume.Value / 100.0f;
+                TotalCpuTicksAboveThreshold += incrementalTicks;
+            }
+            if (mpCpu != null) mpCpu.Volume = newVolume;
+
+
+            float aboveThPct = (TotalCpuTicksAboveThreshold / TotalTicks) * 100.0f;
+            SmartUpdateColor(lblCpuAbovePct, lblEfficientCoresNote.ForeColor, Color.Red, aboveThPct, (float)trkCpuThreshold.Tag);
+            UpdateCaption(lblCpuAbovePct, aboveThPct, "%");
+
+            SmartUpdateColor(lblCpuAlarm, lblEfficientCoresNote.ForeColor, Color.Red, maxCpuUtil, (float)trkCpuThreshold.Tag);
             UpdateCaption(lblCpuAlarm, maxCpuUtil, "%");
 
             UpdateDisk(diskCounterC, lblDiskC, lblMaxDiskC);

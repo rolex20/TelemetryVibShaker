@@ -16,7 +16,7 @@ namespace PerformanceMonitor
             get { return volume; }
             set {
                     volume = value; 
-                    if (waveProvider != null)
+                    if (waveProvider != null && waveProvider.Volume != volume)
                         waveProvider.Volume = volume; 
             }
         }
