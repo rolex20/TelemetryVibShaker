@@ -32,5 +32,11 @@
     <Setting Name="txtAircraftName" Type="System.String" Scope="User">
       <Value Profile="(Default)">F-16C_50</Value>
     </Setting>
+    <Setting Name="chkAutoMinimize" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="chkReassignIdealProcessor" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

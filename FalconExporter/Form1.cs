@@ -6,7 +6,9 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using IdealProcessorEnhanced;
 
 
 
@@ -34,12 +36,20 @@ namespace FalconExporter
         private ulong timeStamp;
         private float lastTelemetry;
 
+        private uint maxProcessorNumber = 0;
+        private bool needToCallSetNewIdealProcessor = true;
+
+
 
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool SetPriorityClass(IntPtr handle, uint priorityClass);
 
         [DllImport("kernel32.dll")]
         public static extern uint GetCurrentThreadId();
+
+        [DllImport("kernel32.dll")]
+        public static extern uint SetThreadIdealProcessor(uint hThread, uint dwIdealProcessor);
+
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint GetCurrentProcessorNumber();
@@ -70,6 +80,7 @@ namespace FalconExporter
             btnStart.Enabled = false;
             timer1.Interval = (int)nudFrequency.Value;
             timer1.Enabled = true;
+            if (chkAutoMinimize.Checked) this.WindowState = FormWindowState.Minimized;
         }
 
         private void btnDisconnect_Click(object sender, EventArgs e)
@@ -96,8 +107,42 @@ namespace FalconExporter
             EnableChildControls(control, false);
         }
 
+        private void SetNewIdealProcessor(uint maxProcNumber)
+        {
+            if (maxProcNumber <= 0)
+            {
+                UpdateCaption(tsStatus, $"Invalid MaxProcessorNumber {maxProcNumber}");
+                return;
+            }
+
+            tsStatus = null;
+            // My Intel 14700K has 8 performance cores and 12 efficiency cores.
+            // CPU numbers 0-15 are performance
+            // CPU numbers 16-27 are efficiency
+            ProcessorAssigner assigner = new ProcessorAssigner(maxProcNumber);
+            uint newIdealProcessor = assigner.GetNextProcessor();
+
+            uint currentThreadHandle = GetCurrentThreadId();
+            int previousProcessor = (int)SetThreadIdealProcessor(currentThreadHandle, newIdealProcessor);
+
+            if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
+            {
+                UpdateCaption(tsStatus, "$Failed to set Ideal Processor {newIdealProcessor}");
+                return;
+            }
+            else
+                UpdateCaption(tsStatus, $"Success for SetNewIdealProcessor({newIdealProcessor})");
+        }
+
         private void timer1_Tick(object sender, EventArgs e)
         {
+            if (chkReassignIdealProcessor.Enabled && chkReassignIdealProcessor.Checked && needToCallSetNewIdealProcessor)
+            {
+                needToCallSetNewIdealProcessor = false;
+                SetNewIdealProcessor(maxProcessorNumber); // This one also displays the new ideal processor
+            }
+
+
             if (chkShowStatistics.Checked)
             {
                 stopWatch.Restart();                
@@ -279,8 +324,29 @@ namespace FalconExporter
             this.Location = new Point(Properties.Settings.Default.XCoordinate, Properties.Settings.Default.YCoordinate);
             // Load the settings for all controls in the form
             LoadSettings(this);
+
+            if (chkAutoMinimize.Checked)
+            {
+                Task.Run(() => AutoStart());
+            }
+
             ProcessorCheck();
         }
+
+        private void AutoStart()
+        {
+            Thread.Sleep(10000);
+
+            this.Invoke((MethodInvoker)delegate
+            {
+                // Code here will run on the UI thread
+                // We can safely interact with UI elements
+
+                // Verify that the user hasn't aborted the autostart or clicked manually on btnStartListening
+                if (chkAutoMinimize.Checked && btnStart.Enabled) btnStart_Click(null, null);
+            });
+        }
+
 
         private void ProcessorCheck()
         {
@@ -439,6 +505,8 @@ namespace FalconExporter
                         affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
                         chkUseEfficiencyCoresOnly.Text = "14700K" + chkUseEfficiencyCoresOnly.Text;
                         chkUseEfficiencyCoresOnly.Visible = true;
+                        chkReassignIdealProcessor.Enabled = true;
+                        maxProcessorNumber = 27;
                     }
                     break;
                 default:
@@ -573,6 +641,11 @@ namespace FalconExporter
         private void nudFrequency_ValueChanged(object sender, EventArgs e)
         {
             timer1.Interval = (int)nudFrequency.Value;
+        }
+
+        private void chkReassignIdealProcessor_CheckedChanged(object sender, EventArgs e)
+        {
+            needToCallSetNewIdealProcessor = true; // this needs to beed done from the Timer.Tick() thread
         }
     }
 }

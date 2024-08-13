@@ -86,6 +86,8 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.btnResetMax = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.chkAutoMinimize = new System.Windows.Forms.CheckBox();
+            this.chkReassignIdealProcessor = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudFrequency)).BeginInit();
@@ -98,14 +100,16 @@
             // 
             this.tabControl1.Controls.Add(this.tabSettings);
             this.tabControl1.Controls.Add(this.tabMonitor);
-            this.tabControl1.Location = new System.Drawing.Point(24, 34);
+            this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(472, 303);
+            this.tabControl1.Size = new System.Drawing.Size(472, 353);
             this.tabControl1.TabIndex = 0;
             // 
             // tabSettings
             // 
+            this.tabSettings.Controls.Add(this.chkReassignIdealProcessor);
+            this.tabSettings.Controls.Add(this.chkAutoMinimize);
             this.tabSettings.Controls.Add(this.txtAircraftName);
             this.tabSettings.Controls.Add(this.label5);
             this.tabSettings.Controls.Add(this.chkUseEfficiencyCoresOnly);
@@ -121,7 +125,7 @@
             this.tabSettings.Location = new System.Drawing.Point(4, 22);
             this.tabSettings.Name = "tabSettings";
             this.tabSettings.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSettings.Size = new System.Drawing.Size(464, 277);
+            this.tabSettings.Size = new System.Drawing.Size(464, 327);
             this.tabSettings.TabIndex = 0;
             this.tabSettings.Text = "Settings";
             this.tabSettings.UseVisualStyleBackColor = true;
@@ -149,7 +153,7 @@
             this.chkUseEfficiencyCoresOnly.AutoSize = true;
             this.chkUseEfficiencyCoresOnly.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.chkUseEfficiencyCoresOnly.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
-            this.chkUseEfficiencyCoresOnly.Location = new System.Drawing.Point(20, 242);
+            this.chkUseEfficiencyCoresOnly.Location = new System.Drawing.Point(20, 289);
             this.chkUseEfficiencyCoresOnly.Name = "chkUseEfficiencyCoresOnly";
             this.chkUseEfficiencyCoresOnly.Size = new System.Drawing.Size(260, 19);
             this.chkUseEfficiencyCoresOnly.TabIndex = 9;
@@ -598,7 +602,7 @@
             // 
             // btnStart
             // 
-            this.btnStart.Location = new System.Drawing.Point(335, 343);
+            this.btnStart.Location = new System.Drawing.Point(323, 371);
             this.btnStart.Name = "btnStart";
             this.btnStart.Size = new System.Drawing.Size(75, 23);
             this.btnStart.TabIndex = 1;
@@ -612,7 +616,7 @@
             // 
             // btnDisconnect
             // 
-            this.btnDisconnect.Location = new System.Drawing.Point(417, 343);
+            this.btnDisconnect.Location = new System.Drawing.Point(405, 371);
             this.btnDisconnect.Name = "btnDisconnect";
             this.btnDisconnect.Size = new System.Drawing.Size(75, 23);
             this.btnDisconnect.TabIndex = 3;
@@ -627,7 +631,7 @@
             this.tsStatus,
             this.tsAircraftChange,
             this.toolStripSeparator1});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 375);
+            this.toolStrip1.Location = new System.Drawing.Point(0, 409);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(512, 25);
             this.toolStrip1.TabIndex = 4;
@@ -657,7 +661,7 @@
             // 
             // btnResetMax
             // 
-            this.btnResetMax.Location = new System.Drawing.Point(28, 343);
+            this.btnResetMax.Location = new System.Drawing.Point(16, 371);
             this.btnResetMax.Name = "btnResetMax";
             this.btnResetMax.Size = new System.Drawing.Size(75, 23);
             this.btnResetMax.TabIndex = 5;
@@ -665,11 +669,32 @@
             this.btnResetMax.UseVisualStyleBackColor = true;
             this.btnResetMax.Click += new System.EventHandler(this.btnResetMax_Click);
             // 
+            // chkAutoMinimize
+            // 
+            this.chkAutoMinimize.AutoSize = true;
+            this.chkAutoMinimize.Location = new System.Drawing.Point(20, 261);
+            this.chkAutoMinimize.Name = "chkAutoMinimize";
+            this.chkAutoMinimize.Size = new System.Drawing.Size(198, 17);
+            this.chkAutoMinimize.TabIndex = 12;
+            this.chkAutoMinimize.Text = "Auto Start and Minimize when start...";
+            this.chkAutoMinimize.UseVisualStyleBackColor = true;
+            // 
+            // chkReassignIdealProcessor
+            // 
+            this.chkReassignIdealProcessor.AutoSize = true;
+            this.chkReassignIdealProcessor.Location = new System.Drawing.Point(20, 233);
+            this.chkReassignIdealProcessor.Name = "chkReassignIdealProcessor";
+            this.chkReassignIdealProcessor.Size = new System.Drawing.Size(280, 17);
+            this.chkReassignIdealProcessor.TabIndex = 13;
+            this.chkReassignIdealProcessor.Text = "Reassign Ideal Processor. (Only supported in 14700K)";
+            this.chkReassignIdealProcessor.UseVisualStyleBackColor = true;
+            this.chkReassignIdealProcessor.CheckedChanged += new System.EventHandler(this.chkReassignIdealProcessor_CheckedChanged);
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(512, 400);
+            this.ClientSize = new System.Drawing.Size(512, 434);
             this.Controls.Add(this.btnResetMax);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.btnDisconnect);
@@ -756,6 +781,8 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label24;
         private System.Windows.Forms.Label lblGear;
+        private System.Windows.Forms.CheckBox chkAutoMinimize;
+        private System.Windows.Forms.CheckBox chkReassignIdealProcessor;
     }
 }
 
