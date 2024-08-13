@@ -410,6 +410,8 @@ namespace SimConnectExporter
             btnDisconnect.Enabled = true;
             cmbSimConnectPeriod.Enabled = false;
             timer1.Enabled = true;
+
+            if (chkAutoMinimize.Checked) this.WindowState = FormWindowState.Minimized;
         }
 
         [DllImport("user32.dll")]
