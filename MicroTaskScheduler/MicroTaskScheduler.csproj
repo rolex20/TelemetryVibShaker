@@ -51,6 +51,7 @@
     <Compile Include="MicroTaskSchedulerService.Designer.cs">
       <DependentUpon>MicroTaskSchedulerService.cs</DependentUpon>
     </Compile>
+    <Compile Include="ProcessorAssigner.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>

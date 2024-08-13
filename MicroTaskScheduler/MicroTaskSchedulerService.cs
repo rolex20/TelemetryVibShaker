@@ -5,6 +5,8 @@ using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Media;
+using IdealProcessorEnhanced;
+using System.Runtime.InteropServices;
 
 namespace MicroTaskScheduler
 {
@@ -23,6 +25,14 @@ namespace MicroTaskScheduler
         private Task hourlyAlarmTask;
         private ProcessStartInfo startInfo;
         private IntPtr affinityMask = IntPtr.Zero;
+
+        [DllImport("kernel32.dll")]
+        public static extern uint GetCurrentThreadId();
+
+        [DllImport("kernel32.dll")]
+        public static extern uint SetThreadIdealProcessor(uint hThread, uint dwIdealProcessor);
+
+
         public MicroTaskSchedulerService()
         {
             InitializeComponent();
@@ -63,6 +73,7 @@ namespace MicroTaskScheduler
                     if (cpuCount == 28)
                     {
                         affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
+                        SetNewIdealProcessor(27);
                     }
                     break;
                 default:
@@ -82,6 +93,30 @@ namespace MicroTaskScheduler
             }
         }
 
+        private void SetNewIdealProcessor(uint maxProcNumber)
+        {
+            if (maxProcNumber <= 0)
+            {
+                //AddToLog(GetTickCount64(), "Invalid MaxProcessorNumber", "$SetNewIdealProcessor({maxProcNumber})", true);
+                return;
+            }
+
+
+            // My Intel 14700K has 8 performance cores and 12 efficiency cores.
+            // CPU numbers 0-15 are performance
+            // CPU numbers 16-27 are efficiency
+            ProcessorAssigner assigner = new ProcessorAssigner(maxProcNumber);
+            uint newIdealProcessor = assigner.GetNextProcessor();
+
+            uint currentThreadHandle = GetCurrentThreadId();
+            int previousProcessor = (int)SetThreadIdealProcessor(currentThreadHandle, newIdealProcessor);
+
+            if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
+            {
+                //AddToLog(GetTickCount64(), "Failed to set Ideal Processor", "$SetNewIdealProcessor({maxProcNumber})", true);
+                return;
+            }
+        }
 
         private void AssignEfficiencyCoresOnlyOld()
         {
