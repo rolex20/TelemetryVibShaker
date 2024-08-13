@@ -9,6 +9,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using IdealProcessorEnhanced;
+using System.IO.Pipes;
+using System.IO;
 
 
 
@@ -38,6 +40,11 @@ namespace FalconExporter
 
         private uint maxProcessorNumber = 0;
         private bool needToCallSetNewIdealProcessor = true;
+
+        private Thread pipeServerThread;  // IPC_PipeServer Thread for pipes interprocess communications
+        private CancellationTokenSource pipeCancellationTokenSource;
+        private bool topMost = false; // to fix .TopMost bug
+
 
 
 
@@ -76,7 +83,7 @@ namespace FalconExporter
             if (chkChangeToMonitor.Checked) tabControl1.SelectedIndex = 1;
             DisableChildControls(tabSettings);
 
-            btnDisconnect.Enabled = true;
+            btnStop.Enabled = true;
             btnStart.Enabled = false;
             timer1.Interval = (int)nudFrequency.Value;
             timer1.Enabled = true;
@@ -88,7 +95,7 @@ namespace FalconExporter
             timer1.Enabled = false;
             EnableChildControls(tabSettings);            
 
-            btnDisconnect.Enabled = false;
+            btnStop.Enabled = false;
             btnStart.Enabled = true;
             UpdateCaption(tsStatus, "Timer stopped.");
             DisconnectUDP();
@@ -331,7 +338,117 @@ namespace FalconExporter
             }
 
             ProcessorCheck();
+
+            // Start Interprocess communication server using named pipes using a different thread
+            pipeCancellationTokenSource = new CancellationTokenSource();
+            pipeServerThread = new Thread(() => IPC_PipeServer(pipeCancellationTokenSource.Token));
+            pipeServerThread.IsBackground = true;
+            pipeServerThread.Start();
+
         }
+
+        // When playing in VR I can't conveniently switch to performance monitor to change settings
+        // Instead I user RemoteWindowControl to send IPC pipe messages to WarThunderExporter
+        // This way I can change settings more conveniently using a web browser in my phone
+        private async void IPC_PipeServer(CancellationToken cancellationToken)
+        {
+            bool need_to_close = false;
+
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                using (NamedPipeServerStream pipeServer = new NamedPipeServerStream("FalconExporterPipeCommands", PipeDirection.In))
+                {
+                    // Wait for a client to connect
+                    await pipeServer.WaitForConnectionAsync(cancellationToken);
+
+                    using (StreamReader reader = new StreamReader(pipeServer))
+                    {
+                        string command;
+                        string result = "OK";
+                        while ((command = await reader.ReadLineAsync()) != null)
+                        {
+                            this.Invoke(new Action(() =>
+                            {
+
+                                switch (command)
+                                {
+                                    case "INTERVAL_100":
+                                        nudFrequency.Value = 100;
+                                        break;
+                                    case "INTERVAL_50":
+                                        nudFrequency.Value = 50;
+                                        break;
+                                    case "MONITOR":
+                                        tabControl1.SelectTab("tabMonitor");
+                                        break;
+                                    case "DEBUG":
+                                        tabControl1.SelectTab("tabDebug");
+                                        break;
+                                    case "SETTINGS":
+                                        tabControl1.SelectTab("tabSettings");
+                                        break;
+                                    case "STOP":
+                                        if (btnStop.Enabled) btnDisconnect_Click(null, null);
+                                        break;
+                                    case "START":
+                                        if (btnStart.Enabled) btnStart_Click(null, null);
+                                        break;
+                                    case "CYCLE_STATISTICS":
+                                        chkShowStatistics.Checked = !chkShowStatistics.Checked;
+                                        break;
+                                    case "MINIMIZE":
+                                        this.WindowState = FormWindowState.Minimized;
+                                        break;
+                                    case "RESTORE":
+                                        this.WindowState = FormWindowState.Normal;
+                                        break;
+                                    case "FOREGROUND":
+                                        this.BringToFront();
+                                        this.Focus();
+                                        break;
+                                    case string s when s.StartsWith("ALIGN_LEFT"):
+                                        if (s.Length > 10)
+                                        {
+                                            string new_position = s.Substring(10);
+                                            int x;
+                                            if (int.TryParse(new_position, out x))
+                                                this.Location = new Point(x, this.Location.Y);
+                                        }
+                                        else
+                                        {
+                                            result = "BAD REQUEST FOR ALIGN_LEFT";
+                                        }
+                                        break;
+                                    case "TOPMOST":
+                                        // The following doesn't work, had to fix with local copy
+                                        // this.TopMost = !(this.TopMost);
+                                        topMost = !topMost;
+                                        this.TopMost = topMost;
+                                        result = "Now .TopMost=" + this.TopMost.ToString();
+                                        break;
+                                    case "CLOSE":
+                                        need_to_close = true;
+                                        pipeCancellationTokenSource.Cancel();
+                                        break;
+                                    default:
+                                        result = "Unknown command";
+                                        break;
+                                }
+                                string info = $"Received command):[{command}][{result}]";
+                                UpdateCaption(tsStatus, $"[{GetTickCount64()}]Received command:[{command}][{result}]");
+                            }));
+                        }
+                    }
+                }
+            }
+            // We need to execute the following code on a thread that can modify form objects/properties
+            if (need_to_close) this.Invoke(new Action(() =>
+            {
+                this.Close();
+            }));
+
+        }
+
 
         private void AutoStart()
         {

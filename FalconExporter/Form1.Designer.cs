@@ -79,7 +79,7 @@
             this.chkChangeToMonitor = new System.Windows.Forms.CheckBox();
             this.btnStart = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.btnDisconnect = new System.Windows.Forms.Button();
+            this.btnStop = new System.Windows.Forms.Button();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.tsStatus = new System.Windows.Forms.ToolStripLabel();
             this.tsAircraftChange = new System.Windows.Forms.ToolStripLabel();
@@ -277,7 +277,7 @@
             this.tabMonitor.Location = new System.Drawing.Point(4, 22);
             this.tabMonitor.Name = "tabMonitor";
             this.tabMonitor.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMonitor.Size = new System.Drawing.Size(464, 277);
+            this.tabMonitor.Size = new System.Drawing.Size(464, 327);
             this.tabMonitor.TabIndex = 1;
             this.tabMonitor.Text = "Monitor";
             this.tabMonitor.UseVisualStyleBackColor = true;
@@ -614,15 +614,15 @@
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // btnDisconnect
+            // btnStop
             // 
-            this.btnDisconnect.Location = new System.Drawing.Point(405, 371);
-            this.btnDisconnect.Name = "btnDisconnect";
-            this.btnDisconnect.Size = new System.Drawing.Size(75, 23);
-            this.btnDisconnect.TabIndex = 3;
-            this.btnDisconnect.Text = "Disconnect";
-            this.btnDisconnect.UseVisualStyleBackColor = true;
-            this.btnDisconnect.Click += new System.EventHandler(this.btnDisconnect_Click);
+            this.btnStop.Location = new System.Drawing.Point(405, 371);
+            this.btnStop.Name = "btnStop";
+            this.btnStop.Size = new System.Drawing.Size(75, 23);
+            this.btnStop.TabIndex = 3;
+            this.btnStop.Text = "Disconnect";
+            this.btnStop.UseVisualStyleBackColor = true;
+            this.btnStop.Click += new System.EventHandler(this.btnDisconnect_Click);
             // 
             // toolStrip1
             // 
@@ -697,7 +697,7 @@
             this.ClientSize = new System.Drawing.Size(512, 434);
             this.Controls.Add(this.btnResetMax);
             this.Controls.Add(this.toolStrip1);
-            this.Controls.Add(this.btnDisconnect);
+            this.Controls.Add(this.btnStop);
             this.Controls.Add(this.btnStart);
             this.Controls.Add(this.tabControl1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
@@ -756,7 +756,7 @@
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.CheckBox chkUseEfficiencyCoresOnly;
-        private System.Windows.Forms.Button btnDisconnect;
+        private System.Windows.Forms.Button btnStop;
         private System.Windows.Forms.CheckBox chkChangeToMonitor;
         private System.Windows.Forms.CheckBox chkShowStatistics;
         private System.Windows.Forms.Label label5;
