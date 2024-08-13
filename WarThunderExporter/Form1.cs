@@ -737,7 +737,7 @@ namespace WarThunderExporter
         // The function is large, but straightforward to understand and almost no indirection-levels of abrstraction required to understand it
         private async Task WarThunderTelemetryAsync()
         {
-            if (chkReassignIdealProcessor.Enabled && chkReassignIdealProcessor.Checked && needToCallSetNewIdealProcessor)
+            if (needToCallSetNewIdealProcessor)
             {
                 needToCallSetNewIdealProcessor = false;
                 SetNewIdealProcessor(maxProcessorNumber); // This one also displays the new ideal processor
@@ -1058,7 +1058,9 @@ namespace WarThunderExporter
 
         private void chkReassignIdealProcessor_CheckedChanged(object sender, EventArgs e)
         {
-            needToCallSetNewIdealProcessor = true; // this needs to beed done from the Timer.Tick() thread
+            // processor cannot be assigned from the current thread
+            // let's signal the need for that operation here
+            needToCallSetNewIdealProcessor = chkReassignIdealProcessor.Visible && chkReassignIdealProcessor.Checked;
         }
     }
 }

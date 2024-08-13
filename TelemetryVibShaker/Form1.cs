@@ -1346,7 +1346,9 @@ namespace TelemetryVibShaker
 
         private void chkReassignIdealProcessor_CheckedChanged(object sender, EventArgs e)
         {
-            needToCallSetNewIdealProcessor = true; // this needs to beed done from the Timer.Tick() thread
+            // processor cannot be assigned from the current thread
+            // let's signal the need for that operation here
+            needToCallSetNewIdealProcessor = chkReassignIdealProcessor.Visible && chkReassignIdealProcessor.Checked;
         }
     }
 }

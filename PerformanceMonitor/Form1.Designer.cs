@@ -137,6 +137,8 @@
             this.toolStripLabel4 = new System.Windows.Forms.ToolStripLabel();
             this.tslblExceptions = new System.Windows.Forms.ToolStripLabel();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.tslblIdealProcessorLabel = new System.Windows.Forms.ToolStripLabel();
+            this.tslblIdealProcessor = new System.Windows.Forms.ToolStripLabel();
             this.tschkShowLastProcessor = new System.Windows.Forms.ToolStripButton();
             this.tslblLP = new System.Windows.Forms.ToolStripLabel();
             this.tslblCurrentProcessor = new System.Windows.Forms.ToolStripLabel();
@@ -203,6 +205,8 @@
             this.txtCpuAlarm = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.tbSettings = new System.Windows.Forms.TabPage();
+            this.lblReassignIdealProcessor = new System.Windows.Forms.Label();
+            this.chkReassignIdealProcessor = new System.Windows.Forms.CheckBox();
             this.lblMonitorBottleneckThreshold = new System.Windows.Forms.Label();
             this.label53 = new System.Windows.Forms.Label();
             this.trkMonitorBottleneckThreshold = new System.Windows.Forms.TrackBar();
@@ -219,10 +223,6 @@
             this.tbErrors = new System.Windows.Forms.TabPage();
             this.txtErrors = new System.Windows.Forms.TextBox();
             this.lblErrorsTitle = new System.Windows.Forms.Label();
-            this.tslblIdealProcessorLabel = new System.Windows.Forms.ToolStripLabel();
-            this.tslblIdealProcessor = new System.Windows.Forms.ToolStripLabel();
-            this.chkReassignIdealProcessor = new System.Windows.Forms.CheckBox();
-            this.lblReassignIdealProcessor = new System.Windows.Forms.Label();
             this.toolStrip1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.tcTabControl.SuspendLayout();
@@ -1279,6 +1279,18 @@
             this.toolStripSeparator5.Name = "toolStripSeparator5";
             this.toolStripSeparator5.Size = new System.Drawing.Size(6, 25);
             // 
+            // tslblIdealProcessorLabel
+            // 
+            this.tslblIdealProcessorLabel.Name = "tslblIdealProcessorLabel";
+            this.tslblIdealProcessorLabel.Size = new System.Drawing.Size(92, 22);
+            this.tslblIdealProcessorLabel.Text = "Ideal Processor: ";
+            // 
+            // tslblIdealProcessor
+            // 
+            this.tslblIdealProcessor.Name = "tslblIdealProcessor";
+            this.tslblIdealProcessor.Size = new System.Drawing.Size(22, 22);
+            this.tslblIdealProcessor.Text = "---";
+            // 
             // tschkShowLastProcessor
             // 
             this.tschkShowLastProcessor.CheckOnClick = true;
@@ -2047,6 +2059,29 @@
             this.tbSettings.UseVisualStyleBackColor = true;
             this.tbSettings.Click += new System.EventHandler(this.tbSettings_Click);
             // 
+            // lblReassignIdealProcessor
+            // 
+            this.lblReassignIdealProcessor.AutoSize = true;
+            this.lblReassignIdealProcessor.Location = new System.Drawing.Point(190, 271);
+            this.lblReassignIdealProcessor.Name = "lblReassignIdealProcessor";
+            this.lblReassignIdealProcessor.Size = new System.Drawing.Size(73, 13);
+            this.lblReassignIdealProcessor.TabIndex = 26;
+            this.lblReassignIdealProcessor.Text = "* 14700K only";
+            // 
+            // chkReassignIdealProcessor
+            // 
+            this.chkReassignIdealProcessor.AutoSize = true;
+            this.chkReassignIdealProcessor.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.chkReassignIdealProcessor.Enabled = false;
+            this.chkReassignIdealProcessor.Location = new System.Drawing.Point(27, 270);
+            this.chkReassignIdealProcessor.Name = "chkReassignIdealProcessor";
+            this.chkReassignIdealProcessor.Size = new System.Drawing.Size(149, 17);
+            this.chkReassignIdealProcessor.TabIndex = 25;
+            this.chkReassignIdealProcessor.Text = "Reassign Ideal Processor:";
+            this.chkReassignIdealProcessor.UseVisualStyleBackColor = true;
+            this.chkReassignIdealProcessor.Visible = false;
+            this.chkReassignIdealProcessor.CheckedChanged += new System.EventHandler(this.chkReassignIdealProcessor_CheckedChanged);
+            // 
             // lblMonitorBottleneckThreshold
             // 
             this.lblMonitorBottleneckThreshold.AutoSize = true;
@@ -2244,40 +2279,6 @@
             this.lblErrorsTitle.Size = new System.Drawing.Size(168, 13);
             this.lblErrorsTitle.TabIndex = 0;
             this.lblErrorsTitle.Text = "Errors: (only the first 100 are listed)";
-            // 
-            // tslblIdealProcessorLabel
-            // 
-            this.tslblIdealProcessorLabel.Name = "tslblIdealProcessorLabel";
-            this.tslblIdealProcessorLabel.Size = new System.Drawing.Size(92, 22);
-            this.tslblIdealProcessorLabel.Text = "Ideal Processor: ";
-            // 
-            // tslblIdealProcessor
-            // 
-            this.tslblIdealProcessor.Name = "tslblIdealProcessor";
-            this.tslblIdealProcessor.Size = new System.Drawing.Size(22, 22);
-            this.tslblIdealProcessor.Text = "---";
-            // 
-            // chkReassignIdealProcessor
-            // 
-            this.chkReassignIdealProcessor.AutoSize = true;
-            this.chkReassignIdealProcessor.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.chkReassignIdealProcessor.Enabled = false;
-            this.chkReassignIdealProcessor.Location = new System.Drawing.Point(27, 270);
-            this.chkReassignIdealProcessor.Name = "chkReassignIdealProcessor";
-            this.chkReassignIdealProcessor.Size = new System.Drawing.Size(149, 17);
-            this.chkReassignIdealProcessor.TabIndex = 25;
-            this.chkReassignIdealProcessor.Text = "Reassign Ideal Processor:";
-            this.chkReassignIdealProcessor.UseVisualStyleBackColor = true;
-            this.chkReassignIdealProcessor.CheckedChanged += new System.EventHandler(this.chkReassignIdealProcessor_CheckedChanged);
-            // 
-            // lblReassignIdealProcessor
-            // 
-            this.lblReassignIdealProcessor.AutoSize = true;
-            this.lblReassignIdealProcessor.Location = new System.Drawing.Point(190, 271);
-            this.lblReassignIdealProcessor.Name = "lblReassignIdealProcessor";
-            this.lblReassignIdealProcessor.Size = new System.Drawing.Size(73, 13);
-            this.lblReassignIdealProcessor.TabIndex = 26;
-            this.lblReassignIdealProcessor.Text = "* 14700K only";
             // 
             // frmMain
             // 

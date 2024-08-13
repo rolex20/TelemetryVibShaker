@@ -443,7 +443,9 @@ namespace PerformanceMonitor
 
         private void chkReassignIdealProcessor_CheckedChanged(object sender, EventArgs e)
         {
-            needToCallSetNewIdealProcessor = true; // this needs to beed done from the Timer.Tick() thread
+            // processor cannot be assigned from the current thread
+            // let's signal the need for that operation here
+            needToCallSetNewIdealProcessor = chkReassignIdealProcessor.Visible && chkReassignIdealProcessor.Checked;
         }
 
         private void pbCPU18_Click(object sender, EventArgs e)
@@ -687,10 +689,6 @@ namespace PerformanceMonitor
             ResetMaxCounters();            
 
 
-            // Change the priority class to the previous setting selected (NORMAL, BELOW_NORMAL or IDLE)
-            cmbPriorityClass.SelectedIndex = Properties.Settings.Default.PriorityClassSelectedIndex;
-
-
             // Obtain current IP Address
             txtIPAddress.Text = GetMyIPAddress();
 
@@ -720,6 +718,11 @@ namespace PerformanceMonitor
             timer1.Interval = (int)nudPollingInterval.Value;
 
             AssignEfficiencyCoresOnly();
+
+            // Change the priority class to the previous setting selected (NORMAL, BELOW_NORMAL or IDLE)
+            // This call must come after AssignEfficiencyCoresOnly
+            cmbPriorityClass.SelectedIndex = Properties.Settings.Default.PriorityClassSelectedIndex;
+
             timer1.Enabled = tschkEnabled.Checked;
         }
 
