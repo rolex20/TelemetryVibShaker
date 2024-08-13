@@ -4,8 +4,8 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
 using System.Text;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.IO.Pipes;
+using IdealProcessorEnhanced;
 
 
 namespace WarThunderExporter
@@ -23,6 +23,9 @@ namespace WarThunderExporter
 
         HttpClient httpClient;
         private Process currentProcess;
+        private uint maxProcessorNumber = 0;
+        private bool needToCallSetNewIdealProcessor = true;
+
         private UdpClient udpSender;
         private byte[] datagram;
         private Stopwatch stopWatch = new Stopwatch();
@@ -45,6 +48,10 @@ namespace WarThunderExporter
 
         [DllImport("kernel32.dll")]
         public static extern uint GetCurrentThreadId();
+
+        [DllImport("kernel32.dll")]
+        public static extern uint SetThreadIdealProcessor(uint hThread, uint dwIdealProcessor);
+
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint GetCurrentProcessorNumber();
@@ -70,7 +77,6 @@ namespace WarThunderExporter
             this.Location = new Point(Properties.Settings.Default.XCoordinate, Properties.Settings.Default.YCoordinate);
             // Load the settings for all controls in the form
             LoadSettings(this);
-            ProcessorCheck();
 
             var handler = new SocketsHttpHandler
             {
@@ -90,6 +96,9 @@ namespace WarThunderExporter
             {
                 Task.Run(() => AutoStart());
             }
+
+
+            ProcessorCheck();
         }
 
         // When playing in VR I can't conveniently switch to performance monitor to change settings
@@ -372,6 +381,8 @@ namespace WarThunderExporter
                         affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
                         chkUseEfficiencyCoresOnly.Text = "14700K" + chkUseEfficiencyCoresOnly.Text;
                         chkUseEfficiencyCoresOnly.Visible = true;
+                        chkReassignIdealProcessor.Enabled = true;
+                        maxProcessorNumber = 27;
                     }
                     break;
                 default:
@@ -649,6 +660,50 @@ namespace WarThunderExporter
             return telemetry.TryGetValue(keyName, out var value) ? (string)value : defaultValue;
         }
 
+        private void SetNewIdealProcessor(uint maxProcNumber)
+        {
+            if (maxProcNumber <= 0)
+            {
+                AddToLog(GetTickCount64(), "Invalid MaxProcessorNumber", "$SetNewIdealProcessor({maxProcNumber})", true);
+                return;
+            }
+
+
+            // My Intel 14700K has 8 performance cores and 12 efficiency cores.
+            // CPU numbers 0-15 are performance
+            // CPU numbers 16-27 are efficiency
+            ProcessorAssigner assigner = new ProcessorAssigner(maxProcNumber);
+            uint newIdealProcessor = assigner.GetNextProcessor();
+
+            uint currentThreadHandle = GetCurrentThreadId();
+            int previousProcessor = (int)SetThreadIdealProcessor(currentThreadHandle, newIdealProcessor);
+
+            if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
+            {
+                AddToLog(GetTickCount64(), "Failed to set Ideal Processor", "$SetNewIdealProcessor({maxProcNumber})", true);
+                return;
+            }
+            else
+                AddToLog(GetTickCount64(), "Success for SetThreadIdealProcess()", $"SetNewIdealProcessor({newIdealProcessor})", true);
+        }
+
+        private void AddToLog(ulong timestamp, string message, string source, bool force = false)
+        {
+            int currentLinesCount = (int)txtDebug.Tag;
+            if (currentLinesCount < 100 || force) // only show first 100 errors
+            {
+                // Show error information                    
+                txtDebug.AppendText($"[{timeStamp}] [{source}] {message} " + Environment.NewLine);
+
+                // The first time we get an error, let's show it to the user
+                if (currentLinesCount == 0)
+                {
+                    tabControl1.SelectedIndex = 2; // Debug tab
+                    txtDebug.Tag = currentLinesCount + 1; // Only let's call the attention on the first error
+                }
+            }
+
+        }
 
         // This is where the War Thunder Telemetry is read
         // More info here: https://github.com/lucasvmx/WarThunder-localhost-documentation
@@ -657,6 +712,14 @@ namespace WarThunderExporter
         // The function is large, but straightforward to understand and almost no indirection-levels of abrstraction required to understand it
         private async Task WarThunderTelemetryAsync()
         {
+            if (chkReassignIdealProcessor.Enabled && chkReassignIdealProcessor.Checked && needToCallSetNewIdealProcessor)
+            {
+                needToCallSetNewIdealProcessor = false;
+                SetNewIdealProcessor(maxProcessorNumber); // This one also displays the new ideal processor
+            }
+
+
+
             // Some times there is a long wait caused by War Thunder to deliver the response
             // timer1.Enabled = false; // Now this is done in the caller
 
@@ -825,19 +888,7 @@ namespace WarThunderExporter
 
             catch (Exception ex)
             {
-
-                if ((int)txtDebug.Tag < 100) // only show first 100 errors
-                {
-                    // Show error information                    
-                    txtDebug.AppendText($"[{timeStamp}] {ex.Message}" + Environment.NewLine);
-
-                    // The first time we get an error, let's show it to the user
-                    if ((int)txtDebug.Tag == 0)
-                    {
-                        tabControl1.SelectedIndex = 2; // Debug tab
-                        txtDebug.Tag = (int)txtDebug.Tag + 1; // Only let's call the attention on the first error
-                    }
-                }
+                AddToLog(timeStamp, ex.Message, "WarThunderTelemetryAsync-catch()");
                 RecoverFromTypicalException("Error Retrieveing Telemtry Data.  Retrying soon...", true);
             }
 
@@ -978,6 +1029,11 @@ namespace WarThunderExporter
         private void txtDestinationPort_KeyPress(object sender, KeyPressEventArgs e)
         {
             AllowOnlyDigits(sender, e);
+        }
+
+        private void chkReassignIdealProcessor_CheckedChanged(object sender, EventArgs e)
+        {
+            needToCallSetNewIdealProcessor = true; // this needs to beed done from the Timer.Tick() thread
         }
     }
 }

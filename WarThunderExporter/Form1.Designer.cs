@@ -32,6 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmWarThunderTelemetry));
             tabControl1 = new TabControl();
             tabSettings = new TabPage();
+            chkReassignIdealProcessor = new CheckBox();
             chkAutoMinimize = new CheckBox();
             label12 = new Label();
             txtWtUrl = new TextBox();
@@ -101,11 +102,12 @@
             tabControl1.Location = new Point(12, 12);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(474, 369);
+            tabControl1.Size = new Size(474, 382);
             tabControl1.TabIndex = 0;
             // 
             // tabSettings
             // 
+            tabSettings.Controls.Add(chkReassignIdealProcessor);
             tabSettings.Controls.Add(chkAutoMinimize);
             tabSettings.Controls.Add(label12);
             tabSettings.Controls.Add(txtWtUrl);
@@ -122,15 +124,28 @@
             tabSettings.Location = new Point(4, 24);
             tabSettings.Name = "tabSettings";
             tabSettings.Padding = new Padding(3);
-            tabSettings.Size = new Size(466, 341);
+            tabSettings.Size = new Size(466, 354);
             tabSettings.TabIndex = 0;
             tabSettings.Text = "Settings";
             tabSettings.UseVisualStyleBackColor = true;
             // 
+            // chkReassignIdealProcessor
+            // 
+            chkReassignIdealProcessor.AutoSize = true;
+            chkReassignIdealProcessor.Enabled = false;
+            chkReassignIdealProcessor.Location = new Point(10, 269);
+            chkReassignIdealProcessor.Name = "chkReassignIdealProcessor";
+            chkReassignIdealProcessor.Size = new Size(303, 19);
+            chkReassignIdealProcessor.TabIndex = 13;
+            chkReassignIdealProcessor.Text = "Reassign Ideal Processor. (Only supported in 14700K)";
+            chkReassignIdealProcessor.UseVisualStyleBackColor = true;
+            chkReassignIdealProcessor.Visible = false;
+            chkReassignIdealProcessor.CheckedChanged += chkReassignIdealProcessor_CheckedChanged;
+            // 
             // chkAutoMinimize
             // 
             chkAutoMinimize.AutoSize = true;
-            chkAutoMinimize.Location = new Point(10, 300);
+            chkAutoMinimize.Location = new Point(10, 323);
             chkAutoMinimize.Name = "chkAutoMinimize";
             chkAutoMinimize.Size = new Size(221, 19);
             chkAutoMinimize.TabIndex = 12;
@@ -244,7 +259,7 @@
             chkUseEfficiencyCoresOnly.AutoSize = true;
             chkUseEfficiencyCoresOnly.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Bold, GraphicsUnit.Point);
             chkUseEfficiencyCoresOnly.ForeColor = Color.FromArgb(91, 155, 213);
-            chkUseEfficiencyCoresOnly.Location = new Point(10, 273);
+            chkUseEfficiencyCoresOnly.Location = new Point(10, 296);
             chkUseEfficiencyCoresOnly.Name = "chkUseEfficiencyCoresOnly";
             chkUseEfficiencyCoresOnly.Size = new Size(260, 19);
             chkUseEfficiencyCoresOnly.TabIndex = 0;
@@ -261,7 +276,7 @@
             tabMonitor.Location = new Point(4, 24);
             tabMonitor.Name = "tabMonitor";
             tabMonitor.Padding = new Padding(3);
-            tabMonitor.Size = new Size(466, 341);
+            tabMonitor.Size = new Size(466, 354);
             tabMonitor.TabIndex = 1;
             tabMonitor.Text = "Monitor";
             tabMonitor.UseVisualStyleBackColor = true;
@@ -569,9 +584,9 @@
             tabDebug.Controls.Add(txtDebug);
             tabDebug.Location = new Point(4, 24);
             tabDebug.Name = "tabDebug";
-            tabDebug.Size = new Size(466, 341);
+            tabDebug.Size = new Size(466, 354);
             tabDebug.TabIndex = 2;
-            tabDebug.Text = "Debug";
+            tabDebug.Text = "Log";
             tabDebug.UseVisualStyleBackColor = true;
             // 
             // lblDebugTitle
@@ -595,7 +610,7 @@
             // 
             // btnStart
             // 
-            btnStart.Location = new Point(326, 387);
+            btnStart.Location = new Point(326, 405);
             btnStart.Name = "btnStart";
             btnStart.Size = new Size(75, 23);
             btnStart.TabIndex = 1;
@@ -606,7 +621,7 @@
             // btnStop
             // 
             btnStop.Enabled = false;
-            btnStop.Location = new Point(407, 387);
+            btnStop.Location = new Point(407, 405);
             btnStop.Name = "btnStop";
             btnStop.Size = new Size(75, 23);
             btnStop.TabIndex = 2;
@@ -616,7 +631,7 @@
             // 
             // btnResetMax
             // 
-            btnResetMax.Location = new Point(16, 387);
+            btnResetMax.Location = new Point(16, 405);
             btnResetMax.Name = "btnResetMax";
             btnResetMax.Size = new Size(75, 23);
             btnResetMax.TabIndex = 3;
@@ -633,7 +648,7 @@
             // 
             toolStrip1.Dock = DockStyle.Bottom;
             toolStrip1.Items.AddRange(new ToolStripItem[] { tsStatus });
-            toolStrip1.Location = new Point(0, 428);
+            toolStrip1.Location = new Point(0, 442);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new Size(501, 25);
             toolStrip1.TabIndex = 4;
@@ -654,7 +669,7 @@
             AcceptButton = btnStart;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(501, 453);
+            ClientSize = new Size(501, 467);
             Controls.Add(toolStrip1);
             Controls.Add(btnResetMax);
             Controls.Add(btnStop);
@@ -739,5 +754,6 @@
         private Label label20;
         private Label label21;
         private CheckBox chkAutoMinimize;
+        private CheckBox chkReassignIdealProcessor;
     }
 }
