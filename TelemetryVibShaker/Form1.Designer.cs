@@ -74,6 +74,7 @@
             label14 = new Label();
             label12 = new Label();
             tabSettings = new TabPage();
+            chkReassignIdealProcessor = new CheckBox();
             chkPlayAlarm = new CheckBox();
             lblCountDownTimer = new Label();
             chkAutoStart = new CheckBox();
@@ -199,7 +200,7 @@
             tabs.Location = new Point(24, 14);
             tabs.Name = "tabs";
             tabs.SelectedIndex = 0;
-            tabs.Size = new Size(517, 412);
+            tabs.Size = new Size(517, 431);
             tabs.TabIndex = 0;
             // 
             // tabNormalSoundEffects
@@ -224,7 +225,7 @@
             tabNormalSoundEffects.Location = new Point(4, 24);
             tabNormalSoundEffects.Name = "tabNormalSoundEffects";
             tabNormalSoundEffects.Padding = new Padding(3);
-            tabNormalSoundEffects.Size = new Size(509, 384);
+            tabNormalSoundEffects.Size = new Size(509, 403);
             tabNormalSoundEffects.TabIndex = 0;
             tabNormalSoundEffects.Text = "Sound Effects";
             tabNormalSoundEffects.UseVisualStyleBackColor = true;
@@ -423,7 +424,7 @@
             tabArduino.Location = new Point(4, 24);
             tabArduino.Name = "tabArduino";
             tabArduino.Padding = new Padding(3);
-            tabArduino.Size = new Size(509, 384);
+            tabArduino.Size = new Size(509, 403);
             tabArduino.TabIndex = 1;
             tabArduino.Text = "Arduino";
             tabArduino.UseVisualStyleBackColor = true;
@@ -595,7 +596,7 @@
             tabTTGO20V3.Location = new Point(4, 24);
             tabTTGO20V3.Name = "tabTTGO20V3";
             tabTTGO20V3.Padding = new Padding(3);
-            tabTTGO20V3.Size = new Size(509, 384);
+            tabTTGO20V3.Size = new Size(509, 403);
             tabTTGO20V3.TabIndex = 2;
             tabTTGO20V3.Text = "T-Watch 2020 V3";
             tabTTGO20V3.UseVisualStyleBackColor = true;
@@ -669,6 +670,7 @@
             // 
             // tabSettings
             // 
+            tabSettings.Controls.Add(chkReassignIdealProcessor);
             tabSettings.Controls.Add(chkPlayAlarm);
             tabSettings.Controls.Add(lblCountDownTimer);
             tabSettings.Controls.Add(chkAutoStart);
@@ -692,16 +694,29 @@
             tabSettings.Controls.Add(label15);
             tabSettings.Location = new Point(4, 24);
             tabSettings.Name = "tabSettings";
-            tabSettings.Size = new Size(509, 384);
+            tabSettings.Size = new Size(509, 403);
             tabSettings.TabIndex = 4;
             tabSettings.Text = "General Settings";
             tabSettings.UseVisualStyleBackColor = true;
+            // 
+            // chkReassignIdealProcessor
+            // 
+            chkReassignIdealProcessor.AutoSize = true;
+            chkReassignIdealProcessor.Enabled = false;
+            chkReassignIdealProcessor.Location = new Point(17, 274);
+            chkReassignIdealProcessor.Name = "chkReassignIdealProcessor";
+            chkReassignIdealProcessor.Size = new Size(303, 19);
+            chkReassignIdealProcessor.TabIndex = 25;
+            chkReassignIdealProcessor.Text = "Reassign Ideal Processor. (Only supported in 14700K)";
+            chkReassignIdealProcessor.UseVisualStyleBackColor = true;
+            chkReassignIdealProcessor.Visible = false;
+            chkReassignIdealProcessor.CheckedChanged += chkReassignIdealProcessor_CheckedChanged;
             // 
             // chkPlayAlarm
             // 
             chkPlayAlarm.AutoSize = true;
             chkPlayAlarm.Enabled = false;
-            chkPlayAlarm.Location = new Point(17, 288);
+            chkPlayAlarm.Location = new Point(17, 301);
             chkPlayAlarm.Name = "chkPlayAlarm";
             chkPlayAlarm.Size = new Size(242, 19);
             chkPlayAlarm.TabIndex = 24;
@@ -721,7 +736,7 @@
             // chkAutoStart
             // 
             chkAutoStart.AutoSize = true;
-            chkAutoStart.Location = new Point(17, 316);
+            chkAutoStart.Location = new Point(17, 329);
             chkAutoStart.Name = "chkAutoStart";
             chkAutoStart.Size = new Size(219, 19);
             chkAutoStart.TabIndex = 22;
@@ -764,7 +779,7 @@
             chkUseEfficiencyCoresOnly.AutoSize = true;
             chkUseEfficiencyCoresOnly.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Bold, GraphicsUnit.Point);
             chkUseEfficiencyCoresOnly.ForeColor = Color.FromArgb(91, 155, 213);
-            chkUseEfficiencyCoresOnly.Location = new Point(17, 341);
+            chkUseEfficiencyCoresOnly.Location = new Point(17, 354);
             chkUseEfficiencyCoresOnly.Name = "chkUseEfficiencyCoresOnly";
             chkUseEfficiencyCoresOnly.Size = new Size(260, 19);
             chkUseEfficiencyCoresOnly.TabIndex = 18;
@@ -925,7 +940,7 @@
             tabTest.Controls.Add(btnTestArduinoMotors);
             tabTest.Location = new Point(4, 24);
             tabTest.Name = "tabTest";
-            tabTest.Size = new Size(509, 384);
+            tabTest.Size = new Size(509, 403);
             tabTest.TabIndex = 5;
             tabTest.Text = "Test";
             tabTest.UseVisualStyleBackColor = true;
@@ -998,7 +1013,7 @@
             tabMonitor.Controls.Add(chkChangeToMonitor);
             tabMonitor.Location = new Point(4, 24);
             tabMonitor.Name = "tabMonitor";
-            tabMonitor.Size = new Size(509, 384);
+            tabMonitor.Size = new Size(509, 403);
             tabMonitor.TabIndex = 3;
             tabMonitor.Text = "Monitor";
             tabMonitor.UseVisualStyleBackColor = true;
@@ -1579,7 +1594,7 @@
             tabNotFounds.Controls.Add(lstNotFounds);
             tabNotFounds.Location = new Point(4, 24);
             tabNotFounds.Name = "tabNotFounds";
-            tabNotFounds.Size = new Size(509, 384);
+            tabNotFounds.Size = new Size(509, 403);
             tabNotFounds.TabIndex = 6;
             tabNotFounds.Text = "Not Founds";
             tabNotFounds.UseVisualStyleBackColor = true;
@@ -1616,7 +1631,7 @@
             // 
             // btnStartListening
             // 
-            btnStartListening.Location = new Point(346, 428);
+            btnStartListening.Location = new Point(346, 451);
             btnStartListening.Name = "btnStartListening";
             btnStartListening.Size = new Size(100, 23);
             btnStartListening.TabIndex = 0;
@@ -1627,7 +1642,7 @@
             // btnStop
             // 
             btnStop.Enabled = false;
-            btnStop.Location = new Point(462, 428);
+            btnStop.Location = new Point(462, 451);
             btnStop.Name = "btnStop";
             btnStop.Size = new Size(75, 23);
             btnStop.TabIndex = 2;
@@ -1648,7 +1663,7 @@
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
-            statusStrip1.Location = new Point(0, 456);
+            statusStrip1.Location = new Point(0, 488);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(566, 22);
             statusStrip1.TabIndex = 3;
@@ -1662,7 +1677,7 @@
             // 
             // btnResetMax
             // 
-            btnResetMax.Location = new Point(24, 428);
+            btnResetMax.Location = new Point(24, 451);
             btnResetMax.Name = "btnResetMax";
             btnResetMax.Size = new Size(75, 23);
             btnResetMax.TabIndex = 4;
@@ -1676,7 +1691,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnStop;
-            ClientSize = new Size(566, 478);
+            ClientSize = new Size(566, 510);
             Controls.Add(btnResetMax);
             Controls.Add(statusStrip1);
             Controls.Add(btnStop);
@@ -1858,5 +1873,6 @@
         private ListBox lstNotFounds;
         private Label label48;
         private Label label51;
+        private CheckBox chkReassignIdealProcessor;
     }
 }

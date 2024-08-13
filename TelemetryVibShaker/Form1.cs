@@ -7,6 +7,7 @@ using Microsoft.Win32;
 using NAudio.CoreAudioApi;
 using System.IO.Pipes;
 using System.Windows.Forms;
+using IdealProcessorEnhanced;
 
 
 namespace TelemetryVibShaker
@@ -37,6 +38,9 @@ namespace TelemetryVibShaker
         private Thread pipeServerThread;  // IPC_PipeServer Thread for pipes interprocess communications
         private CancellationTokenSource pipeCancellationTokenSource;
 
+        private bool topMost = false; // to fix .TopMost bug
+
+
 
         private const uint PROCESS_MODE_BACKGROUND_BEGIN = 0x00100000;
         private const uint PROCESS_MODE_BACKGROUND_END = 0x00200000;
@@ -47,12 +51,17 @@ namespace TelemetryVibShaker
         [DllImport("kernel32.dll")]
         public static extern uint GetCurrentThreadId();
 
+        [DllImport("kernel32.dll")]
+        public static extern uint SetThreadIdealProcessor(uint hThread, uint dwIdealProcessor);
+
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint GetCurrentProcessorNumber();
 
         //[DllImport("kernel32.dll")]
         //private static extern uint GetTickCount();
 
+        private uint maxProcessorNumber = 0;
+        private bool needToCallSetNewIdealProcessor = true;
 
         public frmMain()
         {
@@ -349,8 +358,6 @@ namespace TelemetryVibShaker
             // Load the settings for all controls in the form
             LoadSettings(this);
 
-            // Adjust affinity, priority class based on processor and previous saved settings - loaded in LoadSettings()
-            ProcessorCheck();
 
             // Restore previous location
             this.Location = new Point(Properties.Settings.Default.XCoordinate, Properties.Settings.Default.YCoordinate);
@@ -384,6 +391,10 @@ namespace TelemetryVibShaker
             {
                 Task.Run(() => AutoStartTelemetryVibShaker());
             }
+
+            // Adjust affinity, priority class based on processor and previous saved settings - loaded in LoadSettings()
+            ProcessorCheck();
+
         }
 
 
@@ -392,6 +403,8 @@ namespace TelemetryVibShaker
         // This way I can change settings more conveniently using a web browser in my phone
         private async void IPC_PipeServer(CancellationToken cancellationToken)
         {
+            bool close_requested = false;
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 using (NamedPipeServerStream pipeServer = new NamedPipeServerStream("TelemetryVibShakerPipeCommands", PipeDirection.In))
@@ -438,13 +451,35 @@ namespace TelemetryVibShaker
                                     case "RESTORE":
                                         this.WindowState = FormWindowState.Normal;
                                         break;
-                                    case "ALIGN_LEFT":
-                                        this.Location = new Point(-1700, this.Location.Y);
-                                        break;
                                     case "FOREGROUND":
                                         this.BringToFront();
                                         this.Focus();
                                         break;
+                                    case string s when s.StartsWith("ALIGN_LEFT"):
+                                        if (s.Length > 10)
+                                        {
+                                            string new_position = s.Substring(10);
+                                            int x;
+                                            if (int.TryParse(new_position, out x))
+                                                this.Location = new Point(x, this.Location.Y);
+                                        }
+                                        else
+                                        {
+                                            result = "BAD REQUEST FOR ALIGN_LEFT";
+                                        }
+                                        break;
+                                    case "TOPMOST":
+                                        // The following doesn't work, had to fix with local copy
+                                        // this.TopMost = !(this.TopMost);
+                                        topMost = !topMost;
+                                        this.TopMost = topMost;
+                                        result = "Now .TopMost=" + this.TopMost.ToString();
+                                        break;
+                                    case "CLOSE":
+                                        close_requested = true;
+                                        pipeCancellationTokenSource.Cancel();
+                                        break;
+
 
                                     default:
                                         result = "Unknown command";
@@ -459,6 +494,13 @@ namespace TelemetryVibShaker
                     }
                 }
             }
+
+            // We need to execute the following code on a thread that can modify form objects/properties
+            if (close_requested) this.Invoke(new Action(() =>
+            {
+                this.Close();
+            }));
+
         }
 
 
@@ -712,6 +754,30 @@ namespace TelemetryVibShaker
                 return false;
         }
 
+        private void SetNewIdealProcessor(uint maxProcNumber)
+        {
+            if (maxProcNumber <= 0)
+            {
+                toolStripStatusLabel1.Text = $"Invalid MaxProcessorNumber: {maxProcNumber}";
+                return;
+            }
+
+
+            // My Intel 14700K has 8 performance cores and 12 efficiency cores.
+            // CPU numbers 0-15 are performance
+            // CPU numbers 16-27 are efficiency
+            ProcessorAssigner assigner = new ProcessorAssigner(maxProcNumber);
+            uint newIdealProcessor = assigner.GetNextProcessor();
+
+            uint currentThreadHandle = GetCurrentThreadId();
+            int previousProcessor = (int)SetThreadIdealProcessor(currentThreadHandle, newIdealProcessor);
+
+            if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
+            {
+                toolStripStatusLabel1.Text = $"Call failed SetNewIdealProcessor({{maxProcNumber}})";
+                return;
+            }
+        }
 
 
         private void UpdateMaxUIProcessingTime()
@@ -724,6 +790,13 @@ namespace TelemetryVibShaker
         private void timer1_Tick(object sender, EventArgs e)
         {
             timer1.Enabled = false;
+
+            if (chkReassignIdealProcessor.Enabled && chkReassignIdealProcessor.Checked && needToCallSetNewIdealProcessor)
+            {
+                needToCallSetNewIdealProcessor = false;
+                SetNewIdealProcessor(maxProcessorNumber); // This one also displays the new ideal processor
+            }
+
 
             int processorUsedForUI = 0;
             bool showStatistics = chkShowStatistics.Checked;
@@ -750,66 +823,66 @@ namespace TelemetryVibShaker
 
             // Statistics are updated once per second
             if (showStatistics && telemetry.IsRunning() && (tabs.SelectedIndex == 5) && (this.WindowState != FormWindowState.Minimized))
-            {                
-                    this.SuspendLayout();
+            {
+                this.SuspendLayout();
 
-                    // Report last datagram timestamp
-                    UpdateValue(lblTimestamp, telemetry.TimeStamp);
+                // Report last datagram timestamp
+                UpdateValue(lblTimestamp, telemetry.TimeStamp);
 
-                    // Report sound effectType
-                    UpdateSoundEffectStatus(soundManager.Status);
+                // Report sound effectType
+                UpdateSoundEffectStatus(soundManager.Status);
 
-                    // Report Current Unit Type
-                    UpdateValue(lblCurrentUnitType, telemetry.CurrentUnitType);
+                // Report Current Unit Type
+                UpdateValue(lblCurrentUnitType, telemetry.CurrentUnitType);
 
-                    // Report the last AoA received
-                    UpdateValue(lblLastAoA, telemetry.LastData.AoA);
+                // Report the last AoA received
+                UpdateValue(lblLastAoA, telemetry.LastData.AoA);
 
-                    // Report datagrams per second
-                    UpdateValue(lblDatagramsPerSecond, telemetry.DPS);
+                // Report datagrams per second
+                UpdateValue(lblDatagramsPerSecond, telemetry.DPS);
 
-                    // Report speed brakes
-                    UpdateValue(lblLastSpeedBrakes, telemetry.LastData.SpeedBrakes);
+                // Report speed brakes
+                UpdateValue(lblLastSpeedBrakes, telemetry.LastData.SpeedBrakes);
 
-                    // Report flaps
-                    UpdateValue(lblLastFlaps, telemetry.LastData.Flaps);
+                // Report flaps
+                UpdateValue(lblLastFlaps, telemetry.LastData.Flaps);
 
-                    // Report speed
-                    UpdateValue(lblSpeed, telemetry.LastData.Speed);
+                // Report speed
+                UpdateValue(lblSpeed, telemetry.LastData.Speed);
 
-                    // Report G-Forces
-                    UpdateValue(lblGForces, telemetry.LastData.GForces);
+                // Report G-Forces
+                UpdateValue(lblGForces, telemetry.LastData.GForces);
 
-                    // Report Altitude Above Ground
-                    UpdateValue(lblAltitude, telemetry.LastData.Altitude);
+                // Report Altitude Above Ground
+                UpdateValue(lblAltitude, telemetry.LastData.Altitude);
 
-                    // Report gear
-                    UpdateValue(lblLastGear, telemetry.LastData.Gear);
+                // Report gear
+                UpdateValue(lblLastGear, telemetry.LastData.Gear);
 
 
-                    // Report last processor used for UDP processing
-                    UpdateValue(lblLastProcessorUsedUDP, telemetry.LastProcessorUsed);
+                // Report last processor used for UDP processing
+                UpdateValue(lblLastProcessorUsedUDP, telemetry.LastProcessorUsed);
 
-                    // Report last procesor used for UI (monitor) this function
-                    UpdateValue(lblLastProcessorUsedUI, processorUsedForUI);
+                // Report last procesor used for UI (monitor) this function
+                UpdateValue(lblLastProcessorUsedUI, processorUsedForUI);
 
-                    // Report UI ThreadID
-                    UpdateValue(lblUIThreadID, (int)GetCurrentThreadId());
+                // Report UI ThreadID
+                UpdateValue(lblUIThreadID, (int)GetCurrentThreadId());
 
-                    // Report UDP ThreadID
-                    UpdateValue(lblUDPServerThread, telemetry.ThreadId);
+                // Report UDP ThreadID
+                UpdateValue(lblUDPServerThread, telemetry.ThreadId);
 
-                    // Always calculate/Report max UDP processing time
-                    UpdateValue(lblProcessingTimeUDPMax, telemetry.Stats.Max());
-                    UpdateValue(lblProcessingTimeUDPMin, telemetry.Stats.Min());
-                    UpdateValue(lblProcessingTimeUDPAvg, telemetry.Stats.Average());
+                // Always calculate/Report max UDP processing time
+                UpdateValue(lblProcessingTimeUDPMax, telemetry.Stats.Max());
+                UpdateValue(lblProcessingTimeUDPMin, telemetry.Stats.Min());
+                UpdateValue(lblProcessingTimeUDPAvg, telemetry.Stats.Average());
 
-                    // Always calculate/Report max UI processing time (monitor).  This one needs to be the last                
-                    UpdateMaxUIProcessingTime();
-                    this.ResumeLayout();
-                    
-                    stopWatchUI.Stop();
-                    Stats.AddSample(stopWatchUI.Elapsed.Milliseconds);         
+                // Always calculate/Report max UI processing time (monitor).  This one needs to be the last                
+                UpdateMaxUIProcessingTime();
+                this.ResumeLayout();
+
+                stopWatchUI.Stop();
+                Stats.AddSample(stopWatchUI.Elapsed.Milliseconds);
             }
 
             timer1.Enabled = true;
@@ -1163,6 +1236,8 @@ namespace TelemetryVibShaker
                         affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
                         chkUseEfficiencyCoresOnly.Text = "14700K" + chkUseEfficiencyCoresOnly.Text;
                         chkUseEfficiencyCoresOnly.Visible = true;
+                        chkReassignIdealProcessor.Enabled = true;
+                        maxProcessorNumber = 27;
                     }
                     break;
                 default:
@@ -1265,6 +1340,11 @@ namespace TelemetryVibShaker
             if (lstNotFounds.SelectedItem is null) return;
 
             Clipboard.SetText(lstNotFounds.SelectedItem.ToString());
+        }
+
+        private void chkReassignIdealProcessor_CheckedChanged(object sender, EventArgs e)
+        {
+            needToCallSetNewIdealProcessor = true; // this needs to beed done from the Timer.Tick() thread
         }
     }
 }
