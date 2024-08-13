@@ -792,7 +792,7 @@ namespace TelemetryVibShaker
         {
             timer1.Enabled = false;
 
-            if (chkReassignIdealProcessor.Enabled && chkReassignIdealProcessor.Checked && needToCallSetNewIdealProcessor)
+            if (needToCallSetNewIdealProcessor)
             {
                 needToCallSetNewIdealProcessor = false;
                 SetNewIdealProcessor(maxProcessorNumber); // This one also displays the new ideal processor

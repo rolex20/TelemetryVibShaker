@@ -186,7 +186,7 @@ namespace SimConnectExporter
         private void Simconnect_OnRecvSimobjectData(SimConnect sender, SIMCONNECT_RECV_SIMOBJECT_DATA data)
         {
             // Only here we can do this because, only here it is running from the thread we want to change it's ideal processor
-            if (chkReassignIdealProcessor.Enabled && chkReassignIdealProcessor.Checked && needToCallSetNewIdealProcessor)
+            if (needToCallSetNewIdealProcessor)
             {
                 needToCallSetNewIdealProcessor = false;
                 SetNewIdealProcessor(maxProcessorNumber); 

@@ -143,7 +143,7 @@ namespace FalconExporter
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            if (chkReassignIdealProcessor.Enabled && chkReassignIdealProcessor.Checked && needToCallSetNewIdealProcessor)
+            if (needToCallSetNewIdealProcessor)
             {
                 needToCallSetNewIdealProcessor = false;
                 SetNewIdealProcessor(maxProcessorNumber); // This one also displays the new ideal processor

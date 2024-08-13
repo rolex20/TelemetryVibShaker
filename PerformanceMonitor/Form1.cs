@@ -657,7 +657,7 @@ namespace PerformanceMonitor
             trkGpuVolume.Value = Properties.Settings.Default.trkGpuVolume;
             lblGpuVolume.Text = trkGpuVolume.Value.ToString();
 
-            chkReassignIdealProcessor.Checked = Properties.Settings.Default.chkReassignIdealProcessor;
+            chkReassignIdealProcessor.Checked = Properties.Settings.Default.chkReassignIdealProcessor; //this calls chkReassignIdealProcessor_OnClick()
 
             tcTabControl.SelectedIndex = Properties.Settings.Default.tcTabControl;
 
