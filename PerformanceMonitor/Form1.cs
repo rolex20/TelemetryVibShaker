@@ -526,7 +526,7 @@ namespace PerformanceMonitor
         {
             if (maxProcNumber <= 0)
             {
-                LogError("Invalid MaxProcessorNumber", "$SetNewIdealProcessor({maxProcNumber})");
+                LogError("Invalid MaxProcessorNumber", $"SetNewIdealProcessor({maxProcNumber})");
                 return;
             }
 
@@ -542,7 +542,7 @@ namespace PerformanceMonitor
 
             if (previousProcessor <0 || (previousProcessor > maxProcNumber))
             {
-                LogError("Failed to set Ideal Processor", "$SetNewIdealProcessor({maxProcNumber})");
+                LogError("Failed to set Ideal Processor", $"SetNewIdealProcessor({newIdealProcessor})");
                 tslblIdealProcessor.Text = "ERR";
                 return;
             }
@@ -600,6 +600,7 @@ namespace PerformanceMonitor
                         affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
                         lblEfficientCoresNote.Text = "14700K" + lblEfficientCoresNote.Text;
                         lblEfficientCoresNote.Visible = true;
+                        chkReassignIdealProcessor.Visible = true;
                         chkReassignIdealProcessor.Enabled = true;
                         maxProcessorNumber = 27;
                     }

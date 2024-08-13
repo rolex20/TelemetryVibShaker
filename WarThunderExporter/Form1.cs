@@ -405,6 +405,7 @@ namespace WarThunderExporter
                         affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
                         chkUseEfficiencyCoresOnly.Text = "14700K" + chkUseEfficiencyCoresOnly.Text;
                         chkUseEfficiencyCoresOnly.Visible = true;
+                        chkReassignIdealProcessor.Visible = true;
                         chkReassignIdealProcessor.Enabled = true;
                         maxProcessorNumber = 27;
                     }
@@ -688,7 +689,7 @@ namespace WarThunderExporter
         {
             if (maxProcNumber <= 0)
             {
-                AddToLog(GetTickCount64(), "Invalid MaxProcessorNumber", "$SetNewIdealProcessor({maxProcNumber})", true);
+                AddToLog(GetTickCount64(), "Invalid MaxProcessorNumber", $"SetNewIdealProcessor({maxProcNumber})", true);
                 return;
             }
 
@@ -704,7 +705,7 @@ namespace WarThunderExporter
 
             if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
             {
-                AddToLog(GetTickCount64(), "Failed to set Ideal Processor", "$SetNewIdealProcessor({maxProcNumber})", true);
+                AddToLog(GetTickCount64(), "Failed to set Ideal Processor", $"SetNewIdealProcessor({newIdealProcessor})", true);
                 return;
             }
             else

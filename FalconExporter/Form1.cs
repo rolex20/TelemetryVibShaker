@@ -122,7 +122,7 @@ namespace FalconExporter
                 return;
             }
 
-            tsStatus = null;
+
             // My Intel 14700K has 8 performance cores and 12 efficiency cores.
             // CPU numbers 0-15 are performance
             // CPU numbers 16-27 are efficiency
@@ -134,7 +134,7 @@ namespace FalconExporter
 
             if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
             {
-                UpdateCaption(tsStatus, "$Failed to set Ideal Processor {newIdealProcessor}");
+                UpdateCaption(tsStatus, $"Failed to set Ideal Processor {newIdealProcessor}");
                 return;
             }
             else
@@ -622,6 +622,7 @@ namespace FalconExporter
                         affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
                         chkUseEfficiencyCoresOnly.Text = "14700K" + chkUseEfficiencyCoresOnly.Text;
                         chkUseEfficiencyCoresOnly.Visible = true;
+                        chkReassignIdealProcessor.Visible = true;
                         chkReassignIdealProcessor.Enabled = true;
                         maxProcessorNumber = 27;
                     }

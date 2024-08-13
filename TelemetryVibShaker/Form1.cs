@@ -774,9 +774,10 @@ namespace TelemetryVibShaker
 
             if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
             {
-                toolStripStatusLabel1.Text = $"Call failed SetNewIdealProcessor({{maxProcNumber}})";
+                toolStripStatusLabel1.Text = $"Call failed SetNewIdealProcessor({newIdealProcessor})";
                 return;
             }
+            Debug.Print($"Success for SetNewIdealProcessor({newIdealProcessor})");
         }
 
 
@@ -1236,6 +1237,7 @@ namespace TelemetryVibShaker
                         affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
                         chkUseEfficiencyCoresOnly.Text = "14700K" + chkUseEfficiencyCoresOnly.Text;
                         chkUseEfficiencyCoresOnly.Visible = true;
+                        chkReassignIdealProcessor.Visible = true;
                         chkReassignIdealProcessor.Enabled = true;
                         maxProcessorNumber = 27;
                     }

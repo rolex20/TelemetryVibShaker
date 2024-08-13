@@ -32,6 +32,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             tabs = new TabControl();
             Settings = new TabPage();
+            chkReassignIdealProcessor = new CheckBox();
+            chkAutoMinimize = new CheckBox();
             cmbSimConnectPeriod = new ComboBox();
             label13 = new Label();
             label12 = new Label();
@@ -92,7 +94,6 @@
             btnDisconnect = new Button();
             btnResetMax = new Button();
             timer1 = new System.Windows.Forms.Timer(components);
-            chkAutoMinimize = new CheckBox();
             tabs.SuspendLayout();
             Settings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudFrequency).BeginInit();
@@ -115,6 +116,7 @@
             // 
             // Settings
             // 
+            Settings.Controls.Add(chkReassignIdealProcessor);
             Settings.Controls.Add(chkAutoMinimize);
             Settings.Controls.Add(cmbSimConnectPeriod);
             Settings.Controls.Add(label13);
@@ -136,6 +138,29 @@
             Settings.TabIndex = 0;
             Settings.Text = "Settings";
             Settings.UseVisualStyleBackColor = true;
+            // 
+            // chkReassignIdealProcessor
+            // 
+            chkReassignIdealProcessor.AutoSize = true;
+            chkReassignIdealProcessor.Enabled = false;
+            chkReassignIdealProcessor.Location = new Point(13, 224);
+            chkReassignIdealProcessor.Name = "chkReassignIdealProcessor";
+            chkReassignIdealProcessor.Size = new Size(228, 19);
+            chkReassignIdealProcessor.TabIndex = 29;
+            chkReassignIdealProcessor.Text = "Reassign Ideal Processor (14700K only)";
+            chkReassignIdealProcessor.UseVisualStyleBackColor = true;
+            chkReassignIdealProcessor.Visible = false;
+            chkReassignIdealProcessor.CheckedChanged += chkReassignIdealProcessor_CheckedChanged;
+            // 
+            // chkAutoMinimize
+            // 
+            chkAutoMinimize.AutoSize = true;
+            chkAutoMinimize.Location = new Point(13, 251);
+            chkAutoMinimize.Name = "chkAutoMinimize";
+            chkAutoMinimize.Size = new Size(265, 19);
+            chkAutoMinimize.TabIndex = 28;
+            chkAutoMinimize.Text = "Auto Start and Minimize at program startup...";
+            chkAutoMinimize.UseVisualStyleBackColor = true;
             // 
             // cmbSimConnectPeriod
             // 
@@ -205,11 +230,11 @@
             // 
             chkUseBackgroundProcessing.AutoSize = true;
             chkUseBackgroundProcessing.Enabled = false;
-            chkUseBackgroundProcessing.Location = new Point(13, 225);
+            chkUseBackgroundProcessing.Location = new Point(13, 299);
             chkUseBackgroundProcessing.Name = "chkUseBackgroundProcessing";
-            chkUseBackgroundProcessing.Size = new Size(206, 19);
+            chkUseBackgroundProcessing.Size = new Size(276, 19);
             chkUseBackgroundProcessing.TabIndex = 21;
-            chkUseBackgroundProcessing.Text = "Use background processing mode";
+            chkUseBackgroundProcessing.Text = "Use background processing mode (deprecated)";
             chkUseBackgroundProcessing.UseVisualStyleBackColor = true;
             chkUseBackgroundProcessing.Visible = false;
             chkUseBackgroundProcessing.CheckedChanged += chkUseBackgroundProcessing_CheckedChanged;
@@ -308,7 +333,7 @@
             Monitor.Location = new Point(4, 24);
             Monitor.Name = "Monitor";
             Monitor.Padding = new Padding(3);
-            Monitor.Size = new Size(461, 290);
+            Monitor.Size = new Size(461, 321);
             Monitor.TabIndex = 1;
             Monitor.Text = "Monitor";
             Monitor.UseVisualStyleBackColor = true;
@@ -655,7 +680,7 @@
             tbGForces.Controls.Add(chkTrackGForces);
             tbGForces.Location = new Point(4, 24);
             tbGForces.Name = "tbGForces";
-            tbGForces.Size = new Size(461, 290);
+            tbGForces.Size = new Size(461, 321);
             tbGForces.TabIndex = 2;
             tbGForces.Text = "G Forces Tracker";
             tbGForces.UseVisualStyleBackColor = true;
@@ -760,16 +785,6 @@
             timer1.Interval = 1500;
             timer1.Tick += timer1_Tick;
             // 
-            // chkAutoMinimize
-            // 
-            chkAutoMinimize.AutoSize = true;
-            chkAutoMinimize.Location = new Point(13, 251);
-            chkAutoMinimize.Name = "chkAutoMinimize";
-            chkAutoMinimize.Size = new Size(265, 19);
-            chkAutoMinimize.TabIndex = 28;
-            chkAutoMinimize.Text = "Auto Start and Minimize at program startup...";
-            chkAutoMinimize.UseVisualStyleBackColor = true;
-            // 
             // frmMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -868,5 +883,6 @@
         private Label lblCallbacksPerSec;
         private Label label15;
         private CheckBox chkAutoMinimize;
+        private CheckBox chkReassignIdealProcessor;
     }
 }

@@ -7,6 +7,7 @@ using System.Diagnostics;
 using Microsoft.Win32;
 using System.Windows.Forms;
 using System.IO.Pipes;
+using IdealProcessorEnhanced;
 
 
 namespace SimConnectExporter
@@ -39,8 +40,11 @@ namespace SimConnectExporter
 
         private Thread pipeServerThread;  // IPC_PipeServer Thread for pipes interprocess communications
         private CancellationTokenSource pipeCancellationTokenSource;
-
         private bool topMost = false; // to fix .TopMost bug
+
+        private uint maxProcessorNumber = 0;
+        private bool needToCallSetNewIdealProcessor = true;
+
 
         enum DEFINITIONS
         {
@@ -74,6 +78,10 @@ namespace SimConnectExporter
 
         [DllImport("kernel32.dll")]
         public static extern uint GetCurrentThreadId();
+
+        [DllImport("kernel32.dll")]
+        public static extern uint SetThreadIdealProcessor(uint hThread, uint dwIdealProcessor);
+
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint GetCurrentProcessorNumber();
@@ -177,6 +185,14 @@ namespace SimConnectExporter
 
         private void Simconnect_OnRecvSimobjectData(SimConnect sender, SIMCONNECT_RECV_SIMOBJECT_DATA data)
         {
+            // Only here we can do this because, only here it is running from the thread we want to change it's ideal processor
+            if (chkReassignIdealProcessor.Enabled && chkReassignIdealProcessor.Checked && needToCallSetNewIdealProcessor)
+            {
+                needToCallSetNewIdealProcessor = false;
+                SetNewIdealProcessor(maxProcessorNumber); 
+            }
+
+
             // perform division in double to retain maximum precision
             // result is in milliseconds
             long currentTimeStamp_ms = (long)GetTickCount64();
@@ -185,7 +201,7 @@ namespace SimConnectExporter
             if (lastSecond == second)
             {
                 callsPerSecond++;
-            } 
+            }
             else
             {
                 callsPerSecond = 0;
@@ -284,7 +300,7 @@ namespace SimConnectExporter
                     UpdateValue(lblCallbacksPerSec, callsPerSecond);
                     this.ResumeLayout();
                 }
-                
+
 
             }
             if (chkShowStatistics.Checked)
@@ -802,6 +818,10 @@ namespace SimConnectExporter
                         affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
                         chkUseEfficiencyCoresOnly.Text = "14700K" + chkUseEfficiencyCoresOnly.Text;
                         chkUseEfficiencyCoresOnly.Visible = true;
+                        chkReassignIdealProcessor.Visible = true;
+                        chkReassignIdealProcessor.Enabled = true;
+                        maxProcessorNumber = 27;
+
                     }
                     break;
                 default:
@@ -867,5 +887,38 @@ namespace SimConnectExporter
                 }
             }
         }
+
+        private void chkReassignIdealProcessor_CheckedChanged(object sender, EventArgs e)
+        {
+            needToCallSetNewIdealProcessor = true; // this needs to beed done from the Timer.Tick() thread        }
+        }
+
+            private void SetNewIdealProcessor(uint maxProcNumber)
+        {
+            if (maxProcNumber <= 0)
+            {
+                tsStatusBar1.Text = $"Invalid MaxProcessorNumber {maxProcNumber}";
+                return;
+            }
+
+
+            // My Intel 14700K has 8 performance cores and 12 efficiency cores.
+            // CPU numbers 0-15 are performance
+            // CPU numbers 16-27 are efficiency
+            ProcessorAssigner assigner = new ProcessorAssigner(maxProcNumber);
+            uint newIdealProcessor = assigner.GetNextProcessor();
+
+            uint currentThreadHandle = GetCurrentThreadId();
+            int previousProcessor = (int)SetThreadIdealProcessor(currentThreadHandle, newIdealProcessor);
+
+            if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
+            {
+                tsStatusBar1.Text = $"Failed to set Ideal Processor {newIdealProcessor}";
+                return;
+            }
+
+            Debug.Print($"Success for SetNewIdealProcessor({newIdealProcessor})");
+        }
+
     }
 }

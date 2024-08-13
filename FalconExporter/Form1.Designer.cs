@@ -682,12 +682,14 @@
             // chkReassignIdealProcessor
             // 
             this.chkReassignIdealProcessor.AutoSize = true;
+            this.chkReassignIdealProcessor.Enabled = false;
             this.chkReassignIdealProcessor.Location = new System.Drawing.Point(20, 233);
             this.chkReassignIdealProcessor.Name = "chkReassignIdealProcessor";
             this.chkReassignIdealProcessor.Size = new System.Drawing.Size(280, 17);
             this.chkReassignIdealProcessor.TabIndex = 13;
             this.chkReassignIdealProcessor.Text = "Reassign Ideal Processor. (Only supported in 14700K)";
             this.chkReassignIdealProcessor.UseVisualStyleBackColor = true;
+            this.chkReassignIdealProcessor.Visible = false;
             this.chkReassignIdealProcessor.CheckedChanged += new System.EventHandler(this.chkReassignIdealProcessor_CheckedChanged);
             // 
             // frmMain
