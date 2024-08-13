@@ -41,6 +41,7 @@ namespace WarThunderExporter
         private Thread pipeServerThread;  // IPC_PipeServer Thread for pipes interprocess communications
         private CancellationTokenSource pipeCancellationTokenSource;
 
+        private bool topMost = false; // to fix .TopMost bug
 
 
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -106,17 +107,15 @@ namespace WarThunderExporter
         // This way I can change settings more conveniently using a web browser in my phone
         private async void IPC_PipeServer(CancellationToken cancellationToken)
         {
+            bool need_to_close = false;
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 using (NamedPipeServerStream pipeServer = new NamedPipeServerStream("WarThunderExporterPipeCommands", PipeDirection.In))
                 {
-                    Debug.WriteLine("Named pipe server started. Waiting for connection...");
-
                     // Wait for a client to connect
                     await pipeServer.WaitForConnectionAsync(cancellationToken);
-                    Debug.WriteLine("Client connected.");
 
-                    int lines = 0;
                     using (StreamReader reader = new StreamReader(pipeServer))
                     {
                         string command;
@@ -158,26 +157,51 @@ namespace WarThunderExporter
                                     case "RESTORE":
                                         this.WindowState = FormWindowState.Normal;
                                         break;
-                                    case "ALIGN_LEFT":
-                                        this.Location = new Point(-1700, this.Location.Y);
-                                        break;
                                     case "FOREGROUND":
                                         this.BringToFront();
                                         this.Focus();
+                                        break;
+                                    case string s when s.StartsWith("ALIGN_LEFT"):
+                                        if (s.Length > 10)
+                                        {
+                                            string new_position = s.Substring(10);
+                                            int x;
+                                            if (int.TryParse(new_position, out x))
+                                                this.Location = new Point(x, this.Location.Y);
+                                        } else
+                                        {
+                                            result = "BAD REQUEST FOR ALIGN_LEFT";
+                                        }
+                                        break;
+                                    case "TOPMOST":
+                                        // The following doesn't work, had to fix with local copy
+                                        // this.TopMost = !(this.TopMost);
+                                        topMost = !topMost;
+                                        this.TopMost = topMost;
+                                        result = "Now .TopMost=" + this.TopMost.ToString();
+                                        break;
+                                    case "CLOSE":
+                                        need_to_close = true;
+                                        pipeCancellationTokenSource.Cancel();
                                         break;
                                     default:
                                         result = "Unknown command";
                                         break;
                                 }
-                                string info = $"Received command #${++lines}):[{command}][{result}]";
-                                Debug.WriteLine(info);
-                                //LogError(info, "PipeServer", true);
+                                string info = $"Received command):[{command}][{result}]";
+                                AddToLog(GetTickCount64(), info, "IPC_PipeServer()", true);
 
                             }));
                         }
                     }
                 }
             }
+            // We need to execute the following code on a thread that can modify form objects/properties
+            if (need_to_close) this.Invoke(new Action(() =>
+            {
+                this.Close();
+            }));
+
         }
 
 
