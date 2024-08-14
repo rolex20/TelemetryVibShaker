@@ -97,7 +97,7 @@ namespace MicroTaskScheduler
         {
             if (maxProcNumber <= 0)
             {
-                //AddToLog(GetTickCount64(), "Invalid MaxProcessorNumber", "$SetNewIdealProcessor({maxProcNumber})", true);
+                //AddToLog(GetTickCount64(), "Invalid MaxProcessorNumber", "$SetNewIdealProcessor({maxProcNumber})", true);  // TODO ADD LOG
                 return;
             }
 
@@ -113,7 +113,7 @@ namespace MicroTaskScheduler
 
             if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
             {
-                //AddToLog(GetTickCount64(), "Failed to set Ideal Processor", "$SetNewIdealProcessor({maxProcNumber})", true);
+                //AddToLog(GetTickCount64(), "Failed to set Ideal Processor", "$SetNewIdealProcessor({maxProcNumber})", true); //TODO: Add Log
                 return;
             }
         }

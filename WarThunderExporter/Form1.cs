@@ -408,6 +408,8 @@ namespace WarThunderExporter
                         chkReassignIdealProcessor.Visible = true;
                         chkReassignIdealProcessor.Enabled = true;
                         maxProcessorNumber = 27;
+                        needToCallSetNewIdealProcessor = true; // Force flag because chkReassignIdealProcesso() onclick will miss it since the control wasn't enabled yet
+
                     }
                     break;
                 default:
@@ -705,7 +707,7 @@ namespace WarThunderExporter
 
             if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
             {
-                AddToLog(GetTickCount64(), "Failed to set Ideal Processor", $"SetNewIdealProcessor({newIdealProcessor})", true);
+                AddToLog(GetTickCount64(), "Failed to set Ideal Processor", $"SetNewIdealProcessor({newIdealProcessor})={previousProcessor}");
                 return;
             }
             else

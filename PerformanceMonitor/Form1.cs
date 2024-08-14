@@ -544,7 +544,7 @@ namespace PerformanceMonitor
 
             if (previousProcessor <0 || (previousProcessor > maxProcNumber))
             {
-                LogError("Failed to set Ideal Processor", $"SetNewIdealProcessor({newIdealProcessor})");
+                LogError("Failed to set Ideal Processor", $"SetNewIdealProcessor({newIdealProcessor})={previousProcessor}");
                 tslblIdealProcessor.Text = "ERR";
                 return;
             }
@@ -605,6 +605,7 @@ namespace PerformanceMonitor
                         chkReassignIdealProcessor.Visible = true;
                         chkReassignIdealProcessor.Enabled = true;
                         maxProcessorNumber = 27;
+                        needToCallSetNewIdealProcessor = true; // Force flag because chkReassignIdealProcesso() onclick will miss it since the control wasn't enabled yet
                     }
                     break;
                 default:

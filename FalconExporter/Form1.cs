@@ -134,7 +134,7 @@ namespace FalconExporter
 
             if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
             {
-                UpdateCaption(tsStatus, $"Failed to set Ideal Processor {newIdealProcessor}");
+                UpdateCaption(tsStatus, $"SetNewIdealProcessor({newIdealProcessor})={previousProcessor}");
                 return;
             }
             else
@@ -625,6 +625,7 @@ namespace FalconExporter
                         chkReassignIdealProcessor.Visible = true;
                         chkReassignIdealProcessor.Enabled = true;
                         maxProcessorNumber = 27;
+                        needToCallSetNewIdealProcessor = true; // Force flag because chkReassignIdealProcesso() onclick will miss it since the control wasn't enabled yet
                     }
                     break;
                 default:

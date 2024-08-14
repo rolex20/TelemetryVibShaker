@@ -774,7 +774,7 @@ namespace TelemetryVibShaker
 
             if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
             {
-                toolStripStatusLabel1.Text = $"Call failed SetNewIdealProcessor({newIdealProcessor})";
+                toolStripStatusLabel1.Text = $"SetNewIdealProcessor({newIdealProcessor})={previousProcessor}";
                 return;
             }
             Debug.Print($"Success for SetNewIdealProcessor({newIdealProcessor})");
@@ -1240,6 +1240,8 @@ namespace TelemetryVibShaker
                         chkReassignIdealProcessor.Visible = true;
                         chkReassignIdealProcessor.Enabled = true;
                         maxProcessorNumber = 27;
+                        needToCallSetNewIdealProcessor = true; // Force flag because chkReassignIdealProcesso() onclick will miss it since the control wasn't enabled yet
+
                     }
                     break;
                 default:
