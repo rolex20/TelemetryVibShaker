@@ -34,6 +34,7 @@ namespace TelemetryVibShaker
         private SimpleStatsCalculator Stats = new SimpleStatsCalculator();  // milliseconds elapsed in processing the monitor-update-cycle in Timer1 (UI)
         private Stopwatch? stopWatchUI;  // used to measure processing time in Timer1 (updating the UI)
         private Process? currentProcess;
+        private ProcessorAssigner processorAssigner = null;  // Must be alive the while the program is running and is assigned only once if it is the right type of processor
 
         private Thread pipeServerThread;  // IPC_PipeServer Thread for pipes interprocess communications
         private CancellationTokenSource pipeCancellationTokenSource;
@@ -52,7 +53,11 @@ namespace TelemetryVibShaker
         public static extern uint GetCurrentThreadId();
 
         [DllImport("kernel32.dll")]
-        public static extern uint SetThreadIdealProcessor(uint hThread, uint dwIdealProcessor);
+        public static extern IntPtr GetCurrentThread();
+
+        [DllImport("kernel32.dll")]
+        public static extern uint SetThreadIdealProcessor(IntPtr hThread, uint dwIdealProcessor);
+
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint GetCurrentProcessorNumber();
@@ -765,19 +770,21 @@ namespace TelemetryVibShaker
 
             // My Intel 14700K has 8 performance cores and 12 efficiency cores.
             // CPU numbers 0-15 are performance
-            // CPU numbers 16-27 are efficiency
-            ProcessorAssigner assigner = new ProcessorAssigner(maxProcNumber);
-            uint newIdealProcessor = assigner.GetNextProcessor();
+            // CPU numbers 16-27 are efficiency            
+            uint newIdealProcessor = processorAssigner.GetNextProcessor();
 
-            uint currentThreadHandle = GetCurrentThreadId();
+            IntPtr currentThreadHandle = GetCurrentThread();
             int previousProcessor = (int)SetThreadIdealProcessor(currentThreadHandle, newIdealProcessor);
 
             if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
             {
-                toolStripStatusLabel1.Text = $"SetNewIdealProcessor({newIdealProcessor})={previousProcessor}";
-                return;
+                toolStripStatusLabel1.Text = $"Call Failed. SetNewIdealProcessor({newIdealProcessor})={previousProcessor}";
             }
-            Debug.Print($"Success for SetNewIdealProcessor({newIdealProcessor})");
+            else
+            {
+                toolStripStatusLabel1.Text = $"Call Succeeded. SetNewIdealProcessor({newIdealProcessor})={previousProcessor}";
+            }
+
         }
 
 
@@ -1240,6 +1247,7 @@ namespace TelemetryVibShaker
                         chkReassignIdealProcessor.Visible = true;
                         chkReassignIdealProcessor.Enabled = true;
                         maxProcessorNumber = 27;
+                        if (processorAssigner == null) processorAssigner = new ProcessorAssigner(maxProcessorNumber);
                         needToCallSetNewIdealProcessor = true; // Force flag because chkReassignIdealProcesso() onclick will miss it since the control wasn't enabled yet
 
                     }

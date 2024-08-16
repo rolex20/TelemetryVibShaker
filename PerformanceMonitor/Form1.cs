@@ -49,7 +49,7 @@ namespace PerformanceMonitor
         private CpuType cpuType;
         private uint maxProcessorNumber = 0;
         private bool needToCallSetNewIdealProcessor = true;
-        ProcessorAssigner processorAssigner = null;  // Must be alive the while the program is running and is assigned only once if it is the right type of processor
+        private ProcessorAssigner processorAssigner = null;  // Must be alive the while the program is running and is assigned only once if it is the right type of processor
 
         private int maxCpuUtil; // Maximum recorded CPU utilization
         string maxCpuName;

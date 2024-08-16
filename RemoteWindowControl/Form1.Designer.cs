@@ -51,6 +51,7 @@
             tabDebug = new TabPage();
             txtDebug = new TextBox();
             button1 = new Button();
+            label2 = new Label();
             tabControls.SuspendLayout();
             tabSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudInstance).BeginInit();
@@ -69,6 +70,7 @@
             // 
             // tabSettings
             // 
+            tabSettings.Controls.Add(label2);
             tabSettings.Controls.Add(txtProgramsConfigurationFile);
             tabSettings.Controls.Add(label1);
             tabSettings.Controls.Add(nudInstance);
@@ -289,6 +291,16 @@
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
+            // label2
+            // 
+            label2.Font = new Font("Segoe UI", 16F, FontStyle.Regular, GraphicsUnit.Point);
+            label2.ForeColor = Color.Red;
+            label2.Location = new Point(21, 34);
+            label2.Name = "label2";
+            label2.Size = new Size(299, 239);
+            label2.TabIndex = 18;
+            label2.Text = "THIS PROGRAM IS NOW DEPRECATED.  IT HAS BEEN REPLACED BY PHP PAGES";
+            // 
             // frmMain
             // 
             AcceptButton = btnStartWebServer;
@@ -337,5 +349,6 @@
         private TextBox txtProgramsConfigurationFile;
         private Label label1;
         private Button button1;
+        private Label label2;
     }
 }

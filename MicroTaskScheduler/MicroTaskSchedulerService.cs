@@ -25,12 +25,13 @@ namespace MicroTaskScheduler
         private Task hourlyAlarmTask;
         private ProcessStartInfo startInfo;
         private IntPtr affinityMask = IntPtr.Zero;
+        private ProcessorAssigner processorAssigner = null;  // Must be alive the while the program is running and is assigned only once if it is the right type of processor
 
         [DllImport("kernel32.dll")]
-        public static extern uint GetCurrentThreadId();
+        public static extern IntPtr GetCurrentThread();
 
         [DllImport("kernel32.dll")]
-        public static extern uint SetThreadIdealProcessor(uint hThread, uint dwIdealProcessor);
+        public static extern uint SetThreadIdealProcessor(IntPtr hThread, uint dwIdealProcessor);
 
 
         public MicroTaskSchedulerService()
@@ -73,6 +74,7 @@ namespace MicroTaskScheduler
                     if (cpuCount == 28)
                     {
                         affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
+                        if (processorAssigner == null) processorAssigner = new ProcessorAssigner(27);
                         SetNewIdealProcessor(27);
                     }
                     break;
@@ -104,11 +106,10 @@ namespace MicroTaskScheduler
 
             // My Intel 14700K has 8 performance cores and 12 efficiency cores.
             // CPU numbers 0-15 are performance
-            // CPU numbers 16-27 are efficiency
-            ProcessorAssigner assigner = new ProcessorAssigner(maxProcNumber);
-            uint newIdealProcessor = assigner.GetNextProcessor();
+            // CPU numbers 16-27 are efficiency            
+            uint newIdealProcessor = processorAssigner.GetNextProcessor();
 
-            uint currentThreadHandle = GetCurrentThreadId();
+            IntPtr currentThreadHandle = GetCurrentThread();
             int previousProcessor = (int)SetThreadIdealProcessor(currentThreadHandle, newIdealProcessor);
 
             if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
