@@ -707,7 +707,7 @@ namespace WarThunderExporter
 
             if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
             {
-                AddToLog(GetTickCount64(), "Failed to set Ideal Processor", $"SetNewIdealProcessor({newIdealProcessor})={previousProcessor}");
+                AddToLog(GetTickCount64(), "Failed to set Ideal Processor", $"SetNewIdealProcessor({newIdealProcessor})={previousProcessor}", true);
                 return;
             }
             else

@@ -37,6 +37,7 @@ namespace FalconExporter
         private int maxProcessingTime;
         private ulong timeStamp;
         private float lastTelemetry;
+        ProcessorAssigner processorAssigner = null;  // Must be alive the while the program is running and is assigned only once if it is the right type of processor
 
         private uint maxProcessorNumber = 0;
         private bool needToCallSetNewIdealProcessor = true;
@@ -52,10 +53,10 @@ namespace FalconExporter
         public static extern bool SetPriorityClass(IntPtr handle, uint priorityClass);
 
         [DllImport("kernel32.dll")]
-        public static extern uint GetCurrentThreadId();
+        public static extern IntPtr GetCurrentThread();
 
         [DllImport("kernel32.dll")]
-        public static extern uint SetThreadIdealProcessor(uint hThread, uint dwIdealProcessor);
+        public static extern uint SetThreadIdealProcessor(IntPtr hThread, uint dwIdealProcessor);
 
 
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -125,12 +126,12 @@ namespace FalconExporter
 
             // My Intel 14700K has 8 performance cores and 12 efficiency cores.
             // CPU numbers 0-15 are performance
-            // CPU numbers 16-27 are efficiency
-            ProcessorAssigner assigner = new ProcessorAssigner(maxProcNumber);
-            uint newIdealProcessor = assigner.GetNextProcessor();
+            // CPU numbers 16-27 are efficiency            
+            uint newIdealProcessor = processorAssigner.GetNextProcessor();
 
-            uint currentThreadHandle = GetCurrentThreadId();
+            IntPtr currentThreadHandle = GetCurrentThread();
             int previousProcessor = (int)SetThreadIdealProcessor(currentThreadHandle, newIdealProcessor);
+
 
             if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
             {
@@ -625,6 +626,7 @@ namespace FalconExporter
                         chkReassignIdealProcessor.Visible = true;
                         chkReassignIdealProcessor.Enabled = true;
                         maxProcessorNumber = 27;
+                        if (processorAssigner == null) processorAssigner = new ProcessorAssigner(maxProcessorNumber);
                         needToCallSetNewIdealProcessor = true; // Force flag because chkReassignIdealProcesso() onclick will miss it since the control wasn't enabled yet
                     }
                     break;

@@ -2067,6 +2067,7 @@
             this.lblReassignIdealProcessor.Size = new System.Drawing.Size(73, 13);
             this.lblReassignIdealProcessor.TabIndex = 26;
             this.lblReassignIdealProcessor.Text = "* 14700K only";
+            this.lblReassignIdealProcessor.Visible = false;
             // 
             // chkReassignIdealProcessor
             // 

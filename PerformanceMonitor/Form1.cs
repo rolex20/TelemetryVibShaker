@@ -49,6 +49,7 @@ namespace PerformanceMonitor
         private CpuType cpuType;
         private uint maxProcessorNumber = 0;
         private bool needToCallSetNewIdealProcessor = true;
+        ProcessorAssigner processorAssigner = null;  // Must be alive the while the program is running and is assigned only once if it is the right type of processor
 
         private int maxCpuUtil; // Maximum recorded CPU utilization
         string maxCpuName;
@@ -300,7 +301,6 @@ namespace PerformanceMonitor
 
 
 
-        // Import the SetThreadIdealProcessor API
         [DllImport("kernel32.dll")]
         public static extern uint SetThreadIdealProcessor(IntPtr hThread, uint dwIdealProcessor);
 
@@ -535,9 +535,8 @@ namespace PerformanceMonitor
 
             // My Intel 14700K has 8 performance cores and 12 efficiency cores.
             // CPU numbers 0-15 are performance
-            // CPU numbers 16-27 are efficiency
-            ProcessorAssigner assigner = new ProcessorAssigner(maxProcNumber);
-            uint newIdealProcessor = assigner.GetNextProcessor();
+            // CPU numbers 16-27 are efficiency            
+            uint newIdealProcessor = processorAssigner.GetNextProcessor();
 
             IntPtr currentThreadHandle = GetCurrentThread();
             int previousProcessor = (int)SetThreadIdealProcessor(currentThreadHandle, newIdealProcessor);
@@ -603,8 +602,10 @@ namespace PerformanceMonitor
                         lblEfficientCoresNote.Text = "14700K" + lblEfficientCoresNote.Text;
                         lblEfficientCoresNote.Visible = true;
                         chkReassignIdealProcessor.Visible = true;
+                        lblReassignIdealProcessor.Visible = true;
                         chkReassignIdealProcessor.Enabled = true;
                         maxProcessorNumber = 27;
+                        if (processorAssigner == null) processorAssigner = new ProcessorAssigner(maxProcessorNumber);
                         needToCallSetNewIdealProcessor = true; // Force flag because chkReassignIdealProcesso() onclick will miss it since the control wasn't enabled yet
                     }
                     break;
