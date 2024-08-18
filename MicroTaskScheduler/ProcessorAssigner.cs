@@ -8,8 +8,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Linq;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,8 +31,39 @@ namespace IdealProcessorEnhanced
         // Constructor to initialize the starting processor number
         public ProcessorAssigner(uint maxProcessor)
         {
-            mutex = new Mutex(false, "GlobalProcessorAssignerMutex");
-            mmf = MemoryMappedFile.CreateOrOpen("GlobalProcessorAssignerMMF", 4);
+            // Define the security settings for the mutex
+            var mutexSecurity = new MutexSecurity();
+
+            // Allow full control to the "Everyone" group
+            var mu_rule = new MutexAccessRule(
+                new SecurityIdentifier(WellKnownSidType.WorldSid, null),
+                MutexRights.FullControl,
+                AccessControlType.Allow);
+
+            mutexSecurity.AddAccessRule(mu_rule);
+
+            // Create the global mutex with the specified security settings
+            bool createdNew;
+            mutex = new Mutex(false, "Global\\GlobalProcessorAssignerMutex", out createdNew, mutexSecurity);
+            //   mutex = new Mutex(false, "GlobalProcessorAssignerMutex");
+
+
+
+            // Define the security settings for the memory-mapped file
+            var security = new MemoryMappedFileSecurity();
+
+            // Allow full control to the "Everyone" group
+            var mm_rule = new AccessRule<MemoryMappedFileRights>(
+                new SecurityIdentifier(WellKnownSidType.WorldSid, null),
+                MemoryMappedFileRights.FullControl,
+                AccessControlType.Allow);
+
+            security.AddAccessRule(mm_rule);
+
+            // Create the global memory-mapped file with the specified security settings
+            mmf = MemoryMappedFile.CreateOrOpen("Global\\GlobalProcessorAssignerMMF", 4, MemoryMappedFileAccess.ReadWrite, MemoryMappedFileOptions.None, security, HandleInheritability.None);
+            //mmf = MemoryMappedFile.CreateOrOpen("GlobalProcessorAssignerMMF", 4);            
+            
             accessor = mmf.CreateViewAccessor();
 
             startProcessor = maxProcessor;
