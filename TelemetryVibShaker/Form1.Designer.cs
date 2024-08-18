@@ -167,6 +167,7 @@
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             btnResetMax = new Button();
+            button1 = new Button();
             tabs.SuspendLayout();
             tabNormalSoundEffects.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trkVolumeMultiplier2).BeginInit();
@@ -1685,6 +1686,16 @@
             btnResetMax.UseVisualStyleBackColor = true;
             btnResetMax.Click += btnResetMax_Click;
             // 
+            // button1
+            // 
+            button1.Location = new Point(182, 455);
+            button1.Name = "button1";
+            button1.Size = new Size(75, 23);
+            button1.TabIndex = 5;
+            button1.Text = "button1";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
             // frmMain
             // 
             AcceptButton = btnStartListening;
@@ -1692,6 +1703,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnStop;
             ClientSize = new Size(566, 510);
+            Controls.Add(button1);
             Controls.Add(btnResetMax);
             Controls.Add(statusStrip1);
             Controls.Add(btnStop);
@@ -1874,5 +1886,6 @@
         private Label label48;
         private Label label51;
         private CheckBox chkReassignIdealProcessor;
+        private Button button1;
     }
 }

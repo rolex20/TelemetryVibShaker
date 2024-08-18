@@ -1360,5 +1360,11 @@ namespace TelemetryVibShaker
             // let's signal the need for that operation here
             needToCallSetNewIdealProcessor = chkReassignIdealProcessor.Visible && chkReassignIdealProcessor.Checked;
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (processorAssigner == null) processorAssigner = new ProcessorAssigner(7);
+            SetNewIdealProcessor(2);
+        }
     }
 }
