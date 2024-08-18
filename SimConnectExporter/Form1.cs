@@ -359,7 +359,7 @@ namespace SimConnectExporter
 
         private void btnDisconnect_Click(object sender, EventArgs e)
         {
-            tsStatusBar1.Text = "SimConnect disconnection requested by user at " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"); ;
+            tsStatusBar1.Text = "SimConnect disconnection requested by user at " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
             DisconnectFromSimConnect();
             DisconnectUDP();
 
@@ -916,11 +916,11 @@ namespace SimConnectExporter
             int previousProcessor = (int)SetThreadIdealProcessor(currentThreadHandle, newIdealProcessor);
 
 
-            if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
-            {
-                tsStatusBar1.Text = $"SetNewIdealProcessor({newIdealProcessor})={previousProcessor}";
-                return;
-            }
+            //if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
+            //{
+                tsStatusBar1.Text = $"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}] SetNewIdealProcessor({newIdealProcessor})={previousProcessor}";
+                //return;
+            //}
         }
 
         private void button1_Click(object sender, EventArgs e)
