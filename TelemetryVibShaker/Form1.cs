@@ -778,11 +778,11 @@ namespace TelemetryVibShaker
 
             if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
             {
-                toolStripStatusLabel1.Text = $"Call Failed. SetNewIdealProcessor({newIdealProcessor})={previousProcessor}";
+                toolStripStatusLabel1.Text = $"[{DateTime.Now.ToString("HH:mm:ss.fff")}] SetNewIdealProcessor({newIdealProcessor})={previousProcessor}";
             }
             else
             {
-                toolStripStatusLabel1.Text = $"Call Succeeded. SetNewIdealProcessor({newIdealProcessor})={previousProcessor}";
+                toolStripStatusLabel1.Text = $"[{DateTime.Now.ToString("HH:mm:ss.fff")}] SetNewIdealProcessor({newIdealProcessor})={previousProcessor}";
             }
 
         }
