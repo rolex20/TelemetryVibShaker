@@ -94,6 +94,7 @@
             btnDisconnect = new Button();
             btnResetMax = new Button();
             timer1 = new System.Windows.Forms.Timer(components);
+            button1 = new Button();
             tabs.SuspendLayout();
             Settings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudFrequency).BeginInit();
@@ -785,11 +786,22 @@
             timer1.Interval = 1500;
             timer1.Tick += timer1_Tick;
             // 
+            // button1
+            // 
+            button1.Location = new Point(159, 385);
+            button1.Name = "button1";
+            button1.Size = new Size(75, 23);
+            button1.TabIndex = 5;
+            button1.Text = "button1";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
             // frmMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(493, 450);
+            Controls.Add(button1);
             Controls.Add(btnResetMax);
             Controls.Add(btnDisconnect);
             Controls.Add(statusStrip1);
@@ -884,5 +896,6 @@
         private Label label15;
         private CheckBox chkAutoMinimize;
         private CheckBox chkReassignIdealProcessor;
+        private Button button1;
     }
 }

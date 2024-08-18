@@ -190,7 +190,7 @@ namespace SimConnectExporter
             if (needToCallSetNewIdealProcessor)
             {
                 needToCallSetNewIdealProcessor = false;
-                SetNewIdealProcessor(maxProcessorNumber); 
+                SetNewIdealProcessor(maxProcessorNumber);
             }
 
 
@@ -920,8 +920,13 @@ namespace SimConnectExporter
             {
                 tsStatusBar1.Text = $"SetNewIdealProcessor({newIdealProcessor})={previousProcessor}";
                 return;
-            }            
+            }
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (processorAssigner == null) processorAssigner = new ProcessorAssigner(7);
+            SetNewIdealProcessor(7);
+        }
     }
 }
