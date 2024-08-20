@@ -1,7 +1,7 @@
 ﻿# Deprecated: No funciono bien
 
 # Define the path to watch
-$path = "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\warthunder\ps_scripts"
+$path = "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\warthunder\ps_scripts"
 
 # Create a new FileSystemWatcher
 $watcher = New-Object System.IO.FileSystemWatcher

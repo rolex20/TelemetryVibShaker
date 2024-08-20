@@ -1,31 +1,48 @@
 ﻿# Generate mission type 1 for War Thunder (Type 1 Dogfight with previewer)
 
-. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
-$search_paths = @("C:\MyPrograms\MyApps\TelemetryVibShaker\WebScripts", "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts")
+. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
+$search_paths = @("C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts", "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts")
 $include_file = Include-Script -FileName "Write-VerboseDebug.ps1" -Directories $search_paths
 . $include_file
 
-function Generate_WT_Mission_Type1() {
-    $DownloadUrl1 = "http://localhost/warthunder/dogfight_setup_1.php" # This is the actual mission
-    $DownloadPath1 = "C:\MyPrograms\Steam\steamapps\common\War Thunder\UserMissions\AutoDogfight_setup1.blk"
-    $DownloadUrl2 = "http://localhost/warthunder/viewer_setup_1.php" # This is a pre-viewer for the AI planes to see if they have the right armament/ordinance
-    $DownloadPath2 = "C:\MyPrograms\Steam\steamapps\common\War Thunder\UserMissions\AutoViewer_setup1.blk"
+# create a sound player
+$sound = New-Object System.Media.SoundPlayer;
 
 
-    # create a sound player
-    $sound = New-Object System.Media.SoundPlayer
-    $sound.SoundLocation="C:\Windows\Media\Windows Notify.wav"
-	
-    try {
-	    Invoke-WebRequest -Uri $DownloadUrl1 -OutFile $DownloadPath1 -ErrorAction Stop
-	    Invoke-WebRequest -Uri $DownloadUrl2 -OutFile $DownloadPath2 -ErrorAction Stop
-		
-	    } 
-    catch {
-            Write-VerboseDebug -Timestamp (Get-Date) -Title "WAR THUNDER ERROR" -Message "Invoke-WebRequest" -ForegroundColor "Red"
-		    $sound.SoundLocation = "C:\Windows\Media\Windows Critical Stop.wav"
-        
-        }
-
-    $sound.Play()
+function Play-Sound($player, $filename, $now) {
+	$player.SoundLocation="C:\Windows\Media\Windows Notify.wav"	
+	if ($now) 
+	{
+		$player.Play()	
+	}
 }
+
+
+
+function Generate_WT_Mission_Type1() {
+	$DownloadUrl1 = "http://localhost/warthunder/dogfight_setup_1.php"
+	$DownloadPath1 = "C:\MyPrograms\Steam\steamapps\common\War Thunder\UserMissions\AutoDogfight_setup1.blk"
+	$DownloadUrl2 = "http://localhost/warthunder/viewer_setup_1.php"
+	$DownloadPath2 = "C:\MyPrograms\Steam\steamapps\common\War Thunder\UserMissions\AutoViewer_setup1.blk"
+
+	Play-Sound $sound "C:\Windows\Media\Windows Notify.wav" $true
+	
+	try {
+		$randomNumber = Get-Random -Minimum 1000 -Maximum 10000
+		$url = $DownloadUrl1 + "?rnd=$randomNumber"
+		Invoke-WebRequest -Uri $url -OutFile $DownloadPath1 -ErrorAction Stop
+		$url = $DownloadUrl2 + "?rnd=$randomNumber"
+		Invoke-WebRequest -Uri $url -OutFile $DownloadPath2 -ErrorAction Stop
+		
+		} catch 
+		{
+			Play-Sound $sound "C:\Windows\Media\Windows Critical Stop.wav" $true
+		}
+}
+
+# notify we are about to start and force the player to be ready
+#Play-Sound $sound "C:\Windows\Media\Windows Logon.wav" $true
+
+# use a try...finally construct to release the
+# filesystemwatcher once the loop is aborted
+# by pressing CTRL+C

@@ -3,7 +3,8 @@
         [datetime]$Timestamp,
         [string]$Title,
         [string]$Message,
-        [string]$ForegroundColor = "White"  # Default color is White
+        [string]$ForegroundColor = "White",  # Default color is White
+        [bool]$Speak = $false
     )
 
     $formattedTimestamp = $Timestamp.ToString("yyyy-MM-dd HH:mm:ss.fff") #maximum is fffffff
@@ -15,10 +16,10 @@
 
     Write-Host $output -ForegroundColor $ForegroundColor
 
-    if ($ForegroundColor -eq "Red") {
+    if ($ForegroundColor -eq "Red" -OR $Speak) {
         Add-Type -AssemblyName System.Speech
         $synthesizer = New-Object System.Speech.Synthesis.SpeechSynthesizer
-        $synthesizer.Speak("WARNING: $Title.  $Message")
+        $synthesizer.Speak("PS-Watcher WARNING: $Title  $Message")
     }
 }
 

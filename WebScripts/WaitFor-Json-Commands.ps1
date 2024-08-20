@@ -4,19 +4,19 @@
 # for the next modification on the watch file.
 
 
-. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
+. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
 
 <#
-. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1"
-. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Get-RenamesWatcher.ps1"
-. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
-. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Watchdog-Operations.ps1"
+. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1"
+. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Get-RenamesWatcher.ps1"
+. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
+. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Watchdog-Operations.ps1"
 #>
 
 
 # INCLUDE COMMON FUNCTIONS
 
-$search_paths = @("C:\MyPrograms\MyApps\TelemetryVibShaker\WebScripts", "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts")
+$search_paths = @("C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts", "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts")
 
 $include_file = Include-Script -FileName "Write-VerboseDebug.ps1" -Directories $search_paths
 . $include_file
@@ -24,15 +24,23 @@ $include_file = Include-Script -FileName "Write-VerboseDebug.ps1" -Directories $
 $include_file = Include-Script -FileName "Get-RenamesWatcher.ps1" -Directories $search_paths
 . $include_file
 
-$include_file = Include-Script -FileName "Include-Script.ps1" -Directories $search_paths
+$include_file = Include-Script -FileName "Watchdog-Operations.ps1" -Directories $search_paths
 . $include_file
 
-$include_file = Include-Script -FileName "Watchdog-Operations.ps1" -Directories $search_paths
+$include_file = Include-Script -FileName "SetAffinityAndPriority.ps1" -Directories $search_paths
+. $include_file
+
+$include_file = Include-Script -FileName "Get-ProcessWatcher.ps1" -Directories $search_paths
 . $include_file
 
 
 $need_restart = $false
 try {
+	# 0- SET TITLE
+		$title = 'Watcher for JSON Gaming Commands'
+		$Host.UI.RawUI.WindowTitle = $title
+
+	
 
     # 1- ADJUST PRIORITIES, AFFINITIES, ETC
 
@@ -42,9 +50,9 @@ try {
         } catch {
             Write-VerboseDebug -Timestamp (Get-Date) -Title "WARNING" -Message "Not an Intel 12700K or 14700K " -ForegroundColor "Yellow"
         }
+		
+		SetAffinityAndPriority -SetEfficiencyAffinity $true -SetBackgroudPriority $false -SetIdlePriority $true
 
-        $title = 'Wait for JSON Gaming Commands'
-        $Host.UI.RawUI.WindowTitle = $title
 
 
 
@@ -80,7 +88,7 @@ try {
     # remote commands are sent in support of my TelemetryVibShaker Apps
 
         $remote_commands = {
-            . "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Process-CommandFromJson.ps1"
+            . "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Process-CommandFromJson.ps1"
 
             $path = $Event.SourceEventArgs.FullPath
             $changeType = $Event.SourceEventArgs.ChangeType
@@ -93,7 +101,7 @@ try {
 
 
         # Setup filesystem watch events for json remote control commands
-        $command_file = "C:\wamp\www\remote_control\command.json"
+        $command_file = "C:\MyPrograms\wamp\www\remote_control\command.json"
         $cm_watcher_objects = Get-RenamesWatcher $command_file $remote_commands
 
 
@@ -103,26 +111,41 @@ try {
     # mission_data.json is created by wamp/apache/http/php/mission1.php script
 
         $generate_mission1 = {
-            . "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\WT_MissionType1.ps1"
+            . "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\WT_MissionType1.ps1"
 
             $path = $Event.SourceEventArgs.FullPath
             $changeType = $Event.SourceEventArgs.ChangeType
 
             Write-Host " "
-            Write-VerboseDebug -Timestamp $Event.TimeGenerated -Title "WAR THUNDER" -Message "Generate Mission"
+			Write-VerboseDebug -Timestamp $Event.TimeGenerated -Title "CHANGE_TYPE:$changeType" -Message $path
+            #Write-VerboseDebug -Timestamp $Event.TimeGenerated -Title "WAR THUNDER" -Message "Generate Mission"
             Generate_WT_Mission_Type1
 
         }
 
-        # Setup filesystem watch events for war thunder mission type 1 generation
-        $mission1 = "C:\MyPrograms\wamp\www\warthunder\mission_data.json" #Galvatron
+        # Setup filesystem watch events for war thunder mission type 1 generation        
         $mission1 = "C:\wamp\www\warthunder\mission_data.json"  #Alienware
+		$mission1 = "C:\MyPrograms\wamp\www\warthunder\mission_data.json" #Galvatron
         $wt_watcher_objects = Get-RenamesWatcher $mission1 $generate_mission1
 
 
+    # 5- POWER SCHEME PARAMETERS FOR PROCESS WATCHER
+        $processAction = {
+            . "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Set-GamePowerScheme.ps1"
 
-    # 5- WATCHDOG: Infinite loop to periodically check-alive in filesystem-watch which some times fails or locks
-        Watchdog_Operations
+            $pId = $Event.SourceEventArgs.NewEvent.ProcessID.ToString()
+            $pName = $Event.SourceEventArgs.NewEvent.ProcessName.ToString()
+            $traceName = $Event.SourceEventArgs.NewEvent.ToString()
+
+            Write-Host " "            
+            Write-VerboseDebug -Timestamp $Event.TimeGenerated -Title "PROCESS" -Message "$traceName - $pName [$pID]"
+            Set-GamePowerScheme $traceName $pName
+        }
+        $processWatcher = Get-ProcessWatchers $processAction        
+
+
+    # 6- WATCHDOG: Infinite loop to periodically check-alive in filesystem-watch which some times fails or locks
+        $need_restart = Watchdog_Operations
 
 } #end try block
 
@@ -147,10 +170,15 @@ finally {
     $mutex.Close()  
     $mutex.Dispose()
 
+    Get-Event | Remove-Event -ErrorAction SilentlyContinue
+    Get-EventSubscriber | Unregister-Event -ErrorAction SilentlyContinue
 
 } #end finally block
 
 if ($need_restart) {
-    Start-Sleep -Seconds 2
+    $delay_sec = 5
+    $message = "WARNING: Restarting the Watcher in $delay_sec seconds."
+    Write-VerboseDebug -Timestamp (Get-Date) -Title "WARNING.  " -Message $message -ForegroundColor "Red"
+    Start-Sleep -Seconds $delay_sec
     Start-Process -FilePath "powershell.exe" -ArgumentList "-File `"$PSCommandPath`""
 }

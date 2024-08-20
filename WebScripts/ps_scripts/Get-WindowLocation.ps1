@@ -1,4 +1,4 @@
-﻿#. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1" #Don't forget to include this file for independent testing
+﻿#. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1" #Don't forget to include this file for independent testing
 
 function Get-WindowLocation {
     param (
@@ -40,11 +40,15 @@ function Get-WindowLocation {
             $rect = New-Object User32_GetLocation+RECT
             $r = [User32_GetLocation]::GetWindowRect($hWnd, [ref]$rect)
             
-            # Print the coordinates
             $x = $rect.Left
             $y = $rect.Top
-
-            Set-Content -Path $outFile -Value "$x`n$y"
+			
+			# Some debugging
+			# Write-Host "[$outfile] [$x] [$y]"
+			#$aff = ([System.Diagnostics.Process]::GetCurrentProcess().ProcessorAffinity).ToInt32()
+			#Write-Host $aff
+            
+			Set-Content -Path $outFile -Value "$x`n$y"
         } catch {
             Write-VerboseDebug -Timestamp (Get-Date) -Title "GET-LOCATION-ERROR" -Message "SetWindowPos() failed for $processName" -ForegroundColor "Red"
         }

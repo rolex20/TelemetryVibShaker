@@ -3,7 +3,7 @@
 # https://powershell.one/tricks/filesystem/filesystemwatcher
 
 $WatchFile1 = "C:\wamp\www\warthunder\mission_data.json"
-$WatchFile2 = "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\command.json"
+$WatchFile2 = "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\command.json"
 $DownloadUrl1 = "http://localhost/warthunder/dogfight_setup_1.php"
 $DownloadPath1 = "C:\MyPrograms\Steam\steamapps\common\War Thunder\UserMissions\AutoDogfight_setup1.blk"
 $DownloadUrl2 = "http://localhost/warthunder/viewer_setup_1.php"
@@ -30,7 +30,7 @@ $ChangeTypes = [System.IO.WatcherChangeTypes]::Changed
 
 
 # find the path to the desktop folder:
-#$WatchFile1 = "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts"
+#$WatchFile1 = "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts"
 
 # specify the path to the folder you want to monitor:
 #$Path1 = $desktop

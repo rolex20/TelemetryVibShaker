@@ -1,18 +1,6 @@
-﻿. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
+﻿. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
 
-<#
-. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1"
-. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Set-ForegroundProcess.ps1"
-. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Set-Minimize.ps1"
-. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Send-MessageViaPipe.ps1"
-. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Set-WindowsPosition.ps1"
-. "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Get-WindowLocation.ps1"
-#>
-
-
-
-$search_paths = @("C:\MyPrograms\MyApps\TelemetryVibShaker\WebScripts", "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts")
-
+$search_paths = @("C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts", "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts")
 
 $include_file = Include-Script -FileName "Write-VerboseDebug.ps1" -Directories $search_paths
 . $include_file
@@ -21,6 +9,9 @@ $include_file = Include-Script -FileName "Set-ForegroundProcess.ps1" -Directorie
 . $include_file
 
 $include_file = Include-Script -FileName "Set-Minimize.ps1" -Directories $search_paths
+. $include_file
+
+$include_file = Include-Script -FileName "Set-Maximize.ps1" -Directories $search_paths
 . $include_file
 
 $include_file = Include-Script -FileName "Send-MessageViaPipe.ps1" -Directories $search_paths
@@ -32,11 +23,8 @@ $include_file = Include-Script -FileName "Set-WindowsPosition.ps1" -Directories 
 $include_file = Include-Script -FileName "Get-WindowLocation.ps1" -Directories $search_paths
 . $include_file
 
-<#
-. Include-Script 'Write-VerboseDebug.ps1' 'C:\Users\ralch'
-. Include-Script 'Set-ForegroundProcess.ps1' 'C:\Users\ralch'
-#>
-
+$include_file = Include-Script -FileName "Set-PowerScheme.ps1" -Directories $search_paths
+. $include_file
 
 function Process-CommandFromJson {
     param (
@@ -45,7 +33,7 @@ function Process-CommandFromJson {
 
     # Read the JSON file
     $jsonContent = Get-Content -Path $JsonFilePath -Raw | ConvertFrom-Json
-    Remove-Item -Path $JsonFilePath
+    #Remove-Item -Path $JsonFilePath
 
     # Extract command type and parameters
     $commandType = $jsonContent.command_type
@@ -66,6 +54,11 @@ function Process-CommandFromJson {
             Write-VerboseDebug -Timestamp (Get-Date) -Title "KILL" -Message $parameters.processName
             $p=Stop-Process -Name $parameters.processName -ErrorAction SilentlyContinue
         }
+
+        "MAXIMIZE" {
+            Set-Maximize $parameters.processName $parameters.instance
+        }
+
 
         "MINIMIZE" {
             Set-Minimize $parameters.processName $parameters.instance
@@ -88,9 +81,27 @@ function Process-CommandFromJson {
             Send-MessageViaPipe -pipeName $parameters.pipename -message $parameters.message
         }
 
+
+        "READPOWERSCHEME" {
+            $currentScheme =  Get-ActivePowerPlanName
+            $msg = "The current power plan is: $currentScheme"           
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "P-TRACE" -Message $msg -ForegroundColor "White" -Speak $true
+        }
+
+
+        "POWERSCHEME" {
+            Set-PowerScheme -schemeName $parameters.schemeName
+        }
+
+
         "WATCHDOG" {
             Set-Content -Path $parameters.outFile "WATCHDOG"
-            Write-VerboseDebug -Timestamp (Get-Date) -Title "WATCHDOG" -Message "File System events are still active: OK" -ForegroundColor "Green"
+		    Write-VerboseDebug -Timestamp (Get-Date) -Title "WATCHDOG [PID=$PID]" -Message "File System events are still active: OK." -ForegroundColor "Green"
+			if ($parameters.sound) {
+				Add-Type -AssemblyName System.Speech
+				$synthesizer = New-Object System.Speech.Synthesis.SpeechSynthesizer
+				$synthesizer.Speak("PS-Watcher is OK")
+			}
         }
 
         default {
@@ -106,7 +117,7 @@ function Process-CommandFromJson {
 <#
 
 
-cd C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts
+cd C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts
 
 
 if (Test-Path "command.json") { Remove-Item command.json }

@@ -18,32 +18,39 @@ function Get-NewFileName {
 
 
 function Watchdog_Operations {
-    $watchdog_json = Include-Script "watchdog.json" "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts" "C:\Users\ralch"
+    $watchdog_json = Include-Script "watchdog.json" "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts" "C:\Users\ralch"
     $tmp_json = Get-NewFileName -FilePath $command_file -NewExtension "tmp"
 
-
+	$failure = $false
     $watchers_OK = $true
     do
     {
-        # Wait-Event waits for a second and stays responsive to events
+        # Wait-Event waits while staying responsive to events
         # Start-Sleep in contrast would NOT work and ignore incoming events
-
-        Wait-Event -Timeout 300 # Check every five minutes
-
+		
+        # CHANGE HERE FOR DIFFERENT WAIT TIME
+		$wait_minutes = 5 #Change this
+		
+		$wait = 60 * $wait_minutes
+		Wait-Event -Timeout $wait # Check every five minutes		
+		
 
         if (Test-Path "watchdog.txt") { Remove-Item "watchdog.txt" }
         if (Test-Path $command_file) { Remove-Item $command_file }
         Copy-Item $watchdog_json $tmp_json
         Rename-Item $tmp_json $command_file
 
-        Start-Sleep -Milliseconds 100
+        Start-Sleep -Milliseconds 200
         if (Test-Path "watchdog.txt") {
             # We are good
         } else {
             Write-VerboseDebug -Timestamp (Get-Date) -Title "ERROR" -Message "Events are not being processed" -ForegroundColor "Red"
             $watchers_OK = $false
-            $need_restart = $true
+			$failure = $true
         }
+		
         
     } while ($watchers_OK)
+	
+	return $failure
 }

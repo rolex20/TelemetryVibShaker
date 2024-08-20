@@ -1,6 +1,7 @@
 {
     "command_type": "WATCHDOG",
     "parameters": {
-        "outFile": "watchdog.txt"
+        "outFile": "watchdog.txt",
+		"sound": 0
     }
 }

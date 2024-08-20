@@ -1,4 +1,4 @@
-﻿"C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1" #Don't forget to include this file, when testing individually
+﻿# . "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1" #Don't forget to include this file, when testing individually
 
 function Send-MessageViaPipe {
     param (
