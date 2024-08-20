@@ -13,67 +13,67 @@
     {
       "friendlyName": "Clock",
       "processName": "Time",
-      "path": "C:\\Program Files\\WindowsApps\\Microsoft.WindowsAlarms_11.2403.8.0_x64__8wekyb3d8bbwe\\Time.exe"
+      "path": "timedate.cpl"
     },
     {
       "friendlyName": "WarThunderExporter",
       "processName": "WarThunderExporter",
-      "path": "C:\\Users\\ralch\\source\\repos\\rolex20\\TelemetryVibShaker\\WarThunderExporter\\bin\\Release\\net7.0-windows\\WarThunderExporter.exe"
+      "path": "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WarThunderExporter\\WarThunderExporter.exe"
     },
     {
       "friendlyName": "TelemetryVibShaker",
       "processName": "TelemetryVibShaker",
-      "path": "C:\\Users\\ralch\\source\\repos\\rolex20\\TelemetryVibShaker\\TelemetryVibShaker\\bin\\x64\\Release\\net7.0-windows\\TelemetryVibShaker.exe"
+      "path": "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\TelemetryServer\\TelemetryVibShaker.exe"
     },
     {
       "friendlyName": "FalconExporter",
       "processName": "FalconExporter",
-      "path": "C:\\Users\\ralch\\source\\repos\\rolex20\\TelemetryVibShaker\\FalconExporter\\bin\\Release\\FalconExporter.exe"
+      "path": "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\FalconExporter\\FalconExporter.exe"
     },
     {
       "friendlyName": "PerformanceMonitor",
       "processName": "PerformanceMonitor",
-      "path": "C:\\Users\\ralch\\source\\repos\\rolex20\\TelemetryVibShaker\\PerformanceMonitor\\bin\\x64\\Release\\PerformanceMonitor.exe"
+      "path": "C:\\MyPrograms\\My Apps\\Performance Monitor Light\\PerformanceMonitor.exe"
     },
     {
       "friendlyName": "RemoteWindowControl",
       "processName": "RemoteWindowControl",
-      "path": "C:\\Users\\ralch\\source\\repos\\rolex20\\TelemetryVibShaker\\RemoteWindowControl\\bin\\Release\\net7.0-windows\\RemoteWindowControl.exe"
+      "path": "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\RemoteWindowControl\\RemoteWindowControl.exe"
     },
     {
       "friendlyName": "SimConnectExporter",
       "processName": "SimConnectExporter",
-      "path": "C:\\Users\\ralch\\source\\repos\\rolex20\\TelemetryVibShaker\\SimConnectExporter\\bin\\Release\\net7.0-windows\\SimConnectExporter.exe"
+      "path": "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\SimConnectExporter\\SimConnectExporter.exe"
     },
     {
       "friendlyName": "DCS World",
       "processName": "dcs",
-      "path": "something"
+      "path": "N:\\MyPrograms\\DCS World OpenBeta\\bin-mt\\DCS.exe"
     },
     {
       "friendlyName": "Microsoft Flight Simulator",
       "processName": "FlightSimulator",
-      "path": "something"
+      "path": "C:\\MyPrograms\\Steam\\steamapps\\common\\MicrosoftFlightSimulator\\FlightSimulator.exe"
     },
     {
       "friendlyName": "War Thunder",
       "processName": "aces",
-      "path": "something"
+      "path": "C:\\MyPrograms\\Steam\\steamapps\\common\\War Thunder\\win64\\aces.exe"
     },
     {
-      "friendlyName": "Falcon BMS",
+      "friendlyName": "Falcon BMS Launcher",
       "processName": "falcon",
-      "path": "something"
+      "path": "C:\\MyPrograms\\Falcon BMS 4.37\\Launcher\\FalconBMS_Alternative_Launcher.exe"
     },
     {
       "friendlyName": "HWiNFO64",
       "processName": "HWiNFO64",
-      "path": "C:\\Program Files\\HWiNFO64\\HWiNFO64.EXE"
+      "path": "C:\\MyPrograms\\My Apps\\HWiNFO\\HWiNFO64.exe"
     },
     {
       "friendlyName": "Edge Web Browser",
       "processName": "msedge",
-      "path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
+      "path": "msedge"
     }
   ]
 }

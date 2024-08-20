@@ -1,4 +1,30 @@
 <?php
+function createSpan($color, $text) {
+    return "<span style='color: $color;'>$text</span>";
+}
+
+function tryOpenFile($filename, $retries, $delay_ms) {
+    $attempt = 0;
+    $file = false;
+
+    while ($attempt < $retries) {
+
+		// delay first, to allow WaitFor-Json-Commands.ps1 to complete
+		usleep($delay_ms * 1000); // usleep takes microseconds, so we convert milliseconds to microseconds
+		
+        
+		//if (file_exists($outfile)) { $file = fopen($filename, "r"); }
+		$file = @fopen($filename, "r");
+        if ($file) {
+            return $file;
+        }
+        $attempt++;
+        
+    }
+
+    return false;
+}
+
 function renameFile($existingFileName, $newFileName) {
     // Check if the new file name already exists and delete it
     if (file_exists($newFileName)) {
@@ -18,6 +44,41 @@ function renameFile($existingFileName, $newFileName) {
     } else {
         return false;
     }
+}
+
+function createJsonPOWERSCHEME($filePath, $command, $powerscheme) {
+	
+    // Define the array structure using the older array syntax
+    $data = array(
+        "command_type" => $command,
+        "parameters" => array(
+            "schemeName" => $powerscheme
+        )
+    );
+
+    // Encode the array to JSON format
+    $json_data = json_encode($data);
+
+    // Write the JSON data to the specified file
+	return file_put_contents($filePath, $json_data);
+}
+
+function createJsonWATCHDOG($filePath, $outfile) {
+	
+    // Define the array structure using the older array syntax
+    $data = array(
+        "command_type" => "WATCHDOG",
+        "parameters" => array(
+            "outfile" => $outfile,
+			"sound" => 1
+        )
+    );
+
+    // Encode the array to JSON format
+    $json_data = json_encode($data);
+
+    // Write the JSON data to the specified file
+	return file_put_contents($filePath, $json_data);
 }
 
 
@@ -181,13 +242,16 @@ function getPathByProcessName($jsonFilePath, $processName) {
 // Initialize variables
 $footer = "Ready";
 $time_stamp = getTimestamp();
+$temp_file = "command.tmp";
+$command_file = "command.json";
 
 // Location coordinates
-$frmX = "-1700";
+$frmX = "-1500";
 $frmY = "";
 
 $frm_instance = 0;
 $frm_process = "";
+$frm_pipe_command = isset($_POST['PipeCommand'])? $_POST['PipeCommand']: "";
 
 $name = $gender = $color = "";
 $subscribe = false;
@@ -200,23 +264,53 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	$frm_process = htmlspecialchars($_POST['Process']);
 	
 	
-	// CHECK FOR PIPE COMMAND
+	// CHECK FOR PIPE/SPECIAL COMMAND
 	$post_command = isset($_POST['Command'])? $_POST['Command']: "";
-	if ($post_command == "Command") { // Check if the comand requested was to Launch a program
-		$pipe_tuple = $_POST['PipeCommand'];	
-		$pipe_items = explode('|', $pipe_tuple);
+	if ($post_command == "Command") { // Check if the comand requested was send IPC pipe message
+		$special_command = isset($_POST['SpecialCommand'])? $_POST['SpecialCommand']: "";			
+		$pipe_tuple = isset($_POST['PipeCommand'])? $_POST['PipeCommand']: "";	
 
-		// Assign each value to a variable
-		$pipename = $pipe_items[0];
-		$message = $pipe_items[1];
-		
-		$footer = "Pipe [$pipename] - [$message]";
-				
-		# My Powershell FileSystem Event watcher is configured to listen to rename events
-		# This way I avoid I/O bouncing/flapping, etc, just one event generated
-		createJsonPIPE("command.tmp", $pipename, $message);
-		renameFile("command.tmp", "command.json");
+		if ($special_command == "WATCHDOG") {
+			$footer = "Watchdog with sound.";
+			createJsonWATCHDOG($temp_file, "watchdog.txt");
+			renameFile($temp_file, $command_file);			
+			
+		} else if ($special_command == "HIGHPERFORMANCE") {
+			$footer = "Set Power Scheme to High Power";
+			createJsonPOWERSCHEME($temp_file, "POWERSCHEME", "High Performance");
+			renameFile($temp_file, $command_file);			
+			
+		} else if ($special_command == "BALANCED") {
+			$footer = "Set Power Scheme to Balanced";
+			createJsonPOWERSCHEME($temp_file, "POWERSCHEME", "Balanced");
+			renameFile($temp_file, $command_file);			
+			
+		} else if ($special_command == "BALANCED80") {
+			$footer = "Set Power Scheme to Balanced Max CPU 80%";
+			createJsonPOWERSCHEME($temp_file, "POWERSCHEME", "Balanced with Max 80");
+			renameFile($temp_file, $command_file);			
+		}  else if ($special_command == "READPOWERSCHEME") {
+			$footer = "Read current power plan";
+			createJsonPOWERSCHEME($temp_file, "READPOWERSCHEME", "NA");
+			renameFile($temp_file, $command_file);			
+		}
+		else if (strpos($pipe_tuple, '|') !== false) { // IPC Pipe command?
+			$pipe_items = explode('|', $pipe_tuple);
+
+			// Assign each value to a variable
+			$pipename = $pipe_items[0];
+			$message = $pipe_items[1];
+			
+			$footer = "Pipe [$pipename] - [$message]";
+					
+			//My Powershell FileSystem Event watcher is configured to listen to rename events
+			//This way I avoid I/O bouncing/flapping, etc, just one event generated
+			createJsonPIPE($temp_file, $pipename, $message);
+			renameFile($temp_file, $command_file);			
+		} 
 		$time_stamp = getTimestamp();
+
+
 	} // end-if 
 	
 		
@@ -228,15 +322,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$path = getPathByProcessName($jsonFilePath, $processName);
 
 		if ($path !== null) {
-			$footer = "Launch requested - '$processName': $path\n";
+			$footer = "Launch completed - '$processName': $path\n";
 		} else {
 			$footer = "Launch process '$processName' not found.\n";
 		}
 		
-		# My Powershell FileSystem Event watcher is configured to listen to rename events
-		# This way I avoid I/O bouncing/flapping, etc, just one event generated
-		createJsonRUN("command.tmp", $path, "not-used");
-		renameFile("command.tmp", "command.json");				
+		// My Powershell FileSystem Event watcher is configured to listen to rename events
+		// This way I avoid I/O bouncing/flapping, etc, just one event generated
+		createJsonRUN($temp_file, $path, "not-used");
+		renameFile($temp_file, $command_file);				
 		$time_stamp = getTimestamp();
 	} // end-if Launch
 	
@@ -246,12 +340,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	if ($post_command == "Terminate") { // Check if the comand requested was to Launch a program
 		$processName = $_POST['Process'];
 		
-		$footer = "Terminate requested - [$processName]";
+		$footer = "Terminate completed - [$processName]";
 				
-		# My Powershell FileSystem Event watcher is configured to listen to rename events
-		# This way I avoid I/O bouncing/flapping, etc, just one event generated
-		createJsonKILL("command.tmp", $processName);
-		renameFile("command.tmp", "command.json");
+		// My Powershell FileSystem Event watcher is configured to listen to rename events
+		// This way I avoid I/O bouncing/flapping, etc, just one event generated
+		createJsonKILL($temp_file, $processName);
+		renameFile($temp_file, $command_file);
 		$time_stamp = getTimestamp();
 	} // end-if 
 	
@@ -260,12 +354,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	if ($post_command == "Make Foreground") { // Check if the comand requested was to Launch a program
 		$processName = $_POST['Process'];
 		
-		$footer = "Foreground requested - [$processName]";
+		$footer = "Foreground completed - [$processName]";
 				
-		# My Powershell FileSystem Event watcher is configured to listen to rename events
-		# This way I avoid I/O bouncing/flapping, etc, just one event generated
-		createJsonFOREGROUND("command.tmp", $processName, $frm_instance);
-		renameFile("command.tmp", "command.json");
+		// My Powershell FileSystem Event watcher is configured to listen to rename events
+		// This way I avoid I/O bouncing/flapping, etc, just one event generated
+		createJsonFOREGROUND($temp_file, $processName, $frm_instance);
+		renameFile($temp_file, $command_file);
 		$time_stamp = getTimestamp();
 	} // end-if 
 
@@ -275,25 +369,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	if ($post_command == "GetValues") { // Check if the comand requested was to Launch a program
 		$processName = $_POST['Process'];
 		
-		$footer = "GetValues requested - [$processName]";
+		$footer = "GetValues completed - [$processName]";
+		//$footer = createSpan("blue", "GetValues completed - [$processName]");
 				
-		# My Powershell FileSystem Event watcher is configured to listen to rename events
-		# This way I avoid I/O bouncing/flapping, etc, just one event generated
-		$outfile = "C:\\wamp\\www\\remote_control\\outfile.txt";
-		if (file_exists($outfile)) { unlink($outfile); }
+		// My Powershell FileSystem Event watcher is configured to listen to rename events
+		// This way I avoid I/O bouncing/flapping, etc, just one event generated
+		$outfile = "C:\\MyPrograms\\wamp\\www\\remote_control\\outfile.txt";
+		if (file_exists(basename($outfile))) { unlink(basename($outfile)); }
 		
-		createJsonGETVALUES("command.tmp", $processName, $frm_instance, $outfile);
-		renameFile("command.tmp", "command.json");
+		createJsonGETVALUES($temp_file, $processName, $frm_instance, $outfile);
+		renameFile($temp_file, $command_file);
 		$time_stamp = getTimestamp();
 		
-		usleep(200000); // allow time for the file to be created
-		$file = fopen(basename($outfile), "r");		
+		$file=tryOpenFile(basename($outfile), 50, 100); // wait up to 5 seconds
 		if ($file) {			
 			$frmX = fgets($file); // Read the first line					
 			$frmY = fgets($file); // Read the second line			
 			fclose($file);			
 		} else {
-			$footer = "Error opening the file.";
+			$footer = "<span style='color: red;'>Error opening the file.</span>";
+			//$footer = createSpan("red", "Error opening the file.");
+			$frmX = "?";
+			$frmY = "?";
 		}		
 		
 	} // end-if 
@@ -307,52 +404,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$state = isset($_POST['State'])? $_POST['State']: "0";
 		switch ($state) {
 				case "0":  // Change X,Y coordinates
-					$footer = "Move requested - [$processName]";
+					$footer = "Move completed - [$processName]";
 							
-					# My Powershell FileSystem Event watcher is configured to listen to rename events
-					# This way I avoid I/O bouncing/flapping, etc, just one event generated
-					createJsonMOVE("command.tmp", $processName, $frm_instance, $frmX, $frmY);
-					renameFile("command.tmp", "command.json");
+					// My Powershell FileSystem Event watcher is configured to listen to rename events
+					// This way I avoid I/O bouncing/flapping, etc, just one event generated
+					createJsonMOVE($temp_file, $processName, $frm_instance, $frmX, $frmY);
+					renameFile($temp_file, $command_file);
 					$time_stamp = getTimestamp();
 					break;
 
 				case "-1":	// Minimize
-					$footer = "Minimize requested - [$processName]";
+					$footer = "Minimize completed - [$processName]";
 							
-					# My Powershell FileSystem Event watcher is configured to listen to rename events
-					# This way I avoid I/O bouncing/flapping, etc, just one event generated
-					createJsonWindowState("command.tmp", $processName, $frm_instance, "MINIMIZE");
-					renameFile("command.tmp", "command.json");
+					// My Powershell FileSystem Event watcher is configured to listen to rename events
+					// This way I avoid I/O bouncing/flapping, etc, just one event generated
+					createJsonWindowState($temp_file, $processName, $frm_instance, "MINIMIZE");
+					renameFile($temp_file, $command_file);
 					$time_stamp = getTimestamp();
 					break;
 			
 				case "1":	// Restore
-					$footer = "Restore requested - [$processName]";
+					$footer = "Restore completed - [$processName]";
 							
-					# My Powershell FileSystem Event watcher is configured to listen to rename events
-					# This way I avoid I/O bouncing/flapping, etc, just one event generated
-					createJsonWindowState("command.tmp", $processName, $frm_instance, "RESTORE");
-					renameFile("command.tmp", "command.json");
+					// My Powershell FileSystem Event watcher is configured to listen to rename events
+					// This way I avoid I/O bouncing/flapping, etc, just one event generated
+					createJsonWindowState($temp_file, $processName, $frm_instance, "RESTORE");
+					renameFile($temp_file, $command_file);
 					$time_stamp = getTimestamp();
 					break;
 					
 				case "2":	// Maximize
-					$footer = "Restore requested - [$processName]";
+					$footer = "Restore completed - [$processName]";
 							
-					# My Powershell FileSystem Event watcher is configured to listen to rename events
-					# This way I avoid I/O bouncing/flapping, etc, just one event generated
-					createJsonWindowState("command.tmp", $processName, $frm_instance, "MAXIMIZE");
-					renameFile("command.tmp", "command.json");
+					// My Powershell FileSystem Event watcher is configured to listen to rename events
+					// This way I avoid I/O bouncing/flapping, etc, just one event generated
+					createJsonWindowState($temp_file, $processName, $frm_instance, "MAXIMIZE");
+					renameFile($temp_file, $command_file);
 					$time_stamp = getTimestamp();
 					break;					
 		}		
 	} // end-if 
-	
-	
-	
 
 
-	
 } //end-if REQUEST_METHOD == POST
 
 
@@ -380,7 +473,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     color: #333;
   }  
 </style>
+
 <script>
+<? if ($frm_process != "") { ?>
 	function selectOptionByIdAndText(selectId, text) {
 		// Get the select element by its ID
 		var selectElement = document.getElementById(selectId);
@@ -400,26 +495,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		return false; // Option not found
 	}
 
-
-        function testSelection() {
-            var selectId = 'mySelectBox';
-            var text = document.getElementById('optionText').value;
-            var result = selectOptionByIdAndText(selectId, text);
-            //alert(result ? 'Option selected successfully!' : 'Option not found.');
-        }
-
-
+	// update the previously selected values if any.  server generated.
 	window.onload = function() {
-<? if ($frm_process != "") { ?>
-		selectOptionByIdAndText('Process', '<? echo $frm_process ?>');
-<? } ?>
-	};
+		var program = '<?= $frm_process ?>';
+		var pipe = '<?= $frm_pipe_command ?>';
+		
+		if (program != '') selectOptionByIdAndText('Process', program);
+		selectOptionByIdAndText('PipeCommand', pipe);		
+	}
+
+	
+<? } ?>	
+
+	function changeFontColor(elementId, newColor) {
+		// Get the element by its ID
+		var element = document.getElementById(elementId);
+		
+		// Check if the element exists
+		if (element) {
+			// Change the font color of the element
+			element.style.color = newColor;
+		} else {
+			console.log("Element with ID " + elementId + " not found.");
+		}
+	}
+
+
+
 </script>
 </head>
 <body>
 
-<div class="container">
-	<form name="RemoteControlForm" method="POST" align="center">
+<div id="allcontainer" class="container">
+	<form id="RemoteControlForm" name="RemoteControlForm" method="POST" align="center">
 		<a href="#" onclick="window.location.href = window.location.href.split('?')[0];"><h2>Window Remote Movement</h2></a>
 		<p class="welcome-message">Use this app to <a href="#lblMove">move</a> windows or send <a href="#lblCommand">commands</a> when playing in VR</p>
 
@@ -467,11 +575,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		<input type="submit" class="submit-btn" name="Exit" value="Terminate">
 		<input type="submit" class="submit-btn" name="Launch" value="Launch">
 		
+		<p><label id="lblSpecial" for="SpecialCommand">Select Special Command:</label>
+		<select id="SpecialCommand" name="SpecialCommand">
+			<option selected value="0">[SELECT SPECIAL COMMAND]</option>		
+			<option value="WATCHDOG">WATCHDOG: Watcher for JSON Gaming Commands</option>
+			<option value="HIGHPERFORMANCE">POWER SCHEME: HIGH POWER</option>
+			<option value="BALANCED">POWER SCHEME: BALANCED</option>
+			<option value="BALANCED80">POWER SCHEME: BALANCED MAX 80</option>
+			<option value="READPOWERSCHEME">READ CURRENT POWER PLAN</option>
+		</select>
 		
-		
-		<p><br><label id="lblCommand" for="PipeCommand">Select Command:</label>
-		<select name="PipeCommand">
-			<option selected="selected" value="0">[SELECT COMMAND]</option>
+		<br><label id="lblCommand" for="PipeCommand">Select Pipe Command:</label>
+		<select id="PipeCommand" name="PipeCommand">
+			<option selected value="0">[SELECT PIPE COMMAND]</option>
 			<option value="0">[PERFORMANCE MONITOR]</option>
 			
 			<option value="PerformanceMonitorCommandsPipe|CYCLE_CPU_ALARM">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CYCLE_CPU_ALARM</option>
@@ -489,7 +605,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			<option value="PerformanceMonitorCommandsPipe|RESTART_COUNTERS">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RESTART_COUNTERS</option>
 			<option value="PerformanceMonitorCommandsPipe|MINIMIZE">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MINIMIZE</option>
 			<option value="PerformanceMonitorCommandsPipe|RESTORE">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RESTORE</option>
-			<option value="PerformanceMonitorCommandsPipe|ALIGN_LEFT">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ALIGN_LEFT</option>
+			<option value="PerformanceMonitorCommandsPipe|ALIGN_LEFT-1500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ALIGN_LEFT</option>
+			<option value="PerformanceMonitorCommandsPipe|TOPMOST">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TOPMOST</option>
+			<option value="PerformanceMonitorCommandsPipe|CLOSE">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CLOSE</option>
 			<option value="PerformanceMonitorCommandsPipe|FOREGROUND">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FOREGROUND</option>
 
 			<option value="0">[TELEMETRY VIB SHAKER]</option>
@@ -501,7 +619,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			<option value="TelemetryVibShakerPipeCommands|CYCLE_STATISTICS">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CYCLE_STATISTICS</option>
 			<option value="TelemetryVibShakerPipeCommands|MINIMIZE">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MINIMIZE</option>
 			<option value="TelemetryVibShakerPipeCommands|RESTORE">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RESTORE</option>
-			<option value="TelemetryVibShakerPipeCommands|ALIGN_LEFT">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ALIGN_LEFT</option>
+			<option value="TelemetryVibShakerPipeCommands|ALIGN_LEFT-1500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ALIGN_LEFT</option>
+			<option value="TelemetryVibShakerPipeCommands|TOPMOST">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TOPMOST</option>
+			<option value="TelemetryVibShakerPipeCommands|CLOSE">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CLOSE</option>
 			<option value="TelemetryVibShakerPipeCommands|FOREGROUND">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FOREGROUND</option>
 
 			<option value="0">[WAR THUNDER EXPORTER]</option>
@@ -515,7 +635,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			<option value="WarThunderExporterPipeCommands|NOT_FOUNDS">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NOT_FOUNDS</option>
 			<option value="WarThunderExporterPipeCommands|MINIMIZE">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MINIMIZE</option>
 			<option value="WarThunderExporterPipeCommands|RESTORE">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RESTORE</option>
-			<option value="WarThunderExporterPipeCommands|ALIGN_LEFT">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ALIGN_LEFT</option>
+			<option value="WarThunderExporterPipeCommands|ALIGN_LEFT-1500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ALIGN_LEFT</option>
+			<option value="WarThunderExporterPipeCommands|TOPMOST">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TOPMOST</option>
+			<option value="WarThunderExporterPipeCommands|CLOSE">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CLOSE</option>
 			<option value="WarThunderExporterPipeCommands|FOREGROUND">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FOREGROUND</option>
 
 			<option value="0">[SIM CONNECT EXPORTER]</option>
@@ -527,7 +649,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			<option value="SimConnectExporterPipeCommands|START">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;START</option>
 			<option value="SimConnectExporterPipeCommands|MINIMIZE">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MINIMIZE</option>
 			<option value="SimConnectExporterPipeCommands|RESTORE">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RESTORE</option>
-			<option value="SimConnectExporterPipeCommands|ALIGN_LEFT">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ALIGN_LEFT</option>
+			<option value="SimConnectExporterPipeCommands|ALIGN_LEFT-1500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ALIGN_LEFT</option>
+			<option value="SimConnectExporterPipeCommands|TOPMOST">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TOPMOST</option>
+			<option value="SimConnectExporterPipeCommands|CLOSE">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CLOSE</option>
 			<option value="SimConnectExporterPipeCommands|FOREGROUND">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FOREGROUND</option>
 		</select>
 
@@ -537,9 +661,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 		<!-- Footer message -->
 		<div id="result" class="footer-message">[<?php echo $time_stamp; ?>] <?php echo $footer; ?></div>
-		<p><div id="result" class="footer-message"><?php echo 'PHP version: ' . phpversion();?></div>
+		<p><div id="phpversion" class="footer-message"><?php echo 'PHP version: ' . phpversion();?></div>
 	</form>
 </div>
+
+<script>
+// The following two functions will let the user know 
+// that processing has started in case Powershell takes too long
+// If you see issues posting, remove them for testing
+
+		
+        function handleFormSubmit(event, divId, newText, newColor) {
+            const divElement = document.getElementById(divId);
+			divElement.style.color = newColor;
+            divElement.innerText = newText;
+        }
+
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            form.addEventListener('submit', (event) => {
+                handleFormSubmit(event, 'result', 'Processing', 'blue');
+            });
+        });		
+</script>
 
 </body>
 </html>

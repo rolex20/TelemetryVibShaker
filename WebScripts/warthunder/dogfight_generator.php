@@ -21,10 +21,12 @@ function storePostDataAsJson($filename) {
 	$formattedJsonData = $jsonData;
 
     // Write formatted JSON data to the specified file
-    file_put_contents($filename, $formattedJsonData);
+	// The new powershell script watches for a rename event
+    file_put_contents($filename .  ".tmp", $formattedJsonData);
+	rename($filename . ".tmp", $filename . ".json");
 }
 
-storePostDataAsJson('mission_data.json');
+storePostDataAsJson("mission_data");
 ?>
 
 <!DOCTYPE html>
