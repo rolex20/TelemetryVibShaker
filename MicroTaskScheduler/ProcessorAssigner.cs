@@ -44,7 +44,7 @@ namespace IdealProcessorEnhanced
 
             // Create the global mutex with the specified security settings
             bool createdNew;
-            mutex = new Mutex(false, "Global\\GlobalProcessorAssignerMutex", out createdNew, mutexSecurity);
+            mutex = new Mutex(false, "Global\\ProcessorAssignerMutex", out createdNew, mutexSecurity);
             //   mutex = new Mutex(false, "GlobalProcessorAssignerMutex");
 
 
