@@ -17,6 +17,7 @@ using System.Threading;
 using System.IO.Pipes;
 using System.Windows.Forms.VisualStyles;
 using IdealProcessorEnhanced;
+using System.Reflection;
 //using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 
@@ -870,26 +871,8 @@ namespace PerformanceMonitor
         }
 
         // Function Inlining: Only in this particular case, I prefer to repeat code in this case instead of passing all parameters to the similar function
-        private void UpdateCounter(PerformanceCounter counter, ProgressBar pb, Label lbl, string dimensional = "%")
+        private void UpdateCounter(float counterValue, ProgressBar pb, Label lbl, string dimensional = "%")
         {
-            float counterValue;
-
-            try
-            {
-                counterValue = counter.NextValue();
-                if (counterValue>maxCpuUtil)
-                {
-                    maxCpuUtil = (int)counterValue;
-                    maxCpuName = counter.CounterName;
-                }
-            }
-            catch (Exception ex)
-            {
-                counterValue = 0.0f;
-                ExCounter++;
-                LogError(ex.Message, $"UpdateCounter({pb.Name})");
-            }
-
             int v = (int)counterValue;
 
             
@@ -1016,38 +999,78 @@ namespace PerformanceMonitor
                 UpdateCaption(tslblCurrentProcessor, (int)GetCurrentProcessorNumber());
             }
 
-
             UpdateGPUInfo();
 
+
+
+            float[] counterValues = new float[28];
+            try
+            {
+                counterValues[0] = cpuCounter0.NextValue();
+                counterValues[1] = cpuCounter1.NextValue();
+                counterValues[2] = cpuCounter2.NextValue();
+                counterValues[3] = cpuCounter3.NextValue();
+                counterValues[4] = cpuCounter4.NextValue();
+                counterValues[5] = cpuCounter5.NextValue();
+                counterValues[6] = cpuCounter6.NextValue();
+                counterValues[7] = cpuCounter7.NextValue();
+                counterValues[8] = cpuCounter8.NextValue();
+                counterValues[9] = cpuCounter9.NextValue();
+                counterValues[10] = cpuCounter10.NextValue();
+                counterValues[11] = cpuCounter11.NextValue();
+                counterValues[12] = cpuCounter12.NextValue();
+                counterValues[13] = cpuCounter13.NextValue();
+                counterValues[14] = cpuCounter14.NextValue();
+                counterValues[15] = cpuCounter15.NextValue();
+                counterValues[16] = cpuCounter16.NextValue();
+                counterValues[17] = cpuCounter17.NextValue();
+                counterValues[18] = cpuCounter18.NextValue();
+                counterValues[19] = cpuCounter19.NextValue();
+                counterValues[20] = cpuCounter20.NextValue();
+                counterValues[21] = cpuCounter21.NextValue();
+                counterValues[22] = cpuCounter22.NextValue();
+                counterValues[23] = cpuCounter23.NextValue();
+                counterValues[24] = cpuCounter24.NextValue();
+                counterValues[25] = cpuCounter25.NextValue();
+                counterValues[26] = cpuCounter26.NextValue();
+                counterValues[27] = cpuCounter27.NextValue();
+            } catch(Exception ex)
+            {
+                ExCounter++;
+                LogError(ex.Message, $"cpuCounterXX.NextValue()");
+            }
+
+
             maxCpuUtil = 0;
-            UpdateCounter(cpuCounter0, pbCPU0, lblCPU0);
-            UpdateCounter(cpuCounter1, pbCPU1, lblCPU1);
-            UpdateCounter(cpuCounter2, pbCPU2, lblCPU2);
-            UpdateCounter(cpuCounter3, pbCPU3, lblCPU3);
-            UpdateCounter(cpuCounter4, pbCPU4, lblCPU4);
-            UpdateCounter(cpuCounter5, pbCPU5, lblCPU5);
-            UpdateCounter(cpuCounter6, pbCPU6, lblCPU6);
-            UpdateCounter(cpuCounter7, pbCPU7, lblCPU7);
-            UpdateCounter(cpuCounter8, pbCPU8, lblCPU8);
-            UpdateCounter(cpuCounter9, pbCPU9, lblCPU9);
-            UpdateCounter(cpuCounter10, pbCPU10, lblCPU10);
-            UpdateCounter(cpuCounter11, pbCPU11, lblCPU11);
-            UpdateCounter(cpuCounter12, pbCPU12, lblCPU12);
-            UpdateCounter(cpuCounter13, pbCPU13, lblCPU13);
-            UpdateCounter(cpuCounter14, pbCPU14, lblCPU14);
-            UpdateCounter(cpuCounter15, pbCPU15, lblCPU15);
-            UpdateCounter(cpuCounter16, pbCPU16, lblCPU16);
-            UpdateCounter(cpuCounter17, pbCPU17, lblCPU17);
-            UpdateCounter(cpuCounter18, pbCPU18, lblCPU18);
-            UpdateCounter(cpuCounter19, pbCPU19, lblCPU19);
-            UpdateCounter(cpuCounter20, pbCPU20, lblCPU20);
-            UpdateCounter(cpuCounter21, pbCPU21, lblCPU21);
-            UpdateCounter(cpuCounter22, pbCPU22, lblCPU22);
-            UpdateCounter(cpuCounter23, pbCPU23, lblCPU23);
-            UpdateCounter(cpuCounter24, pbCPU24, lblCPU24);
-            UpdateCounter(cpuCounter25, pbCPU25, lblCPU25);
-            UpdateCounter(cpuCounter26, pbCPU26, lblCPU26);
-            UpdateCounter(cpuCounter27, pbCPU27, lblCPU27);
+            //Unrolled for now, change everything to arrays later
+            UpdateCounter(counterValues[0], pbCPU0, lblCPU0);
+            UpdateCounter(counterValues[1], pbCPU1, lblCPU1);
+            UpdateCounter(counterValues[2], pbCPU2, lblCPU2);
+            UpdateCounter(counterValues[3], pbCPU3, lblCPU3);
+            UpdateCounter(counterValues[4], pbCPU4, lblCPU4);
+            UpdateCounter(counterValues[5], pbCPU5, lblCPU5);
+            UpdateCounter(counterValues[6], pbCPU6, lblCPU6);
+            UpdateCounter(counterValues[7], pbCPU7, lblCPU7);
+            UpdateCounter(counterValues[8], pbCPU8, lblCPU8);
+            UpdateCounter(counterValues[9], pbCPU9, lblCPU9);
+            UpdateCounter(counterValues[10], pbCPU10, lblCPU10);
+            UpdateCounter(counterValues[11], pbCPU11, lblCPU11);
+            UpdateCounter(counterValues[12], pbCPU12, lblCPU12);
+            UpdateCounter(counterValues[13], pbCPU13, lblCPU13);
+            UpdateCounter(counterValues[14], pbCPU14, lblCPU14);
+            UpdateCounter(counterValues[15], pbCPU15, lblCPU15);
+            UpdateCounter(counterValues[16], pbCPU16, lblCPU16);
+            UpdateCounter(counterValues[17], pbCPU17, lblCPU17);
+            UpdateCounter(counterValues[18], pbCPU18, lblCPU18);
+            UpdateCounter(counterValues[19], pbCPU19, lblCPU19);
+            UpdateCounter(counterValues[20], pbCPU20, lblCPU20);
+            UpdateCounter(counterValues[21], pbCPU21, lblCPU21);
+            UpdateCounter(counterValues[22], pbCPU22, lblCPU22);
+            UpdateCounter(counterValues[23], pbCPU23, lblCPU23);
+            UpdateCounter(counterValues[24], pbCPU24, lblCPU24);
+            UpdateCounter(counterValues[25], pbCPU25, lblCPU25);
+            UpdateCounter(counterValues[26], pbCPU26, lblCPU26);
+            UpdateCounter(counterValues[27], pbCPU27, lblCPU27);
 
 
             // Always Track max Cpu util (alarms)
