@@ -26,6 +26,9 @@ $include_file = Include-Script -FileName "Get-WindowLocation.ps1" -Directories $
 $include_file = Include-Script -FileName "Set-PowerScheme.ps1" -Directories $search_paths
 . $include_file
 
+$include_file = Include-Script -FileName "Set-IdealProcessor.ps1" -Directories $search_paths
+. $include_file
+
 function Process-CommandFromJson {
     param (
         [string]$JsonFilePath
@@ -102,6 +105,10 @@ function Process-CommandFromJson {
 				$synthesizer = New-Object System.Speech.Synthesis.SpeechSynthesizer
 				$synthesizer.Speak("PS-Watcher is OK")
 			}
+        }
+
+        "GAME" {
+            Run-ActionsPerGame $parameters.processName $parameters.jsonFile
         }
 
         default {
