@@ -266,7 +266,8 @@ namespace TelemetryVibShaker
                     // New aircraft, let's make sure, sounds are muted
                     soundManager_AoA.MuteEffects();
 
-                    if (unit != null)  // If found, use the limits defined in the JSON file
+                    bool aircraftFound = (unit != null);
+                    if (aircraftFound)  // If found, use the limits defined in the JSON file
                     {
                         soundManager_AoA.AoA1 = unit.AoA1;
                         soundManager_AoA.AoA2 = unit.AoA2;
@@ -284,7 +285,7 @@ namespace TelemetryVibShaker
 
                     }
 
-                    soundManager_AoA.ScheduleAlarm(); // Sound Notification now and in 30 minutes
+                    soundManager_AoA.ScheduleAlarm(aircraftFound); // Sound Notification now and in 30 minutes
                 }
 
                 if (Statistics) 

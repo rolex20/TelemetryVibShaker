@@ -113,5 +113,14 @@
     <Setting Name="chkReassignIdealProcessor" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="AircraftFoundSoundEffect" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.\StartNewAircraft.wav</Value>
+    </Setting>
+    <Setting Name="AircraftNotFoundSoundEffect" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.\AircraftNotInJson.wav</Value>
+    </Setting>
+    <Setting Name="HalfAnHourAlarmSoundEffect" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.\30MinuteAlarm.wav</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -12,7 +12,7 @@ namespace TelemetryVibShaker.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.10.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.11.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -464,6 +464,42 @@ namespace TelemetryVibShaker.Properties {
             }
             set {
                 this["chkReassignIdealProcessor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(".\\StartNewAircraft.wav")]
+        public string AircraftFoundSoundEffect {
+            get {
+                return ((string)(this["AircraftFoundSoundEffect"]));
+            }
+            set {
+                this["AircraftFoundSoundEffect"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(".\\AircraftNotInJson.wav")]
+        public string AircraftNotFoundSoundEffect {
+            get {
+                return ((string)(this["AircraftNotFoundSoundEffect"]));
+            }
+            set {
+                this["AircraftNotFoundSoundEffect"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(".\\30MinuteAlarm.wav")]
+        public string HalfAnHourAlarmSoundEffect {
+            get {
+                return ((string)(this["HalfAnHourAlarmSoundEffect"]));
+            }
+            set {
+                this["HalfAnHourAlarmSoundEffect"] = value;
             }
         }
     }

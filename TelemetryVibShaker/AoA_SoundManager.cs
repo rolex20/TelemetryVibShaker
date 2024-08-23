@@ -3,6 +3,7 @@
 using System.Diagnostics;
 using System.Numerics;
 using System.Threading;
+using TelemetryVibShaker.Properties;
 
 namespace TelemetryVibShaker
 {
@@ -13,6 +14,22 @@ namespace TelemetryVibShaker
         public bool EnableEffect2 = true;
 
         public SoundEffectStatus Status = SoundEffectStatus.Invalid;
+
+        public int AoA1;          // Optimal angle of attack.  Lower limit. (Sound Effect 1)
+        public int AoA2;          // Optimal angle of attack.  Upper limit. (Sound Effect 1)
+                                  // If newAoA > AoA2 then Sound Effect 2 should be heard.
+
+        private MediaPlayer mp1;    // for the optimal AoA sound effectType
+        private float lastVolume1; // cached volume for mp1
+
+
+        private MediaPlayer mp2;    // for the non optimal sound effectType (above optimal AoA)
+        private float lastVolume2; // cached volume for mp2
+
+        // Support members to play the alarm after 30 minutes of flight in each new plane
+        public bool PlayAlarm;
+        private CancellationTokenSource? cancellationPlayAlarm;
+
 
         private float volumeAmplifier1;
         public float VolumeAmplifier1
@@ -43,28 +60,7 @@ namespace TelemetryVibShaker
         }
 
 
-        public int AoA1;          // Optimal angle of attack.  Lower limit. (Sound Effect 1)
-        public int AoA2;          // Optimal angle of attack.  Upper limit. (Sound Effect 1)
-                                  // If newAoA > AoA2 then Sound Effect 2 should be heard.
 
-        private MediaPlayer mp1;    // for the optimal AoA sound effectType
-        private float lastVolume1; // cached volume for mp1
-
-
-        private MediaPlayer mp2;    // for the non optimal sound effectType (above optimal AoA)
-        private float lastVolume2; // cached volume for mp2
-
-        // Support members to play the alarm after 30 minutes of flight in each new plane
-        public bool PlayAlarm;
-        private CancellationTokenSource? cancellationPlayAlarm;
-        private MediaPlayer alarmPlayer;
-
-
-
-        public void makeitsound1()
-        {
-            mp2.Volume = 0.8f;
-        }
 
         public AoA_SoundManager(String sound1, String sound2, float VolAmplifier1, float VolAmplifier2, int AudioDeviceIndex, bool PlayAlarm)
         {
@@ -73,14 +69,12 @@ namespace TelemetryVibShaker
             mp1 = new MediaPlayer(AudioDeviceIndex);
             mp1.Open(sound1);
             lastVolume1 = 0.0f;
-            //mp1.Volume = lastVolume1;  // redundant, below is reassigned
             VolumeAmplifier1 = VolAmplifier1;
             mp1.PlayLooping();
 
             mp2 = new MediaPlayer(AudioDeviceIndex);
             mp2.Open(sound2);
             lastVolume2 = 0.0f;
-            //mp2.Volume = lastVolume2;  // redundant, below is reassigned
             VolumeAmplifier2 = VolAmplifier2;
             mp2.PlayLooping();
 
@@ -89,11 +83,7 @@ namespace TelemetryVibShaker
             AoA1 = 360;
             AoA2 = 360;
 
-            // In case the user activates this later, let's setup all now
-            this.PlayAlarm = PlayAlarm;
-            alarmPlayer = new MediaPlayer(AudioDeviceIndex);
-            alarmPlayer.Open(@".\StartCredit.wav");
-            alarmPlayer.Volume = VolAmplifier1;
+
 
             Status = SoundEffectStatus.Ready;
         }
@@ -218,7 +208,7 @@ namespace TelemetryVibShaker
         }
 
 
-        public void ScheduleAlarm()
+        public void ScheduleAlarm(bool aircraftFound)
         {
             if (cancellationPlayAlarm is null)
             {
@@ -231,7 +221,11 @@ namespace TelemetryVibShaker
                 cancellationPlayAlarm = new CancellationTokenSource();
             }
 
-            alarmPlayer.Play();  // Sound the notification now
+            string soundEffectFileName = (aircraftFound ? Properties.Settings.Default.AircraftFoundSoundEffect : Properties.Settings.Default.AircraftNotFoundSoundEffect);
+            MediaPlayer soundEffectPlayer = new MediaPlayer(mp1.DeviceIndex);
+            soundEffectPlayer.Open(soundEffectFileName);
+            soundEffectPlayer.Volume = mp1.Volume;
+            soundEffectPlayer.Play();
 
             Task.Run(async () =>
             {
@@ -243,7 +237,10 @@ namespace TelemetryVibShaker
 
                         if (!cancellationPlayAlarm.IsCancellationRequested && PlayAlarm)
                         {
-                            alarmPlayer.Play(); // And sound the notification again in 30 minutes 
+                            MediaPlayer soundEffect = new MediaPlayer(mp1.DeviceIndex);
+                            soundEffect.Open(Properties.Settings.Default.HalfAnHourAlarmSoundEffect);
+                            soundEffect.Volume = mp1.Volume;
+                            soundEffect.Play();
                         }
                     }
                 }

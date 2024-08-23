@@ -5,10 +5,11 @@ namespace TelemetryVibShaker
 {
     internal class MediaPlayer
     {
-        public MediaPlayer(int AudioDeviceIndex) {
-            volume = 1.0f; // i.e. 100%
-            deviceIndex = AudioDeviceIndex;
-        }
+        private WaveOut? waveOut = null;
+        private int deviceIndex = 0;
+        private String? audioFile = null;
+        private AudioFileReader? waveProvider = null;
+        private LoopStream? loopStream = null;
 
         private float volume; // the backing field
         public float Volume // Valid values between 0.0f and 1.0f
@@ -21,11 +22,15 @@ namespace TelemetryVibShaker
             }
         }
 
-        private WaveOut? waveOut = null;
-        private int deviceIndex = 0;
-        private String? audioFile= null;
-        private AudioFileReader? waveProvider = null;
-        private LoopStream? loopStream = null;
+        public int DeviceIndex { get { return deviceIndex; } }
+
+        public MediaPlayer(int AudioDeviceIndex)
+        {
+            volume = 1.0f; // i.e. 100%
+            deviceIndex = AudioDeviceIndex;
+        }
+
+
         public void Open(string AudioFilePath)
         {
             audioFile = AudioFilePath;
