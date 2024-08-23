@@ -63,6 +63,24 @@ function createJsonPOWERSCHEME($filePath, $command, $powerscheme) {
 	return file_put_contents($filePath, $json_data);
 }
 
+function createJsonGAME($filePath, $command, $processName, $actionsFileName) {
+	
+    // Define the array structure using the older array syntax
+    $data = array(
+        "command_type" => $command,
+        "parameters" => array(
+            "processName" => $processName,
+			"jsonFile" => $actionsFileName
+        )
+    );
+
+    // Encode the array to JSON format
+    $json_data = json_encode($data);
+
+    // Write the JSON data to the specified file
+	return file_put_contents($filePath, $json_data);
+}
+
 function createJsonWATCHDOG($filePath, $outfile) {
 	
     // Define the array structure using the older array syntax
@@ -266,51 +284,78 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	
 	// CHECK FOR PIPE/SPECIAL COMMAND
 	$post_command = isset($_POST['Command'])? $_POST['Command']: "";
-	if ($post_command == "Command") { // Check if the comand requested was send IPC pipe message
-		$special_command = isset($_POST['SpecialCommand'])? $_POST['SpecialCommand']: "";			
-		$pipe_tuple = isset($_POST['PipeCommand'])? $_POST['PipeCommand']: "";	
+	if ($post_command == "Command") {
+		$special_command = isset($_POST['SpecialCommand']) ? $_POST['SpecialCommand'] : "";
+		$pipe_tuple = isset($_POST['PipeCommand']) ? $_POST['PipeCommand'] : "";
 
-		if ($special_command == "WATCHDOG") {
-			$footer = "Watchdog with sound.";
-			createJsonWATCHDOG($temp_file, "watchdog.txt");
-			renameFile($temp_file, $command_file);			
-			
-		} else if ($special_command == "HIGHPERFORMANCE") {
-			$footer = "Set Power Scheme to High Power";
-			createJsonPOWERSCHEME($temp_file, "POWERSCHEME", "High Performance");
-			renameFile($temp_file, $command_file);			
-			
-		} else if ($special_command == "BALANCED") {
-			$footer = "Set Power Scheme to Balanced";
-			createJsonPOWERSCHEME($temp_file, "POWERSCHEME", "Balanced");
-			renameFile($temp_file, $command_file);			
-			
-		} else if ($special_command == "BALANCED80") {
-			$footer = "Set Power Scheme to Balanced Max CPU 80%";
-			createJsonPOWERSCHEME($temp_file, "POWERSCHEME", "Balanced with Max 80");
-			renameFile($temp_file, $command_file);			
-		}  else if ($special_command == "READPOWERSCHEME") {
-			$footer = "Read current power plan";
-			createJsonPOWERSCHEME($temp_file, "READPOWERSCHEME", "NA");
-			renameFile($temp_file, $command_file);			
+		switch ($special_command) {
+			case "WATCHDOG":
+				$footer = "Watchdog with sound.";
+				createJsonWATCHDOG($temp_file, "watchdog.txt");
+				renameFile($temp_file, $command_file);
+				break;
+
+			case "HIGHPERFORMANCE":
+				$footer = "Set Power Scheme to High Power";
+				createJsonPOWERSCHEME($temp_file, "POWERSCHEME", "High Performance");
+				renameFile($temp_file, $command_file);
+				break;
+
+			case "BALANCED":
+				$footer = "Set Power Scheme to Balanced";
+				createJsonPOWERSCHEME($temp_file, "POWERSCHEME", "Balanced");
+				renameFile($temp_file, $command_file);
+				break;
+
+			case "BALANCED80":
+				$footer = "Set Power Scheme to Balanced Max CPU 80%";
+				createJsonPOWERSCHEME($temp_file, "POWERSCHEME", "Balanced with Max 80");
+				renameFile($temp_file, $command_file);
+				break;
+
+			case "READPOWERSCHEME":
+				$footer = "Read current power plan";
+				createJsonPOWERSCHEME($temp_file, "READPOWERSCHEME", "NA");
+				renameFile($temp_file, $command_file);
+				break;
+
+			case "MSFS1":
+				$footer = "Boost 1 for MSFS Priority and Reassign Ideal Processors (not Affinity)";
+				createJsonGAME($temp_file, "GAME", "FlightSimulator", "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost1.json");
+				renameFile($temp_file, $command_file);
+				break;
+
+			case "MSFS2":
+				$footer = "Boost 2 for MSFS Affinity, Priority and Reassign Ideal Processors";
+				createJsonGAME($temp_file, "GAME", "FlightSimulator", "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost2.json");
+				renameFile($temp_file, $command_file);
+				break;
+
+			case "ACES":
+				$footer = "All Boost for War Thunder (Affinity, Priority and Reassign Ideal Processors)";
+				createJsonGAME($temp_file, "GAME", "aces", "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost1.json");
+				renameFile($temp_file, $command_file);
+				break;
+
+			case "DCS":
+				$footer = "All Boost for DCS World (Affinity, Priority[DCS] and Reassign Ideal Processors for OVR_Server and Joystick_Gremlin)";
+				createJsonGAME($temp_file, "GAME", "dcs", "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost1.json");
+				renameFile($temp_file, $command_file);
+				break;
+				
+			default:
+				if (strpos($pipe_tuple, '|') !== false) {
+					$pipe_items = explode('|', $pipe_tuple);
+					$pipename = $pipe_items[0];
+					$message = $pipe_items[1];
+					$footer = "Pipe [$pipename] - [$message]";
+					createJsonPIPE($temp_file, $pipename, $message);
+					renameFile($temp_file, $command_file);
+				}
+				break;
 		}
-		else if (strpos($pipe_tuple, '|') !== false) { // IPC Pipe command?
-			$pipe_items = explode('|', $pipe_tuple);
 
-			// Assign each value to a variable
-			$pipename = $pipe_items[0];
-			$message = $pipe_items[1];
-			
-			$footer = "Pipe [$pipename] - [$message]";
-					
-			//My Powershell FileSystem Event watcher is configured to listen to rename events
-			//This way I avoid I/O bouncing/flapping, etc, just one event generated
-			createJsonPIPE($temp_file, $pipename, $message);
-			renameFile($temp_file, $command_file);			
-		} 
 		$time_stamp = getTimestamp();
-
-
 	} // end-if 
 	
 		
@@ -583,6 +628,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			<option value="BALANCED">POWER SCHEME: BALANCED</option>
 			<option value="BALANCED80">POWER SCHEME: BALANCED MAX 80</option>
 			<option value="READPOWERSCHEME">READ CURRENT POWER PLAN</option>
+			<option value="MSFS1">BOOST LEVEL 1 FOR MSFS</option>
+			<option value="MSFS2">BOOST LEVEL 2 FOR MSFS</option>
+			<option value="ACES">BOOST FOR WAR THUNDER</option>			
+			<option value="DCS">BOOST FOR DCS WORLD</option>			
 		</select>
 		
 		<br><label id="lblCommand" for="PipeCommand">Select Pipe Command:</label>
