@@ -33,6 +33,11 @@ $include_file = Include-Script -FileName "SetAffinityAndPriority.ps1" -Directori
 $include_file = Include-Script -FileName "Get-ProcessWatcher.ps1" -Directories $search_paths
 . $include_file
 
+$include_file = Include-Script -FileName "Send-IPC-ExitCommand.ps1" -Directories $search_paths
+. $include_file
+
+
+
 
 $need_restart = $false
 try {
@@ -133,24 +138,32 @@ try {
         $processAction = {
             . "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Set-GamePowerScheme.ps1"
 
-            $pId = $Event.SourceEventArgs.NewEvent.ProcessID.ToString()
+            $event_pId = $Event.SourceEventArgs.NewEvent.ProcessID.ToString()
             $pName = $Event.SourceEventArgs.NewEvent.ProcessName.ToString()
             $traceName = $Event.SourceEventArgs.NewEvent.ToString()
 
             Write-Host " "            
-            Write-VerboseDebug -Timestamp $Event.TimeGenerated -Title "PROCESS" -Message "$traceName - $pName [$pID]"
+            Write-VerboseDebug -Timestamp $Event.TimeGenerated -Title "PROCESS" -Message "$traceName - $pName [$event_pId]"
             Set-GamePowerScheme $traceName $pName
         }
         $processWatcher = Get-ProcessWatchers $processAction        
 
+    # 7- START NEW IPC PIPE SERVER THREAD FOR SPECIAL COMMANDS (SHOW PROCESS TIMES REQUIRES INITIAL STATE MEMORY)
+        $include_file = Include-Script -FileName "Declare-IPC-Server-Action.ps1" -Directories $search_paths
+        . $include_file
 
-    # 6- WATCHDOG: Infinite loop to periodically check-alive in filesystem-watch which some times fails or locks
+        $job = Start-ThreadJob -ScriptBlock $ipc_job_action -StreamingHost $Host
+            
+
+    # 8- WATCHDOG: Infinite loop to periodically check-alive in filesystem-watch which some times fails or locks
         $need_restart = Watchdog_Operations
 
 } #end try block
 
 finally {
     Write-VerboseDebug -Timestamp (Get-Date) -Title "FINALLY" -Message "Disposing objects" -ForegroundColor "Yellow"
+    Send-IPC-ExitCommand "ipc_pipe_vr_server_commands"
+
   
     if ($cm_watcher_objects) {
         $cm_watcher_objects[1].EnableRaisingEvents = $false

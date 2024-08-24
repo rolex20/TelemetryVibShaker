@@ -98,13 +98,24 @@ function Process-CommandFromJson {
 
 
         "WATCHDOG" {
-            Set-Content -Path $parameters.outFile "WATCHDOG"
-		    Write-VerboseDebug -Timestamp (Get-Date) -Title "WATCHDOG [PID=$PID]" -Message "File System events are still active: OK." -ForegroundColor "Green"
-			if ($parameters.sound) {
-				Add-Type -AssemblyName System.Speech
-				$synthesizer = New-Object System.Speech.Synthesis.SpeechSynthesizer
-				$synthesizer.Speak("PS-Watcher is OK")
-			}
+            if (Send-MessageViaPipe -pipeName "ipc_pipe_vr_server_commands" -message "ECHO") {
+                Set-Content -Path $parameters.outFile "WATCHDOG"
+                Write-VerboseDebug -Timestamp (Get-Date) -Title "WATCHDOG [PID=$PID]" -Message "File System events are still active: OK." -ForegroundColor "Green"
+                if ($parameters.sound) {
+                    Add-Type -AssemblyName System.Speech
+                    $synthesizer = New-Object System.Speech.Synthesis.SpeechSynthesizer
+                    $synthesizer.Speak("PS-Watcher is OK")
+                }    
+            } else {
+                if ($parameters.sound) {
+                    Add-Type -AssemblyName System.Speech
+                    $synthesizer = New-Object System.Speech.Synthesis.SpeechSynthesizer
+                    $synthesizer.Speak("ERROR: IPC Thread is not working.")
+                }    
+
+            }
+
+
         }
 
         "GAME" {

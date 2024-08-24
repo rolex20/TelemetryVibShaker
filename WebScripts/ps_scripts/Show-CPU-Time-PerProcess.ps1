@@ -47,12 +47,6 @@ $Host.UI.RawUI.WindowTitle = $title
 
 
 
-# This script monitors a specified file for changes. When the file is modified,
-# the script downloads a file from a provided URL and saves it to a designated path.
-# The script then sleeps for a set duration and repeats the process, waiting
-# for the next modification on the watch file.
-
-
 # First, make sure this is the only instance running.
 
 # Define the name of the mutex, to prevent other instances

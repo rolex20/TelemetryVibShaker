@@ -18,11 +18,12 @@ function Send-MessageViaPipe {
         $writer.WriteLine($message)
         $writer.Close()
         $pipe.Close()
-
+        return $true
         
     } catch {
         $err = "Failed to send message: $_"
         Write-VerboseDebug -Timestamp (Get-Date) -Title "IPC PIPE" -Message "$err" -ForegroundColor "Red"
+        return $false
     }
 }
 
