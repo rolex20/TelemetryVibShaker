@@ -1,4 +1,130 @@
-﻿# Define constants
+﻿# Define the SetProcessDefaultCpuSets, SetThreadSelectedCpuSets, GetThreadSelectedCpuSets, and GetSystemCpuSetInformation functions from kernel32.dll
+# See and search for SetGet-DefaultCpuSets.ps1 for extended information
+Add-Type @"
+using System;
+using System.Runtime.InteropServices;
+
+public class CpuSetHelper {
+
+// The SYSTEM_CPU_SET_INFORMATION structure has been modified from its original C++ definition to ensure
+// proper interop with the GetSystemCpuSetInformation function in C#. The changes made are as follows:
+//
+// 1. Flattened Structure:
+//    The original structure in C++ uses unions and nested structures, which are complex to replicate in C#.
+//    This version flattens the structure by directly declaring all fields. This simplifies the memory layout
+//    and avoids potential issues with alignment and incorrect data interpretation.
+//
+// 2. Correct Field Types and Sizes:
+//    The field types have been carefully chosen to match the size and type of their C++ counterparts:
+//    - int for Size and Type to match DWORD (4-byte integers in C++).
+//    - uint for Id and Reserved to match DWORD (4-byte unsigned integers in C++).
+//    - ushort for Group to match WORD (2-byte unsigned integer in C++).
+//    - byte for LogicalProcessorIndex, CoreIndex, LastLevelCacheIndex, NumaNodeIndex, EfficiencyClass, 
+//      and AllFlags to match BYTE (1-byte unsigned integers in C++).
+//    - ulong for AllocationTag to match ULONG_PTR (pointer-sized unsigned integer, 8 bytes on 64-bit systems).
+//
+// These adjustments ensure that the structure is correctly marshaled and that data from GetSystemCpuSetInformation 
+// is interpreted accurately, preventing garbled output.
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct SYSTEM_CPU_SET_INFORMATION {
+		public int Size;
+		public int Type;
+        public uint Id; // DWORD
+        public ushort Group; // WORD
+        public byte LogicalProcessorIndex;
+        public byte CoreIndex;
+        public byte LastLevelCacheIndex;
+        public byte NumaNodeIndex;
+        public byte EfficiencyClass;
+        public byte AllFlags;
+        public uint Reserved; // DWORD
+        public ulong AllocationTag; // ULONG_PTR
+    }
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern bool SetProcessDefaultCpuSets(IntPtr process, uint[] cpuSetIds, uint cpuSetIdCount);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern bool GetProcessDefaultCpuSets(IntPtr process, uint[] cpuSetIds, uint cpuSetIdCount, ref uint requiredIdCount);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern bool SetThreadSelectedCpuSets(IntPtr thread, uint[] cpuSetIds, uint cpuSetIdCount);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern bool GetThreadSelectedCpuSets(IntPtr thread, uint[] cpuSetIds, uint cpuSetIdCount, ref uint requiredIdCount);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern bool GetSystemCpuSetInformation(IntPtr information, uint bufferLength, ref uint returnedLength, IntPtr process, uint flags);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern IntPtr OpenThread(uint dwDesiredAccess, bool bInheritHandle, uint dwThreadId);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool CloseHandle(IntPtr hObject);
+
+    public static SYSTEM_CPU_SET_INFORMATION[] GetSystemCpuSetInfo() {
+        uint bufferLength = 0;
+        GetSystemCpuSetInformation(IntPtr.Zero, 0, ref bufferLength, IntPtr.Zero, 0);
+        IntPtr buffer = Marshal.AllocHGlobal((int)bufferLength);
+        try {
+            if (!GetSystemCpuSetInformation(buffer, bufferLength, ref bufferLength, IntPtr.Zero, 0)) {
+                throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+            }
+            int count = (int)(bufferLength / Marshal.SizeOf(typeof(SYSTEM_CPU_SET_INFORMATION)));
+            SYSTEM_CPU_SET_INFORMATION[] cpuSetInfo = new SYSTEM_CPU_SET_INFORMATION[count];
+            IntPtr current = buffer;
+            for (int i = 0; i < count; i++) {
+                cpuSetInfo[i] = Marshal.PtrToStructure<SYSTEM_CPU_SET_INFORMATION>(current);
+                current = IntPtr.Add(current, Marshal.SizeOf(typeof(SYSTEM_CPU_SET_INFORMATION)));
+            }
+            return cpuSetInfo;
+        } finally {
+            Marshal.FreeHGlobal(buffer);
+        }
+    }
+
+    public static void SetDefaultCpuSets(IntPtr processHandle, uint[] cpuSetIds) {
+        if (!SetProcessDefaultCpuSets(processHandle, cpuSetIds, (uint)cpuSetIds.Length)) {
+            throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+        }
+    }
+
+    public static uint[] GetDefaultCpuSets(IntPtr processHandle) {
+        uint requiredIdCount = 0;
+        GetProcessDefaultCpuSets(processHandle, null, 0, ref requiredIdCount);
+        uint[] cpuSetIds = new uint[requiredIdCount];
+        if (!GetProcessDefaultCpuSets(processHandle, cpuSetIds, (uint)cpuSetIds.Length, ref requiredIdCount)) {
+            throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+        }
+        return cpuSetIds;
+    }
+
+    public static void SetThreadCpuSets(IntPtr threadHandle, uint[] cpuSetIds) {
+        if (!SetThreadSelectedCpuSets(threadHandle, cpuSetIds, (uint)cpuSetIds.Length)) {
+            throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+        }
+    }
+
+    public static uint[] GetThreadCpuSets(IntPtr threadHandle) {
+        uint requiredIdCount = 0;
+        GetThreadSelectedCpuSets(threadHandle, null, 0, ref requiredIdCount);
+        uint[] cpuSetIds = new uint[requiredIdCount];
+        if (!GetThreadSelectedCpuSets(threadHandle, cpuSetIds, (uint)cpuSetIds.Length, ref requiredIdCount)) {
+            throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+        }
+        return cpuSetIds;
+    }
+}
+"@
+
+# Define constants for thread access rights
+$THREAD_SET_INFORMATION = 0x0020
+$THREAD_QUERY_INFORMATION = 0x0040
+
+
+# Define constants
 $THREAD_SET_INFORMATION = 0x0020
 $THREAD_SET_PRIORITY = 0x0040
 $THREAD_PRIORITY_IDLE = -15
@@ -61,7 +187,7 @@ public class NativeMethods {
 #$EfficiencyAffinity = 268369920 # HyperThreading enabled
 #$PowerAffinity = 65535 # HyperThreading enabled
 
-
+#Configured for my 14700K
 function Get-EfficiencyCoreAffinity {
     param (
         [int]$cpuCount
@@ -70,24 +196,40 @@ function Get-EfficiencyCoreAffinity {
     switch ($cpuCount) {
         28 { return 268369920 } # Efficiency cores with hyperthreading enabled
         20 { return 1048320 } # Efficiency cores with hyperthreading disabled
-        default { throw "Unsupported CPU count: $cpuCount" }
+        8  { return 255} # Hyperthreading and E-cores disabled
+        default { throw "Not-Implemented CPU count: $cpuCount" }
     }
 }
 
+#Configured for my 14700K
 function Get-PerformanceCoreAffinity {
     param (
         [int]$cpuCount
     )
 
     switch ($cpuCount) {
-        28 { return 65535 } # Performance cores with hyperthreading enabled
-        20 { return 255 } # Performance cores with hyperthreading disabled
-        default { throw "Unsupported CPU count: $cpuCount" }
+        28 { return 65535 } # P-cores with hyperthreading enabled
+        20 { return 255 } # P-cores with hyperthreading disabled
+        8  { return 255} # Hyperthreading and E-cores disabled
+        default { throw "Not-Implemented CPU count: $cpuCount" }
+    }
+}
+
+function Get-AllCoreAffinity {
+    param (
+        [int]$cpuCount
+    )
+
+    switch ($cpuCount) {
+        28 { return 268435455 } # All cores with hyperthreading enabled
+        20 { return 1048575 } # All cores with hyperthreading disabled
+        8 { return 255} # Hyperthreading and E-Cores disabled
+        default { throw "Not-Implemented CPU count: $cpuCount" }
     }
 }
 
 
-function Get-CPUCount {
+function Get-CPU-Count {
     try {
         $cpuKeyPath = "HKLM:\HARDWARE\DESCRIPTION\System\CentralProcessor"
         $cpuCount = (Get-ChildItem -Path $cpuKeyPath).Count
@@ -146,7 +288,7 @@ function Set-ThreadIdealProcessor($threadObject, $newProcessor) {
     }
 
     if (-not [NativeMethods]::SetThreadIdealProcessor($hThread, $newProcessor)) {
-        Write-Host "Failed to set ideal processor for thread $($thread.Id): $newProcessor"
+        Write-Host "Failed to set ideal processor for thread $($thread.Id): $newProcessor" -ForegroundColor DarkYellow
     } else {
         Write-Host "Set ideal processor for thread $($thread.Id): $newProcessor"
     }
@@ -174,7 +316,7 @@ function Set-IdealProcessorForProcess($processName, $newProcessor) {
     }
 
     if (-not (Enable-Privilege -Privilege $SE_INC_BASE_PRIORITY_NAME)) {
-        Write-Host "Failed to enable privilege."
+        Write-Host "Failed to enable privilege." -ForegroundColor DarkYellow
         exit
     }
 
@@ -212,19 +354,17 @@ function Get-SetBits {
 #The new ideal processor will be only from the Affinity allowed
 function Set-ProcessAffinityAndPriority {
     param (
-        [string]$ProcessId,
-        [int]$Affinity,
-        [string]$ProcessPriority,
-		[string]$ThreadPriority
+        [Parameter(Mandatory=$true)]$Process,
+        [Parameter(Mandatory=$true)]$ProcessAffinity,
+        [Parameter(Mandatory=$true)]$ProcessPriority,
+		[Parameter(Mandatory=$true)]$ThreadIdealProcessor,
+		[Parameter(Mandatory=$true)]$ThreadPriority,
+        [Parameter(Mandatory=$true)]$CpuSet,
+        [Parameter(Mandatory=$true)]$ChangeCpuSetForProcessAlso
     )
 
+    $ProcessId = $Process.Id
 
-    $process = Get-Process -Id $processID -ErrorAction SilentlyContinue
-
-    if (-not $process) {
-        Write-Host "Process not found."
-        exit
-    }
 
     if (-not (Enable-Privilege -Privilege $SE_INC_BASE_PRIORITY_NAME)) {
         Write-Host "Failed to enable privilege."
@@ -232,77 +372,114 @@ function Set-ProcessAffinityAndPriority {
     }
 
 
-    # Set the processor affinity
-    if ($Affinity -ge 0) {$process.ProcessorAffinity = [IntPtr]$Affinity}
+    # Set the processor affinity	
+    if ($ProcessAffinity -ge 0) {
+		Write-Host "Set Process Affinity for process $($Process.Name) = $ProcessAffinity"
+		$Process.ProcessorAffinity = [IntPtr]$ProcessAffinity
+	}
 
     # Set the process priority
     if ($ProcessPriority -ne "DoNotChange") { 
-        Write-Host "Set Priority Class for process $($process.Name) = $ProcessPriority"
-        $process.PriorityClass = [System.Diagnostics.ProcessPriorityClass]::$ProcessPriority
+        Write-Host "Set Priority Class for process $($Process.Name) = $ProcessPriority"
+        $Process.PriorityClass = [System.Diagnostics.ProcessPriorityClass]::$ProcessPriority
     }
 
+	
+	# The new ideal cpu assignment will select the physical cores first to the most busy threads, and then hyperthreading threads.  This is a soft assignment
+	$sortedThreads = $Process.Threads | Sort-Object TotalProcessorTime -Descending
 
-    # Reassign PriorityClass and new ideal processor to each thread
+    # Set the default CpuSet for new threads created by the process
+    if ($CpuSet.Count -GT 0 -AND $ChangeCpuSetForProcessAlso) { 
+        Write-Host "Set $($Process.Name) Default Cpu Sets to: $($CpuSet -join ', ')"
+        [CpuSetHelper]::SetDefaultCpuSets($Process.Handle, $CpuSet)
+    }
+
 	
-	# The new process assignment will select the physical cores first to the most busy threads
-	$sortedThreads = $process.Threads | Sort-Object TotalProcessorTime -Descending
-	
-  
-    $allowedProcessors = Get-SetBits -number $Affinity
-	# Setting optimized Ideal Processor based on affinity
+  	
+	# Prepare ideal processor assignment if requested
+    $allowedProcessors = Get-SetBits -number $ThreadIdealProcessor
+	$physicalProcessors = $null
+	$optimizedProcessorAsignment = $null
+	$n = 0
+	$i = 0
 	if ($allowedProcessors) {
-
-
         $physicalProcessors = @(0,2,4,6,8,10,12,14,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31) # Valid for #12700K, 14700K, it doesn't affect if it is not found
         $optimizedProcessorAsignment = Add-100ToMatches -array1 $allowedProcessors -array2 $physicalProcessors
 
         $n = $allowedProcessors.Count
         $i = 0
-        foreach ($thread in $sortedThreads) {
-            #if ($ThreadPriority -ne "DoNotChange") { $thread.PriorityLevel = [System.Diagnostics.ThreadPriorityLevel]::$ThreadPriority } #cannot rely on doing this here if $allowedProcessors==$null
-            $index = $i++ % $n
-			if ($Affinity -ge 0) {
-				$thread.ProcessorAffinity = [IntPtr]$Affinity
-				Set-ThreadIdealProcessor $thread $optimizedProcessorAsignment[$index]				
-			}
-            
-        }
-    }
+	}
 	
-	# Setting thread processor Affinity
-	foreach ($thread in $sortedThreads) {
+	# Do the work on each thread
+	foreach ($thread in $sortedThreads) {	
+
+		# Setting thread processor Priority
 		if ($ThreadPriority -ne "DoNotChange") { 
 			Write-Host "Set Priority Class for thread $($thread.Id) = $ThreadPriority"
 			$thread.PriorityLevel = [System.Diagnostics.ThreadPriorityLevel]::$ThreadPriority 
 		}
+		
+		# Setting ProcessAffinity for the ThreadCount
+		if ($ProcessAffinity -ge 0) {
+			$thread.ProcessorAffinity = [IntPtr]$ProcessAffinity
+		}
+		
+		# Set next ideal processor
+		if ($allowedProcessors) {
+            $index = $i++ % $n
+			Set-ThreadIdealProcessor $thread $optimizedProcessorAsignment[$index]			
+		}
+
+        # Set CPU-Sets 
+        Set-Thread-Cpu-Sets $thread $CpuSet
 	}
+	
 
     $processName = $process.Name
     Write-Output "Affinity and priority for '$processName' processes/threads have been set."
 }
 
 
+function Set-Thread-Cpu-Sets($thread, $CpuSet) {
+    if ($CpuSet.Count -LE 0) { return }
+
+    $threadHandle = [CpuSetHelper]::OpenThread($THREAD_SET_INFORMATION -bor $THREAD_QUERY_INFORMATION, $false, $thread.Id)
+    if ($threadHandle -eq [IntPtr]::Zero) {
+        Write-Error "Failed to open handle for thread ID $($thread.Id)"
+        continue
+    }
+
+    try {
+        [CpuSetHelper]::SetThreadCpuSets($threadHandle, $CpuSet)
+    } finally {
+        $r = [CpuSetHelper]::CloseHandle($threadHandle)
+    }
+}
+
 # Show Threads belonging to a process sorted by TotalProcessorTime descending
-function Get-ProcessThreadTimes {
+function Show-Process-Thread-Times {
     param (
         [string]$ProcessName
     )
 
     # Get the process object
-    $process = Get-Process -Name $ProcessName -ErrorAction Stop
+    $processes = Get-Process -Name $ProcessName  -ErrorAction SilentlyContinue
+    foreach($process in $processes) {
 
-    # Get the threads of the process
-    $threads = $process.Threads
+        # Get the threads of the process
+        $threads = $process.Threads
 
-    # Sort the threads by TotalProcessorTime in descending order
-    $sortedThreads = $threads | Sort-Object TotalProcessorTime -Descending
+        # Sort the threads by TotalProcessorTime in descending order
+        $sortedThreads = $threads | Sort-Object TotalProcessorTime -Descending
 
-    # Print the TotalProcessorTime for each thread
-    Write-Host "Most busy threads:" + $threads.Count
-    foreach ($thread in $sortedThreads) {
-        [PSCustomObject]@{
-            ThreadId = $thread.Id
-            TotalProcessorTime = $thread.TotalProcessorTime
+        # Print the TotalProcessorTime for each thread
+        Write-Host " " 
+	    Write-Host "[ProcessName=$ProcessName], [PID=$($process.Id)], [ThreadCount=$($threads.Count)] - Busiest threads:" -ForegroundColor Yellow
+        foreach ($thread in $sortedThreads) {
+            [PSCustomObject]@{
+                ThreadId = $thread.Id
+                TotalProcessorTime = $thread.TotalProcessorTime
+            }
         }
     }
 }
@@ -345,48 +522,91 @@ function Get-ActionsPerGame($fileName) {
 }
 
 #Returns numeric affinity for the current 14700K processor
-#input parameter can be "Efficiency", "Performance" or a number
-function Get-NumericAffinity($affinity) {
-    $cpuCount = Get-CPUCount
+#input parameter can be "E-Cores", "P-Cores" or a number
+function Get-NumericAffinity($affinity, $cpuCount) {
     switch($affinity) {
-        "Efficiency" {return Get-EfficiencyCoreAffinity -cpuCount $cpuCount}
-        "Performance" {return Get-PerformanceCoreAffinity -cpuCount $cpuCount}
+        "E-Cores" {return Get-EfficiencyCoreAffinity -cpuCount $cpuCount}
+        "P-Cores" {return Get-PerformanceCoreAffinity -cpuCount $cpuCount}
+        "All-Cores" {return Get-AllCoreAffinity -cpuCount $cpuCount}
 		"DoNotChange" {return -1}
+        $null {return -1}
         default {return $affinity}
     }
 }
 
 
+
+function Get-Cpu-Set($cpuSet, $cpuCount) {
+    switch($cpuSet) {
+        "E-Cores" {
+            switch ($cpuCount) {
+                28 { return [uint32[]](272..283) } # Efficiency cores with hyperthreading enabled
+                20 { return [uint32[]](264..275) } # Efficiency cores with hyperthreading disabled
+                8  { return [uint32[]](256..263) } # Hyperthreading en Efficiency cores disabled                
+                default { throw "Not-Implemented CPU count: $cpuCount" }
+            }
+         }
+
+        "P-Cores" {
+            switch ($cpuCount) {
+                28 { return [uint32[]](256..271) } # P-Cores with hyperthreading enabled                
+                20 { return [uint32[]](256..263) } # P-Cores cores with hyperthreading disabled
+                8 { return [uint32[]](256..263) } # Hyperthreading en Efficiency cores disabled
+                default { throw "Not-Implemented CPU count: $cpuCount" }
+            }
+         }
+
+        "All-Cores" {
+            switch ($cpuCount) {
+                28 { return [uint32[]](256..283) } # hyperthreading enabled
+                20 { return [uint32[]](256..275) } # hyperthreading disabled
+                8  { return [uint32[]](256..263) } # Hyperthreading en Efficiency cores disabled                
+                default { throw "Not-Implemented CPU count: $cpuCount" }
+            }
+        }
+
+		"DoNotChange" {return @()}
+
+        $null {return @()}
+
+        default {return @()}
+    }
+}
+
+
 function Run-ActionsPerGame($processName, $fileName) {
-    $game = Get-Process -Name $processName -ErrorAction SilentlyContinue
-    if (-not $game) { return }
-
-
+    $cpuCount = Get-CPU-Count
     $actions = Get-ActionsPerGame $fileName
 
     foreach ($action in $actions) {
-        $process = Get-Process -Name $action.process_name -ErrorAction SilentlyContinue
-        if (-not $process) { continue }
-        if (($game.Name) -ne ($process.Name)) {continue}
+        $processes = Get-Process -Name $action.process_name -ErrorAction SilentlyContinue
+        foreach($process in $processes) {
 
+            $paffinity = Get-NumericAffinity $action.parameters.process_affinity $cpuCount
+            $taffinity = Get-NumericAffinity $action.parameters.thread_ideal_processor $cpuCount
+            $cpuset = Get-Cpu-Set $action.parameters.thread_cpu_sets $cpuCount
+            $changeCpuSetForProcesses = $action.parameters.process_change_cpu_sets
 
-        $affinity = Get-NumericAffinity $action.parameters.affinity
+            Write-Host " "
+            Write-Host "STARTING " + $process.Name -ForegroundColor Yellow
 
-Write-Host " "
-Write-Host "STARTING " + $process.Name -ForegroundColor Yellow
-
-        Set-ProcessAffinityAndPriority -ProcessId $process.Id -Affinity $affinity -ProcessPriority $action.parameters.process_priority -ThreadPriority $action.parameters.thread_priority
-
-        foreach ($dependance in $action.parameters.dependances) {
-            $depProcess = Get-Process -Name $dependance.process_name -ErrorAction SilentlyContinue
-            if (-not $depProcess) { continue}
+            Set-ProcessAffinityAndPriority -Process $process -ProcessAffinity $paffinity -ProcessPriority $action.parameters.process_priority -ThreadIdealProcessor $taffinity -ThreadPriority $action.parameters.thread_priority -CpuSet $cpuset -ChangeCpuSetForProcessAlso $changeCpuSetForProcesses
+        
+            foreach ($dependance in $action.parameters.dependances) {
+                $depProcesses = Get-Process -Name $dependance.process_name -ErrorAction SilentlyContinue
+                foreach($depProcess in $depProcesses) {
+                    if (-not $depProcess) { continue}
             
-            $affinity = Get-NumericAffinity $dependance.affinity
+                    $paffinity = Get-NumericAffinity $dependance.process_affinity $cpuCount
+                    $taffinity = Get-NumericAffinity $dependance.thread_ideal_processor $cpuCount
+                    $cpuset = Get-Cpu-Set $dependance.thread_cpu_sets $cpuCount
 
-Write-Host " "
-Write-Host "STARTING " + $depProcess.Name -ForegroundColor Yellow
+                    Write-Host " "
+                    Write-Host "STARTING " + $depProcess.Name -ForegroundColor Yellow
 
-            Set-ProcessAffinityAndPriority -ProcessId $depProcess.Id -Affinity $affinity -ProcessPriority $dependance.process_priority -ThreadPriority $dependance.thread_priority
+                    Set-ProcessAffinityAndPriority -Process $depProcess -ProcessAffinity $paffinity -ProcessPriority $dependance.process_priority -ThreadIdealProcessor $taffinity -ThreadPriority $dependance.thread_priority -CpuSet $cpuset -ChangeCpuSetForProcessAlso $changeCpuSetForProcesses
+                }
+            }
         }
 
     }
@@ -400,11 +620,11 @@ Write-Host "STARTING " + $depProcess.Name -ForegroundColor Yellow
 # Example usage
 
 
-Get-ProcessThreadTimes -ProcessName "FlightSimulator"
-Get-ProcessThreadTimes -ProcessName "NotePad"
-Get-ProcessThreadTimes -ProcessName "joystick_gremlin"
+Show-Process-Thread-Times -ProcessName "FlightSimulator"
+Show-Process-Thread-Times -ProcessName "NotePad"
+Show-Process-Thread-Times -ProcessName "joystick_gremlin"
 
-Get-ProcessThreadTimes -ProcessName "FlightSimulator"
+Show-Process-Thread-Times -ProcessName "FlightSimulator"
 
 Run-ActionsPerGame "FlightSimulator" "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\action-per-process.json"
 
@@ -414,7 +634,7 @@ Run-ActionsPerGame "FlightSimulator" "C:\MyPrograms\My Apps\TelemetryVibShaker\W
 
 Set-ProcessAffinityAndPriority -ProcessId 22456 -Affinity 5 -Priority "AboveNormal"
 
-Get-ProcessThreadTimes -ProcessName "notepad"
+Show-Process-Thread-Times -ProcessName "notepad"
 
 # Example usage:
 $array1 = @(10, 20, 30, 40, 50)
@@ -423,7 +643,7 @@ $result = Add-100ToMatches -array1 $array1 -array2 $array2
 Write-Output $result
 
 
-Get-ProcessThreadTimes -ProcessName "notepad"
+Show-Process-Thread-Timess -ProcessName "notepad"
 
 # Example usage:
 Set-ProcessAffinityAndPriority -ProcessId 16488 -Affinity 5 -Priority "AboveNormal"

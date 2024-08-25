@@ -122,6 +122,14 @@ function Process-CommandFromJson {
             Run-ActionsPerGame $parameters.processName $parameters.jsonFile
         }
 
+
+        "SHOW_THREADS" {
+            Show-Process-Thread-Times "FlightSimulator"
+            Show-Process-Thread-Times "aces"
+            Show-Process-Thread-Times "dcs"
+            Show-Process-Thread-Times "OVRServer_x64"            
+        }
+
         default {
             Write-VerboseDebug -Timestamp (Get-Date) -Title "UNKNOWN COMMAND" -Message $commandType -ForegroundColor "Red"        
         }

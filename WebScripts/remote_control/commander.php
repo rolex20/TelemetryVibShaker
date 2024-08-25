@@ -100,8 +100,8 @@ function getPathByProcessName($jsonFilePath, $processName) {
 $footer = "Ready";
 $time_stamp = getTimestamp();
 
-// Location coordinates
-$frmX = "-1500";
+// Default location coordinates when not included in POST['X']
+$frmX = "-1700";
 $frmY = "";
 
 $frm_instance = 0;
@@ -116,6 +116,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	$frmX = htmlspecialchars($_POST['X']);
 	$frmY = htmlspecialchars($_POST['Y']);
 	$frm_instance = htmlspecialchars($_POST['Instance']);
+	$threads = is_numeric($frm_instance)?(int)$frm_instance: 65535; //0 means change all threads per process (65535 should be enough right)
+
+	
 	$frm_process = htmlspecialchars($_POST['Process']);
 	
 	
@@ -160,33 +163,56 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			  writeJsonToFile($jsonData, TEMP_FILE);
 			  renameFile(TEMP_FILE, COMMAND_FILE);
 			  break;
+			  
+			case "SHOW_THREADS":
+			  $footer = "Show Threads for VR Flight Games";
+			  $jsonData = createJsonCommand("SHOW_THREADS", array("argument1" => "NA"));
+			  writeJsonToFile($jsonData, TEMP_FILE);
+			  renameFile(TEMP_FILE, COMMAND_FILE);
+			  break;
+			
   
 			case "MSFS1":
-			  $footer = "Boost 1 for MSFS Priority and Reassign Ideal Processors (not Affinity)";
+			  $footer = "Boost Level 1 for MSFS Priority + Reassign-Ideal-Processors";
 			  $jsonData = createJsonCommand("GAME", array(
 				"processName" => "FlightSimulator",
-				"jsonFile" => "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost1.json"
+				"jsonFile" => "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost1.json",
+				"howManyThreads" => $threads
 			  ));
 			  writeJsonToFile($jsonData, TEMP_FILE);
 			  renameFile(TEMP_FILE, COMMAND_FILE);
 			  break;
 				  
 
-			case "MSFS2":
-			  $footer = "Boost 2 for MSFS Affinity, Priority and Reassign Ideal Processors";
+			case "MSFS2":			
+			  $footer = "Boost Level 2 for MSFS Priority + Reassign-Ideal-Processors + CPU_SETS";
 			  $jsonData = createJsonCommand("GAME", array(
 				"processName" => "FlightSimulator",
-				"jsonFile" => "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost2.json"
+				"jsonFile" => "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost2.json",
+				"howManyThreads" => $threads
 			  ));
 			  writeJsonToFile($jsonData, TEMP_FILE);
 			  renameFile(TEMP_FILE, COMMAND_FILE);
 			  break;
 			  
+			case "MSFS3":
+			  $footer = "Boost Level 3 for MSFS Priority + Reassign-Ideal-Processors + Hard-Affinities";
+			  $jsonData = createJsonCommand("GAME", array(
+				"processName" => "FlightSimulator",
+				"jsonFile" => "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost3.json",
+				"howManyThreads" => $threads
+			  ));
+			  writeJsonToFile($jsonData, TEMP_FILE);
+			  renameFile(TEMP_FILE, COMMAND_FILE);
+			  break;
+			  
+			  
 			case "ACES":
 			  $footer = "All Boost for War Thunder (Affinity, Priority and Reassign Ideal Processors)";
 			  $jsonData = createJsonCommand("GAME", array(
 				"processName" => "aces",
-				"jsonFile" => "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost1.json"
+				"jsonFile" => "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost1.json",
+				"howManyThreads" => $threads
 			  ));
 			  writeJsonToFile($jsonData, TEMP_FILE);
 			  renameFile(TEMP_FILE, COMMAND_FILE);
@@ -196,7 +222,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			  $footer = "Boost for DCS World[Priority]: OVR_Server[Priority, Affinity, Ideal Processors] and Joystick_Gremlin[Priority, Affinity, Ideal Processors]";
 			  $jsonData = createJsonCommand("GAME", array(
 				"processName" => "dcs",
-				"jsonFile" => "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost1.json"
+				"jsonFile" => "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost1.json",
+				"howManyThreads" => $threads
 			  ));
 			  writeJsonToFile($jsonData, TEMP_FILE);
 			  renameFile(TEMP_FILE, COMMAND_FILE);
@@ -472,7 +499,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		</select>
 
 
-		<br><label for="Instance">Select Instance:</label>
+		<br><label for="Instance">Select Instance or # Threads to Modify:</label>
 		<input type='text' name='Instance' required value='<?php echo $frm_instance; ?>' placeholder='type process instance #'>
 
 		<br><label for="State">Select State:</label>
@@ -502,9 +529,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			<option value="HIGHPERFORMANCE">POWER SCHEME: HIGH POWER</option>
 			<option value="BALANCED">POWER SCHEME: BALANCED</option>
 			<option value="BALANCED80">POWER SCHEME: BALANCED MAX 80</option>
-			<option value="READPOWERSCHEME">READ CURRENT POWER PLAN</option>
-			<option value="MSFS1">BOOST LEVEL 1 FOR MSFS</option>
-			<option value="MSFS2">BOOST LEVEL 2 FOR MSFS</option>
+			<option value="READPOWERSCHEME">READ CURRENT POWER PLAN</option>			
+			<option value="SHOW_THREADS">Show Thread times for VR Flight Games</option>
+			<option value="MSFS1">BOOST1(MSFS): AboveNormal, P-Cores: IdealThread</option>
+			<option value="MSFS2">BOOST2(MSFS): AboveNormal, P-Cores: IdealThread + CPU_SETS</option>			
+			<option value="MSFS3">BOOST3(MSFS): AboveNormal, P-Cores: IdealThread + Affinity</option>
 			<option value="ACES">BOOST FOR WAR THUNDER</option>			
 			<option value="DCS">BOOST FOR DCS WORLD</option>			
 		</select>

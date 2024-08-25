@@ -1,0 +1,95 @@
+[
+    {
+        "process_name": "FlightSimulator",
+        "parameters": {
+            "process_affinity": "P-Cores",
+            "process_priority": "AboveNormal",
+            "thread_ideal_processor": "P-Cores",
+            "thread_priority": "AboveNormal",
+			"thread_cpu_sets": "All-Cores",
+			"process_change_cpu_sets": true,			
+            "dependances": [
+                {
+                    "process_name": "OVRServer_x64",
+                    "process_affinity": "DoNotChange",
+                    "process_priority": "AboveNormal",
+                    "thread_ideal_processor": "P-Cores",
+                    "thread_priority": "AboveNormal",
+					"thread_cpu_sets": "P-Cores"
+                },
+                {
+                    "process_name": "joystick_gremlin",
+                    "process_affinity": "DoNotChange",
+                    "process_priority": "High",
+                    "thread_ideal_processor": "E-Cores",
+                    "thread_priority": "Highest",
+					"thread_cpu_sets": "E-Cores"
+                },
+                {
+                    "process_name": "notepad",
+                    "process_affinity": 5,
+                    "process_priority": "AboveNormal",
+                    "thread_ideal_processor": "P-Cores",
+                    "thread_priority": "AboveNormal",
+					"thread_cpu_sets": "P-Cores"
+                }
+            ]
+        }
+    },
+    {
+        "process_name": "aces",
+        "parameters": {
+            "process_affinity": "DoNotChange",
+            "process_priority": "AboveNormal",
+            "thread_ideal_processor": "P-Cores",
+            "thread_priority": "AboveNormal",
+			"thread_cpu_sets": "DoNotChange",
+            "dependances": [
+                {
+                    "process_name": "OVRServer_x64",
+                    "process_affinity": "P-Cores",
+                    "process_priority": "AboveNormal",
+                    "thread_ideal_processor": "P-Cores",
+                    "thread_priority": "AboveNormal",
+					"thread_cpu_sets": "P-Cores"
+                },
+                {
+                    "process_name": "joystick_gremlin",
+                    "process_affinity": "E-Cores",
+                    "process_priority": "High",
+                    "thread_ideal_processor": "E-Cores",
+                    "thread_priority": "Highest",
+					"thread_cpu_sets": "E-Cores"
+                }
+            ]
+        }
+    },
+    {
+        "process_name": "dcs",
+        "parameters": {
+            "process_affinity": "DoNotChange",
+            "process_priority": "DoNotChange",
+            "thread_ideal_processor": "DoNotChange",
+            "thread_priority": "DoNotChange",
+			"thread_cpu_sets": "DoNotChange",
+            "dependances": [
+                {
+                    "process_name": "OVRServer_x64",
+                    "process_affinity": "DoNotChange",
+                    "process_priority": "AboveNormal",
+                    "thread_ideal_processor": "P-Cores",
+                    "thread_priority": "AboveNormal",
+					"thread_cpu_sets": "P-Cores"
+                },
+                {
+                    "process_name": "joystick_gremlin",
+                    "process_affinity": "DoNotChange",
+                    "process_priority": "High",
+                    "thread_ideal_processor": "E-Cores",
+                    "thread_priority": "Highest",
+					"thread_cpu_sets": "E-Cores"
+                }
+            ]
+        }
+    }
+]
