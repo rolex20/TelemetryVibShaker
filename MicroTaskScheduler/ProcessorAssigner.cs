@@ -42,9 +42,9 @@ namespace IdealProcessorEnhanced
 
             mutexSecurity.AddAccessRule(mu_rule);
 
-            // Create the global mutex with the specified security settings
+            
             bool createdNew;
-            mutex = new Mutex(false, "ProcessorAssignerMutex", out createdNew, mutexSecurity);
+            mutex = new Mutex(false, @"Global\ProcessorAssignerMutex", out createdNew, mutexSecurity);
             //   mutex = new Mutex(false, "GlobalProcessorAssignerMutex");
 
 
@@ -61,7 +61,7 @@ namespace IdealProcessorEnhanced
             security.AddAccessRule(mm_rule);
 
             // Create the global memory-mapped file with the specified security settings
-            mmf = MemoryMappedFile.CreateOrOpen("ProcessorAssignerMMF", 4, MemoryMappedFileAccess.ReadWrite, MemoryMappedFileOptions.None, security, HandleInheritability.None);
+            mmf = MemoryMappedFile.CreateOrOpen(@"Global\ProcessorAssignerMMF", 4, MemoryMappedFileAccess.ReadWrite, MemoryMappedFileOptions.None, security, HandleInheritability.None);
             //mmf = MemoryMappedFile.CreateOrOpen("GlobalProcessorAssignerMMF", 4);            
             
             accessor = mmf.CreateViewAccessor();
