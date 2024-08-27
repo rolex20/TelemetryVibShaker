@@ -97,8 +97,11 @@
             txtListeningPort = new TextBox();
             label15 = new Label();
             tabTest = new TabPage();
-            lblTestErrMsg = new Label();
             btnTestTWatchDisplay = new Button();
+            btnTestSoundEffect5 = new Button();
+            btnTestSoundEffect4 = new Button();
+            btnTestSoundEffect3 = new Button();
+            lblTestErrMsg = new Label();
             btnTestTWatchMotor = new Button();
             btnTestSoundEffect2 = new Button();
             btnTestSoundEffect1 = new Button();
@@ -933,8 +936,11 @@
             // 
             // tabTest
             // 
-            tabTest.Controls.Add(lblTestErrMsg);
             tabTest.Controls.Add(btnTestTWatchDisplay);
+            tabTest.Controls.Add(btnTestSoundEffect5);
+            tabTest.Controls.Add(btnTestSoundEffect4);
+            tabTest.Controls.Add(btnTestSoundEffect3);
+            tabTest.Controls.Add(lblTestErrMsg);
             tabTest.Controls.Add(btnTestTWatchMotor);
             tabTest.Controls.Add(btnTestSoundEffect2);
             tabTest.Controls.Add(btnTestSoundEffect1);
@@ -946,26 +952,56 @@
             tabTest.Text = "Test";
             tabTest.UseVisualStyleBackColor = true;
             // 
-            // lblTestErrMsg
-            // 
-            lblTestErrMsg.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            lblTestErrMsg.ForeColor = Color.FromArgb(192, 0, 0);
-            lblTestErrMsg.Location = new Point(29, 213);
-            lblTestErrMsg.Name = "lblTestErrMsg";
-            lblTestErrMsg.Size = new Size(431, 135);
-            lblTestErrMsg.TabIndex = 5;
-            lblTestErrMsg.Text = "error msg";
-            lblTestErrMsg.TextAlign = ContentAlignment.MiddleCenter;
-            // 
             // btnTestTWatchDisplay
             // 
             btnTestTWatchDisplay.Location = new Point(282, 82);
             btnTestTWatchDisplay.Name = "btnTestTWatchDisplay";
             btnTestTWatchDisplay.Size = new Size(178, 23);
-            btnTestTWatchDisplay.TabIndex = 4;
+            btnTestTWatchDisplay.TabIndex = 10;
             btnTestTWatchDisplay.Text = "Test T-Watch Display";
             btnTestTWatchDisplay.UseVisualStyleBackColor = true;
-            btnTestTWatchDisplay.Click += TestTWatchDisplay_Click;
+            btnTestTWatchDisplay.Click += btnTestTWatchDisplay_Click;
+            // 
+            // btnTestSoundEffect5
+            // 
+            btnTestSoundEffect5.Location = new Point(29, 290);
+            btnTestSoundEffect5.Name = "btnTestSoundEffect5";
+            btnTestSoundEffect5.Size = new Size(200, 23);
+            btnTestSoundEffect5.TabIndex = 9;
+            btnTestSoundEffect5.Text = "Test Sound Effect - 30 Minute";
+            btnTestSoundEffect5.UseVisualStyleBackColor = true;
+            btnTestSoundEffect5.Click += btnTestSoundEffect5_Click;
+            // 
+            // btnTestSoundEffect4
+            // 
+            btnTestSoundEffect4.Location = new Point(29, 238);
+            btnTestSoundEffect4.Name = "btnTestSoundEffect4";
+            btnTestSoundEffect4.Size = new Size(200, 23);
+            btnTestSoundEffect4.TabIndex = 7;
+            btnTestSoundEffect4.Text = "Test Sound Effect - Unknown Unit";
+            btnTestSoundEffect4.UseVisualStyleBackColor = true;
+            btnTestSoundEffect4.Click += btnTestSoundEffect4_Click;
+            // 
+            // btnTestSoundEffect3
+            // 
+            btnTestSoundEffect3.Location = new Point(29, 186);
+            btnTestSoundEffect3.Name = "btnTestSoundEffect3";
+            btnTestSoundEffect3.Size = new Size(200, 23);
+            btnTestSoundEffect3.TabIndex = 6;
+            btnTestSoundEffect3.Text = "Test Sound Effect - Known Unit";
+            btnTestSoundEffect3.UseVisualStyleBackColor = true;
+            btnTestSoundEffect3.Click += btnTestSoundEffect3_Click;
+            // 
+            // lblTestErrMsg
+            // 
+            lblTestErrMsg.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            lblTestErrMsg.ForeColor = Color.FromArgb(192, 0, 0);
+            lblTestErrMsg.Location = new Point(29, 336);
+            lblTestErrMsg.Name = "lblTestErrMsg";
+            lblTestErrMsg.Size = new Size(431, 54);
+            lblTestErrMsg.TabIndex = 5;
+            lblTestErrMsg.Text = "error msg";
+            lblTestErrMsg.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // btnTestTWatchMotor
             // 
@@ -979,11 +1015,11 @@
             // 
             // btnTestSoundEffect2
             // 
-            btnTestSoundEffect2.Location = new Point(29, 139);
+            btnTestSoundEffect2.Location = new Point(29, 134);
             btnTestSoundEffect2.Name = "btnTestSoundEffect2";
-            btnTestSoundEffect2.Size = new Size(178, 23);
+            btnTestSoundEffect2.Size = new Size(200, 23);
             btnTestSoundEffect2.TabIndex = 2;
-            btnTestSoundEffect2.Text = "Test Sound Effect 2";
+            btnTestSoundEffect2.Text = "Test Sound Effect - On AoA";
             btnTestSoundEffect2.UseVisualStyleBackColor = true;
             btnTestSoundEffect2.Click += TestSoundEffect2_Click;
             // 
@@ -991,9 +1027,9 @@
             // 
             btnTestSoundEffect1.Location = new Point(29, 82);
             btnTestSoundEffect1.Name = "btnTestSoundEffect1";
-            btnTestSoundEffect1.Size = new Size(178, 23);
+            btnTestSoundEffect1.Size = new Size(200, 23);
             btnTestSoundEffect1.TabIndex = 1;
-            btnTestSoundEffect1.Text = "Test Sound Effect 1";
+            btnTestSoundEffect1.Text = "Test Sound Effect - Above AoA";
             btnTestSoundEffect1.UseVisualStyleBackColor = true;
             btnTestSoundEffect1.Click += TestSoundEffect1_Click;
             // 
@@ -1001,7 +1037,7 @@
             // 
             btnTestArduinoMotors.Location = new Point(29, 30);
             btnTestArduinoMotors.Name = "btnTestArduinoMotors";
-            btnTestArduinoMotors.Size = new Size(178, 23);
+            btnTestArduinoMotors.Size = new Size(200, 23);
             btnTestArduinoMotors.TabIndex = 0;
             btnTestArduinoMotors.Text = "Test Arduino Motor 1 && 2";
             btnTestArduinoMotors.UseVisualStyleBackColor = true;
@@ -1688,7 +1724,7 @@
             // 
             // button1
             // 
-            button1.Location = new Point(182, 455);
+            button1.Location = new Point(184, 451);
             button1.Name = "button1";
             button1.Size = new Size(75, 23);
             button1.TabIndex = 5;
@@ -1846,7 +1882,6 @@
         private Button btnTestArduinoMotors;
         private Button btnTestSoundEffect1;
         private Button btnTestSoundEffect2;
-        private Button btnTestTWatchDisplay;
         private Button btnTestTWatchMotor;
         private Label lblTestErrMsg;
         private Label label30;
@@ -1887,5 +1922,9 @@
         private Label label51;
         private CheckBox chkReassignIdealProcessor;
         private Button button1;
+        private Button btnTestSoundEffect3;
+        private Button btnTestSoundEffect4;
+        private Button btnTestSoundEffect5;
+        private Button btnTestTWatchDisplay;
     }
 }

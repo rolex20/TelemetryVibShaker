@@ -220,7 +220,7 @@ namespace TelemetryVibShaker
                 cancellationPlayAlarm.Dispose();
                 cancellationPlayAlarm = new CancellationTokenSource();
             }
-
+            
             string soundEffectFileName = (aircraftFound ? Properties.Settings.Default.AircraftFoundSoundEffect : Properties.Settings.Default.AircraftNotFoundSoundEffect);
             MediaPlayer soundEffectPlayer = new MediaPlayer(mp1.DeviceIndex);
             soundEffectPlayer.Open(soundEffectFileName);

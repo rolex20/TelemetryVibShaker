@@ -1041,8 +1041,8 @@ namespace TelemetryVibShaker
             }
         }
 
-
-        public void PlaySound(string filePath, int audioDeviceId)
+        // Uses WaveOut Directly
+        public void TestSound1(string filePath, int audioDeviceId)
         {
             lblTestErrMsg.Text = String.Empty;
 
@@ -1055,7 +1055,7 @@ namespace TelemetryVibShaker
                     outputDevice.Play();
                     while (outputDevice.PlaybackState == PlaybackState.Playing)
                     {
-                        Thread.Sleep(1000);
+                     Thread.Sleep(500); // busy waiting but only for this
                     }
                 }
             }
@@ -1067,12 +1067,12 @@ namespace TelemetryVibShaker
 
         private void TestSoundEffect1_Click(object sender, EventArgs e)
         {
-            PlaySound(txtSoundEffect1.Text, cmbAudioDevice1.SelectedIndex);
+            TestSound1(txtSoundEffect1.Text, cmbAudioDevice1.SelectedIndex);
         }
 
         private void TestSoundEffect2_Click(object sender, EventArgs e)
         {
-            PlaySound(txtSoundEffect2.Text, cmbAudioDevice1.SelectedIndex);
+            TestSound1(txtSoundEffect2.Text, cmbAudioDevice1.SelectedIndex);
         }
 
         private void btnTestArduinoMotors_Click(object sender, EventArgs e)
@@ -1110,30 +1110,6 @@ namespace TelemetryVibShaker
 
 
 
-        private void TestTWatchDisplay_Click(object sender, EventArgs e)
-        {
-            lblTestErrMsg.Text = String.Empty;
-
-            byte[] parameters = { 0, 1 }; // [0]-Motor Vibration, [1]-Screen Color
-            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
-            Thread.Sleep(800);
-
-            parameters[1] = 2; // Dark Green
-            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters);
-            Thread.Sleep(800);
-
-            parameters[1] = 3; // TFT_GREEN
-            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters);
-            Thread.Sleep(800);
-
-            parameters[1] = 4; // TFT_RED
-            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters);
-            Thread.Sleep(800);
-
-            parameters[1] = 0; // TFT_BLACK
-            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters);
-
-        }
 
         private void TestRoutines(bool Enabled)
         {
@@ -1365,6 +1341,55 @@ namespace TelemetryVibShaker
         {
             if (processorAssigner == null) processorAssigner = new ProcessorAssigner(7);
             SetNewIdealProcessor(2);
+        }
+
+        //Uses Internal MediaPlayer
+        private void SoundTester2(string fileName, float volume)
+        {
+            MediaPlayer soundEffect = new MediaPlayer(cmbAudioDevice1.SelectedIndex);
+            soundEffect.Open(fileName);
+            soundEffect.Volume = volume;
+            soundEffect.Play();
+        }
+
+        private void btnTestSoundEffect3_Click(object sender, EventArgs e)
+        {
+            SoundTester2(Properties.Settings.Default.AircraftFoundSoundEffect, trkVolumeMultiplier1.Value / 100.0f);
+        }
+
+        private void btnTestSoundEffect4_Click(object sender, EventArgs e)
+        {
+            SoundTester2(Properties.Settings.Default.AircraftNotFoundSoundEffect, trkVolumeMultiplier1.Value / 100.0f);
+        }
+
+        private void btnTestSoundEffect5_Click(object sender, EventArgs e)
+        {
+            SoundTester2(Properties.Settings.Default.HalfAnHourAlarmSoundEffect, trkVolumeMultiplier1.Value / 100.0f);
+        }
+
+        private void btnTestTWatchDisplay_Click(object sender, EventArgs e)
+        {
+            lblTestErrMsg.Text = String.Empty;
+
+            byte[] parameters = { 0, 1 }; // [0]-Motor Vibration, [1]-Screen Color
+            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters); // Vibrate and Turn Screen 1 => TFT_YELLOW
+            Thread.Sleep(800);
+
+            parameters[1] = 2; // Dark Green
+            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters);
+            Thread.Sleep(800);
+
+            parameters[1] = 3; // TFT_GREEN
+            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters);
+            Thread.Sleep(800);
+
+            parameters[1] = 4; // TFT_RED
+            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters);
+            Thread.Sleep(800);
+
+            parameters[1] = 0; // TFT_BLACK
+            SendUdpDatagram(txtTWatchIP.Text, Convert.ToInt32(txtTWatchPort.Text), parameters);
+
         }
     }
 }
