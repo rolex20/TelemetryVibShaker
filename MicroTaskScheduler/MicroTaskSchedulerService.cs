@@ -223,8 +223,10 @@ namespace MicroTaskScheduler
                 {
                     // Calculate the time remaining until the next hour
                     TimeSpan timeToNextHour = TimeSpan.FromHours(1) - TimeSpan.FromMinutes(DateTime.Now.Minute) - TimeSpan.FromSeconds(DateTime.Now.Second) - TimeSpan.FromMilliseconds(DateTime.Now.Millisecond);
-                    await Task.Delay(timeToNextHour, cancellationToken);
+                    await Task.Delay(timeToNextHour, cancellationToken); // wait here and see ya in an hour
+
                     if (!cancellationToken.IsCancellationRequested) myWaveFile.Play();
+                    Thread.Sleep(1500); // Wait at least one second, otherwise it might complete so fast that it will play the alarm several times
                 }
             }
             catch
