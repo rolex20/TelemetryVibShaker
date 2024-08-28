@@ -131,8 +131,7 @@ namespace TelemetryVibShaker
         }
 
         // This function is called on every frame, so avoid function calls, etc.
-        // In this one case, I don't mind repeating 20 lines instead of creating a generic subrotine
-        // Dispatcher.BeginInvoke is used because the async callback UDP listenerUdp runs in a different thread than the UI
+        // In this one case, I don't mind repeating 20 lines instead of creating a generic subrotine        
         public bool UpdateEffect(int newAoA)
         {
             bool volumeHasChanged = false;
@@ -224,7 +223,7 @@ namespace TelemetryVibShaker
             string soundEffectFileName = (aircraftFound ? Properties.Settings.Default.AircraftFoundSoundEffect : Properties.Settings.Default.AircraftNotFoundSoundEffect);
             MediaPlayer soundEffectPlayer = new MediaPlayer(mp1.DeviceIndex);
             soundEffectPlayer.Open(soundEffectFileName);
-            soundEffectPlayer.Volume = mp1.Volume;
+            soundEffectPlayer.Volume = volumeAmplifier1;
             soundEffectPlayer.Play();
 
             Task.Run(async () =>
@@ -239,7 +238,7 @@ namespace TelemetryVibShaker
                         {
                             MediaPlayer soundEffect = new MediaPlayer(mp1.DeviceIndex);
                             soundEffect.Open(Properties.Settings.Default.HalfAnHourAlarmSoundEffect);
-                            soundEffect.Volume = mp1.Volume;
+                            soundEffect.Volume = volumeAmplifier1;
                             soundEffect.Play();
                         }
                     }
