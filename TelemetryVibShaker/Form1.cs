@@ -648,6 +648,7 @@ namespace TelemetryVibShaker
             soundManager.EnableEffect1 = chkEnableAoASoundEffects1.Checked;
             soundManager.EnableEffect2 = chkEnableAoASoundEffects2.Checked;
             UpdateSoundEffectStatus(soundManager.Status);
+            soundManager.PlayAlarm = chkPlayAlarm.Checked;
 
             telemetry = new TelemetryServer(soundManager, motorControllers, chkShowStatistics.Checked, Int32.Parse(txtListeningPort.Text));
             telemetry.SetJSON(txtJSON.Text);
@@ -1308,17 +1309,13 @@ namespace TelemetryVibShaker
 
         private void chkPlayAlarm_CheckedChanged(object sender, EventArgs e)
         {
-            if (!chkPlayAlarm.Enabled) return;
+            if (soundManager != null) { soundManager.PlayAlarm = chkPlayAlarm.Checked; }
 
+            if (!chkPlayAlarm.Enabled) return;
 
             if (chkPlayAlarm.Checked)
             {
-                MediaPlayer mp = new MediaPlayer(cmbAudioDevice1.SelectedIndex);
-                mp.Open(@".\Casio Watch Alarm.wav");
-                //mp.Open(@"C:\\Windows\\Media\\Ring05.wav");
-                mp.Volume = 1.0f;
-                mp.Stop();
-                mp.Play();
+                SoundTester2(Properties.Settings.Default.HalfAnHourAlarmSoundEffect, trkVolumeMultiplier1.Value / 100.0f);
             }
 
         }

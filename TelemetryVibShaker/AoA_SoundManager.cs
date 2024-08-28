@@ -27,7 +27,7 @@ namespace TelemetryVibShaker
         private float lastVolume2; // cached volume for mp2
 
         // Support members to play the alarm after 30 minutes of flight in each new plane
-        public bool PlayAlarm;
+        public bool PlayAlarm = false;
         private CancellationTokenSource? cancellationPlayAlarm;
 
 
@@ -241,6 +241,7 @@ namespace TelemetryVibShaker
                             soundEffect.Volume = volumeAmplifier1;
                             soundEffect.Play();
                         }
+                        Thread.Sleep(2000); // Give a little time before scheduling again
                     }
                 }
                 catch (TaskCanceledException)
