@@ -228,20 +228,20 @@ namespace TelemetryVibShaker
 
             Task.Run(async () =>
             {
+                MediaPlayer reminderSoundEffect = new MediaPlayer(mp1.DeviceIndex);
+                reminderSoundEffect.Open(Properties.Settings.Default.HalfAnHourAlarmSoundEffect);
                 try
                 {
-                    while (true)
+                    while (!cancellationPlayAlarm.IsCancellationRequested)
                     {
                         await Task.Delay(TimeSpan.FromMinutes(30), cancellationPlayAlarm.Token);
 
                         if (!cancellationPlayAlarm.IsCancellationRequested && PlayAlarm)
-                        {
-                            MediaPlayer soundEffect = new MediaPlayer(mp1.DeviceIndex);
-                            soundEffect.Open(Properties.Settings.Default.HalfAnHourAlarmSoundEffect);
-                            soundEffect.Volume = volumeAmplifier1;
-                            soundEffect.Play();
+                        {                            
+                            reminderSoundEffect.Volume = volumeAmplifier1;
+                            reminderSoundEffect.Play();
                         }
-                        Thread.Sleep(2000); // Give a little time before scheduling again
+                        //Thread.Sleep(2000); // Give a little time before scheduling again
                     }
                 }
                 catch (TaskCanceledException)
