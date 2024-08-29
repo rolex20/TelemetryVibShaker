@@ -7,7 +7,7 @@ function Send-MessageViaPipe {
     )
 
 
-    Write-VerboseDebug -Timestamp (Get-Date) -Title "IPC PIPE" -Message "$pipeName $message"
+    Write-VerboseDebug -Timestamp (Get-Date) -Title "IPC PIPE" -Message "Sending [$message] to pipe [$pipeName]"
     try {
         
         $pipe = New-Object System.IO.Pipes.NamedPipeClientStream(".", $pipeName, [System.IO.Pipes.PipeDirection]::Out)
@@ -22,8 +22,10 @@ function Send-MessageViaPipe {
         
     } catch {
         $err = "Failed to send message: $_"
-        Write-VerboseDebug -Timestamp (Get-Date) -Title "IPC PIPE" -Message "$err" -ForegroundColor "Red"
+        Write-VerboseDebug -Timestamp (Get-Date) -Title "Send-Message-Via-Pipe" -Message "$err" -ForegroundColor "Red"
         return $false
+    } finally {
+        $pipe.Dispose()
     }
 }
 
@@ -35,3 +37,5 @@ function Send-MessageViaPipe {
 #Send-MessageViaPipe -pipeName "WarThunderExporterPipeCommands" -message "CYCLE_STATISTICS"
 
 #Send-MessageViaPipe -pipeName "TelemetryVibShakerPipeCommands" -message "CYCLE_STATISTICS"
+
+#Send-MessageViaPipe -pipeName "ipc_pipe_vr_server_commands" -message "ECHO"

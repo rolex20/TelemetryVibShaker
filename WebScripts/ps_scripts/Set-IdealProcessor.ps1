@@ -354,94 +354,106 @@ function Get-SetBits {
 #The new ideal processor will be only from the Affinity allowed
 function Set-ProcessAffinityAndPriority {
     param (
-        [Parameter(Mandatory=$true)]$Process,
-        [Parameter(Mandatory=$true)]$ProcessAffinity,
-        [Parameter(Mandatory=$true)]$ProcessPriority,
-		[Parameter(Mandatory=$true)]$ThreadIdealProcessor,
-		[Parameter(Mandatory=$true)]$ThreadPriority,
-        [Parameter(Mandatory=$true)]$CpuSet,
-        [Parameter(Mandatory=$true)]$ChangeCpuSetForProcessAlso
+        $Process,
+        $ProcessAffinity,
+        $ProcessPriority,
+		$ThreadIdealProcessor,
+		$ThreadPriority,
+        $CpuSet,
+        $ChangeCpuSetForProcessAlso,
+        $MaximumThreadsToChange
     )
 
     $ProcessId = $Process.Id
 
+    try {
 
-    if (-not (Enable-Privilege -Privilege $SE_INC_BASE_PRIORITY_NAME)) {
-        Write-Host "Failed to enable privilege."
-        exit
-    }
+        if (-not (Enable-Privilege -Privilege $SE_INC_BASE_PRIORITY_NAME)) {
+            Write-Host "Failed to enable privilege."
+            exit
+        }
 
 
-    # Set the processor affinity	
-    if ($ProcessAffinity -ge 0) {
-		Write-Host "Set Process Affinity for process $($Process.Name) = $ProcessAffinity"
-		$Process.ProcessorAffinity = [IntPtr]$ProcessAffinity
-	}
+        # Set the processor affinity	
+        if ($ProcessAffinity -ge 0) {
+		    Write-Host "Set Process Affinity for process $($Process.Name) = $ProcessAffinity"
+		    $Process.ProcessorAffinity = [IntPtr]$ProcessAffinity
+	    }
 
-    # Set the process priority
-    if ($ProcessPriority -ne "DoNotChange") { 
-        Write-Host "Set Priority Class for process $($Process.Name) = $ProcessPriority"
-        $Process.PriorityClass = [System.Diagnostics.ProcessPriorityClass]::$ProcessPriority
-    }
-
-	
-	# The new ideal cpu assignment will select the physical cores first to the most busy threads, and then hyperthreading threads.  This is a soft assignment
-	$sortedThreads = $Process.Threads | Sort-Object TotalProcessorTime -Descending
-
-    # Set the default CpuSet for new threads created by the process
-    if ($CpuSet.Count -GT 0 -AND $ChangeCpuSetForProcessAlso) { 
-        Write-Host "Set $($Process.Name) Default Cpu Sets to: $($CpuSet -join ', ')"
-        [CpuSetHelper]::SetDefaultCpuSets($Process.Handle, $CpuSet)
-    }
+        # Set the process priority
+        if ($ProcessPriority -ne "DoNotChange") { 
+            Write-Host "Set Priority Class for process $($Process.Name) = $ProcessPriority"
+            $Process.PriorityClass = [System.Diagnostics.ProcessPriorityClass]::$ProcessPriority
+        }
 
 	
-  	
-	# Prepare ideal processor assignment if requested
-    $allowedProcessors = Get-SetBits -number $ThreadIdealProcessor
-	$physicalProcessors = $null
-	$optimizedProcessorAsignment = $null
-	$n = 0
-	$i = 0
-	if ($allowedProcessors) {
-        $physicalProcessors = @(0,2,4,6,8,10,12,14,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31) # Valid for #12700K, 14700K, it doesn't affect if it is not found
-        $optimizedProcessorAsignment = Add-100ToMatches -array1 $allowedProcessors -array2 $physicalProcessors
+	    # The new ideal cpu assignment will select the physical cores first to the most busy threads, and then hyperthreading threads.  This is a soft assignment
+	    $sortedThreads = $Process.Threads | Sort-Object TotalProcessorTime -Descending
 
-        $n = $allowedProcessors.Count
-        $i = 0
-	}
+        # Set the default CpuSet for new threads created by the process
+        if ($CpuSet -AND $CpuSet.Count -GT 0 -AND $ChangeCpuSetForProcessAlso) { 
+            Write-Host "Set $($Process.Name) Default Cpu Sets to: $($CpuSet -join ', ')"
+            [CpuSetHelper]::SetDefaultCpuSets($Process.Handle, $CpuSet)
+        }
+
+
+
+	    # Prepare ideal processor assignment if requested
+        $allowedProcessors = Get-SetBits -number $ThreadIdealProcessor
+	    $physicalProcessors = $null
+	    $optimizedProcessorAsignment = $null
+	    $n = 0
+	    $i = 0
+	    if ($allowedProcessors) {
+            $physicalProcessors = @(0,2,4,6,8,10,12,14,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31) # Valid for #12700K, 14700K, it doesn't affect if it is not found
+            $optimizedProcessorAsignment = Add-100ToMatches -array1 $allowedProcessors -array2 $physicalProcessors
+
+            $n = $allowedProcessors.Count
+	    }
 	
-	# Do the work on each thread
-	foreach ($thread in $sortedThreads) {	
+	    # Do the work on each thread
+        $t = 1
+	    foreach ($thread in $sortedThreads) {
+            if ($t++ -GT $MaximumThreadsToChange) { break }
 
-		# Setting thread processor Priority
-		if ($ThreadPriority -ne "DoNotChange") { 
-			Write-Host "Set Priority Class for thread $($thread.Id) = $ThreadPriority"
-			$thread.PriorityLevel = [System.Diagnostics.ThreadPriorityLevel]::$ThreadPriority 
-		}
+		    # Setting thread processor Priority
+            $newPriority = [System.Diagnostics.ThreadPriorityLevel]::$ThreadPriority 
+		    if ($ThreadPriority -ne "DoNotChange" -AND ($thread.PriorityLevel.value__ -LT $newPriority.value__)) { 
+			    Write-Host "Set Priority Class for thread $($thread.Id) = $ThreadPriority"
+			    $thread.PriorityLevel = $newPriority
+		    } else {
+                Write-Host "Warning: This Thread $($thread.Id), has higher priority.  No changes made."
+            }
 		
-		# Setting ProcessAffinity for the ThreadCount
-		if ($ProcessAffinity -ge 0) {
-			$thread.ProcessorAffinity = [IntPtr]$ProcessAffinity
-		}
+		    # Setting ProcessAffinity for the ThreadCount
+		    if ($ProcessAffinity -ge 0) {
+			    $thread.ProcessorAffinity = [IntPtr]$ProcessAffinity
+		    }
 		
-		# Set next ideal processor
-		if ($allowedProcessors) {
-            $index = $i++ % $n
-			Set-ThreadIdealProcessor $thread $optimizedProcessorAsignment[$index]			
-		}
+		    # Set next ideal processor
+		    if ($allowedProcessors) {
+                $index = $i++ % $n
+			    Set-ThreadIdealProcessor $thread $optimizedProcessorAsignment[$index]			
+		    }
 
-        # Set CPU-Sets 
-        Set-Thread-Cpu-Sets $thread $CpuSet
-	}
+            # Set CPU-Sets 
+            Set-Thread-Cpu-Sets $thread $CpuSet
+	    }
 	
 
-    $processName = $process.Name
-    Write-Output "Affinity and priority for '$processName' processes/threads have been set."
+        $processName = $process.Name
+        Write-Output "Affinity and priority for '$processName' processes/threads have been set."
+
+    } catch {
+        Write-Host "An error occurred in Set-ProcessAffinityAndPriority: $($_.Exception.Message)"
+        Write-Host "Error occurred at line: $($_.InvocationInfo.ScriptLineNumber)"
+        [System.Media.SystemSounds]::Hand.Play()
+    }
 }
 
 
 function Set-Thread-Cpu-Sets($thread, $CpuSet) {
-    if ($CpuSet.Count -LE 0) { return }
+    if ($CpuSet -EQ 0 -OR $null -EQ $CpuSet) { return }
 
     $threadHandle = [CpuSetHelper]::OpenThread($THREAD_SET_INFORMATION -bor $THREAD_QUERY_INFORMATION, $false, $thread.Id)
     if ($threadHandle -eq [IntPtr]::Zero) {
@@ -456,10 +468,30 @@ function Set-Thread-Cpu-Sets($thread, $CpuSet) {
     }
 }
 
+
+function Get-Cpu-Sets {
+    param (
+        [int]$ThreadID
+    )
+
+    $threadHandle = [CpuSetHelper]::OpenThread($THREAD_QUERY_INFORMATION, $false, $ThreadID)
+    if ($threadHandle -eq [IntPtr]::Zero) {
+        return "Failed to open handle for thread ID $ThreadID"
+    }
+
+    try {
+        $threadCpuSets = [CpuSetHelper]::GetThreadCpuSets($threadHandle)
+        return "$($threadCpuSets -join ', ')"
+    } finally {
+        $r = [CpuSetHelper]::CloseHandle($threadHandle)
+    }
+}
+
 # Show Threads belonging to a process sorted by TotalProcessorTime descending
 function Show-Process-Thread-Times {
     param (
-        [string]$ProcessName
+        [string]$ProcessName,
+		[int]$ThreadsLimit
     )
 
     # Get the process object
@@ -470,18 +502,18 @@ function Show-Process-Thread-Times {
         $threads = $process.Threads
 
         # Sort the threads by TotalProcessorTime in descending order
-        $sortedThreads = $threads | Sort-Object TotalProcessorTime -Descending
+        $sortedThreads = $threads | Sort-Object TotalProcessorTime -Descending | Select-Object -First $ThreadsLimit | ForEach-Object { [PSCustomObject]@{ Id = $_.Id; TotalProcessorTime = $_.TotalProcessorTime; Cpu_Sets = Get-Cpu-Sets -ThreadID $_.Id } }
+
 
         # Print the TotalProcessorTime for each thread
         Write-Host " " 
-	    Write-Host "[ProcessName=$ProcessName], [PID=$($process.Id)], [ThreadCount=$($threads.Count)] - Busiest threads:" -ForegroundColor Yellow
-        foreach ($thread in $sortedThreads) {
-            [PSCustomObject]@{
-                ThreadId = $thread.Id
-                TotalProcessorTime = $thread.TotalProcessorTime
-            }
-        }
+	    Write-Host "[ProcessName=$ProcessName], [PID=$($process.Id)], [ThreadCount=$($threads.Count)] - Busiest [$ThreadsLimit] threads:" -ForegroundColor Yellow
+
+        $sortedThreads | Select-Object Id, @{Name='TotalProcessorTime';Expression={("{0:hh\:mm\:ss\.fff}" -f $_.TotalProcessorTime)}}, Cpu_Sets | Format-Table -AutoSize | Out-String | ForEach-Object { Write-Host $_ }
+
+
     }
+
 }
 
 #Returns an array based on $array1 where the matching numbers in $array2 are prioritized
@@ -565,16 +597,16 @@ function Get-Cpu-Set($cpuSet, $cpuCount) {
             }
         }
 
-		"DoNotChange" {return @()}
+		"DoNotChange" {return 0}
 
-        $null {return @()}
+        $null {return 0}
 
-        default {return @()}
+        default {return 0}
     }
 }
 
 
-function Run-ActionsPerGame($processName, $fileName) {
+function Run-Actions-Per-Game($processName, $fileName, $threadsLimit) {
     $cpuCount = Get-CPU-Count
     $actions = Get-ActionsPerGame $fileName
 
@@ -586,12 +618,12 @@ function Run-ActionsPerGame($processName, $fileName) {
             $taffinity = Get-NumericAffinity $action.parameters.thread_ideal_processor $cpuCount
             $cpuset = Get-Cpu-Set $action.parameters.thread_cpu_sets $cpuCount
             $changeCpuSetForProcesses = $action.parameters.process_change_cpu_sets
-
             Write-Host " "
-            Write-Host "STARTING " + $process.Name -ForegroundColor Yellow
+            Write-Host "STARTING $($process.Name)"  -ForegroundColor Yellow
+            
+            
+            Set-ProcessAffinityAndPriority -Process $process -ProcessAffinity $paffinity -ProcessPriority $action.parameters.process_priority -ThreadIdealProcessor $taffinity -ThreadPriority $action.parameters.thread_priority -CpuSet $cpuset -ChangeCpuSetForProcessAlso $changeCpuSetForProcesses -MaximumThreadsToChange $threadsLimit
 
-            Set-ProcessAffinityAndPriority -Process $process -ProcessAffinity $paffinity -ProcessPriority $action.parameters.process_priority -ThreadIdealProcessor $taffinity -ThreadPriority $action.parameters.thread_priority -CpuSet $cpuset -ChangeCpuSetForProcessAlso $changeCpuSetForProcesses
-        
             foreach ($dependance in $action.parameters.dependances) {
                 $depProcesses = Get-Process -Name $dependance.process_name -ErrorAction SilentlyContinue
                 foreach($depProcess in $depProcesses) {
@@ -600,11 +632,12 @@ function Run-ActionsPerGame($processName, $fileName) {
                     $paffinity = Get-NumericAffinity $dependance.process_affinity $cpuCount
                     $taffinity = Get-NumericAffinity $dependance.thread_ideal_processor $cpuCount
                     $cpuset = Get-Cpu-Set $dependance.thread_cpu_sets $cpuCount
+                    
 
                     Write-Host " "
                     Write-Host "STARTING " + $depProcess.Name -ForegroundColor Yellow
 
-                    Set-ProcessAffinityAndPriority -Process $depProcess -ProcessAffinity $paffinity -ProcessPriority $dependance.process_priority -ThreadIdealProcessor $taffinity -ThreadPriority $dependance.thread_priority -CpuSet $cpuset -ChangeCpuSetForProcessAlso $changeCpuSetForProcesses
+                    Set-ProcessAffinityAndPriority -Process $depProcess -ProcessAffinity $paffinity -ProcessPriority $dependance.process_priority -ThreadIdealProcessor $taffinity -ThreadPriority $dependance.thread_priority -CpuSet $cpuset -ChangeCpuSetForProcessAlso $changeCpuSetForProcesses -MaximumThreadsToChange $threadsLimit
                 }
             }
         }

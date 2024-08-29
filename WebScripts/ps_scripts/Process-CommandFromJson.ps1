@@ -29,6 +29,11 @@ $include_file = Include-Script -FileName "Set-PowerScheme.ps1" -Directories $sea
 $include_file = Include-Script -FileName "Set-IdealProcessor.ps1" -Directories $search_paths
 . $include_file
 
+function ScheduleWatchdogCheck($delay = 10) {
+Write-Host "DoWatchDogCheck"
+	New-Event -SourceIdentifier "DoWatchDogCheck" -MessageData $delay # This will wake up Watchodg-Operations
+}
+
 function Process-CommandFromJson {
     param (
         [string]$JsonFilePath
@@ -45,61 +50,82 @@ function Process-CommandFromJson {
     # Process the command based on the command type
     switch ($commandType) {
         "RUN" {
+            ScheduleWatchdogCheck
             Write-VerboseDebug -Timestamp (Get-Date) -Title "RUN" -Message $parameters.program
             try {
                 $p = Start-Process -FilePath $parameters.program -ErrorAction SilentlyContinue
             } catch {
                 Write-VerboseDebug -Timestamp (Get-Date) -Title "RUN-ERROR" -Message $_ -ForegroundColor "Red"
             }
+			
         }
 
         "KILL" {
+            ScheduleWatchdogCheck
             Write-VerboseDebug -Timestamp (Get-Date) -Title "KILL" -Message $parameters.processName
             $p=Stop-Process -Name $parameters.processName -ErrorAction SilentlyContinue
+			
         }
 
         "MAXIMIZE" {
-            Set-Maximize $parameters.processName $parameters.instance
+            ScheduleWatchdogCheck
+            Set-Maximize $parameters.processName $parameters.instance			
         }
 
 
         "MINIMIZE" {
+            ScheduleWatchdogCheck
             Set-Minimize $parameters.processName $parameters.instance
+			
         }
 
         "FOREGROUND" {            
+            ScheduleWatchdogCheck
             Set-ForegroundProcess $parameters.processName $parameters.instance
+			
         }
 
         "CHANGE_LOCATION" {
+            ScheduleWatchdogCheck
             Set-WindowPosition -processName $parameters.processName -instance $parameters.instance -x $parameters.x -y $parameters.y
+			
         }
 
         "GET-LOCATION" {            
+            ScheduleWatchdogCheck
             Get-WindowLocation -processName $parameters.processName -instance $parameters.instance -outfile $parameters.outfile
+			
         }
 
 
         "PIPE" {
+            ScheduleWatchdogCheck
             Send-MessageViaPipe -pipeName $parameters.pipename -message $parameters.message
+			
         }
 
 
         "READPOWERSCHEME" {
+            ScheduleWatchdogCheck
             $currentScheme =  Get-ActivePowerPlanName
             $msg = "The current power plan is: $currentScheme"           
-            Write-VerboseDebug -Timestamp (Get-Date) -Title "P-TRACE" -Message $msg -ForegroundColor "White" -Speak $true
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "P-TRACE" -Message $msg -ForegroundColor "White" -Speak $true			
         }
 
 
         "POWERSCHEME" {
+            ScheduleWatchdogCheck
             Set-PowerScheme -schemeName $parameters.schemeName
+			
         }
 
 
         "WATCHDOG" {
+			#If this code is being executed is because the system is still responding well to file system events
+
+			#Let's send a simple request to the ipc pipe server to see if it still responding ok to commands
             if (Send-MessageViaPipe -pipeName "ipc_pipe_vr_server_commands" -message "ECHO") {
-                Set-Content -Path $parameters.outFile "WATCHDOG"
+                Set-Content -Path $parameters.outFile "WATCHDOG" # This file is expected by Watchdog-Operations.ps1 
                 Write-VerboseDebug -Timestamp (Get-Date) -Title "WATCHDOG [PID=$PID]" -Message "File System events are still active: OK." -ForegroundColor "Green"
                 if ($parameters.sound) {
                     Add-Type -AssemblyName System.Speech
@@ -115,23 +141,27 @@ function Process-CommandFromJson {
 
             }
 
-
         }
 
         "GAME" {
-            Run-ActionsPerGame $parameters.processName $parameters.jsonFile
+            ScheduleWatchdogCheck 20
+            Run-Actions-Per-Game $parameters.processName $parameters.jsonFile $parameters.threadsLimit			
         }
 
 
         "SHOW_THREADS" {
-            Show-Process-Thread-Times "FlightSimulator"
-            Show-Process-Thread-Times "aces"
-            Show-Process-Thread-Times "dcs"
-            Show-Process-Thread-Times "OVRServer_x64"            
+            ScheduleWatchdogCheck 20
+            Show-Process-Thread-Times "FlightSimulator" $parameters.threadsLimit
+            Show-Process-Thread-Times "aces"  $parameters.threadsLimit
+            Show-Process-Thread-Times "dcs"  $parameters.threadsLimit
+            Show-Process-Thread-Times "OVRServer_x64"  $parameters.threadsLimit
+			
         }
 
         default {
-            Write-VerboseDebug -Timestamp (Get-Date) -Title "UNKNOWN COMMAND" -Message $commandType -ForegroundColor "Red"        
+            ScheduleWatchdogCheck 
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "UNKNOWN COMMAND" -Message $commandType -ForegroundColor "Red"
+			
         }
     }
 }

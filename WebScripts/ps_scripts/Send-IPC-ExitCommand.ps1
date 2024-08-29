@@ -12,10 +12,10 @@
 
         $writer.WriteLine("EXIT")
         $pipeClient.Close()
-        Write-Host "EXIT command sent successfully."
+        Write-Host "IPC-EXIT command sent successfully."
         return $true
     } catch {
-        Write-Host "Failed to connect to the server. Make sure the server is running."
+        Write-Host "Failed to connect to the IPC-Pipe-Server. Make sure the server is running."
         return $false
     }
 }

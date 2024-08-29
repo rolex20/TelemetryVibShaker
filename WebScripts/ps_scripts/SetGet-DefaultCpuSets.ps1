@@ -108,6 +108,10 @@ public class CpuSetHelper {
     public static extern IntPtr OpenThread(uint dwDesiredAccess, bool bInheritHandle, uint dwThreadId);
 
     [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern IntPtr OpenProcess(uint dwDesiredAccess, bool bInheritHandle, uint dwProcessId);
+
+
+    [DllImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool CloseHandle(IntPtr hObject);
 
@@ -169,56 +173,150 @@ public class CpuSetHelper {
 # Define constants for thread access rights
 $THREAD_SET_INFORMATION = 0x0020
 $THREAD_QUERY_INFORMATION = 0x0040
+$PROCESS_QUERY_INFORMATION = 0x0400
+
+function Convert-ToBinary {
+    param (
+        [int]$number
+    )
+    return [Convert]::ToString($number, 2)
+}
+
+function Get-Thread-Cpu-Sets {
+    param (
+        [int]$ThreadID
+    )
+
+    $threadHandle = [CpuSetHelper]::OpenThread($THREAD_QUERY_INFORMATION, $false, $ThreadID)
+    if ($threadHandle -eq [IntPtr]::Zero) {
+        return "Failed to open handle for thread ID $ThreadID"
+    }
+
+    try {
+        $threadCpuSets = [CpuSetHelper]::GetThreadCpuSets($threadHandle)
+        return "$($threadCpuSets -join ', ') Total [$($threadCpuSets.Count)]"
+    catch {
+        return "Error with thread ID $ThreadID"
+    }
+    } finally {
+        $r = [CpuSetHelper]::CloseHandle($threadHandle)
+    }
+}
+
+function Get-Process-Cpu-Sets {
+    param (
+        [int]$ProcessID
+    )
+
+    $processHandle = [CpuSetHelper]::OpenProcess($PROCESS_QUERY_INFORMATION, $false, $ProcessID)
+    if ($processHandle -eq [IntPtr]::Zero) {
+        return "Failed to open handle for process ID $ProcessID"
+    }
+
+    try {
+        $processCpuSets = [CpuSetHelper]::GetDefaultCpuSets($processHandle)
+        return "$($processCpuSets -join ', ') Total [$($processCpuSets.Count)]"
+    catch {
+        return "Error with process ID $ProcessID"
+    }
+    } finally {
+        $r = [CpuSetHelper]::CloseHandle($processHandle)
+    }
+}
+
+
+function Format-ProcessTable {
+    param (
+        [Parameter(ValueFromPipeline)]
+        [System.Diagnostics.Process[]]$Processes
+    )
+    begin {
+        $allProcesses = @()
+    }
+    process {
+        $allProcesses += $_
+    }
+    end {
+        $allProcesses | Format-Table -AutoSize -Property Id, ProcessName, @{Name="ThreadCount";Expression={$_.Threads.Count}}, PriorityClass, @{Name='ProcessorAffinity';Expression={ Convert-ToBinary $_.ProcessorAffinity };Align="Right"}, @{Name='TotalProcessorTime';Expression={("{0:hh\:mm\:ss\.fff}" -f $_.TotalProcessorTime)};Align="Right"}, @{Name='Cpu-Sets';Expression={ Get-Process-Cpu-Sets $_.Id };Align="Right"}
+    }
+}
+
+Clear-Host
 
 # Get and print all available CPU set information
 # and most importantly, which IDs you can use in your own system.
+Write-Output "$([Environment]::NewLine)Available CPU-Set Information"
+
 $cpuSetInfo = [CpuSetHelper]::GetSystemCpuSetInfo()
 foreach ($info in $cpuSetInfo) {
     Write-Output "CPU Set ID: $($info.Id), Group: $($info.Group), Logical Processor Index: $($info.LogicalProcessorIndex), Core Index: $($info.CoreIndex), Efficiency Class: $($info.EfficiencyClass)"
 }
 
-# Prompt the user for the process name
-$processName = Read-Host "Enter the name of the target process"
 
-# Prompt the user for the list of CPU IDs
-$cpuIdsInput = Read-Host "Enter the list of CPU IDs separated by commas"
-$cpuIds = $cpuIdsInput -split ',' | ForEach-Object { [uint32]$_.Trim() }
+#Warn the user if some process won't be shown due to non admin permissions
+$currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
+$principal = New-Object Security.Principal.WindowsPrincipal($currentUser)
+$adminRole = [Security.Principal.WindowsBuiltinRole]::Administrator
+if (-not $principal.IsInRole($adminRole)) {
+    Write-Host -ForegroundColor DarkRed "Warning: This script is not running as an administrator. Some processes may not be shown."
+}
+
+# Show the TOP 5 list of process with higher TotalProcessor Time
+Write-Host "$([Environment]::NewLine)Top 5 processes (Higher TotalProcessorTime):"
+Get-Process | Where-Object { $_.TotalProcessorTime -ne $null } -ErrorAction SilentlyContinue | Sort-Object TotalProcessorTime -Descending | Select-Object -First 5 | Format-ProcessTable
+
+# Prompt the user for the process name
+$processName = Read-Host "$([Environment]::NewLine)Enter the name of the target process.  Empty line to Exit"
+if ($processName.Trim() -EQ "") { Exit }
 
 # Get the process by name
-$process = Get-Process -Name $processName -ErrorAction Stop
+$processes = Get-Process -Name $processName -ErrorAction Stop
 
-# Set the specified CPUs as the default CPU sets for the target process
-[CpuSetHelper]::SetDefaultCpuSets($process.Handle, $cpuIds)
+# Prompt the user for the list of CPU IDs
+$cpuIdsInput = Read-Host "Enter the list of CPU IDs separated by commas.  Emtpy list to show the current CPU Sets"
+$cpuIds = $cpuIdsInput -split ',' | ForEach-Object { [uint32]$_.Trim() }
 
-# Iterate over each thread in the process and set the specified CPUs
-foreach ($thread in $process.Threads) {
-    $threadHandle = [CpuSetHelper]::OpenThread($THREAD_SET_INFORMATION -bor $THREAD_QUERY_INFORMATION, $false, $thread.Id)
-    if ($threadHandle -eq [IntPtr]::Zero) {
-        Write-Error "Failed to open handle for thread ID $($thread.Id)"
-        continue
-    }
+$processes | Sort-Object TotalProcessorTime -Descending | Format-ProcessTable
 
-    try {
-        [CpuSetHelper]::SetThreadCpuSets($threadHandle, $cpuIds)
-    } finally {
-        $r = [CpuSetHelper]::CloseHandle($threadHandle)
-    }
-}
+if ($cpuIds -AND $cpuIds.Count -GT 0) {
+    Write-Output "$([Environment]::NewLine)Setting the CPU sets for each process/thread: " 
+    foreach($process in $processes) {
+        $process | Format-Table -AutoSize -Property Id, ProcessName, @{Name="ThreadCount";Expression={$_.Threads.Count}}, PriorityClass, @{Name='ProcessorAffinity';Expression={ Convert-ToBinary $_.ProcessorAffinity };Align="Right"}, @{Name='TotalProcessorTime';Expression={("{0:hh\:mm\:ss\.fff}" -f $_.TotalProcessorTime)};Align="Right"}
+	        # Set the specified CPUs as the default CPU sets for the target process
+	        [CpuSetHelper]::SetDefaultCpuSets($process.Handle, $cpuIds)
 
-# Verify the CPU sets for each thread
-foreach ($thread in $process.Threads) {
-    $threadHandle = [CpuSetHelper]::OpenThread($THREAD_QUERY_INFORMATION, $false, $thread.Id)
-    if ($threadHandle -eq [IntPtr]::Zero) {
-        Write-Error "Failed to open handle for thread ID $($thread.Id)"
-        continue
-    }
+	        # Iterate over each thread in the process and set the specified CPUs
+	        foreach ($thread in $process.Threads) {
+		        $threadHandle = [CpuSetHelper]::OpenThread($THREAD_SET_INFORMATION -bor $THREAD_QUERY_INFORMATION, $false, $thread.Id)
+		        if ($threadHandle -eq [IntPtr]::Zero) {
+			        Write-Error "Failed to open handle for thread ID $($thread.Id)"
+			        continue
+		        }
 
-    try {
-        $threadCpuSets = [CpuSetHelper]::GetThreadCpuSets($threadHandle)
-        Write-Output "Thread ID $($thread.Id) CPU sets: $($threadCpuSets -join ', ')"
-    } finally {
-        $r = [CpuSetHelper]::CloseHandle($threadHandle)
+		        try {
+                    Write-Output "Setting Cpu-Set for ThreadId=[$($thread.Id)]"
+			        [CpuSetHelper]::SetThreadCpuSets($threadHandle, $cpuIds)
+		        } finally {
+			        $r = [CpuSetHelper]::CloseHandle($threadHandle)
+		        }
+	        }       
     }
 }
 
-Write-Output "Default CPU sets updated to CPUs $($cpuIds -join ', ') for process $processName and its threads."
+
+if ($processes) {
+    Write-Output "$([Environment]::NewLine)Verifying the CPU sets for each process/thread"
+
+    foreach($process in $processes) {
+
+        $process | Format-Table -AutoSize -Property Id, ProcessName, @{Name="ThreadCount";Expression={$_.Threads.Count}}, PriorityClass, @{Name='ProcessorAffinity';Expression={ Convert-ToBinary $_.ProcessorAffinity };Align="Right"}, @{Name='TotalProcessorTime';Expression={("{0:hh\:mm\:ss\.fff}" -f $_.TotalProcessorTime)};Align="Right"}
+
+        $process.Threads |  Sort-Object TotalProcessorTime -Descending | Format-Table -AutoSize -Property @{Name="Process.ID";Expression={$process.Id}}, Id, PriorityLevel,@{Name="ProcessorAffinity";Expression={"Cannot get"};Align="Right"}, @{Name='TotalProcessorTime';Expression={("{0:hh\:mm\:ss\.fff}" -f $_.TotalProcessorTime)};Align="Right"}, @{Name='Cpu-Sets';Expression={ Get-Thread-Cpu-Sets $_.Id };Align="Right"}
+
+    }
+
+}
+
+if ($cpuIds -AND $cpuIds.Count -GT 0) {
+    Write-Output "Completed Default-CPU-sets updated to CPUs $($cpuIds -join ', ') for process $processName and its threads."
+}

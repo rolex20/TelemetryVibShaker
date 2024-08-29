@@ -77,10 +77,8 @@ Add-Type @"
                 $sortedProcessesDiff = $processesDiff | Sort-Object -Property Difference -Descending
                 
                 # Display the sorted list in a table format
-                $sortedProcessesDiff | Format-Table -Property Name, Id, OldCPUTime, NewCPUTime, Difference -AutoSize
+                $sortedProcessesDiff | Format-Table -Property Name, Id, OldCPUTime, NewCPUTime, Difference -AutoSize | Out-String | ForEach-Object { Write-Host $_}
                 
-                
-                Write-Host "[PID= $pid] The list of processes is in the [processesDiff] list.  Press Ctrl+C to Exit..."                
             }
             "ECHO" {
                 # Respond with "ECHO"
@@ -109,7 +107,7 @@ Add-Type @"
     $mutex = New-Object System.Threading.Mutex($false, $mutexName, [ref]$isNew)
 
     if (-NOT $isNew) { 
-        Write-Host -ForegroundColor Red "There is another instance of this script already running."
+        Write-Host -ForegroundColor Red "There is another instance of this IPC-Pipe-Server already running."
         Start-Sleep -Seconds 5
         $global:IPC_ContinueServer = $false
     }
@@ -130,7 +128,7 @@ Add-Type @"
 
     # Start the server loop
     while ($global:IPC_ContinueServer) {
-        Write-Output "Waiting for new IPC client connection..."
+        Write-Host "Waiting for new IPC client connection..."
         $pipeServer.WaitForConnection()
 
         $reader = New-Object System.IO.StreamReader($pipeServer)
@@ -149,4 +147,5 @@ Add-Type @"
         }
     }
     $mutex.Dispose()
+	Write-Host "IPC Pipe Server terminated."
 }
