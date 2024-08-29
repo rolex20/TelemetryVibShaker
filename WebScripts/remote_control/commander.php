@@ -116,7 +116,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	$frmX = htmlspecialchars($_POST['X']);
 	$frmY = htmlspecialchars($_POST['Y']);
 	$frm_instance = htmlspecialchars($_POST['Instance']);
-	$threads = is_numeric($frm_instance)?(int)$frm_instance: 65535; //0 means change all threads per process (65535 should be enough right)
+	$threads = is_numeric($frm_instance)?(int)$frm_instance: 50; // how many threads per process should be processed (50 busiest should be enough right)
+	if ($threads<=0) $threads = 50;
 
 	
 	$frm_process = htmlspecialchars($_POST['Process']);
@@ -166,7 +167,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			  
 			case "SHOW_THREADS":
 			  $footer = "Show Threads for VR Flight Games";
-			  $jsonData = createJsonCommand("SHOW_THREADS", array("argument1" => "NA"));
+			  $jsonData = createJsonCommand("SHOW_THREADS", array("threadsLimit" => $threads));
 			  writeJsonToFile($jsonData, TEMP_FILE);
 			  renameFile(TEMP_FILE, COMMAND_FILE);
 			  break;
@@ -177,7 +178,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			  $jsonData = createJsonCommand("GAME", array(
 				"processName" => "FlightSimulator",
 				"jsonFile" => "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost1.json",
-				"howManyThreads" => $threads
+				"threadsLimit" => $threads
 			  ));
 			  writeJsonToFile($jsonData, TEMP_FILE);
 			  renameFile(TEMP_FILE, COMMAND_FILE);
@@ -189,7 +190,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			  $jsonData = createJsonCommand("GAME", array(
 				"processName" => "FlightSimulator",
 				"jsonFile" => "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost2.json",
-				"howManyThreads" => $threads
+				"threadsLimit" => $threads
 			  ));
 			  writeJsonToFile($jsonData, TEMP_FILE);
 			  renameFile(TEMP_FILE, COMMAND_FILE);
@@ -200,7 +201,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			  $jsonData = createJsonCommand("GAME", array(
 				"processName" => "FlightSimulator",
 				"jsonFile" => "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost3.json",
-				"howManyThreads" => $threads
+				"threadsLimit" => $threads
 			  ));
 			  writeJsonToFile($jsonData, TEMP_FILE);
 			  renameFile(TEMP_FILE, COMMAND_FILE);
