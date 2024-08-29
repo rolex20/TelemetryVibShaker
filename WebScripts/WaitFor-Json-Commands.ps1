@@ -36,6 +36,8 @@ $include_file = Include-Script -FileName "Get-ProcessWatcher.ps1" -Directories $
 $include_file = Include-Script -FileName "Send-IPC-ExitCommand.ps1" -Directories $search_paths
 . $include_file
 
+$include_file = Include-Script -FileName "Check-Admin-Privileges.ps1" -Directories $search_paths
+. $include_file
 
 
 
@@ -48,6 +50,8 @@ try {
 	
 
     # 1- ADJUST PRIORITIES, AFFINITIES, ETC
+
+        Check-Admin-Privileges | Out-Null
 
         $EfficiencyAffinity = 983040 # HyperThreading enabled
         try {
@@ -74,9 +78,8 @@ try {
         # Create the Mutex
         $mutex_owner = $false
         $mutex = New-Object System.Threading.Mutex($false, $mutexName, [ref]$isNew)
-
-        if ($isNew) {
-            $r = $mutex.WaitOne()
+		$r = $mutex.WaitOne(1000)
+        if ($r) {          
             $mutex_owner = $true
             Write-VerboseDebug -Timestamp (Get-Date) -Title "STARTING" -Message "This is the only instance running" -ForegroundColor "Gray"
         } else {
@@ -152,7 +155,7 @@ try {
         $include_file = Include-Script -FileName "Declare-IPC-Server-Action.ps1" -Directories $search_paths
         . $include_file
 
-        $job = Start-ThreadJob -ScriptBlock $ipc_job_action -StreamingHost $Host
+        $job = Start-ThreadJob -ScriptBlock $ipc_job_action -ThrottleLimit 5 -StreamingHost $Host
             
 
     # 8- WATCHDOG: Infinite loop to periodically check-alive in filesystem-watch which some times fails or locks
@@ -161,9 +164,9 @@ try {
 } #end try block
 
 finally {
+    Send-IPC-ExitCommand "ipc_pipe_vr_server_commands"	
+	
     Write-VerboseDebug -Timestamp (Get-Date) -Title "FINALLY" -Message "Disposing objects" -ForegroundColor "Yellow"
-    Send-IPC-ExitCommand "ipc_pipe_vr_server_commands"
-
   
     if ($cm_watcher_objects) {
         $cm_watcher_objects[1].EnableRaisingEvents = $false
@@ -183,9 +186,9 @@ finally {
     $mutex.Close()  
     $mutex.Dispose()
 
+	Write-VerboseDebug -Timestamp (Get-Date) -Title "FINALLY" -Message "Removing CimIndicationEvents" -ForegroundColor "Yellow"	
     Get-Event | Remove-Event -ErrorAction SilentlyContinue
     Get-EventSubscriber | Unregister-Event -ErrorAction SilentlyContinue
-
 } #end finally block
 
 if ($need_restart) {
