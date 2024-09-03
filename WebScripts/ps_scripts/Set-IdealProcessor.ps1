@@ -361,7 +361,8 @@ function Set-ProcessAffinityAndPriority {
 		$ThreadPriority,
         $CpuSet,
         $ChangeCpuSetForProcessAlso,
-        $MaximumThreadsToChange
+        $MaximumThreadsToChange,
+        $OverrideHigherPriority
     )
 
     $ProcessId = $Process.Id
@@ -416,14 +417,21 @@ function Set-ProcessAffinityAndPriority {
 	    foreach ($thread in $sortedThreads) {
             if ($t++ -GT $MaximumThreadsToChange) { break }
 
-		    # Setting thread processor Priority
-            $newPriority = [System.Diagnostics.ThreadPriorityLevel]::$ThreadPriority 
-		    if ($ThreadPriority -ne "DoNotChange" -AND ($thread.PriorityLevel.value__ -LT $newPriority.value__)) { 
-			    Write-Host "Set Priority Class for thread $($thread.Id) = $ThreadPriority"
-			    $thread.PriorityLevel = $newPriority
-		    } else {
-                Write-Host "Warning: This Thread $($thread.Id), has higher priority.  No changes made."
+            # Setting thread processor Priority
+            $flag_change_process_priority = $true;
+            if ($ThreadPriority -EQ "DoNotChange") { $flag_change_process_priority  = $false }
+            elseif ($thread.PriorityLevel.value__ -LT $newPriority.value__) {
+                Write-Host "Warning: This Thread $($thread.Id), has higher priority: $($thread.PriorityLevel), new priority: $newPriority"
+                if ($OverrideHigherPriority) { Write-Host "Override Higer Priority enabled" }
+                else {$flag_change_process_priority = $false }
             }
+
+            if ($flag_change_process_priority) {
+                $newPriority = [System.Diagnostics.ThreadPriorityLevel]::$ThreadPriority
+    			Write-Host "Set Priority Class for thread $($thread.Id) = $ThreadPriority"
+	    		$thread.PriorityLevel = $newPriority
+            }
+
 		
 		    # Setting ProcessAffinity for the ThreadCount
 		    if ($ProcessAffinity -ge 0) {
@@ -639,29 +647,38 @@ function Run-Actions-Per-Game($processName, $fileName, $threadsLimit) {
 				$taffinity = Get-NumericAffinity $action.parameters.thread_ideal_processor $cpuCount
 				$cpuset = Get-Cpu-Set $action.parameters.thread_cpu_sets $cpuCount
 				$changeCpuSetForProcesses = $action.parameters.process_change_cpu_sets
+                $overrideHigherPriority = ( $action.parameters.override_higher_priority -EQ $true)
+                if ($action.parameters.max_threads_to_change -GT 0) { #Check if json/process has different definition for number of threads to change
+                    $threadsLimit = $action.parameters.max_threads_to_change
+                }
+
 				Write-Host " "
 				Write-Host "STARTING [$($process.Name)]"  -ForegroundColor Yellow
 				
 				
-				Set-ProcessAffinityAndPriority -Process $process -ProcessAffinity $paffinity -ProcessPriority $action.parameters.process_priority -ThreadIdealProcessor $taffinity -ThreadPriority $action.parameters.thread_priority -CpuSet $cpuset -ChangeCpuSetForProcessAlso $changeCpuSetForProcesses -MaximumThreadsToChange $threadsLimit
+				Set-ProcessAffinityAndPriority -Process $process -ProcessAffinity $paffinity -ProcessPriority $action.parameters.process_priority -ThreadIdealProcessor $taffinity -ThreadPriority $action.parameters.thread_priority -CpuSet $cpuset -ChangeCpuSetForProcessAlso $changeCpuSetForProcesses -MaximumThreadsToChange $threadsLimit -OverrideHigherPriority $overrideHigherPriority
 
-				foreach ($dependance in $action.parameters.dependances) {
-					$process_names_array = Get-TrimmedProcessNames $dependance.process_name
+				foreach ($dependence in $action.parameters.dependencies) {
+					$process_names_array = Get-TrimmedProcessNames $dependence.process_name
 					foreach ($process_name in $process_names_array) {
 					
 						$depProcesses = Get-Process -Name $process_name -ErrorAction SilentlyContinue
-						foreach($depProcess in $depProcesses) {
-							if (-not $depProcess) { continue}
-					
-							$paffinity = Get-NumericAffinity $dependance.process_affinity $cpuCount
-							$taffinity = Get-NumericAffinity $dependance.thread_ideal_processor $cpuCount
-							$cpuset = Get-Cpu-Set $dependance.thread_cpu_sets $cpuCount
+						foreach($depProcess in $depProcesses) {					
+							$paffinity = Get-NumericAffinity $dependence.process_affinity $cpuCount
+							$taffinity = Get-NumericAffinity $dependence.thread_ideal_processor $cpuCount
+							$cpuset = Get-Cpu-Set $dependence.thread_cpu_sets $cpuCount
+            				$changeCpuSetForProcesses = $dependence.process_change_cpu_sets
+                            $overrideHigherPriority = ( $dependence.override_higher_priority -EQ $true)
+                            if ($dependence.max_threads_to_change -GT 0) { #Check if json/process has different definition for number of threads to change
+                                $threadsLimit = $dependence.max_threads_to_change
+                            }
+
 							
 
 							Write-Host " "
 							Write-Host "STARTING SUB [$($depProcess.Name)]" -ForegroundColor Yellow
 
-							Set-ProcessAffinityAndPriority -Process $depProcess -ProcessAffinity $paffinity -ProcessPriority $dependance.process_priority -ThreadIdealProcessor $taffinity -ThreadPriority $dependance.thread_priority -CpuSet $cpuset -ChangeCpuSetForProcessAlso $changeCpuSetForProcesses -MaximumThreadsToChange $threadsLimit
+							Set-ProcessAffinityAndPriority -Process $depProcess -ProcessAffinity $paffinity -ProcessPriority $dependence.process_priority -ThreadIdealProcessor $taffinity -ThreadPriority $dependence.thread_priority -CpuSet $cpuset -ChangeCpuSetForProcessAlso $changeCpuSetForProcesses -MaximumThreadsToChange $threadsLimit -OverrideHigherPriority $overrideHigherPriority
 						}
 					}
 				}
