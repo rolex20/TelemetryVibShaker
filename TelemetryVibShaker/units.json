@@ -8,6 +8,12 @@
         "volume": 50
       },
       {
+        "typeName": "f-4e_iaf",
+        "AoA1": 11,
+        "AoA2": 15,
+        "volume": 50
+      },	  
+      {
         "typeName": "f-8e_fn",
         "AoA1": 8,
         "AoA2": 12,
@@ -56,6 +62,12 @@
         "volume": 50
       },
       {
+        "typeName": "F-14A Tomcat VF-1 NK100 (1974)",
+        "AoA1": 8,
+        "AoA2": 12,
+        "volume": 50
+      },	  
+      {
         "typeName": "F-14B",
         "AoA1": 8,
         "AoA2": 12,
@@ -73,6 +85,12 @@
         "AoA2": 13,
         "volume": 50
       },
+      {
+        "typeName": "f_15c_baz_msip",
+        "AoA1": 9,
+        "AoA2": 13,
+        "volume": 50
+      },	  
       {
         "typeName": "MiG-29A",
         "AoA1": 10,
@@ -145,6 +163,12 @@
         "AoA2": 12,
         "volume": 50
       },
+      {
+        "typeName": "jaguar_e",
+        "AoA1": 8,
+        "AoA2": 12,
+        "volume": 50
+      },	  
       {
         "typeName": "a_4e_early_iaf",
         "AoA1": 8,
