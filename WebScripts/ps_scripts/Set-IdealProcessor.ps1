@@ -504,14 +504,14 @@ function Show-Process-Thread-Times {
 			$threads = $process.Threads
 
 			# Sort the threads by TotalProcessorTime in descending order
-			$sortedThreads = $threads | Sort-Object TotalProcessorTime -Descending | Select-Object -First $ThreadsLimit | ForEach-Object { [PSCustomObject]@{ Id = $_.Id; TotalProcessorTime = $_.TotalProcessorTime; Cpu_Sets = Get-Cpu-Sets -ThreadID $_.Id } }
+			$sortedThreads = $threads | Sort-Object TotalProcessorTime -Descending | Select-Object -First $ThreadsLimit | ForEach-Object { [PSCustomObject]@{ Id = $_.Id; PriorityLevel= $_.PriorityLevel ; TotalProcessorTime = $_.TotalProcessorTime; Cpu_Sets = Get-Cpu-Sets -ThreadID $_.Id } }
 
 
 			# Print the TotalProcessorTime for each thread
 			Write-Host " " 
-			Write-Host "[ProcessName=$ProcessName], [PID=$($process.Id)], [ThreadCount=$($threads.Count)] - Busiest [$ThreadsLimit] threads:" -ForegroundColor Yellow
+			Write-Host "[ProcessName=$ProcessName], [PID=$($process.Id)], [PriorityClass=$($process.PriorityClass)], [PriocessorAffinity=$($process.ProcessorAffinity)], [ThreadCount=$($threads.Count)] - Busiest [$ThreadsLimit] threads:" -ForegroundColor Yellow
 
-			$sortedThreads | Select-Object Id, @{Name='TotalProcessorTime';Expression={("{0:hh\:mm\:ss\.fff}" -f $_.TotalProcessorTime)}}, Cpu_Sets | Format-Table -AutoSize | Out-String | ForEach-Object { Write-Host $_ }
+			$sortedThreads | Select-Object Id, PriorityLevel, @{Name='TotalProcessorTime';Expression={("{0:hh\:mm\:ss\.fff}" -f $_.TotalProcessorTime)}}, Cpu_Sets | Format-Table -AutoSize | Out-String | ForEach-Object { Write-Host $_ }
 
 		} catch {
 			Write-Host "An error occurred in Show-Process-Thread-Times: $($_.Exception.Message)"
