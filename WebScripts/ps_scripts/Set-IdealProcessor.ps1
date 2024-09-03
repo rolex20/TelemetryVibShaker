@@ -497,21 +497,28 @@ function Show-Process-Thread-Times {
     # Get the process object
     $processes = Get-Process -Name $ProcessName  -ErrorAction SilentlyContinue
     foreach($process in $processes) {
+		
+		try {
 
-        # Get the threads of the process
-        $threads = $process.Threads
+			# Get the threads of the process
+			$threads = $process.Threads
 
-        # Sort the threads by TotalProcessorTime in descending order
-        $sortedThreads = $threads | Sort-Object TotalProcessorTime -Descending | Select-Object -First $ThreadsLimit | ForEach-Object { [PSCustomObject]@{ Id = $_.Id; TotalProcessorTime = $_.TotalProcessorTime; Cpu_Sets = Get-Cpu-Sets -ThreadID $_.Id } }
-
-
-        # Print the TotalProcessorTime for each thread
-        Write-Host " " 
-	    Write-Host "[ProcessName=$ProcessName], [PID=$($process.Id)], [ThreadCount=$($threads.Count)] - Busiest [$ThreadsLimit] threads:" -ForegroundColor Yellow
-
-        $sortedThreads | Select-Object Id, @{Name='TotalProcessorTime';Expression={("{0:hh\:mm\:ss\.fff}" -f $_.TotalProcessorTime)}}, Cpu_Sets | Format-Table -AutoSize | Out-String | ForEach-Object { Write-Host $_ }
+			# Sort the threads by TotalProcessorTime in descending order
+			$sortedThreads = $threads | Sort-Object TotalProcessorTime -Descending | Select-Object -First $ThreadsLimit | ForEach-Object { [PSCustomObject]@{ Id = $_.Id; TotalProcessorTime = $_.TotalProcessorTime; Cpu_Sets = Get-Cpu-Sets -ThreadID $_.Id } }
 
 
+			# Print the TotalProcessorTime for each thread
+			Write-Host " " 
+			Write-Host "[ProcessName=$ProcessName], [PID=$($process.Id)], [ThreadCount=$($threads.Count)] - Busiest [$ThreadsLimit] threads:" -ForegroundColor Yellow
+
+			$sortedThreads | Select-Object Id, @{Name='TotalProcessorTime';Expression={("{0:hh\:mm\:ss\.fff}" -f $_.TotalProcessorTime)}}, Cpu_Sets | Format-Table -AutoSize | Out-String | ForEach-Object { Write-Host $_ }
+
+		} catch {
+			Write-Host "An error occurred in Show-Process-Thread-Times: $($_.Exception.Message)"
+			Write-Host "Error occurred at line: $($_.InvocationInfo.ScriptLineNumber)"
+			[System.Media.SystemSounds]::Hand.Play()
+		}
+		
     }
 
 }
@@ -606,42 +613,60 @@ function Get-Cpu-Set($cpuSet, $cpuCount) {
 }
 
 
+function Get-TrimmedProcessNames {
+    param (
+        [string]$processNames
+    )
+
+    # Split the string by comma and trim each process name
+    $trimmedNames = $processNames -split ',' | ForEach-Object { $_.Trim() }
+
+    return $trimmedNames
+}
+
+
 function Run-Actions-Per-Game($processName, $fileName, $threadsLimit) {
     $cpuCount = Get-CPU-Count
     $actions = Get-ActionsPerGame $fileName
 
     foreach ($action in $actions) {
-        $processes = Get-Process -Name $action.process_name -ErrorAction SilentlyContinue
-        foreach($process in $processes) {
+		$proc_names_array = Get-TrimmedProcessNames $action.process_name
+		foreach ($proc_name in $proc_names_array) {
+			$processes = Get-Process -Name $proc_name -ErrorAction SilentlyContinue
+			foreach($process in $processes) {
 
-            $paffinity = Get-NumericAffinity $action.parameters.process_affinity $cpuCount
-            $taffinity = Get-NumericAffinity $action.parameters.thread_ideal_processor $cpuCount
-            $cpuset = Get-Cpu-Set $action.parameters.thread_cpu_sets $cpuCount
-            $changeCpuSetForProcesses = $action.parameters.process_change_cpu_sets
-            Write-Host " "
-            Write-Host "STARTING $($process.Name)"  -ForegroundColor Yellow
-            
-            
-            Set-ProcessAffinityAndPriority -Process $process -ProcessAffinity $paffinity -ProcessPriority $action.parameters.process_priority -ThreadIdealProcessor $taffinity -ThreadPriority $action.parameters.thread_priority -CpuSet $cpuset -ChangeCpuSetForProcessAlso $changeCpuSetForProcesses -MaximumThreadsToChange $threadsLimit
+				$paffinity = Get-NumericAffinity $action.parameters.process_affinity $cpuCount
+				$taffinity = Get-NumericAffinity $action.parameters.thread_ideal_processor $cpuCount
+				$cpuset = Get-Cpu-Set $action.parameters.thread_cpu_sets $cpuCount
+				$changeCpuSetForProcesses = $action.parameters.process_change_cpu_sets
+				Write-Host " "
+				Write-Host "STARTING [$($process.Name)]"  -ForegroundColor Yellow
+				
+				
+				Set-ProcessAffinityAndPriority -Process $process -ProcessAffinity $paffinity -ProcessPriority $action.parameters.process_priority -ThreadIdealProcessor $taffinity -ThreadPriority $action.parameters.thread_priority -CpuSet $cpuset -ChangeCpuSetForProcessAlso $changeCpuSetForProcesses -MaximumThreadsToChange $threadsLimit
 
-            foreach ($dependance in $action.parameters.dependances) {
-                $depProcesses = Get-Process -Name $dependance.process_name -ErrorAction SilentlyContinue
-                foreach($depProcess in $depProcesses) {
-                    if (-not $depProcess) { continue}
-            
-                    $paffinity = Get-NumericAffinity $dependance.process_affinity $cpuCount
-                    $taffinity = Get-NumericAffinity $dependance.thread_ideal_processor $cpuCount
-                    $cpuset = Get-Cpu-Set $dependance.thread_cpu_sets $cpuCount
-                    
+				foreach ($dependance in $action.parameters.dependances) {
+					$process_names_array = Get-TrimmedProcessNames $dependance.process_name
+					foreach ($process_name in $process_names_array) {
+					
+						$depProcesses = Get-Process -Name $process_name -ErrorAction SilentlyContinue
+						foreach($depProcess in $depProcesses) {
+							if (-not $depProcess) { continue}
+					
+							$paffinity = Get-NumericAffinity $dependance.process_affinity $cpuCount
+							$taffinity = Get-NumericAffinity $dependance.thread_ideal_processor $cpuCount
+							$cpuset = Get-Cpu-Set $dependance.thread_cpu_sets $cpuCount
+							
 
-                    Write-Host " "
-                    Write-Host "STARTING " + $depProcess.Name -ForegroundColor Yellow
+							Write-Host " "
+							Write-Host "STARTING SUB [$($depProcess.Name)]" -ForegroundColor Yellow
 
-                    Set-ProcessAffinityAndPriority -Process $depProcess -ProcessAffinity $paffinity -ProcessPriority $dependance.process_priority -ThreadIdealProcessor $taffinity -ThreadPriority $dependance.thread_priority -CpuSet $cpuset -ChangeCpuSetForProcessAlso $changeCpuSetForProcesses -MaximumThreadsToChange $threadsLimit
-                }
-            }
-        }
-
+							Set-ProcessAffinityAndPriority -Process $depProcess -ProcessAffinity $paffinity -ProcessPriority $dependance.process_priority -ThreadIdealProcessor $taffinity -ThreadPriority $dependance.thread_priority -CpuSet $cpuset -ChangeCpuSetForProcessAlso $changeCpuSetForProcesses -MaximumThreadsToChange $threadsLimit
+						}
+					}
+				}
+			}
+		}
     }
 }
 
@@ -691,6 +716,15 @@ Write-Output $setBits
 # Eample usage:
 #$processName = Read-Host "Enter the process name"
 #Set-IdealProcessorForProcess $processName 3
+
+
+# Example usage
+$processNames = "notepad, chrome , explorer , powershell"
+$trimmedArray = Get-TrimmedProcessNames -processNames $processNames
+
+# Output the result
+$trimmedArray
+
 #>
 
 

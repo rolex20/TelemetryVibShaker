@@ -99,7 +99,7 @@ function Process-CommandFromJson {
 
 
         "PIPE" {
-            ScheduleWatchdogCheck
+            ScheduleWatchdogCheck 60
             Send-MessageViaPipe -pipeName $parameters.pipename -message $parameters.message
 			
         }
@@ -151,8 +151,9 @@ function Process-CommandFromJson {
 
         "SHOW_THREADS" {
             ScheduleWatchdogCheck 20
+			Show-Process-Thread-Times "joystick_gremlin" $parameters.threadsLimit
             Show-Process-Thread-Times "FlightSimulator" $parameters.threadsLimit
-            Show-Process-Thread-Times "aces"  $parameters.threadsLimit
+            #Show-Process-Thread-Times "aces"  $parameters.threadsLimit
             Show-Process-Thread-Times "dcs"  $parameters.threadsLimit
             Show-Process-Thread-Times "OVRServer_x64"  $parameters.threadsLimit
 			

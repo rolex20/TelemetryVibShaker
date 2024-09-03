@@ -41,9 +41,9 @@
         "process_name": "FlightSimulator",
         "parameters": {
             "process_affinity": "P-Cores",
-            "process_priority": "Normal",
+            "process_priority": "AboveNormal",
             "thread_ideal_processor": "P-Cores",
-            "thread_priority": "Normal",
+            "thread_priority": "AboveNormal",
             "thread_cpu_sets": "DoNotChange",
             "process_change_cpu_sets": true,
             "dependances": [
@@ -57,7 +57,7 @@
                 },
                 {
                     "process_name": "OVRServer_x64",
-                    "process_affinity": "DoNotChange",
+                    "process_affinity": "P-Cores",
                     "process_priority": "AboveNormal",
                     "thread_ideal_processor": "P-Cores",
                     "thread_priority": "AboveNormal",
@@ -131,7 +131,7 @@
                 },
                 {
                     "process_name": "OVRServer_x64",
-                    "process_affinity": "DoNotChange",
+                    "process_affinity": "P-Cores",
                     "process_priority": "AboveNormal",
                     "thread_ideal_processor": "P-Cores",
                     "thread_priority": "AboveNormal",
