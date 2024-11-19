@@ -871,9 +871,11 @@ namespace PerformanceMonitor
         }
 
         // Function Inlining: Only in this particular case, I prefer to repeat code in this case instead of passing all parameters to the similar function
-        private void UpdateCounter(float counterValue, ProgressBar pb, Label lbl, string dimensional = "%")
+        private void UpdateCounter(float counterValue, ProgressBar pb, Label lbl, ref int maxCounterValue, string dimensional = "%")
         {
             int v = (int)counterValue;
+            if (v > maxCounterValue) maxCounterValue = v;
+           
 
             
             // Only update the label if it is visible in the selected tab and the value has changed
@@ -1043,34 +1045,35 @@ namespace PerformanceMonitor
 
             maxCpuUtil = 0;
             //Unrolled for now, change everything to arrays later
-            UpdateCounter(counterValues[0], pbCPU0, lblCPU0);
-            UpdateCounter(counterValues[1], pbCPU1, lblCPU1);
-            UpdateCounter(counterValues[2], pbCPU2, lblCPU2);
-            UpdateCounter(counterValues[3], pbCPU3, lblCPU3);
-            UpdateCounter(counterValues[4], pbCPU4, lblCPU4);
-            UpdateCounter(counterValues[5], pbCPU5, lblCPU5);
-            UpdateCounter(counterValues[6], pbCPU6, lblCPU6);
-            UpdateCounter(counterValues[7], pbCPU7, lblCPU7);
-            UpdateCounter(counterValues[8], pbCPU8, lblCPU8);
-            UpdateCounter(counterValues[9], pbCPU9, lblCPU9);
-            UpdateCounter(counterValues[10], pbCPU10, lblCPU10);
-            UpdateCounter(counterValues[11], pbCPU11, lblCPU11);
-            UpdateCounter(counterValues[12], pbCPU12, lblCPU12);
-            UpdateCounter(counterValues[13], pbCPU13, lblCPU13);
-            UpdateCounter(counterValues[14], pbCPU14, lblCPU14);
-            UpdateCounter(counterValues[15], pbCPU15, lblCPU15);
-            UpdateCounter(counterValues[16], pbCPU16, lblCPU16);
-            UpdateCounter(counterValues[17], pbCPU17, lblCPU17);
-            UpdateCounter(counterValues[18], pbCPU18, lblCPU18);
-            UpdateCounter(counterValues[19], pbCPU19, lblCPU19);
-            UpdateCounter(counterValues[20], pbCPU20, lblCPU20);
-            UpdateCounter(counterValues[21], pbCPU21, lblCPU21);
-            UpdateCounter(counterValues[22], pbCPU22, lblCPU22);
-            UpdateCounter(counterValues[23], pbCPU23, lblCPU23);
-            UpdateCounter(counterValues[24], pbCPU24, lblCPU24);
-            UpdateCounter(counterValues[25], pbCPU25, lblCPU25);
-            UpdateCounter(counterValues[26], pbCPU26, lblCPU26);
-            UpdateCounter(counterValues[27], pbCPU27, lblCPU27);
+            UpdateCounter(counterValues[0], pbCPU0, lblCPU0, ref maxCpuUtil);
+
+            UpdateCounter(counterValues[1], pbCPU1, lblCPU1, ref maxCpuUtil);
+            UpdateCounter(counterValues[2], pbCPU2, lblCPU2, ref maxCpuUtil);
+            UpdateCounter(counterValues[3], pbCPU3, lblCPU3, ref maxCpuUtil);
+            UpdateCounter(counterValues[4], pbCPU4, lblCPU4, ref maxCpuUtil);
+            UpdateCounter(counterValues[5], pbCPU5, lblCPU5, ref maxCpuUtil);
+            UpdateCounter(counterValues[6], pbCPU6, lblCPU6, ref maxCpuUtil);
+            UpdateCounter(counterValues[7], pbCPU7, lblCPU7, ref maxCpuUtil);
+            UpdateCounter(counterValues[8], pbCPU8, lblCPU8, ref maxCpuUtil);
+            UpdateCounter(counterValues[9], pbCPU9, lblCPU9, ref maxCpuUtil);
+            UpdateCounter(counterValues[10], pbCPU10, lblCPU10, ref maxCpuUtil);
+            UpdateCounter(counterValues[11], pbCPU11, lblCPU11, ref maxCpuUtil);
+            UpdateCounter(counterValues[12], pbCPU12, lblCPU12, ref maxCpuUtil);
+            UpdateCounter(counterValues[13], pbCPU13, lblCPU13, ref maxCpuUtil);
+            UpdateCounter(counterValues[14], pbCPU14, lblCPU14, ref maxCpuUtil);
+            UpdateCounter(counterValues[15], pbCPU15, lblCPU15, ref maxCpuUtil);
+            UpdateCounter(counterValues[16], pbCPU16, lblCPU16, ref maxCpuUtil);
+            UpdateCounter(counterValues[17], pbCPU17, lblCPU17, ref maxCpuUtil);
+            UpdateCounter(counterValues[18], pbCPU18, lblCPU18, ref maxCpuUtil);
+            UpdateCounter(counterValues[19], pbCPU19, lblCPU19, ref maxCpuUtil);
+            UpdateCounter(counterValues[20], pbCPU20, lblCPU20, ref maxCpuUtil);
+            UpdateCounter(counterValues[21], pbCPU21, lblCPU21, ref maxCpuUtil);
+            UpdateCounter(counterValues[22], pbCPU22, lblCPU22, ref maxCpuUtil);
+            UpdateCounter(counterValues[23], pbCPU23, lblCPU23, ref maxCpuUtil);
+            UpdateCounter(counterValues[24], pbCPU24, lblCPU24, ref maxCpuUtil);
+            UpdateCounter(counterValues[25], pbCPU25, lblCPU25, ref maxCpuUtil);
+            UpdateCounter(counterValues[26], pbCPU26, lblCPU26, ref maxCpuUtil);
+            UpdateCounter(counterValues[27], pbCPU27, lblCPU27, ref maxCpuUtil);
 
 
             // Always Track max Cpu util (alarms)
