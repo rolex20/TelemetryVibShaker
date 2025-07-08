@@ -51,7 +51,7 @@ TelemetryVibShaker is a high-performance Windows application that provides real-
 ---
 
 ## Usage
-- Start your flight simulator and ensure it is sending telemetry to the configured UDP port.
+- Start your flight simulator and telemetry program (find it in this Github space) and ensure it is sending telemetry to the configured UDP port.
 - Use the UI to test vibration motors and sound effects.
 - Monitor real-time feedback and statistics in the Monitor tab.
 - Adjust settings as needed for your aircraft and hardware.
@@ -59,7 +59,7 @@ TelemetryVibShaker is a high-performance Windows application that provides real-
 ---
 
 ## Screenshots
-*(Add screenshots of the main UI, settings, and monitor tabs here)*
+*(TODO: screenshots of the main UI, settings, and monitor tabs here)*
 
 ---
 
