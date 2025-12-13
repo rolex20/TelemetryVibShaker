@@ -1,6 +1,11 @@
 {
   "programs": [
     {
+      "friendlyName": "Fanatec Pedals Monitor (Racing)",
+      "processName": "fanatecmonitor_RaptorLake",
+      "path": "C:\\Users\\ralch\\Desktop\\Fanatec Monitor - Race.lnk"
+    },
+    {
       "friendlyName": "Calc",
       "processName": "CalculatorApp",
       "path": "calc.exe"

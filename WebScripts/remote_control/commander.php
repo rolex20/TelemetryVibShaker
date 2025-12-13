@@ -4,6 +4,17 @@ const TEMP_FILE = 'command.tmp';
 const WATCHDOG_FILE = 'watchdog.txt';
 const PROGRAMS_JSON = 'programs.json';
 
+function getProgramsList() {
+    if (!file_exists(PROGRAMS_JSON)) {
+        return array();
+    }
+    $jsonData = file_get_contents(PROGRAMS_JSON);
+    $data = json_decode($jsonData, true);
+    
+    // Check if key exists using ternary operator instead of ??
+    return isset($data['programs']) ? $data['programs'] : array();
+}
+
 function createJsonCommand($commandType, $parameters = array()) {
   $data = array(
     "command_type" => $commandType,
@@ -173,9 +184,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			  break;
 			
   
-			case "MSFS1":
-			  $footer = "Boost Level 1 for MSFS Priority + Reassign-Ideal-Processors";
-			  $jsonData = createJsonCommand("GAME", array(
+			case "BOOST_1":
+			  $footer = "Boost Level 1: AboveNormal_Priority + Reassign-Ideal-Processors";
+			  $jsonData = createJsonCommand("GAME_BOOST", array(
 				"processName" => "FlightSimulator",
 				"jsonFile" => "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost1.json",
 				"threadsLimit" => $threads
@@ -185,9 +196,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			  break;
 				  
 
-			case "MSFS2":			
-			  $footer = "Boost Level 2 for MSFS Priority + Reassign-Ideal-Processors + CPU_SETS";
-			  $jsonData = createJsonCommand("GAME", array(
+			case "BOOST_2":			
+			  $footer = "Boost Level 2: AboveNormal_Priority + Reassign-Ideal-Processors + CPU_SETS";
+			  $jsonData = createJsonCommand("GAME_BOOST", array(
 				"processName" => "FlightSimulator",
 				"jsonFile" => "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost2.json",
 				"threadsLimit" => $threads
@@ -196,40 +207,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			  renameFile(TEMP_FILE, COMMAND_FILE);
 			  break;
 			  
-			case "MSFS3":
-			  $footer = "Boost Level 3 for MSFS Priority + Reassign-Ideal-Processors + Hard-Affinities";
-			  $jsonData = createJsonCommand("GAME", array(
+			case "BOOST_3":
+			  $footer = "Boost Level 3: AboveNormal_Priority + Reassign-Ideal-Processors + Hard-Affinities";
+			  $jsonData = createJsonCommand("GAME_BOOST", array(
 				"processName" => "FlightSimulator",
 				"jsonFile" => "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost3.json",
 				"threadsLimit" => $threads
 			  ));
 			  writeJsonToFile($jsonData, TEMP_FILE);
 			  renameFile(TEMP_FILE, COMMAND_FILE);
-			  break;
-			  
-			  
-			case "ACES":
-			  $footer = "All Boost for War Thunder (Affinity, Priority and Reassign Ideal Processors)";
-			  $jsonData = createJsonCommand("GAME", array(
-				"processName" => "aces",
-				"jsonFile" => "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost1.json",
-				"howManyThreads" => $threads
-			  ));
-			  writeJsonToFile($jsonData, TEMP_FILE);
-			  renameFile(TEMP_FILE, COMMAND_FILE);
-			  break;			  
-
-			case "DCS":
-			  $footer = "Boost for DCS World[Priority]: OVR_Server[Priority, Affinity, Ideal Processors] and Joystick_Gremlin[Priority, Affinity, Ideal Processors]";
-			  $jsonData = createJsonCommand("GAME", array(
-				"processName" => "dcs",
-				"jsonFile" => "C:\\MyPrograms\\My Apps\\TelemetryVibShaker\\WebScripts\\ps_scripts\\action-per-process-boost1.json",
-				"howManyThreads" => $threads
-			  ));
-			  writeJsonToFile($jsonData, TEMP_FILE);
-			  renameFile(TEMP_FILE, COMMAND_FILE);
-			  break;	
-		
+			  break;			  	
 				
 			default:
 			  if (strpos($pipe_tuple, '|') !== false) {
@@ -252,9 +239,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	// CHECK FOR LAUNCH COMMAND
 	$post_command = isset($_POST['Launch'])? $_POST['Launch']: "";
 	if ($post_command == "Launch") { // Check if the comand requested was to Launch a program
-		$jsonFilePath = 'programs.json';
 		$processName = $_POST['Process'];
-		$path = getPathByProcessName($jsonFilePath, $processName);
+		$path = getPathByProcessName(PROGRAMS_JSON, $processName);
 
 		if ($path !== null) {
 			$footer = "Launch completed - '$processName': $path\n";
@@ -482,21 +468,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		<!-- Combo box for options -->
 		<label for="Process">Select Process:</label>
 		<select id='Process' name='Process' required>
-			<option  value='PerformanceMonitor'>PerformanceMonitor</option>
-			<option  value='WarThunderExporter'>WarThunderExporter</option>
-			<option  value='TelemetryVibShaker'>TelemetryVibShaker</option>
-			<option  value='FalconExporter'>FalconExporter</option>
-			<option  value='RemoteWindowControl'>RemoteWindowControl</option>
-			<option  value='SimConnectExporter'>SimConnectExporter</option>
-			<option  value='dcs'>DCS World</option>
-			<option  value='FlightSimulator'>Microsoft Flight Simulator</option>
-			<option  value='aces'>War Thunder</option>
-			<option  value='falcon'>Falcon BMS</option>
-			<option  value='Time'>Clock</option>			
-			<option  value='HWiNFO64'>HWiNFO64</option>
-			<option  value='msedge'>Edge Web Browser</option>			
-			<option  value='CalculatorApp'>Calc</option>
-			<option  value='Notepad'>Notepad</option>			
+            <?php
+            $programs = getProgramsList();
+            foreach ($programs as $prog) {
+                $pName = htmlspecialchars($prog['processName']);
+                // Use friendlyName if available, otherwise fallback to processName
+                $fName = htmlspecialchars(isset($prog['friendlyName']) ? $prog['friendlyName'] : $pName);
+                echo "<option value='$pName'>$fName</option>";
+            }
+            ?>
 		</select>
 
 
@@ -532,11 +512,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			<option value="BALANCED80">POWER SCHEME: BALANCED MAX 80</option>
 			<option value="READPOWERSCHEME">READ CURRENT POWER PLAN</option>			
 			<option value="SHOW_THREADS">Show Thread times for VR Flight Games</option>
-			<option value="MSFS1">BOOST1(MSFS): AboveNormal, P-Cores: IdealThread</option>
-			<option value="MSFS2">BOOST2(MSFS): AboveNormal, P-Cores: IdealThread + CPU_SETS</option>			
-			<option value="MSFS3">BOOST3(MSFS): AboveNormal, P-Cores: IdealThread + Affinity</option>
-			<option value="ACES">BOOST FOR WAR THUNDER</option>			
-			<option value="DCS">BOOST FOR DCS WORLD</option>			
+			<option value="BOOST_1">BOOST 1: AboveNormal, IdealThread: P-Cores</option>
+			<option value="BOOST_2">BOOST 2: AboveNormal, IdealThread: P-Cores + CPU_SETS</option>			
+			<option value="BOOST_3">BOOST 3: AboveNormal, IdealThread: P-Cores + Hard Affinity</option>
 		</select>
 		
 		<br><label id="lblCommand" for="PipeCommand">Select Pipe Command:</label>
