@@ -45,6 +45,78 @@
         }
     },
     {
+        "process_name": "SGWContracts2",
+        "parameters": {
+            "process_affinity": "DoNotChange",
+            "process_priority": "AboveNormal",
+            "thread_ideal_processor": "P-Cores",
+            "thread_priority": "AboveNormal",
+            "thread_cpu_sets": "P-Cores",
+            "process_change_cpu_sets": true,
+            "override_higher_priority": false,
+            "dependencies": [
+                {
+                    "process_name": "steamwebhelper",
+                    "process_affinity": "E-Cores",
+                    "process_priority": "Idle",
+                    "thread_ideal_processor": "E-Cores",
+                    "thread_priority": "Idle",
+                    "thread_cpu_sets": "E-Cores",
+                    "process_change_cpu_sets": true,
+                    "override_higher_priority": true
+                }
+            ]
+        }
+    },	
+    {
+        "process_name": "acs",
+        "parameters": {
+            "process_affinity": "P-Cores",
+            "process_priority": "AboveNormal",
+            "thread_ideal_processor": "P-Cores",
+            "thread_priority": "AboveNormal",
+            "thread_cpu_sets": "DoNotChange",
+            "process_change_cpu_sets": true,
+            "override_higher_priority": false,
+            "max_threads_to_change": 5,
+            "dependencies": [
+                {
+                    "process_name": "steamwebhelper",
+                    "process_affinity": "E-Cores",
+                    "process_priority": "Idle",
+                    "thread_ideal_processor": "E-Cores",
+                    "thread_priority": "Idle",
+                    "thread_cpu_sets": "E-Cores",
+                    "process_change_cpu_sets": true,
+                    "override_higher_priority": true,
+                    "max_threads_to_change": 1000
+                },
+                {
+                    "process_name": "OVRServer_x64",
+                    "process_affinity": "P-Cores",
+                    "process_priority": "AboveNormal",
+                    "thread_ideal_processor": "P-Cores",
+                    "thread_priority": "AboveNormal",
+                    "thread_cpu_sets": "DoNotChange",
+                    "process_change_cpu_sets": true,
+                    "override_higher_priority": false,
+                    "max_threads_to_change": 5
+                },
+                {
+                    "process_name": "joystick_gremlin",
+                    "process_affinity": "DoNotChange",
+                    "process_priority": "High",
+                    "thread_ideal_processor": "E-Cores",
+                    "thread_priority": "DoNotChange",
+                    "thread_cpu_sets": "E-Cores",
+                    "process_change_cpu_sets": true,
+                    "override_higher_priority": false,
+                    "max_threads_to_change": 5
+                }
+            ]
+        }
+    },	
+    {
         "process_name": "FlightSimulator",
         "parameters": {
             "process_affinity": "P-Cores",

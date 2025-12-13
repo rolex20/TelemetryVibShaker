@@ -349,6 +349,65 @@ function Get-SetBits {
     return [int[]]$setBits
 }
 
+function Restore-ProcessToDefaults {
+    <#
+    .SYNOPSIS
+        Restores a process to default settings based on its original boost parameters.
+    #>
+    param (
+        [Parameter(Mandatory)]
+        $Process,
+        
+        [Parameter(Mandatory)]
+        $OriginalParameters,
+        
+        [int]$threadsLimit = 50
+    )
+
+    $cpuCount = Get-CPU-Count
+    
+    # Prepare a parameters hashtable for splatting to Set-ProcessAffinityAndPriority
+    $restoreParams = @{
+        Process = $Process
+        MaximumThreadsToChange = $threadsLimit
+        OverrideHigherPriority = $true  # Always override to ensure a clean restore
+        ChangeCpuSetForProcessAlso = $false # We are clearing sets, not setting new defaults
+    }
+
+    # Conditionally set parameters for restoration only if they were originally changed.
+    if ($OriginalParameters.process_priority -ne 'DoNotChange') {
+        $restoreParams.ProcessPriority = 'Normal'
+    } else {
+        $restoreParams.ProcessPriority = 'DoNotChange'
+    }
+
+    if ($OriginalParameters.thread_priority -ne 'DoNotChange') {
+        $restoreParams.ThreadPriority = 'Normal'
+    } else {
+        $restoreParams.ThreadPriority = 'DoNotChange'
+    }
+
+    if ($OriginalParameters.process_affinity -ne 'DoNotChange') {
+        $restoreParams.ProcessAffinity = Get-AllCoreAffinity -cpuCount $cpuCount
+    } else {
+        $restoreParams.ProcessAffinity = -1 # Signal DoNotChange
+    }
+
+    if ($OriginalParameters.thread_ideal_processor -ne 'DoNotChange') {
+        $restoreParams.ThreadIdealProcessor = Get-AllCoreAffinity -cpuCount $cpuCount
+    } else {
+        $restoreParams.ThreadIdealProcessor = -1 # Signal DoNotChange
+    }
+
+    if ($OriginalParameters.thread_cpu_sets -ne 'DoNotChange') {
+        $restoreParams.CpuSet = @() # An empty array clears the CPU sets
+    } else {
+        $restoreParams.CpuSet = $null # Signal DoNotChange
+    }
+    
+    # Call the main function with the intelligently constructed restore parameters.
+    Set-ProcessAffinityAndPriority @restoreParams
+}
 
 #Given a Process.ID it reassigs Affinity and Ideal Processor (round robin)
 #The new ideal processor will be only from the Affinity allowed
@@ -420,10 +479,13 @@ function Set-ProcessAffinityAndPriority {
             # Setting thread processor Priority
             $flag_change_process_priority = $true;
             if ($ThreadPriority -EQ "DoNotChange") { $flag_change_process_priority  = $false }
-            elseif ($thread.PriorityLevel.value__ -LT $newPriority.value__) {
-                Write-Host "Warning: This Thread $($thread.Id), has higher priority: $($thread.PriorityLevel), new priority: $newPriority"
-                if ($OverrideHigherPriority) { Write-Host "Override Higer Priority enabled" }
-                else {$flag_change_process_priority = $false }
+            else {
+                $newPriority = [System.Diagnostics.ThreadPriorityLevel]::$ThreadPriority
+                if ($thread.PriorityLevel.value__ -GT $newPriority.value__) {                
+                    Write-Host "Warning: This Thread $($thread.Id), has higher priority: $($thread.PriorityLevel), new wanted priority: $newPriority"
+                    if ($OverrideHigherPriority) { Write-Host "Warning: Override Higer Priority enabled."  }
+                    else {$flag_change_process_priority = $false }
+                }
             }
 
             if ($flag_change_process_priority) {
@@ -636,7 +698,7 @@ function Get-TrimmedProcessNames {
 function Run-Actions-Per-Game($processName, $fileName, $threadsLimit) {
     $cpuCount = Get-CPU-Count
     $actions = Get-ActionsPerGame $fileName
-
+	
     foreach ($action in $actions) {
 		$proc_names_array = Get-TrimmedProcessNames $action.process_name
 		foreach ($proc_name in $proc_names_array) {
@@ -686,9 +748,6 @@ function Run-Actions-Per-Game($processName, $fileName, $threadsLimit) {
 		}
     }
 }
-
-
-
 
 
 <#

@@ -143,7 +143,7 @@ function Process-CommandFromJson {
 
         }
 
-        "GAME" {
+        "GAME_BOOST" {
             ScheduleWatchdogCheck 20
             Run-Actions-Per-Game $parameters.processName $parameters.jsonFile $parameters.threadsLimit			
         }
@@ -155,9 +155,13 @@ function Process-CommandFromJson {
             Show-Process-Thread-Times "FlightSimulator" $parameters.threadsLimit
             #Show-Process-Thread-Times "aces"  $parameters.threadsLimit
             Show-Process-Thread-Times "dcs"  $parameters.threadsLimit
-            Show-Process-Thread-Times "OVRServer_x64"  $parameters.threadsLimit
-			
+            Show-Process-Thread-Times "OVRServer_x64"  $parameters.threadsLimit			
         }
+		
+		"GAME_RESTORE" {
+			ScheduleWatchdogCheck 20
+			Restore-Processes-To-Default $parameters.processNames
+		}		
 
         default {
             ScheduleWatchdogCheck 

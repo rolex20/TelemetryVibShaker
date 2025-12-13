@@ -156,9 +156,13 @@ try {
         . $include_file
 
         $job = Start-ThreadJob -ScriptBlock $ipc_job_action -ThrottleLimit 5 -StreamingHost $Host
+
+
+    # 8 - Report whenever war-thunder rewrites my customized distance multiplier
+        . "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Monitor-War-Thunder-Distance-Multiplier.ps1"
             
 
-    # 8- WATCHDOG: Infinite loop to periodically check-alive in filesystem-watch which some times fails or locks
+    # 9- WATCHDOG: Infinite loop to periodically check-alive in filesystem-watch which some times fails or locks
         $need_restart = Watchdog_Operations
 
 } #end try block
