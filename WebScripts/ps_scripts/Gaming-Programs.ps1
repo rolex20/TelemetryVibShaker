@@ -28,18 +28,19 @@
 # The structure is a hash table where:
 #   - The 'Key' is the process name including the .exe extension (e.g., "DCS.exe").
 #   - The 'Value' is another hash table containing the 'Start' and 'Stop' power schemes,
-#     and an optional 'BoostAction' JSON file.
+#     and optional fields like 'BoostAction' (JSON file), 'Speak' (text-to-speech), and
+#     'AuxPrograms' (array of helper executables to auto-launch when the game starts).
 #------------------------------------------------------------------------------------
 $Global:GameProfiles = @{
-    "Notepad.exe"                      = @{ Start = "Balanced"; Stop = "Balanced" ; Speak = "Notepad" } #; BoostAction = "action-per-process-boost1.json" }
+    "Notepad.exe"                      = @{ Start = "Balanced"; Stop = "Balanced" ; Speak = "Notepad"; AuxPrograms = @() } #; BoostAction = "action-per-process-boost1.json" }
     "DCS.exe"                          = @{ Start = "High Performance"; Stop = "Balanced" }
     "aces.exe"                         = @{ Start = "High Performance"; Stop = "Balanced" }
     "FlightSimulator.exe"              = @{ Start = "High Performance"; Stop = "Balanced" }
-    "Ace7Game.exe"                     = @{ Start = "Balanced"; Stop = "Balanced" } #; BoostAction = "action-per-process-boost1.json" }	
+    "Ace7Game.exe"                     = @{ Start = "Balanced"; Stop = "Balanced" } #; BoostAction = "action-per-process-boost1.json" }
     "forza_steamworks_release_final.exe" = @{ Start = "Balanced"; Stop = "Balanced" }
     "forzamotorsport7.exe"             = @{ Start = "Balanced"; Stop = "Balanced" }
-    "AssettoCorsa.exe"                 = @{ Start = "Balanced"; Stop = "Balanced" }
-	"TiWorker.exe"                     = @{ Comment = "Ti-Worker" }
+    "AssettoCorsa.exe"                 = @{ Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\\Tools\\FanatecPedalMonitor.exe") }
+        "TiWorker.exe"                     = @{ Comment = "Ti-Worker" }
 }
 # "Ace7Game.exe"                     = @{ Start = "High Performance"; Stop = "Balanced" ; BoostAction = "action-per-process-boost1.json" }
 # "Ace7Game.exe"                     = @{ Start = "Balanced"; Stop = "Balanced" } #; BoostAction = "action-per-process-boost1.json" }
@@ -119,5 +120,27 @@ function Get-GameSpeakMessage {
     
     # Return null if no speak action is configured for the program.
     return $null
+}
+
+function Get-GameAuxPrograms {
+    <#
+    .SYNOPSIS
+        Retrieves auxiliary programs to launch when a given program starts, if configured.
+    #>
+    param (
+        [Parameter(Mandatory)]
+        [string]$programName
+    )
+
+    if ($Global:GameProfiles.ContainsKey($programName) -and $Global:GameProfiles[$programName].ContainsKey('AuxPrograms')) {
+        $auxPrograms = $Global:GameProfiles[$programName].AuxPrograms
+        if ($null -eq $auxPrograms) {
+            return @()
+        }
+
+        return $auxPrograms
+    }
+
+    return @()
 }
 

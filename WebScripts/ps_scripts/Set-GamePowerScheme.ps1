@@ -70,14 +70,17 @@ function Play-SeatBelt() {
 
 function Set-GamePowerScheme($traceName, $programName) {
     $powerSchemes = $null
-	
-	# Check if there is a Speak action defined
-	$speakText = Get-GameSpeakMessage -programName $programName
-	
-	# First, do the power scheme
+
+        # Check if there is a Speak action defined
+        $speakText = Get-GameSpeakMessage -programName $programName
+
+        # Retrieve any auxiliary programs configured for this title
+        $auxPrograms = Get-GameAuxPrograms -programName $programName
+
+        # First, do the power scheme
     switch ($traceName) {
-        "Win32_ProcessStartTrace" { 
-            $powerSchemes = Get-StartPowerSchemes 
+        "Win32_ProcessStartTrace" {
+            $powerSchemes = Get-StartPowerSchemes
 			if ($speakText) {
 				Write-VerboseDebug -Timestamp (Get-Date) -Title "PROCESS STARTED:" -ForegroundColor "Yellow" -Speak $true -Message $speakText
 			}
@@ -107,13 +110,28 @@ function Set-GamePowerScheme($traceName, $programName) {
 	# Next, do the boost if required by the game
 	Start-Sleep -Seconds 5	
     switch ($traceName) {
-        "Win32_ProcessStartTrace" { 
-            #$powerSchemes = Get-StartPowerSchemes 
-            
+        "Win32_ProcessStartTrace" {
+            #$powerSchemes = Get-StartPowerSchemes
+
+            # Launch auxiliaries linked to the game
+            foreach ($aux in $auxPrograms) {
+                if ([string]::IsNullOrWhiteSpace($aux)) {
+                    continue
+                }
+
+                if (Test-Path $aux) {
+                    Write-VerboseDebug -Timestamp (Get-Date) -Title "AUX START" -ForegroundColor "Green" -Message "Launching $aux"
+                    Start-Process -FilePath $aux
+                }
+                else {
+                    Write-VerboseDebug -Timestamp (Get-Date) -Title "AUX START" -ForegroundColor "DarkYellow" -Message "Aux program not found: $aux"
+                }
+            }
+
             # Look for a boost action using the full program name (with .exe).
             $boostJsonPath = Get-GameBoostActions -programName $programName
             if ($boostJsonPath -and (Test-Path $boostJsonPath)) {
-				Play-SeatBelt
+                                Play-SeatBelt
                 Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST" -Message "Applying boost for '$programName' from '$boostJsonPath'" -ForegroundColor "Green"
                 # Call Run-Actions-Per-Game with the EXTENSION-LESS name for JSON compatibility.
                 $normalizedProgramName = $programName -replace '\.exe$', ''
