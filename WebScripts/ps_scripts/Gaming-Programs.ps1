@@ -15,10 +15,6 @@
     "NewGame.exe" = @{ Start = "High Performance"; Stop = "Balanced"; BoostAction = "action-per-process-boost-new.json" }
     
     The functions will automatically include the new game without any further modification.
-
-.NOTES
-    Last Edit:   2025-12-11
-    Version:     1.2
 #>
 
 #------------------------------------------------------------------------------------
@@ -32,15 +28,16 @@
 #     'AuxPrograms' (array of helper executables to auto-launch when the game starts).
 #------------------------------------------------------------------------------------
 $Global:GameProfiles = @{
-    "Notepad.exe"                      = @{ Start = "Balanced"; Stop = "Balanced" ; Speak = "Notepad"; AuxPrograms = @() } #; BoostAction = "action-per-process-boost1.json" }
+    "Notepad.exe"                      = @{ AuxPrograms = @("C:\Users\ralch\Desktop\Fanatec Monitor - Race.lnk") } #; BoostAction = "action-per-process-boost1.json" }
     "DCS.exe"                          = @{ Start = "High Performance"; Stop = "Balanced" }
     "aces.exe"                         = @{ Start = "High Performance"; Stop = "Balanced" }
     "FlightSimulator.exe"              = @{ Start = "High Performance"; Stop = "Balanced" }
     "Ace7Game.exe"                     = @{ Start = "Balanced"; Stop = "Balanced" } #; BoostAction = "action-per-process-boost1.json" }
-    "forza_steamworks_release_final.exe" = @{ Start = "Balanced"; Stop = "Balanced" }
-    "forzamotorsport7.exe"             = @{ Start = "Balanced"; Stop = "Balanced" }
-    "AssettoCorsa.exe"                 = @{ Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\\Tools\\FanatecPedalMonitor.exe") }
-        "TiWorker.exe"                     = @{ Comment = "Ti-Worker" }
+    "forza_steamworks_release_final.exe" = @{ Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\Fanatec Monitor - Race.lnk") }
+    "forzamotorsport7.exe"             = @{ Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\Fanatec Monitor - Race.lnk") }
+	"ForzaHorizon5.exe"                = @{ Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\Fanatec Monitor - Race.lnk") }
+    "AssettoCorsa.exe"                 = @{ Start = "Balanced"; Stop = "Balanced" ; AuxPrograms = @("C:\Users\ralch\Desktop\Fanatec Monitor - Race.lnk") }
+    "TiWorker.exe"                     = @{ Speak = "Check if yor game is running slower because of the Ti-Worker process." }
 }
 # "Ace7Game.exe"                     = @{ Start = "High Performance"; Stop = "Balanced" ; BoostAction = "action-per-process-boost1.json" }
 # "Ace7Game.exe"                     = @{ Start = "Balanced"; Stop = "Balanced" } #; BoostAction = "action-per-process-boost1.json" }
@@ -143,4 +140,3 @@ function Get-GameAuxPrograms {
 
     return @()
 }
-
