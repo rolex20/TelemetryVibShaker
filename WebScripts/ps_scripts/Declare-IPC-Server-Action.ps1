@@ -9,6 +9,19 @@
     # Variable to control the server loop
     $global:IPC_ContinueServer = $true
 
+    # ---------------------------------------------------------
+    # OPTIMIZATION: Initialize TTS Engine ONCE at startup
+    # ---------------------------------------------------------
+    Add-Type -AssemblyName System.speech
+    $tts = New-Object System.Speech.Synthesis.SpeechSynthesizer
+    
+    try {
+        $tts.SelectVoiceByHints([System.Speech.Synthesis.VoiceGender]::Female, [System.Speech.Synthesis.VoiceAge]::Adult)
+    } catch {
+        Write-Host "Warning: Requested voice not found, using default."
+    }
+    $tts.Rate = 0	
+
 # Import necessary functions from user32.dll
 Add-Type @"
     using System;
@@ -27,6 +40,18 @@ Add-Type @"
         )
 
         $hwnd = (Get-Process -Id $pid).MainWindowHandle
+
+        # ---------------------------------------------------------
+        # HANDLE "SPEAK" COMMAND
+        # We check this before the switch because it contains dynamic text
+        # ---------------------------------------------------------
+        if ($command.StartsWith("SPEAK: ")) {
+            $textToSay = $command.Substring(7) # Remove "SPEAK: " prefix
+            
+            # Use SpeakAsync so we don't block the pipe listener
+            $tts.SpeakAsync($textToSay) | Out-Null
+            return
+        }		
 
         switch ($command) {
             "MINIMIZE" {
@@ -147,5 +172,6 @@ Add-Type @"
         }
     }
     $mutex.Dispose()
+	if ($tts) { $tts.Dispose() }
 	Write-Host "IPC Pipe Server terminated."
 }
