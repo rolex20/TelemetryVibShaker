@@ -42,18 +42,21 @@ Add-Type @"
         $hwnd = (Get-Process -Id $pid).MainWindowHandle
 
         # ---------------------------------------------------------
-        # HANDLE "SPEAK" COMMAND
-        # We check this before the switch because it contains dynamic text
+        # CLEAN PARSING: Verb + Payload
+        # Split the string into maximum 2 parts using space as delimiter.
+        # Example: "SPEAK Hello World" -> $verb="SPEAK", $payload="Hello World"
+        # Example: "MINIMIZE"          -> $verb="MINIMIZE", $payload=$null
         # ---------------------------------------------------------
-        if ($command.StartsWith("SPEAK: ")) {
-            $textToSay = $command.Substring(7) # Remove "SPEAK: " prefix
-            
-            # Use SpeakAsync so we don't block the pipe listener
-            $tts.SpeakAsync($textToSay) | Out-Null
-            return
-        }		
-
-        switch ($command) {
+        $parts = $command -split ' ', 2
+        $verb = $parts[0]
+        $payload = if ($parts.Count -gt 1) { $parts[1] } else { $null }
+		
+        switch ($verb) {
+            "SPEAK" {
+                if ($payload) {
+                    $tts.SpeakAsync($payload) | Out-Null
+                }
+            }		
             "MINIMIZE" {
                 [IPC_User32]::ShowWindow($hwnd, 6)  # SW_MINIMIZE
             }
@@ -114,7 +117,7 @@ Add-Type @"
                 $global:IPC_ContinueServer = $false
             }
             default {
-                Write-Output "Unknown command: $command"
+                Write-Output "Unknown command: $verb"
             }
         }
     }
