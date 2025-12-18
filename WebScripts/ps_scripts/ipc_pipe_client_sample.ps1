@@ -7,6 +7,7 @@ function Send-Command {
         [string]$command
     )
 
+	Write-Output "SERVER PIPE NAME: [$pipeName]"
     try {
         $pipeClient = New-Object System.IO.Pipes.NamedPipeClientStream(".", $pipeName, [System.IO.Pipes.PipeDirection]::InOut)
         $pipeClient.Connect(1000) # Timeout after 1 second if the server is not available
@@ -25,15 +26,17 @@ function Send-Command {
 
         $pipeClient.Close()
     } catch {
-        Write-Output "Failed to connect to the server. Make sure the server is running."
+        Write-Host "Failed to connect to the server. Make sure the server is running. $($_.Exception.GetType().FullName) - $($_.Exception.Message)"   -ForegroundColor Red
+
     }
 }
 
 # Main loop to prompt for commands
 while ($true) {
-    $command = Read-Host "Enter command (MINIMIZE, MAXIMIZE, RESTORE, SHOW_PROCESS, ECHO, EXIT)"
-    Send-Command -command $command
-    if ($command -eq "EXIT") {
+    $command = Read-Host "Enter command (MINIMIZE, MAXIMIZE, RESTORE, SHOW_PROCESS, ECHO, EXIT, SPEAK <something>), QUIT"
+    if ($command -eq "QUIT") {
         break
-    }
+    }	
+    Send-Command -command $command
+
 }

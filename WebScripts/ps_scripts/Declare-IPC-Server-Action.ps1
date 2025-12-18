@@ -1,10 +1,45 @@
 ﻿$ipc_job_action = {
+. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
+$search_paths = @("C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts", "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts")
+$include_file = Include-Script -FileName "Write-VerboseDebug.ps1" -Directories $search_paths
+. $include_file
+
     # Define the named pipe
     $pipeName = "ipc_pipe_vr_server_commands"
     $maxInstances = 2  # Set the maximum number of instances
 
     # Create the named pipe server
-    $pipeServer = New-Object System.IO.Pipes.NamedPipeServerStream($pipeName, [System.IO.Pipes.PipeDirection]::InOut, $maxInstances)
+    #$pipeServer = New-Object System.IO.Pipes.NamedPipeServerStream($pipeName, [System.IO.Pipes.PipeDirection]::InOut, $maxInstances)
+
+
+
+    # 1. Create the Security Object
+    $pipeSecurity = New-Object System.IO.Pipes.PipeSecurity
+
+    # 2. Get the "Everyone" SID (WorldSid)
+    # This works on all versions of Windows (English, Spanish, etc.)
+    $everyoneSid = New-Object System.Security.Principal.SecurityIdentifier([System.Security.Principal.WellKnownSidType]::WorldSid, $null)
+
+    # 3. Create the Access Rule (Grant Everyone Read/Write access)
+    $accessRule = New-Object System.IO.Pipes.PipeAccessRule(
+        $everyoneSid, 
+        [System.IO.Pipes.PipeAccessRights]::ReadWrite, 
+        [System.Security.AccessControl.AccessControlType]::Allow
+    )
+    $pipeSecurity.AddAccessRule($accessRule)
+
+    # 4. Initialize the pipe with the Security Object
+    # PS 5.1 requires this specific constructor to apply security at creation
+    $pipeServer = New-Object System.IO.Pipes.NamedPipeServerStream(
+        $pipeName, 
+        [System.IO.Pipes.PipeDirection]::InOut, 
+        $maxInstances, 
+        [System.IO.Pipes.PipeTransmissionMode]::Byte, 
+        [System.IO.Pipes.PipeOptions]::Asynchronous, 
+        0, # Default input buffer
+        0, # Default output buffer
+        $pipeSecurity
+    )
 
     # Variable to control the server loop
     $global:IPC_ContinueServer = $true
@@ -41,6 +76,7 @@ Add-Type @"
 
         $hwnd = (Get-Process -Id $pid).MainWindowHandle
 
+
         # ---------------------------------------------------------
         # CLEAN PARSING: Verb + Payload
         # Split the string into maximum 2 parts using space as delimiter.
@@ -50,6 +86,8 @@ Add-Type @"
         $parts = $command -split ' ', 2
         $verb = $parts[0]
         $payload = if ($parts.Count -gt 1) { $parts[1] } else { $null }
+		
+		Write-VerboseDebug -Timestamp (Get-Date) -Title "IPC COMMAND" -Message $command
 		
         switch ($verb) {
             "SPEAK" {
@@ -156,7 +194,7 @@ Add-Type @"
 
     # Start the server loop
     while ($global:IPC_ContinueServer) {
-        Write-Host "Waiting for new IPC client connection..."
+        Write-Host "Waiting for new IPC client connection on pipe [$pipeName]..."
         $pipeServer.WaitForConnection()
 
         $reader = New-Object System.IO.StreamReader($pipeServer)
