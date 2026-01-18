@@ -1,4 +1,11 @@
 <?php
+// Permitir cualquier origen (tu celular)
+header("Access-Control-Allow-Origin: *");
+// Permitir métodos comunes
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+// Permitir encabezados personalizados si los usas
+header("Access-Control-Allow-Headers: Content-Type");
+
 const COMMAND_FILE = 'command.json';
 const TEMP_FILE = 'command.tmp';
 const WATCHDOG_FILE = 'watchdog.txt';
