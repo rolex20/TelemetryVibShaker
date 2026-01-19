@@ -1,4 +1,12 @@
 <?php
+// Permitir cualquier origen (tu celular)
+header("Access-Control-Allow-Origin: *");
+// Permitir métodos comunes
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+// Permitir encabezados personalizados si los usas
+header("Access-Control-Allow-Headers: Content-Type");
+
+
 function store_in_globals($key) {		
 	if (!empty($_POST[$key])) {
 			$value = $_POST[$key];
