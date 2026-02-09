@@ -33,11 +33,12 @@ $Global:GameProfiles = @{
     "aces.exe"                         = @{ Start = "High Performance"; Stop = "Balanced" }
     "FlightSimulator.exe"              = @{ Start = "High Performance"; Stop = "Balanced" }
     "Ace7Game.exe"                     = @{ Start = "Balanced"; Stop = "Balanced" } #; BoostAction = "action-per-process-boost1.json" }
-    "forza_steamworks_release_final.exe" = @{ Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\Fanatec Monitor - Race.lnk") }
-    "forzamotorsport7.exe"             = @{ Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\Fanatec Monitor - Race.lnk") }
-	"ForzaHorizon5.exe"                = @{ Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\Fanatec Monitor - Race.lnk") }
-    "AssettoCorsa.exe"                 = @{ Start = "Balanced"; Stop = "Balanced" ; AuxPrograms = @("C:\Users\ralch\Desktop\Fanatec Monitor - Race.lnk") }
-    "TiWorker.exe"                     = @{ Speak = "Check if yor game is running slower because of the Ti-Worker process." }
+    "forza_steamworks_release_final.exe" = @{ Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
+    "forzamotorsport7.exe"             = @{ Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
+	"ForzaHorizon5.exe"                = @{ Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
+    "AssettoCorsa.exe"                 = @{ Start = "Balanced"; Stop = "Balanced" ; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
+    "TiWorker.exe"                     = @{ Speak = "Windows Ti-Worker process" }
+	"CompatTelRunner.exe"              = @{ Speak = "Windows Compat-Tel-Runner process" }
 }
 # "Ace7Game.exe"                     = @{ Start = "High Performance"; Stop = "Balanced" ; BoostAction = "action-per-process-boost1.json" }
 # "Ace7Game.exe"                     = @{ Start = "Balanced"; Stop = "Balanced" } #; BoostAction = "action-per-process-boost1.json" }

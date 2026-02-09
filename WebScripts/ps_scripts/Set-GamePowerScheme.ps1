@@ -153,10 +153,9 @@ function Set-GamePowerScheme($traceName, $programName) {
     }
 	
 
-	if ($speakText) {
-		Write-VerboseDebug -Timestamp (Get-Date) -Title "LAUNCH DETECTED" -ForegroundColor "Yellow" -Speak $true -Message $speakText
-
-	}
+	#if ($speakText) {
+	#	Write-VerboseDebug -Timestamp (Get-Date) -Title "LAUNCH DETECTED" -ForegroundColor "Yellow" -Speak $true -Message $speakText
+	#}
 
 
 }
