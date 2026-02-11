@@ -68,7 +68,162 @@ function Play-SeatBelt() {
 		Start-Sleep -Seconds 1
 }
 
-function Set-GamePowerScheme($traceName, $programName) {
+
+if (-not $Global:GameRuntimeByPid) {
+    $Global:GameRuntimeByPid = @{}
+}
+
+function Format-GameplayDurationText {
+    param (
+        [Parameter(Mandatory)]
+        [double]$TotalSeconds
+    )
+
+    if ($TotalSeconds -lt 60) {
+        return "{0} seconds" -f [Math]::Round($TotalSeconds, 1)
+    }
+
+    if ($TotalSeconds -lt 3600) {
+        return "{0} minutes" -f [Math]::Round(($TotalSeconds / 60), 1)
+    }
+
+    return "{0} hours" -f [Math]::Round(($TotalSeconds / 3600), 1)
+}
+
+function Start-GameRuntimeTracker {
+    param (
+        [Parameter(Mandatory)]
+        [string]$ProgramName,
+
+        [Parameter(Mandatory)]
+        [int]$ProcessId
+    )
+
+    if ($Global:GameRuntimeByPid.ContainsKey($ProcessId)) {
+        Stop-GameRuntimeTracker -ProgramName $ProgramName -ProcessId $ProcessId | Out-Null
+    }
+
+    $processObject = $null
+    $cpuStartSeconds = 0.0
+
+    try {
+        $processObject = [System.Diagnostics.Process]::GetProcessById($ProcessId)
+        $cpuStartSeconds = $processObject.TotalProcessorTime.TotalSeconds
+    }
+    catch {
+        Write-VerboseDebug -Timestamp (Get-Date) -Title "PLAYTIME" -ForegroundColor "DarkYellow" -Message "Could not capture process object for $ProgramName [PID:$ProcessId]."
+    }
+
+    $startedAt = Get-Date
+
+    $timer = New-Object System.Timers.Timer
+    $timer.Interval = 3600000
+    $timer.AutoReset = $true
+
+    $sourceIdentifier = "GameRuntimeHour_${ProcessId}_$([guid]::NewGuid().ToString('N'))"
+    $messageData = @{
+        ProcessId = $ProcessId
+        ProgramName = $ProgramName
+        StartedAt = $startedAt
+    }
+
+    $null = Register-ObjectEvent -InputObject $timer -EventName Elapsed -SourceIdentifier $sourceIdentifier -MessageData $messageData -Action {
+        try {
+            . "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1"
+
+            $eventPid = [int]$Event.MessageData.ProcessId
+            $eventProgramName = $Event.MessageData.ProgramName
+            $eventStartedAt = [datetime]$Event.MessageData.StartedAt
+
+            $isRunning = Get-Process -Id $eventPid -ErrorAction SilentlyContinue
+            if (-not $isRunning) {
+                Unregister-Event -SourceIdentifier $EventSubscriber.SourceIdentifier -ErrorAction SilentlyContinue
+                return
+            }
+
+            $elapsed = (Get-Date) - $eventStartedAt
+            $totalWholeHours = [Math]::Floor($elapsed.TotalHours)
+            if ($totalWholeHours -lt 1) {
+                return
+            }
+
+            $hoursText = if ($totalWholeHours -eq 1) { "1 hour" } else { "$totalWholeHours hours" }
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "PLAYTIME" -ForegroundColor "Yellow" -Speak $true -Message "$eventProgramName [PID:$eventPid] - $hoursText"
+        }
+        catch {
+            Write-Host "[PLAYTIME ERROR] $($_.Exception.Message)" -ForegroundColor Red
+        }
+    }
+
+    $Global:GameRuntimeByPid[$ProcessId] = @{
+        ProgramName = $ProgramName
+        StartedAt = $startedAt
+        ProcessObject = $processObject
+        CpuStartSeconds = $cpuStartSeconds
+        Timer = $timer
+        TimerEventSourceIdentifier = $sourceIdentifier
+    }
+
+    $timer.Start()
+}
+
+function Stop-GameRuntimeTracker {
+    param (
+        [Parameter(Mandatory)]
+        [string]$ProgramName,
+
+        [Parameter(Mandatory)]
+        [int]$ProcessId
+    )
+
+    if (-not $Global:GameRuntimeByPid.ContainsKey($ProcessId)) {
+        return $null
+    }
+
+    $runtimeInfo = $Global:GameRuntimeByPid[$ProcessId]
+
+    if ($runtimeInfo.Timer) {
+        $runtimeInfo.Timer.Stop()
+    }
+
+    if ($runtimeInfo.TimerEventSourceIdentifier) {
+        Unregister-Event -SourceIdentifier $runtimeInfo.TimerEventSourceIdentifier -ErrorAction SilentlyContinue
+    }
+
+    if ($runtimeInfo.Timer) {
+        $runtimeInfo.Timer.Dispose()
+    }
+
+    $stoppedAt = Get-Date
+    $wallClockSeconds = ($stoppedAt - $runtimeInfo.StartedAt).TotalSeconds
+
+    $cpuTotalSeconds = 0.0
+    if ($runtimeInfo.ProcessObject) {
+        try {
+            $cpuTotalSeconds = [Math]::Max(0, ($runtimeInfo.ProcessObject.TotalProcessorTime.TotalSeconds - $runtimeInfo.CpuStartSeconds))
+        }
+        catch {
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "PLAYTIME" -ForegroundColor "DarkYellow" -Message "Could not read CPU elapsed total for $ProgramName [PID:$ProcessId]."
+        }
+        finally {
+            $runtimeInfo.ProcessObject.Dispose()
+        }
+    }
+
+    $Global:GameRuntimeByPid.Remove($ProcessId)
+
+    return @{
+        ProgramName = $runtimeInfo.ProgramName
+        ProcessId = $ProcessId
+        StartedAt = $runtimeInfo.StartedAt
+        StoppedAt = $stoppedAt
+        WallClockSeconds = $wallClockSeconds
+        CpuTotalSeconds = $cpuTotalSeconds
+    }
+}
+
+function Set-GamePowerScheme($traceName, $programName, $processId) {
+    try {
     $powerSchemes = $null
 
         # Check if there is a Speak action defined
@@ -81,12 +236,24 @@ function Set-GamePowerScheme($traceName, $programName) {
     switch ($traceName) {
         "Win32_ProcessStartTrace" {
             $powerSchemes = Get-StartPowerSchemes
+            Start-GameRuntimeTracker -ProgramName $programName -ProcessId ([int]$processId)
 			if ($speakText) {
 				Write-VerboseDebug -Timestamp (Get-Date) -Title "PROCESS STARTED:" -ForegroundColor "Yellow" -Speak $true -Message $speakText
 			}
         }
         "Win32_ProcessStopTrace" { 
             $powerSchemes = Get-StopPowerSchemes 
+            $runtimeSummary = Stop-GameRuntimeTracker -ProgramName $programName -ProcessId ([int]$processId)
+            if ($runtimeSummary) {
+                $wallClockFormatted = Format-GameplayDurationText -TotalSeconds $runtimeSummary.WallClockSeconds
+                $cpuFormatted = Format-GameplayDurationText -TotalSeconds $runtimeSummary.CpuTotalSeconds
+                Write-VerboseDebug -Timestamp $runtimeSummary.StoppedAt -Title "PLAYTIME" -ForegroundColor "Cyan" -Message "$programName [PID:$processId] stopped. CPU elapsed total: $cpuFormatted; wall-clock delta: $wallClockFormatted"
+
+                if ($runtimeSummary.CpuTotalSeconds -ge 2) {
+                    $ttsTotal = Format-GameplayDurationText -TotalSeconds $runtimeSummary.CpuTotalSeconds
+                    Write-VerboseDebug -Timestamp $runtimeSummary.StoppedAt -Title "PLAYTIME" -ForegroundColor "Yellow" -Speak $true -Message "$programName stopped, $ttsTotal total"
+                }
+            }
 			if ($speakText) {
 				Write-VerboseDebug -Timestamp (Get-Date) -Title "PROCESS EXIT:" -ForegroundColor "Yellow" -Speak $true -Message $speakText
 			}			
@@ -132,7 +299,7 @@ function Set-GamePowerScheme($traceName, $programName) {
             $boostJsonPath = Get-GameBoostActions -programName $programName
             if ($boostJsonPath -and (Test-Path $boostJsonPath)) {
                                 Play-SeatBelt
-                Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST" -Message "Applying boost for '$programName' from '$boostJsonPath'" -ForegroundColor "Green"
+                Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST" -Message "Applying boost for '$programName' from '$boostJsonPath' [PID:$processId]" -ForegroundColor "Green"
                 # Call Run-Actions-Per-Game with the EXTENSION-LESS name for JSON compatibility.
                 $normalizedProgramName = $programName -replace '\.exe$', ''
                 Run-Actions-Per-Game -processName $normalizedProgramName -fileName $boostJsonPath -threadsLimit 50
@@ -145,9 +312,9 @@ function Set-GamePowerScheme($traceName, $programName) {
             $boostJsonPath = Get-GameBoostActions -programName $programName
             if ($boostJsonPath -and (Test-Path $boostJsonPath)) {
 				Play-SeatBelt
-                Write-VerboseDebug -Timestamp (Get-Date) -Title "RESTORE" -Message "Restoring processes related to '$programName' using '$boostJsonPath'" -ForegroundColor "Cyan"
+                Write-VerboseDebug -Timestamp (Get-Date) -Title "RESTORE" -Message "Restoring processes related to '$programName' using '$boostJsonPath' [PID:$processId]" -ForegroundColor "Cyan"
                 # Call our corrected restore function.
-                Restore-GameBoost -programName $programName -boostJsonPath $boostJsonPath -threadsLimit 50
+                Restore-GameBoost -programNameWithExt $programName -boostJsonPath $boostJsonPath -threadsLimit 50
             }
         }
     }
@@ -157,5 +324,8 @@ function Set-GamePowerScheme($traceName, $programName) {
 	#	Write-VerboseDebug -Timestamp (Get-Date) -Title "LAUNCH DETECTED" -ForegroundColor "Yellow" -Speak $true -Message $speakText
 	#}
 
-
+    }
+    catch {
+        Write-VerboseDebug -Timestamp (Get-Date) -Title "PROCESS HANDLER ERROR" -ForegroundColor "Red" -Speak $false -Message "Set-GamePowerScheme failed for $programName [PID:$processId]: $($_.Exception.Message)"
+    }
 }
