@@ -37,6 +37,7 @@ $Global:GameProfiles = @{
     "forzamotorsport7.exe"             = @{ Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
 	"ForzaHorizon5.exe"                = @{ Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
     "AssettoCorsa.exe"                 = @{ Start = "Balanced"; Stop = "Balanced" ; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
+	"GRB.exe"                          = @{ Start = "Balanced"; Stop = "Balanced" ; AuxPrograms = @("C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
     "TiWorker.exe"                     = @{ Speak = "Windows Ti-Worker process" }
 	"CompatTelRunner.exe"              = @{ Speak = "Windows Compat-Tel-Runner process" }
 }
