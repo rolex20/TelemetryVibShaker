@@ -147,7 +147,7 @@ try {
 
             Write-Host " "            
             Write-VerboseDebug -Timestamp $Event.TimeGenerated -Title "PROCESS" -Message "$traceName - $pName [$event_pId]"
-            Set-GamePowerScheme -traceName $traceName -programName $pName -processId $event_pId
+            Set-GamePowerScheme $traceName $pName
         }
         $processWatcher = Get-ProcessWatchers $processAction        
 
