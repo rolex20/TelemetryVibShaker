@@ -3,17 +3,22 @@
     {
       "friendlyName": "Fanatec Pedals Monitor (Racing)",
       "processName": "fanatecmonitor_RaptorLake",
-      "path": "C:\\Users\\ralch\\Desktop\\Fanatec Monitor - Race.lnk"
+      "path": "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk"
     },
     {
-      "friendlyName": "Calc",
-      "processName": "CalculatorApp",
-      "path": "calc.exe"
-    },
+      "friendlyName": "Set Headphones as Sound Device",
+      "processName": "powershell.exe",
+      "path": "C:\\Users\\ralch\\AppData\\Roaming\\Microsoft\\Internet Explorer\\Quick Launch\\User Pinned\\TaskBar\\Set Realtek Speakers as Sound Device.lnk"
+    },		
     {
-      "friendlyName": "Notepad",
-      "processName": "Notepad",
-      "path": "notepad.exe"
+      "friendlyName": "Set VR as Sound Device",
+      "processName": "powershell.exe",
+      "path": "C:\\Users\\ralch\\AppData\\Roaming\\Microsoft\\Internet Explorer\\Quick Launch\\User Pinned\\TaskBar\\Set VR as Sound Device.lnk"
+    },		
+    {
+      "friendlyName": "Set TV as Sound Device",
+      "processName": "powershell.exe",
+      "path": "C:\\Users\\ralch\\AppData\\Roaming\\Microsoft\\Internet Explorer\\Quick Launch\\User Pinned\\TaskBar\\Set TV as Sound Device.lnk"
     },
     {
       "friendlyName": "Clock",
@@ -75,6 +80,16 @@
       "processName": "HWiNFO64",
       "path": "C:\\MyPrograms\\My Apps\\HWiNFO\\HWiNFO64.exe"
     },
+    {
+      "friendlyName": "Calc",
+      "processName": "CalculatorApp",
+      "path": "calc.exe"
+    },
+    {
+      "friendlyName": "Notepad",
+      "processName": "Notepad",
+      "path": "notepad.exe"
+    },	
     {
       "friendlyName": "Edge Web Browser",
       "processName": "msedge",
