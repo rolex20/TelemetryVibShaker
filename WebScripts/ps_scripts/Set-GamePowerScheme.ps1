@@ -171,7 +171,7 @@ function Start-GameRuntimeTracker {
         StartedAt = $startedAt
         ProcessObject = $processObject
         CpuStartSeconds = $cpuStartSeconds
-        LastKnownCpuSeconds = $cpuStartSeconds
+        LastKnownCpuSeconds = $null
         LastKnownCpuCapturedHour = 0
         Timer = $timer
         TimerEventSourceIdentifier = $sourceIdentifier
@@ -210,27 +210,30 @@ function Stop-GameRuntimeTracker {
     $stoppedAt = Get-Date
     $wallClockSeconds = ($stoppedAt - $runtimeInfo.StartedAt).TotalSeconds
 
-    $cpuTotalSeconds = -1.0
+    $cpuTotalSeconds = $null
     $cpuReadUsedFallback = $false
     $cpuFallbackHourMark = 0
+    $cpuDataState = "Unavailable"
 
     if ($runtimeInfo.ProcessObject) {
         try {
             $runtimeInfo.ProcessObject.Refresh()
             $cpuTotalSeconds = [Math]::Max(0, $runtimeInfo.ProcessObject.TotalProcessorTime.TotalSeconds)
+            $cpuDataState = "Exact"
         }
         catch {
-            Write-VerboseDebug -Timestamp (Get-Date) -Title "PLAYTIME" -ForegroundColor "DarkYellow" -Message "Could not read OS CPU time for $ProgramName [PID:$ProcessId]."
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "PLAYTIME" -ForegroundColor "DarkYellow" -Message "Could not read OS CPU time for $ProgramName [PID:$ProcessId] at stop event (expected for late Win32_ProcessStopTrace)."
         }
         finally {
             $runtimeInfo.ProcessObject.Dispose()
         }
     }
 
-    if (($cpuTotalSeconds -lt 0) -and ($null -ne $runtimeInfo.LastKnownCpuSeconds) -and ([double]$runtimeInfo.LastKnownCpuSeconds -ge 0)) {
+    if (($cpuDataState -ne "Exact") -and ($null -ne $runtimeInfo.LastKnownCpuSeconds) -and ([double]$runtimeInfo.LastKnownCpuSeconds -ge 0)) {
         $cpuTotalSeconds = [double]$runtimeInfo.LastKnownCpuSeconds
         $cpuReadUsedFallback = $true
         $cpuFallbackHourMark = [int]$runtimeInfo.LastKnownCpuCapturedHour
+        $cpuDataState = "Sampled"
     }
 
     $Global:GameRuntimeByPid.Remove($ProcessId)
@@ -244,6 +247,7 @@ function Stop-GameRuntimeTracker {
         CpuTotalSeconds = $cpuTotalSeconds
         CpuReadUsedFallback = $cpuReadUsedFallback
         CpuFallbackHourMark = $cpuFallbackHourMark
+        CpuDataState = $cpuDataState
     }
 }
 
@@ -274,17 +278,32 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
             $runtimeSummary = Stop-GameRuntimeTracker -ProgramName $programName -ProcessId ([int]$processId)
             if ($runtimeSummary) {
                 $wallClockFormatted = Format-GameplayDurationText -TotalSeconds $runtimeSummary.WallClockSeconds
-                $cpuFormatted = Format-GameplayDurationText -TotalSeconds $runtimeSummary.CpuTotalSeconds
-                if ($runtimeSummary.CpuReadUsedFallback -and $runtimeSummary.CpuFallbackHourMark -ge 1) {
-                    $cpuCompact = ($cpuFormatted -replace ' ', '')
-                    $cpuDisplay = "CpuElapsedTime = $cpuCompact/$($runtimeSummary.CpuFallbackHourMark)h"
-                    Write-VerboseDebug -Timestamp $runtimeSummary.StoppedAt -Title "PLAYTIME" -ForegroundColor "Cyan" -Message "$programName [PID:$processId] stopped. $cpuDisplay; wall-clock delta: $wallClockFormatted"
-                }
-                else {
-                    Write-VerboseDebug -Timestamp $runtimeSummary.StoppedAt -Title "PLAYTIME" -ForegroundColor "Cyan" -Message "$programName [PID:$processId] stopped. CpuElapsedTime = $cpuFormatted; wall-clock delta: $wallClockFormatted"
+                $cpuDisplay = "CpuElapsedTime = unavailable"
+
+                switch ($runtimeSummary.CpuDataState) {
+                    "Exact" {
+                        $cpuFormatted = Format-GameplayDurationText -TotalSeconds $runtimeSummary.CpuTotalSeconds
+                        $cpuDisplay = "CpuElapsedTime = $cpuFormatted"
+                    }
+                    "Sampled" {
+                        $cpuFormatted = Format-GameplayDurationText -TotalSeconds $runtimeSummary.CpuTotalSeconds
+                        if ($runtimeSummary.CpuFallbackHourMark -ge 1) {
+                            $cpuDisplay = "CpuElapsedTime (sampled up to $($runtimeSummary.CpuFallbackHourMark)h) = $cpuFormatted"
+                        }
+                        else {
+                            $cpuDisplay = "CpuElapsedTime (sampled) = $cpuFormatted"
+                        }
+                    }
+                    default {
+                        if ($runtimeSummary.WallClockSeconds -ge 3600) {
+                            $cpuDisplay = "CpuElapsedTime = CPU unavailable (late stop signal)"
+                        }
+                    }
                 }
 
-                if ($runtimeSummary.CpuTotalSeconds -ge 2) {
+                Write-VerboseDebug -Timestamp $runtimeSummary.StoppedAt -Title "PLAYTIME" -ForegroundColor "Cyan" -Message "$programName [PID:$processId] stopped. $cpuDisplay; wall-clock delta: $wallClockFormatted"
+
+                if (($runtimeSummary.CpuDataState -ne "Unavailable") -and ($runtimeSummary.CpuTotalSeconds -ge 2)) {
                     $ttsTotal = Format-GameplayDurationText -TotalSeconds $runtimeSummary.CpuTotalSeconds
                     Write-VerboseDebug -Timestamp $runtimeSummary.StoppedAt -Title "PLAYTIME" -ForegroundColor "Yellow" -Speak $true -Message "$ttsName stopped, $ttsTotal total"
                 }
