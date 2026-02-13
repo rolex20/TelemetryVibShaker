@@ -121,6 +121,28 @@ function Get-GameSpeakMessage {
     return $null
 }
 
+function Get-GameTtsDisplayName {
+    <#
+    .SYNOPSIS
+        Retrieves a display name for TTS phrasing.
+    #>
+    param (
+        [string]$programName
+    )
+
+    if ([string]::IsNullOrWhiteSpace($programName)) {
+        return $programName
+    }
+
+    if ($Global:GameProfiles.ContainsKey($programName) -and
+        $Global:GameProfiles[$programName].ContainsKey('NickName') -and
+        -not [string]::IsNullOrWhiteSpace($Global:GameProfiles[$programName].NickName)) {
+        return $Global:GameProfiles[$programName].NickName
+    }
+
+    return ($programName -replace '(?i)\\.exe$', '')
+}
+
 function Get-GameAuxPrograms {
     <#
     .SYNOPSIS
