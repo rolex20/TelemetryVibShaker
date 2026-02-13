@@ -30,14 +30,14 @@
 $Global:GameProfiles = @{
     "Notepad.exe"                      = @{ AuxPrograms = @("C:\Users\ralch\Desktop\Fanatec Monitor - Race.lnk") } #; BoostAction = "action-per-process-boost1.json" }
     "DCS.exe"                          = @{ Start = "High Performance"; Stop = "Balanced" }
-    "aces.exe"                         = @{ Start = "High Performance"; Stop = "Balanced" }
-    "FlightSimulator.exe"              = @{ Start = "High Performance"; Stop = "Balanced" }
-    "Ace7Game.exe"                     = @{ Start = "Balanced"; Stop = "Balanced" } #; BoostAction = "action-per-process-boost1.json" }
-    "forza_steamworks_release_final.exe" = @{ Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
-    "forzamotorsport7.exe"             = @{ Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
-	"ForzaHorizon5.exe"                = @{ Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
-    "AssettoCorsa.exe"                 = @{ Start = "Balanced"; Stop = "Balanced" ; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
-	"GRB.exe"                          = @{ Start = "Balanced"; Stop = "Balanced" ; AuxPrograms = @("C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
+    "aces.exe"                         = @{ NickName = "War thunder"; Start = "High Performance"; Stop = "Balanced" }
+    "FlightSimulator.exe"              = @{ NickName = "M.S.F.S.";Start = "High Performance"; Stop = "Balanced" }
+    "Ace7Game.exe"                     = @{ NickName = "Ace Comabt"; Start = "Balanced"; Stop = "Balanced" } #; BoostAction = "action-per-process-boost1.json" }
+    "forza_steamworks_release_final.exe" = @{ NickName = "Forza"; Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
+    "forzamotorsport7.exe"             = @{ NickName = "Forza 7"; Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
+	"ForzaHorizon5.exe"                = @{ NickName = "Forza Horizon"; Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
+    "AssettoCorsa.exe"                 = @{ NickName = "Asseto Corsa"; Start = "Balanced"; Stop = "Balanced" ; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
+	"GRB.exe"                          = @{ NickName = "G.R. Breakpoint"; Start = "Balanced"; Stop = "Balanced" ; AuxPrograms = @("C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
     "TiWorker.exe"                     = @{ Speak = "Windows Ti-Worker process" }
 	"CompatTelRunner.exe"              = @{ Speak = "Windows Compat-Tel-Runner process" }
 }
@@ -142,3 +142,4 @@ function Get-GameAuxPrograms {
 
     return @()
 }
+
