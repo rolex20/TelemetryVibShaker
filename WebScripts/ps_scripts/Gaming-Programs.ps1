@@ -28,7 +28,7 @@
 #     'AuxPrograms' (array of helper executables to auto-launch when the game starts).
 #------------------------------------------------------------------------------------
 $Global:GameProfiles = @{
-    "Notepad.exe"                      = @{ AuxPrograms = @("C:\Users\ralch\Desktop\Fanatec Monitor - Race.lnk") } #; BoostAction = "action-per-process-boost1.json" }
+    "Notepad.exe"                      = @{ AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk") } #; BoostAction = "action-per-process-boost1.json" }
     "DCS.exe"                          = @{ Start = "High Performance"; Stop = "Balanced" }
     "aces.exe"                         = @{ NickName = "War thunder"; Start = "High Performance"; Stop = "Balanced" }
     "FlightSimulator.exe"              = @{ NickName = "M.S.F.S.";Start = "High Performance"; Stop = "Balanced" }
