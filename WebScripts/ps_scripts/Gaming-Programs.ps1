@@ -121,6 +121,23 @@ function Get-GameSpeakMessage {
     return $null
 }
 
+function Get-GameTtsDisplayName {
+    <#
+    .SYNOPSIS
+        Retrieves the TTS-friendly display name for a given program.
+    #>
+    param (
+        [Parameter(Mandatory)]
+        [string]$programName
+    )
+
+    if ($Global:GameProfiles.ContainsKey($programName) -and $Global:GameProfiles[$programName].ContainsKey('NickName')) {
+        return $Global:GameProfiles[$programName].NickName
+    }
+
+    return $programName
+}
+
 function Get-GameAuxPrograms {
     <#
     .SYNOPSIS

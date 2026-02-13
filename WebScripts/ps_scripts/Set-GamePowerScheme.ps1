@@ -254,6 +254,9 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
         # Check if there is a Speak action defined
         $speakText = Get-GameSpeakMessage -programName $programName
 
+        # Resolve a TTS-friendly display name (nickname when configured)
+        $ttsName = Get-GameTtsDisplayName -programName $programName
+
         # Retrieve any auxiliary programs configured for this title
         $auxPrograms = Get-GameAuxPrograms -programName $programName
 
@@ -283,7 +286,7 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
 
                 if ($runtimeSummary.CpuTotalSeconds -ge 2) {
                     $ttsTotal = Format-GameplayDurationText -TotalSeconds $runtimeSummary.CpuTotalSeconds
-                    Write-VerboseDebug -Timestamp $runtimeSummary.StoppedAt -Title "PLAYTIME" -ForegroundColor "Yellow" -Speak $true -Message "$programName stopped, $ttsTotal total"
+                    Write-VerboseDebug -Timestamp $runtimeSummary.StoppedAt -Title "PLAYTIME" -ForegroundColor "Yellow" -Speak $true -Message "$ttsName stopped, $ttsTotal total"
                 }
             }
 			if ($speakText) {
