@@ -187,9 +187,11 @@ function Start-GameRuntimeTracker {
     $timer.AutoReset = $true
 
     $sourceIdentifier = "GameRuntimeHour_${ProcessId}_$([guid]::NewGuid().ToString('N'))"
+    $ttsDisplayName = Get-GameTtsDisplayName -programName $ProgramName
     $messageData = @{
         ProcessId = $ProcessId
         ProgramName = $ProgramName
+        TtsDisplayName = $ttsDisplayName
         StartedAt = $startedAt
     }
 
@@ -199,6 +201,10 @@ function Start-GameRuntimeTracker {
 
             $eventPid = [int]$Event.MessageData.ProcessId
             $eventProgramName = $Event.MessageData.ProgramName
+            $eventTtsDisplayName = $Event.MessageData.TtsDisplayName
+            if ([string]::IsNullOrWhiteSpace($eventTtsDisplayName)) {
+                $eventTtsDisplayName = $eventProgramName
+            }
             $eventStartedAt = [datetime]$Event.MessageData.StartedAt
 
             $isRunning = Get-Process -Id $eventPid -ErrorAction SilentlyContinue
@@ -222,7 +228,8 @@ function Start-GameRuntimeTracker {
             }
 
             $hoursText = if ($totalWholeHours -eq 1) { "1 hour" } else { "$totalWholeHours hours" }
-            Write-VerboseDebug -Timestamp (Get-Date) -Title "PLAYTIME" -ForegroundColor "Yellow" -Speak $true -Message "$eventProgramName [PID:$eventPid] - $hoursText"
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "PLAYTIME" -ForegroundColor "Yellow" -Message "$eventProgramName [PID:$eventPid] - $hoursText"
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "PLAYTIME" -ForegroundColor "Yellow" -Speak $true -Message "$eventTtsDisplayName - $hoursText"
         }
         catch {
             Write-Host "[PLAYTIME ERROR] $($_.Exception.Message)" -ForegroundColor Red
