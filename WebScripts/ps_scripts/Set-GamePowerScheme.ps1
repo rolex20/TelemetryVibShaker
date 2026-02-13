@@ -73,6 +73,70 @@ if (-not $Global:GameRuntimeByPid) {
     $Global:GameRuntimeByPid = @{}
 }
 
+function Get-GameRuntimeCpuSnapshotPath {
+    param (
+        [Parameter(Mandatory)]
+        [int]$ProcessId
+    )
+
+    return Join-Path $env:TEMP ("TelemetryVibShaker-GameRuntimeCpu-{0}.json" -f $ProcessId)
+}
+
+function Save-GameRuntimeCpuSnapshot {
+    param (
+        [Parameter(Mandatory)]
+        [int]$ProcessId,
+
+        [Parameter(Mandatory)]
+        [double]$CpuSeconds,
+
+        [Parameter(Mandatory)]
+        [int]$HourMark
+    )
+
+    $snapshotPath = Get-GameRuntimeCpuSnapshotPath -ProcessId $ProcessId
+    $payload = @{ CpuSeconds = $CpuSeconds; HourMark = $HourMark }
+    $payload | ConvertTo-Json -Compress | Set-Content -Path $snapshotPath -Encoding UTF8
+}
+
+function Read-GameRuntimeCpuSnapshot {
+    param (
+        [Parameter(Mandatory)]
+        [int]$ProcessId
+    )
+
+    $snapshotPath = Get-GameRuntimeCpuSnapshotPath -ProcessId $ProcessId
+    if (-not (Test-Path $snapshotPath)) {
+        return $null
+    }
+
+    try {
+        $raw = Get-Content -Path $snapshotPath -Raw -ErrorAction Stop
+        if ([string]::IsNullOrWhiteSpace($raw)) {
+            return $null
+        }
+
+        $parsed = $raw | ConvertFrom-Json -ErrorAction Stop
+        return @{
+            CpuSeconds = [double]$parsed.CpuSeconds
+            HourMark = [int]$parsed.HourMark
+        }
+    }
+    catch {
+        return $null
+    }
+}
+
+function Remove-GameRuntimeCpuSnapshot {
+    param (
+        [Parameter(Mandatory)]
+        [int]$ProcessId
+    )
+
+    $snapshotPath = Get-GameRuntimeCpuSnapshotPath -ProcessId $ProcessId
+    Remove-Item -Path $snapshotPath -ErrorAction SilentlyContinue
+}
+
 function Format-GameplayDurationText {
     param (
         [Parameter(Mandatory)]
@@ -116,6 +180,8 @@ function Start-GameRuntimeTracker {
 
     $startedAt = Get-Date
 
+    Save-GameRuntimeCpuSnapshot -ProcessId $ProcessId -CpuSeconds $cpuStartSeconds -HourMark 0
+
     $timer = New-Object System.Timers.Timer
     $timer.Interval = 3600000
     $timer.AutoReset = $true
@@ -149,10 +215,7 @@ function Start-GameRuntimeTracker {
 
             try {
                 $cpuNowSeconds = [double]$isRunning.CPU
-                if ($Global:GameRuntimeByPid.ContainsKey($eventPid)) {
-                    $Global:GameRuntimeByPid[$eventPid].LastKnownCpuSeconds = $cpuNowSeconds
-                    $Global:GameRuntimeByPid[$eventPid].LastKnownCpuCapturedHour = $totalWholeHours
-                }
+                Save-GameRuntimeCpuSnapshot -ProcessId $eventPid -CpuSeconds $cpuNowSeconds -HourMark $totalWholeHours
             }
             catch {
                 # Keep hourly notifications resilient even if CPU sampling temporarily fails.
@@ -227,11 +290,21 @@ function Stop-GameRuntimeTracker {
         }
     }
 
-    if (($cpuTotalSeconds -lt 0) -and ($null -ne $runtimeInfo.LastKnownCpuSeconds) -and ([double]$runtimeInfo.LastKnownCpuSeconds -ge 0)) {
-        $cpuTotalSeconds = [double]$runtimeInfo.LastKnownCpuSeconds
-        $cpuReadUsedFallback = $true
-        $cpuFallbackHourMark = [int]$runtimeInfo.LastKnownCpuCapturedHour
+    if ($cpuTotalSeconds -lt 0) {
+        $snapshotData = Read-GameRuntimeCpuSnapshot -ProcessId $ProcessId
+        if ($snapshotData -and ($null -ne $snapshotData.CpuSeconds) -and ([double]$snapshotData.CpuSeconds -ge 0)) {
+            $cpuTotalSeconds = [double]$snapshotData.CpuSeconds
+            $cpuReadUsedFallback = $true
+            $cpuFallbackHourMark = [int]$snapshotData.HourMark
+        }
+        elseif (($null -ne $runtimeInfo.LastKnownCpuSeconds) -and ([double]$runtimeInfo.LastKnownCpuSeconds -ge 0)) {
+            $cpuTotalSeconds = [double]$runtimeInfo.LastKnownCpuSeconds
+            $cpuReadUsedFallback = $true
+            $cpuFallbackHourMark = [int]$runtimeInfo.LastKnownCpuCapturedHour
+        }
     }
+
+    Remove-GameRuntimeCpuSnapshot -ProcessId $ProcessId
 
     $Global:GameRuntimeByPid.Remove($ProcessId)
 
