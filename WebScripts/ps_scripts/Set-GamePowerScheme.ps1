@@ -265,14 +265,13 @@ function Stop-GameRuntimeTracker {
 
     $runtimeInfo = $Global:GameRuntimeByPid[$ProcessId]
 
+    # Stop timers
     if ($runtimeInfo.Timer) {
         $runtimeInfo.Timer.Stop()
     }
-
     if ($runtimeInfo.TimerEventSourceIdentifier) {
         Unregister-Event -SourceIdentifier $runtimeInfo.TimerEventSourceIdentifier -ErrorAction SilentlyContinue
     }
-
     if ($runtimeInfo.Timer) {
         $runtimeInfo.Timer.Dispose()
     }
@@ -280,39 +279,70 @@ function Stop-GameRuntimeTracker {
     $stoppedAt = Get-Date
     $wallClockSeconds = ($stoppedAt - $runtimeInfo.StartedAt).TotalSeconds
 
+    # --- FIX START ---
+    # Initialize cpuTotalSeconds to -1 to distinguish between "0 seconds usage" and "Failed to read"
     $cpuTotalSeconds = -1.0
     $cpuReadUsedFallback = $false
     $cpuFallbackHourMark = 0
 
+    # 1. Attempt to get the final live reading from the process object
     if ($runtimeInfo.ProcessObject) {
         try {
+            # Attempt to refresh stats. On an exited process, this often zeroes out data or throws.
             $runtimeInfo.ProcessObject.Refresh()
-            $cpuTotalSeconds = [Math]::Max(0, $runtimeInfo.ProcessObject.TotalProcessorTime.TotalSeconds)
+            $procTime = $runtimeInfo.ProcessObject.TotalProcessorTime.TotalSeconds
+            
+            # Only accept positive values. If it returns 0, we treat it as a failure 
+            # because the game likely ran for some time.
+            if ($procTime -gt 0) {
+                $cpuTotalSeconds = $procTime
+            }
         }
         catch {
-            Write-VerboseDebug -Timestamp (Get-Date) -Title "PLAYTIME" -ForegroundColor "DarkYellow" -Message "Could not read OS CPU time for $ProgramName [PID:$ProcessId]."
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "PLAYTIME" -ForegroundColor "DarkYellow" -Message "Could not read OS CPU time for $ProgramName [PID:$ProcessId] (Process likely terminated)."
         }
         finally {
             $runtimeInfo.ProcessObject.Dispose()
         }
     }
 
-    if ($cpuTotalSeconds -lt 0) {
-        $snapshotData = Read-GameRuntimeCpuSnapshot -ProcessId $ProcessId
-        if ($snapshotData -and ($null -ne $snapshotData.CpuSeconds) -and ([double]$snapshotData.CpuSeconds -ge 0)) {
-            $cpuTotalSeconds = [double]$snapshotData.CpuSeconds
-            $cpuReadUsedFallback = $true
-            $cpuFallbackHourMark = [int]$snapshotData.HourMark
-        }
-        elseif (($null -ne $runtimeInfo.LastKnownCpuSeconds) -and ([double]$runtimeInfo.LastKnownCpuSeconds -ge 0)) {
-            $cpuTotalSeconds = [double]$runtimeInfo.LastKnownCpuSeconds
-            $cpuReadUsedFallback = $true
-            $cpuFallbackHourMark = [int]$runtimeInfo.LastKnownCpuCapturedHour
-        }
+    # 2. Retrieve the last saved snapshot (Hourly data)
+    $snapshotData = Read-GameRuntimeCpuSnapshot -ProcessId $ProcessId
+    $snapshotCpu = -1.0
+    if ($snapshotData -and ($null -ne $snapshotData.CpuSeconds)) {
+        $snapshotCpu = [double]$snapshotData.CpuSeconds
     }
 
-    Remove-GameRuntimeCpuSnapshot -ProcessId $ProcessId
+    # 3. Validation Logic:
+    # If the live read failed (-1) OR returned 0 (zombie handle), 
+    # check if we have better data in the snapshot.
+    # This specifically fixes the "0 seconds" bug when the process handle dies before reading.
+    if ($cpuTotalSeconds -le 0 -and $snapshotCpu -gt 0) {
+        $cpuTotalSeconds = $snapshotCpu
+        $cpuReadUsedFallback = $true
+        $cpuFallbackHourMark = [int]$snapshotData.HourMark
+    }
+    elseif ($cpuTotalSeconds -lt $snapshotCpu) {
+        # Even if live read worked, if snapshot says we had MORE time previously (unlikely unless corruption), trust snapshot.
+        $cpuTotalSeconds = $snapshotCpu
+        $cpuReadUsedFallback = $true
+        $cpuFallbackHourMark = [int]$snapshotData.HourMark
+    }
 
+    # 4. Last resort: In-memory fallback (usually just the start time, but included for completeness)
+    if ($cpuTotalSeconds -le 0 -and ($null -ne $runtimeInfo.LastKnownCpuSeconds)) {
+         $memCpu = [double]$runtimeInfo.LastKnownCpuSeconds
+         if ($memCpu -gt $cpuTotalSeconds) {
+            $cpuTotalSeconds = $memCpu
+            $cpuFallbackHourMark = [int]$runtimeInfo.LastKnownCpuCapturedHour
+         }
+    }
+
+    # If we still have nothing (-1) after all fallbacks, default to 0 to avoid errors in formatting
+    if ($cpuTotalSeconds -lt 0) { $cpuTotalSeconds = 0 }
+    # --- FIX END ---
+
+    Remove-GameRuntimeCpuSnapshot -ProcessId $ProcessId
     $Global:GameRuntimeByPid.Remove($ProcessId)
 
     return @{
