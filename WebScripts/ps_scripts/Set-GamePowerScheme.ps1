@@ -183,7 +183,7 @@ function Start-GameRuntimeTracker {
     Save-GameRuntimeCpuSnapshot -ProcessId $ProcessId -CpuSeconds $cpuStartSeconds -HourMark 0
 
     $timer = New-Object System.Timers.Timer
-    $timer.Interval = 3600000
+    $timer.Interval = 300000  # 5 minutes for finer-grained CPU sampling and refreshes
     $timer.AutoReset = $true
 
     $sourceIdentifier = "GameRuntimeHour_${ProcessId}_$([guid]::NewGuid().ToString('N'))"
@@ -195,46 +195,62 @@ function Start-GameRuntimeTracker {
         StartedAt = $startedAt
     }
 
-    $null = Register-ObjectEvent -InputObject $timer -EventName Elapsed -SourceIdentifier $sourceIdentifier -MessageData $messageData -Action {
-        try {
-            . "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1"
+$null = Register-ObjectEvent -InputObject $timer -EventName Elapsed -SourceIdentifier $sourceIdentifier -MessageData $messageData -Action {
+    try {
+        . "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1"
 
-            $eventPid = [int]$Event.MessageData.ProcessId
-            $eventProgramName = $Event.MessageData.ProgramName
-            $eventTtsDisplayName = $Event.MessageData.TtsDisplayName
-            if ([string]::IsNullOrWhiteSpace($eventTtsDisplayName)) {
-                $eventTtsDisplayName = $eventProgramName
-            }
-            $eventStartedAt = [datetime]$Event.MessageData.StartedAt
+        $eventPid = [int]$Event.MessageData.ProcessId
+        $eventProgramName = $Event.MessageData.ProgramName
+        $eventTtsDisplayName = $Event.MessageData.TtsDisplayName
+        if ([string]::IsNullOrWhiteSpace($eventTtsDisplayName)) {
+            $eventTtsDisplayName = $eventProgramName
+        }
+        $eventStartedAt = [datetime]$Event.MessageData.StartedAt
 
-            $isRunning = Get-Process -Id $eventPid -ErrorAction SilentlyContinue
-            if (-not $isRunning) {
-                Unregister-Event -SourceIdentifier $EventSubscriber.SourceIdentifier -ErrorAction SilentlyContinue
-                return
-            }
+        $isRunning = Get-Process -Id $eventPid -ErrorAction SilentlyContinue
+        if (-not $isRunning) {
+            Unregister-Event -SourceIdentifier $EventSubscriber.SourceIdentifier -ErrorAction SilentlyContinue
+            return
+        }
 
-            $elapsed = (Get-Date) - $eventStartedAt
-            $totalWholeHours = [Math]::Floor($elapsed.TotalHours)
-            if ($totalWholeHours -lt 1) {
-                return
-            }
-
+        # Refresh the stored ProcessObject to keep its CPU time updated
+        if ($Global:GameRuntimeByPid.ContainsKey($eventPid) -and $Global:GameRuntimeByPid[$eventPid].ProcessObject) {
             try {
-                $cpuNowSeconds = [double]$isRunning.CPU
-                Save-GameRuntimeCpuSnapshot -ProcessId $eventPid -CpuSeconds $cpuNowSeconds -HourMark $totalWholeHours
+                $Global:GameRuntimeByPid[$eventPid].ProcessObject.Refresh()
             }
             catch {
-                # Keep hourly notifications resilient even if CPU sampling temporarily fails.
+                # Silent fail if refresh temporarily errors (rare)
             }
+        }
 
+        $elapsed = (Get-Date) - $eventStartedAt
+        $totalWholeHours = [Math]::Floor($elapsed.TotalHours)
+
+        $cpuNowSeconds = 0.0
+        try {
+            $cpuNowSeconds = [double]$isRunning.CPU
+        }
+        catch {
+            # Keep updates resilient even if CPU sampling temporarily fails.
+        }
+
+        $snapshotData = Read-GameRuntimeCpuSnapshot -ProcessId $eventPid
+        $prevHourMark = if ($snapshotData) { [int]$snapshotData.HourMark } else { 0 }
+
+        # Always save the snapshot on every tick for accuracy
+        Save-GameRuntimeCpuSnapshot -ProcessId $eventPid -CpuSeconds $cpuNowSeconds -HourMark $totalWholeHours
+
+        # Only notify/speak on new whole hours
+        if ($totalWholeHours -gt $prevHourMark -and $totalWholeHours -ge 1) {
             $hoursText = if ($totalWholeHours -eq 1) { "1 hour" } else { "$totalWholeHours hours" }
             Write-VerboseDebug -Timestamp (Get-Date) -Title "PLAYTIME" -ForegroundColor "Yellow" -Message "$eventProgramName [PID:$eventPid] - $hoursText"
             Write-VerboseDebug -Timestamp (Get-Date) -Title "PLAYTIME" -ForegroundColor "Yellow" -Speak $true -Message "$eventTtsDisplayName - $hoursText"
         }
-        catch {
-            Write-Host "[PLAYTIME ERROR] $($_.Exception.Message)" -ForegroundColor Red
-        }
     }
+    catch {
+        Write-Host "[PLAYTIME ERROR] $($_.Exception.Message)" -ForegroundColor Red
+    }
+}
 
     $Global:GameRuntimeByPid[$ProcessId] = @{
         ProgramName = $ProgramName
