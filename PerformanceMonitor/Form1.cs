@@ -851,19 +851,20 @@ namespace PerformanceMonitor
         }
 
         // Function Inlining: Only in this particular case, I prefer to repeat code in this case instead of passing all parameters to the similar function
-        private void UpdateCounter(int counter, ProgressBar pb, Label lbl, string dimensional = "%")
+        // default threshold of 10000 is larger than cpu/memory utilization percentage and fan-rpm, so it won't trigger the red color for those counters, but it will trigger for disk throughput in MB/s which can be a bottleneck
+        private void UpdateCounter(int counter, ProgressBar pb, Label lbl, string dimensional = "%", int threshold = 10000)
         {
 
             if (this.WindowState != FormWindowState.Minimized && (int)lbl.Tag != counter)
             {
                 lbl.Tag = counter;
 
-                System.Drawing.Color color = counter <= 100.0f ? (System.Drawing.Color)pb.Tag : System.Drawing.Color.Red;
+                System.Drawing.Color color = counter < threshold ? (System.Drawing.Color)pb.Tag : System.Drawing.Color.Red;
                 if (pb.ForeColor != color) pb.ForeColor = color;
                 pb.Value = counter <= 100 ? counter : 100;
 
-                // Let's notify with red when counter >= 80 to denote possible bottleneck
-                color = counter <= 80.0f ? System.Drawing.Color.Black : System.Drawing.Color.Red;
+                // Let's notify with red when counter >= threshold to denote possible bottleneck
+                color = counter < threshold ? System.Drawing.Color.Black : System.Drawing.Color.Red;
                 if (lbl.ForeColor != color) lbl.ForeColor = color;
                 lbl.Text = $"{counter:F1}{dimensional}";
             }
@@ -886,6 +887,7 @@ namespace PerformanceMonitor
 
                 // Let's notify with red when counter >= trkMonitorBottleneckThreshold.Value to denote possible bottleneck
                 Color color = counterValue < threshold ? (Color)pb.Tag : Color.Red;
+
                 if (pb.ForeColor != color) pb.ForeColor = color;
                 pb.Value = v <= 100 ? v : 100;
 
@@ -893,6 +895,7 @@ namespace PerformanceMonitor
                 color = counterValue < threshold ? Color.Black : Color.Red;
                 if (lbl.ForeColor != color) lbl.ForeColor = color;
                 lbl.Text = $"{counterValue:F1}{dimensional}";
+
             }
         }
 
@@ -965,18 +968,18 @@ namespace PerformanceMonitor
             switch (tscmbCategory.SelectedIndex)
             {
                 case 0: // %GPU Time
-                    UpdateCounter(util, pbGPU0, lblGPU0, "%");
+                    UpdateCounter(util, pbGPU0, lblGPU0, "%", trkMonitorBottleneckThreshold.Value);
                     break;
                 case 1: // GPU Temperature (in degrees C)
-                    UpdateCounter(temp, pbGPU0, lblGPU0, "°C");
+                    UpdateCounter(temp, pbGPU0, lblGPU0, "°C", 80);
                     break;
                 case 2: // Memory Utilization
-                    UpdateCounter(myRTX4090.MemoryUtilization, pbGPU0, lblGPU0, "?");
+                    UpdateCounter(myRTX4090.MemoryUtilization, pbGPU0, lblGPU0, "?", trkMonitorBottleneckThreshold.Value);
                     break;
             }
 
             // update Fan-Speed
-            UpdateCounter(fanspeed, pbGPUFanSpeed, lblGPUFanSpeed);
+            UpdateCounter(fanspeed, pbGPUFanSpeed, lblGPUFanSpeed, "%", trkMonitorBottleneckThreshold.Value);
         }
 
         private void UpdateMonitorLabels()
