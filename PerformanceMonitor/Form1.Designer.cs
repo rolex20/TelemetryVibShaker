@@ -126,7 +126,6 @@
             this.toolStrip4090Label = new System.Windows.Forms.ToolStripLabel();
             this.tscmbCategory = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.tslblLT = new System.Windows.Forms.ToolStripLabel();
             this.tslblLoopTime = new System.Windows.Forms.ToolStripLabel();
@@ -178,6 +177,7 @@
             this.lblCPU24 = new System.Windows.Forms.Label();
             this.pbCPU24 = new System.Windows.Forms.ProgressBar();
             this.tbAlarm = new System.Windows.Forms.TabPage();
+            this.lblStaticAboveHelps = new System.Windows.Forms.Label();
             this.lblGpuAbovePct = new System.Windows.Forms.Label();
             this.label50 = new System.Windows.Forms.Label();
             this.label48 = new System.Windows.Forms.Label();
@@ -205,6 +205,7 @@
             this.txtCpuAlarm = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.tbSettings = new System.Windows.Forms.TabPage();
+            this.lblRedStaticHelp = new System.Windows.Forms.Label();
             this.lblReassignIdealProcessor = new System.Windows.Forms.Label();
             this.chkReassignIdealProcessor = new System.Windows.Forms.CheckBox();
             this.lblMonitorBottleneckThreshold = new System.Windows.Forms.Label();
@@ -223,8 +224,6 @@
             this.tbErrors = new System.Windows.Forms.TabPage();
             this.txtErrors = new System.Windows.Forms.TextBox();
             this.lblErrorsTitle = new System.Windows.Forms.Label();
-            this.lblRedStaticHelp = new System.Windows.Forms.Label();
-            this.lblStaticAboveHelps = new System.Windows.Forms.Label();
             this.toolStrip1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.tcTabControl.SuspendLayout();
@@ -249,7 +248,7 @@
             // 
             this.lblCPU.AutoSize = true;
             this.lblCPU.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCPU.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(200)))), ((int)(((byte)(83)))));
+            this.lblCPU.ForeColor = System.Drawing.Color.Green;
             this.lblCPU.Location = new System.Drawing.Point(11, 23);
             this.lblCPU.Name = "lblCPU";
             this.lblCPU.Size = new System.Drawing.Size(47, 13);
@@ -316,7 +315,7 @@
             // 
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(229)))), ((int)(((byte)(160)))));
+            this.label6.ForeColor = System.Drawing.Color.Teal;
             this.label6.Location = new System.Drawing.Point(237, 23);
             this.label6.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
             this.label6.Name = "label6";
@@ -346,7 +345,7 @@
             // 
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label7.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(200)))), ((int)(((byte)(83)))));
+            this.label7.ForeColor = System.Drawing.Color.Green;
             this.label7.Location = new System.Drawing.Point(11, 63);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(47, 13);
@@ -376,7 +375,7 @@
             this.label8.AutoSize = true;
             this.label8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label8.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(200)))), ((int)(((byte)(83)))));
+            this.label8.ForeColor = System.Drawing.Color.Green;
             this.label8.Location = new System.Drawing.Point(11, 107);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(49, 15);
@@ -404,7 +403,7 @@
             // 
             this.label10.AutoSize = true;
             this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(200)))), ((int)(((byte)(83)))));
+            this.label10.ForeColor = System.Drawing.Color.Green;
             this.label10.Location = new System.Drawing.Point(11, 150);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(47, 13);
@@ -434,7 +433,7 @@
             this.label12.AutoSize = true;
             this.label12.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label12.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(200)))), ((int)(((byte)(83)))));
+            this.label12.ForeColor = System.Drawing.Color.Green;
             this.label12.Location = new System.Drawing.Point(11, 193);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(49, 15);
@@ -464,7 +463,7 @@
             this.label14.AutoSize = true;
             this.label14.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label14.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(200)))), ((int)(((byte)(83)))));
+            this.label14.ForeColor = System.Drawing.Color.Green;
             this.label14.Location = new System.Drawing.Point(4, 235);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(56, 15);
@@ -492,7 +491,7 @@
             // 
             this.label16.AutoSize = true;
             this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label16.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(200)))), ((int)(((byte)(83)))));
+            this.label16.ForeColor = System.Drawing.Color.Green;
             this.label16.Location = new System.Drawing.Point(4, 279);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(54, 13);
@@ -520,7 +519,7 @@
             // 
             this.label18.AutoSize = true;
             this.label18.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label18.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(200)))), ((int)(((byte)(83)))));
+            this.label18.ForeColor = System.Drawing.Color.Green;
             this.label18.Location = new System.Drawing.Point(4, 324);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(54, 13);
@@ -549,7 +548,7 @@
             // 
             this.label20.AutoSize = true;
             this.label20.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label20.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(229)))), ((int)(((byte)(160)))));
+            this.label20.ForeColor = System.Drawing.Color.Teal;
             this.label20.Location = new System.Drawing.Point(236, 63);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(62, 13);
@@ -578,7 +577,7 @@
             // 
             this.label9.AutoSize = true;
             this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label9.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(229)))), ((int)(((byte)(160)))));
+            this.label9.ForeColor = System.Drawing.Color.Teal;
             this.label9.Location = new System.Drawing.Point(236, 107);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(62, 13);
@@ -607,7 +606,7 @@
             // 
             this.label13.AutoSize = true;
             this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label13.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(229)))), ((int)(((byte)(160)))));
+            this.label13.ForeColor = System.Drawing.Color.Teal;
             this.label13.Location = new System.Drawing.Point(236, 150);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(62, 13);
@@ -635,7 +634,7 @@
             // 
             this.label17.AutoSize = true;
             this.label17.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label17.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(229)))), ((int)(((byte)(160)))));
+            this.label17.ForeColor = System.Drawing.Color.Teal;
             this.label17.Location = new System.Drawing.Point(236, 193);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(62, 13);
@@ -663,7 +662,7 @@
             // 
             this.label21.AutoSize = true;
             this.label21.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label21.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(229)))), ((int)(((byte)(160)))));
+            this.label21.ForeColor = System.Drawing.Color.Teal;
             this.label21.Location = new System.Drawing.Point(229, 234);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(69, 13);
@@ -691,7 +690,7 @@
             // 
             this.label23.AutoSize = true;
             this.label23.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label23.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(229)))), ((int)(((byte)(160)))));
+            this.label23.ForeColor = System.Drawing.Color.Teal;
             this.label23.Location = new System.Drawing.Point(229, 279);
             this.label23.Name = "label23";
             this.label23.Size = new System.Drawing.Size(69, 13);
@@ -719,7 +718,7 @@
             // 
             this.label25.AutoSize = true;
             this.label25.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label25.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(229)))), ((int)(((byte)(160)))));
+            this.label25.ForeColor = System.Drawing.Color.Teal;
             this.label25.Location = new System.Drawing.Point(229, 323);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(69, 13);
@@ -747,7 +746,7 @@
             // 
             this.label11.AutoSize = true;
             this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label11.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.label11.ForeColor = System.Drawing.Color.Blue;
             this.label11.Location = new System.Drawing.Point(472, 23);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(69, 13);
@@ -777,7 +776,7 @@
             // 
             this.label15.AutoSize = true;
             this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label15.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.label15.ForeColor = System.Drawing.Color.Blue;
             this.label15.Location = new System.Drawing.Point(472, 63);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(69, 13);
@@ -807,7 +806,7 @@
             // 
             this.label22.AutoSize = true;
             this.label22.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label22.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.label22.ForeColor = System.Drawing.Color.Blue;
             this.label22.Location = new System.Drawing.Point(472, 107);
             this.label22.Name = "label22";
             this.label22.Size = new System.Drawing.Size(69, 13);
@@ -837,7 +836,7 @@
             // 
             this.label26.AutoSize = true;
             this.label26.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label26.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.label26.ForeColor = System.Drawing.Color.Blue;
             this.label26.Location = new System.Drawing.Point(472, 150);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(69, 13);
@@ -1015,6 +1014,7 @@
             this.lblGPUFanSpeed.Name = "lblGPUFanSpeed";
             this.lblGPUFanSpeed.Size = new System.Drawing.Size(13, 13);
             this.lblGPUFanSpeed.TabIndex = 97;
+            this.lblGPUFanSpeed.Tag = "1";
             this.lblGPUFanSpeed.Text = "--";
             // 
             // pbGPUFanSpeed
@@ -1057,8 +1057,7 @@
             this.toolStripSeparator2,
             this.toolStrip4090Label,
             this.tscmbCategory,
-            this.toolStripSeparator3,
-            this.toolStripButton1});
+            this.toolStripSeparator3});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(1001, 28);
@@ -1174,15 +1173,6 @@
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
             this.toolStripSeparator3.Size = new System.Drawing.Size(6, 28);
-            // 
-            // toolStripButton1
-            // 
-            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
-            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(23, 25);
-            this.toolStripButton1.Text = "toolStripButton1";
             // 
             // toolStrip2
             // 
@@ -1524,7 +1514,7 @@
             // 
             this.label44.AutoSize = true;
             this.label44.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label44.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.label44.ForeColor = System.Drawing.Color.Blue;
             this.label44.Location = new System.Drawing.Point(720, 151);
             this.label44.Name = "label44";
             this.label44.Size = new System.Drawing.Size(69, 13);
@@ -1552,7 +1542,7 @@
             // 
             this.label42.AutoSize = true;
             this.label42.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label42.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.label42.ForeColor = System.Drawing.Color.Blue;
             this.label42.Location = new System.Drawing.Point(720, 108);
             this.label42.Name = "label42";
             this.label42.Size = new System.Drawing.Size(69, 13);
@@ -1597,7 +1587,7 @@
             // 
             this.label49.AutoSize = true;
             this.label49.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label49.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.label49.ForeColor = System.Drawing.Color.Blue;
             this.label49.Location = new System.Drawing.Point(472, 323);
             this.label49.Name = "label49";
             this.label49.Size = new System.Drawing.Size(69, 13);
@@ -1625,7 +1615,7 @@
             // 
             this.label47.AutoSize = true;
             this.label47.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label47.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.label47.ForeColor = System.Drawing.Color.Blue;
             this.label47.Location = new System.Drawing.Point(472, 279);
             this.label47.Name = "label47";
             this.label47.Size = new System.Drawing.Size(69, 13);
@@ -1653,7 +1643,7 @@
             // 
             this.label45.AutoSize = true;
             this.label45.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label45.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.label45.ForeColor = System.Drawing.Color.Blue;
             this.label45.Location = new System.Drawing.Point(472, 234);
             this.label45.Name = "label45";
             this.label45.Size = new System.Drawing.Size(69, 13);
@@ -1681,7 +1671,7 @@
             // 
             this.label43.AutoSize = true;
             this.label43.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label43.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.label43.ForeColor = System.Drawing.Color.Blue;
             this.label43.Location = new System.Drawing.Point(472, 193);
             this.label43.Name = "label43";
             this.label43.Size = new System.Drawing.Size(69, 13);
@@ -1692,7 +1682,7 @@
             // 
             this.label41.AutoSize = true;
             this.label41.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label41.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.label41.ForeColor = System.Drawing.Color.Blue;
             this.label41.Location = new System.Drawing.Point(720, 64);
             this.label41.Name = "label41";
             this.label41.Size = new System.Drawing.Size(69, 13);
@@ -1720,7 +1710,7 @@
             // 
             this.label40.AutoSize = true;
             this.label40.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label40.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
+            this.label40.ForeColor = System.Drawing.Color.Blue;
             this.label40.Location = new System.Drawing.Point(720, 24);
             this.label40.Name = "label40";
             this.label40.Size = new System.Drawing.Size(69, 13);
@@ -1779,6 +1769,15 @@
             this.tbAlarm.TabIndex = 3;
             this.tbAlarm.Text = "Alert";
             this.tbAlarm.UseVisualStyleBackColor = true;
+            // 
+            // lblStaticAboveHelps
+            // 
+            this.lblStaticAboveHelps.AutoSize = true;
+            this.lblStaticAboveHelps.Location = new System.Drawing.Point(425, 330);
+            this.lblStaticAboveHelps.Name = "lblStaticAboveHelps";
+            this.lblStaticAboveHelps.Size = new System.Drawing.Size(380, 13);
+            this.lblStaticAboveHelps.TabIndex = 26;
+            this.lblStaticAboveHelps.Text = "*Percentage of tick/events where sound-alert-thresholds have been exceeded.";
             // 
             // lblGpuAbovePct
             // 
@@ -2063,6 +2062,15 @@
             this.tbSettings.UseVisualStyleBackColor = true;
             this.tbSettings.Click += new System.EventHandler(this.tbSettings_Click);
             // 
+            // lblRedStaticHelp
+            // 
+            this.lblRedStaticHelp.AutoSize = true;
+            this.lblRedStaticHelp.Location = new System.Drawing.Point(302, 220);
+            this.lblRedStaticHelp.Name = "lblRedStaticHelp";
+            this.lblRedStaticHelp.Size = new System.Drawing.Size(262, 13);
+            this.lblRedStaticHelp.TabIndex = 27;
+            this.lblRedStaticHelp.Text = "*Only applies to red color thresholds (not sound alerts).";
+            // 
             // lblReassignIdealProcessor
             // 
             this.lblReassignIdealProcessor.AutoSize = true;
@@ -2285,24 +2293,6 @@
             this.lblErrorsTitle.TabIndex = 0;
             this.lblErrorsTitle.Text = "Errors: (only the first 100 are listed)";
             // 
-            // lblRedStaticHelp
-            // 
-            this.lblRedStaticHelp.AutoSize = true;
-            this.lblRedStaticHelp.Location = new System.Drawing.Point(302, 220);
-            this.lblRedStaticHelp.Name = "lblRedStaticHelp";
-            this.lblRedStaticHelp.Size = new System.Drawing.Size(262, 13);
-            this.lblRedStaticHelp.TabIndex = 27;
-            this.lblRedStaticHelp.Text = "*Only applies to red color thresholds (not sound alerts).";
-            // 
-            // lblStaticAboveHelps
-            // 
-            this.lblStaticAboveHelps.AutoSize = true;
-            this.lblStaticAboveHelps.Location = new System.Drawing.Point(425, 330);
-            this.lblStaticAboveHelps.Name = "lblStaticAboveHelps";
-            this.lblStaticAboveHelps.Size = new System.Drawing.Size(380, 13);
-            this.lblStaticAboveHelps.TabIndex = 26;
-            this.lblStaticAboveHelps.Text = "*Percentage of tick/events where sound-alert-thresholds have been exceeded.";
-            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -2465,7 +2455,6 @@
         private System.Windows.Forms.ToolStripLabel tsYCoordLabel;
         private System.Windows.Forms.ToolStripLabel tslblTop;
         private System.Windows.Forms.ToolStripButton tsbtnRecenter;
-        private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
         private System.Windows.Forms.TabControl tcTabControl;
         private System.Windows.Forms.TabPage tbMonitor;
