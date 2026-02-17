@@ -119,46 +119,7 @@ namespace MicroTaskScheduler
             }
         }
 
-        private void AssignEfficiencyCoresOnlyOld()
-        {
-            Process currentProcess = Process.GetCurrentProcess();
-
-
-            // Open the registry key for the processor
-            RegistryKey regKey = Registry.LocalMachine.OpenSubKey("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0");
-
-            // Read the processor name from the registry
-            string processorName = regKey.GetValue("ProcessorNameString").ToString();
-
-            // Make sure we have 20 CPUs (HyperThreading Enabled and Efficient Cores enabled in 12700K)
-            // Open the registry key for the processors
-            int cpuCount = 0;
-            regKey = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor");
-            if (regKey != null)
-            {
-                // The number of subkeys corresponds to the number of CPUs
-                cpuCount = regKey.SubKeyCount;
-            }
-
-            // Check if the processor name contains "Intel 12700K", HyperThreading Enabled and Efficient Cores enabled
-            if (processorName.Contains("12700K") && cpuCount == 20)
-            {                    
-                // Define the CPU affinity mask for CPUs 17 to 20                                 
-                // CPUs are zero-indexed, so CPU 17 is represented by bit 16, and so on.
-                affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
-
-                try
-                {
-                        // Set the CPU affinity
-                        currentProcess.ProcessorAffinity = affinityMask;
-                    }
-                    catch { } // Ignore
-            }
-
-            regKey.Close();
-
-        }
-
+        
         protected override void OnStart(string[] args)
         {
             AssignEfficiencyCoresOnly();
@@ -216,17 +177,23 @@ namespace MicroTaskScheduler
         {
             SoundPlayer myWaveFile = new SoundPlayer(Properties.Resources.Casio_Watch_Alarm);
             myWaveFile.Play();
+            Thread.Sleep(2000); // Wait a couple of seconds to avoid the startup beep being right on the edge of the next hour which would cause a double beep
 
             try
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     // Calculate the time remaining until the next hour
-                    TimeSpan timeToNextHour = TimeSpan.FromHours(1) - TimeSpan.FromMinutes(DateTime.Now.Minute) - TimeSpan.FromSeconds(DateTime.Now.Second) - TimeSpan.FromMilliseconds(DateTime.Now.Millisecond);
+                    //TimeSpan timeToNextHour = TimeSpan.FromHours(1) - TimeSpan.FromMinutes(DateTime.Now.Minute) - TimeSpan.FromSeconds(DateTime.Now.Second) - TimeSpan.FromMilliseconds(DateTime.Now.Millisecond);
+
+                    DateTime now = DateTime.Now;
+                    DateTime nextHour = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0, 0).AddHours(1);
+                    TimeSpan timeToNextHour = nextHour - now;
+
                     await Task.Delay(timeToNextHour, cancellationToken); // wait here and see ya in an hour
 
                     if (!cancellationToken.IsCancellationRequested) myWaveFile.Play();
-                    Thread.Sleep(1500); // Wait at least one second, otherwise it might complete so fast that it will play the alarm several times
+                    
                 }
             }
             catch
@@ -235,6 +202,59 @@ namespace MicroTaskScheduler
                 // we can ignore them
             }
         }
+
+        // This is an improved version of the HourlyAlarm method that is more robust and handles edge cases better. Will test later.
+        private async Task HourlyAlarm(CancellationToken cancellationToken, int second_version)
+        {
+            SoundPlayer myWaveFile = new SoundPlayer(Properties.Resources.Casio_Watch_Alarm);
+
+            // Option B:
+            // Beep on service start, BUT if we're very close to the next top-of-hour,
+            // skip the startup beep so you don't get a back-to-back double beep.
+            TimeSpan skipStartupBeepWindow = TimeSpan.FromSeconds(3);
+
+            try
+            {
+                // Robust: compute "time to next hour" from a single timestamp snapshot
+                DateTime now = DateTime.Now;
+                DateTime nextHour = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0, 0).AddHours(1);
+                TimeSpan timeToNextHour = nextHour - now;
+
+                // Startup beep only if we're not within the skip window
+                if (timeToNextHour > skipStartupBeepWindow && !cancellationToken.IsCancellationRequested)
+                {
+                    myWaveFile.Stop();   // defensive: prevent overlap
+                    myWaveFile.Play();
+                    await Task.Delay(1500, cancellationToken);
+                }
+
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    now = DateTime.Now;
+                    nextHour = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0, 0).AddHours(1);
+                    timeToNextHour = nextHour - now;
+
+                    if (timeToNextHour < TimeSpan.Zero)
+                        timeToNextHour = TimeSpan.Zero; // defensive: handles rare clock/time anomalies
+
+                    await Task.Delay(timeToNextHour, cancellationToken);
+
+                    if (cancellationToken.IsCancellationRequested)
+                        break;
+
+                    myWaveFile.Stop();   // defensive: prevent overlap
+                    myWaveFile.Play();
+
+                    // Replace Thread.Sleep(1500) with an async delay (doesn't block the thread)
+                    await Task.Delay(1500, cancellationToken);
+                }
+            }
+            catch
+            {
+                // Ignore exceptions during shutdown/cancellation
+            }
+        }
+
 
         private void ExecutePowerShellScript()
         {
