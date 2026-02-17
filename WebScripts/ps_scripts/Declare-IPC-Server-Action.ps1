@@ -194,7 +194,7 @@ Add-Type @"
 
     # Start the server loop
     while ($global:IPC_ContinueServer) {
-        Write-Host "Waiting for new IPC client connection on pipe [$pipeName]..."
+		Write-VerboseDebug -Timestamp (Get-Date) -Title "IPC SERVER" -Message "Listening on pipe [$pipeName]"
         $pipeServer.WaitForConnection()
 
         $reader = New-Object System.IO.StreamReader($pipeServer)
@@ -214,5 +214,5 @@ Add-Type @"
     }
     $mutex.Dispose()
 	if ($tts) { $tts.Dispose() }
-	Write-Host "IPC Pipe Server terminated."
+	Write-VerboseDebug -Timestamp (Get-Date) -Title "IPC EXIT" -Message "IPC Pipe Server terminated."
 }

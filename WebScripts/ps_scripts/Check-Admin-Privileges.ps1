@@ -44,7 +44,7 @@ Function Check-Admin-Privileges()
   else
     {
        Write-Host "This script requires elevated privileges.  Start it as an administrator"
-       Start-Sleep -Seconds 20
+       #Start-Sleep -Seconds 20
        #Exit from the current, unelevated, process
        Exit
  
