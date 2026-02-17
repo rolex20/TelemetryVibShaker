@@ -779,16 +779,10 @@ namespace TelemetryVibShaker
             uint newIdealProcessor = processorAssigner.GetNextProcessor();
 
             IntPtr currentThreadHandle = GetCurrentThread();
-            int previousProcessor = (int)SetThreadIdealProcessor(currentThreadHandle, newIdealProcessor);
+            int previousProcessor = (int)SetThreadIdealProcessor(currentThreadHandle, newIdealProcessor); // returns -1 if failed
 
-            if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
-            {
-                toolStripStatusLabel1.Text = $"[{DateTime.Now.ToString("HH:mm:ss.fff")}] SetNewIdealProcessor({newIdealProcessor})={previousProcessor}";
-            }
-            else
-            {
-                toolStripStatusLabel1.Text = $"[{DateTime.Now.ToString("HH:mm:ss.fff")}] SetNewIdealProcessor({newIdealProcessor})={previousProcessor}";
-            }
+
+            toolStripStatusLabel1.Text = $"[{DateTime.Now.ToString("HH:mm:ss.fff")}] SetNewIdealProcessor({newIdealProcessor})={previousProcessor}";
 
         }
 

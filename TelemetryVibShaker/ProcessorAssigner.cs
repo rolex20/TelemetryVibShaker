@@ -1,4 +1,4 @@
-﻿
+﻿// This class will calculate an Ideal Processor in Round Robin Fashion considering only Efficiency Processors
 // Helpful in my set of TelemetryVibShaker programs which runs only in Efficiency Processors
 // Tested in my Intel 12700K and 14700K
 
@@ -28,8 +28,8 @@ namespace IdealProcessorEnhanced
         // Constructor to initialize the starting processor number
         public ProcessorAssigner(uint maxProcessor)
         {
-            mutex = new Mutex(false, "ProcessorAssignerMutex");
-            mmf = MemoryMappedFile.CreateOrOpen("ProcessorAssignerMMF", 4);
+            mutex = new Mutex(false, @"Global\ProcessorAssignerMutex");
+            mmf = MemoryMappedFile.CreateOrOpen(@"Global\ProcessorAssignerMMF", 4);
             accessor = mmf.CreateViewAccessor();
 
             startProcessor = maxProcessor;
