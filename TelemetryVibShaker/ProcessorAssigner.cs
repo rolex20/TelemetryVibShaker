@@ -1,4 +1,4 @@
-﻿// This class will calculate an Ideal Processor in Round Robin Fashion considering only Efficiency Processors
+﻿
 // Helpful in my set of TelemetryVibShaker programs which runs only in Efficiency Processors
 // Tested in my Intel 12700K and 14700K
 
@@ -70,7 +70,7 @@ namespace IdealProcessorEnhanced
                 // Read the current processor number from the memory-mapped file
                 accessor.Read(0, out currentProcessor);
                 // Decrement the processor number
-                uint nextProcessor = currentProcessor-1;
+                uint nextProcessor = currentProcessor - 1;
                 // If the processor number goes below 16, reset it to the starting processor number
                 if (nextProcessor < 16)
                 {
