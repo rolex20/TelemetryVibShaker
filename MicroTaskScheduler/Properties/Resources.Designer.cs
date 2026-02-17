@@ -68,5 +68,14 @@ namespace MicroTaskScheduler.Properties {
                 return ResourceManager.GetStream("Casio_Watch_Alarm", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream StartCredit {
+            get {
+                return ResourceManager.GetStream("StartCredit", resourceCulture);
+            }
+        }
     }
 }

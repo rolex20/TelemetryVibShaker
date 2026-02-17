@@ -175,10 +175,11 @@ namespace MicroTaskScheduler
 
         private async Task HourlyAlarm(CancellationToken cancellationToken)
         {
-            SoundPlayer myWaveFile = new SoundPlayer(Properties.Resources.Casio_Watch_Alarm);
+            SoundPlayer myWaveFile = new SoundPlayer(Properties.Resources.StartCredit);
             myWaveFile.Play();
             Thread.Sleep(2000); // Wait a couple of seconds to avoid the startup beep being right on the edge of the next hour which would cause a double beep
 
+            myWaveFile = new SoundPlayer(Properties.Resources.Casio_Watch_Alarm);
             try
             {
                 while (!cancellationToken.IsCancellationRequested)
