@@ -175,13 +175,17 @@ namespace MicroTaskScheduler
 
         private async Task HourlyAlarm(CancellationToken cancellationToken)
         {
-            SoundPlayer myWaveFile = new SoundPlayer(Properties.Resources.StartCredit);
-            myWaveFile.Play();
-            Thread.Sleep(2000); // Wait a couple of seconds to avoid the startup beep being right on the edge of the next hour which would cause a double beep
-
-            myWaveFile = new SoundPlayer(Properties.Resources.Casio_Watch_Alarm);
             try
             {
+                SoundPlayer spWelcome = new SoundPlayer(Properties.Resources.StartCredit);
+                spWelcome.Play();
+                Thread.Sleep(2000); // Wait a couple of seconds to avoid the startup beep being right on the edge of the next hour which would cause a double beep
+                spWelcome = null;
+
+                SoundPlayer spCasio = new SoundPlayer(Properties.Resources.Casio_Watch_Alarm);
+                spCasio.Play();
+                Thread.Sleep(2000); // Wait a couple of seconds to avoid the startup beep being right on the edge of the next hour which would cause a double beep
+
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     // Calculate the time remaining until the next hour
@@ -193,14 +197,19 @@ namespace MicroTaskScheduler
 
                     await Task.Delay(timeToNextHour, cancellationToken); // wait here and see ya in an hour
 
-                    if (!cancellationToken.IsCancellationRequested) myWaveFile.Play();
+                    if (!cancellationToken.IsCancellationRequested)
+                    {
+                        spCasio.Play();
+                        Thread.Sleep(2000);
+                    }
                     
                 }
             }
-            catch
+            catch (Exception ex)
             {
                 // obviously the previous calls might generate an exception when the cancelation token is triggered by an onStop() request
                 // we can ignore them
+                EventLog.WriteEntry($"HourlyAlarm() Exception: {ex.Message}.  No more hourly alarms after this moment.", EventLogEntryType.Error);
             }
         }
 
