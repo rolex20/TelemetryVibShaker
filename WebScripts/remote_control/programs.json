@@ -1,6 +1,11 @@
 {
   "programs": [
     {
+      "friendlyName": "Spartan Mod for GRB",
+      "processName": "powershell.exe",
+      "path": "C:\\Users\\ralch\\Desktop\\Spartan Mod.lnk"
+    },
+    {
       "friendlyName": "Fanatec Pedals Monitor (Racing)",
       "processName": "fanatecmonitor_RaptorLake",
       "path": "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk"
