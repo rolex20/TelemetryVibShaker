@@ -195,7 +195,7 @@ namespace MicroTaskScheduler
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     DateTime now = DateTime.Now;
-                    DateTime nextHour = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0, 0).AddMinutes(10);
+                    DateTime nextHour = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0, 0).AddHours(1);
                     TimeSpan timeToNextHour = nextHour - now;
 
                     // Wait until the next hour
