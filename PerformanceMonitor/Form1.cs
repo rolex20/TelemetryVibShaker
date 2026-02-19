@@ -62,6 +62,9 @@ namespace PerformanceMonitor
 
         private bool topMost = false; // to fix .TopMost bug
 
+        private ProcessorAssignmentStats cpuStats;
+
+
         private void ResetTicksCounters()
         {
             TotalTicks = 0.0f;
@@ -74,8 +77,7 @@ namespace PerformanceMonitor
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            //No longer using a service to get Gpu counters
-            //UpdateGpuInterval(1000); // No longer need lower intervals 
+            cpuStats.WriteReportSnapshot(true, "Final Snapshot on FormClosing()");
 
             timer1.Enabled = false;
             pipeCancellationTokenSource.Cancel();
@@ -426,15 +428,7 @@ namespace PerformanceMonitor
             UpdatePercentageTrackers(trkMonitorBottleneckThreshold, lblMonitorBottleneckThreshold, null);
         }
 
-        private void tbSettings_Click(object sender, EventArgs e)
-        {
 
-        }
-
-        private void lblCPU5_Click(object sender, EventArgs e)
-        {
-
-        }
 
         private void chkReassignIdealProcessor_CheckedChanged(object sender, EventArgs e)
         {
@@ -451,6 +445,7 @@ namespace PerformanceMonitor
             {
                 CPU_QoS.SetEcoQoS(false);
                 CPU_QoS.SetCpuSets(CPU_QoS.CpuSetType.None);
+                ResetHardAffinity();
             }
             else if (rbHardAffinity.Checked)
             {
@@ -462,31 +457,37 @@ namespace PerformanceMonitor
             {
                 CPU_QoS.SetEcoQoS(true);
                 CPU_QoS.SetCpuSets(CPU_QoS.CpuSetType.None);
+                ResetHardAffinity();
             }
             else if (rbCpuSetsAffinity.Checked)
             {
                 CPU_QoS.SetEcoQoS(false);
                 CPU_QoS.SetCpuSets(CPU_QoS.CpuSetType.Efficiency);
+                ResetHardAffinity();
             }
         }
 
         private void rbNoAffinity_CheckedChanged(object sender, EventArgs e)
         {
+            cpuStats.Reset("Affinity changed to No Affinity", true);
             ReassignAffinity();
         }
 
         private void rbHardAffinity_CheckedChanged(object sender, EventArgs e)
         {
+            cpuStats.Reset("Affinity changed to Hard Affinity", true);      
             ReassignAffinity();
         }
 
         private void rbEcoQosAffinity_CheckedChanged(object sender, EventArgs e)
         {
+            cpuStats.Reset("Affinity changed to EcoQoS", true);
             ReassignAffinity();
         }
 
         private void rbCpuSetsAffinity_CheckedChanged(object sender, EventArgs e)
         {
+            cpuStats.Reset("Affinity changed to CpuSets", true);
             ReassignAffinity();
         }
 
@@ -590,6 +591,14 @@ namespace PerformanceMonitor
 
         }
 
+        private void ResetHardAffinity()
+        {
+            // Reset the CPU affinity to all available CPUs
+            currentProcess.ProcessorAffinity = (IntPtr)((1 << CPUCount) - 1);
+            lblEfficientCoresNote.Text = "Hard affinity changed to all available cores.";
+        }
+
+
         private void AssignEfficiencyCoresOnly()
         {
             // Define the CPU affinity mask for CPUs 17 to 20
@@ -602,7 +611,7 @@ namespace PerformanceMonitor
                     if (CPUCount == 20) // Make sure HyperThreading and Efficient cores are enabled
                     {
                         affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
-                        lblEfficientCoresNote.Text = "12700K" + lblEfficientCoresNote.Text;
+                        lblEfficientCoresNote.Text = "14700K  detected:   Using only efficient cores.";
                         lblEfficientCoresNote.Visible = true;
                     }
 
@@ -616,7 +625,7 @@ namespace PerformanceMonitor
                     if (CPUCount == 28) // Make sure HyperThreading and Efficient cores are enabled
                     {
                         affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
-                        lblEfficientCoresNote.Text = "14700K" + lblEfficientCoresNote.Text;
+                        lblEfficientCoresNote.Text = "14700K  detected:   Using only efficient cores.";
                         lblEfficientCoresNote.Visible = true;
                         chkReassignIdealProcessor.Visible = true;
                         lblReassignIdealProcessor.Visible = true;
@@ -648,8 +657,11 @@ namespace PerformanceMonitor
             SingleInstanceChecker();
             DetermineCpuTypeAndCount();
 
-
             ResetTicksCounters();
+
+            cpuStats = new ProcessorAssignmentStats(CPUCount);
+
+
 
             // Restore previous location
             this.Location = new Point(Properties.Settings.Default.XCoordinate, Properties.Settings.Default.YCoordinate);
@@ -750,9 +762,25 @@ namespace PerformanceMonitor
             nudPollingInterval.Value = Properties.Settings.Default.TimerInterval;
             timer1.Interval = (int)nudPollingInterval.Value;
 
-            if (rbHardAffinity.Checked) AssignEfficiencyCoresOnly();
-            else if (rbEcoQosAffinity.Checked) CPU_QoS.SetEcoQoS(true);
-            else if (rbCpuSetsAffinity.Checked) CPU_QoS.SetCpuSets(CPU_QoS.CpuSetType.Efficiency);
+            if (rbHardAffinity.Checked)
+            {
+                AssignEfficiencyCoresOnly();
+                cpuStats.Reset("Affinity changed to Hard Affinity", true);
+            }
+            else if (rbEcoQosAffinity.Checked)
+            {
+                CPU_QoS.SetEcoQoS(true);
+                cpuStats.Reset("Affinity changed to EcoQoS", true);
+            }
+            else if (rbCpuSetsAffinity.Checked)
+            {
+                CPU_QoS.SetCpuSets(CPU_QoS.CpuSetType.Efficiency);
+                cpuStats.Reset("Affinity changed to CpuSets", true);
+            }
+            else
+            {
+                cpuStats.Reset("Affinity changed to No Specified Affinity", true);
+            }
 
             // Change the priority class to the previous setting selected (NORMAL, BELOW_NORMAL or IDLE)
             // This call must come after AssignEfficiencyCoresOnly
@@ -1023,7 +1051,10 @@ namespace PerformanceMonitor
 
             if (tschkShowLastProcessor.Checked)
             {
-                UpdateCaption(tslblCurrentProcessor, (int)GetCurrentProcessorNumber());
+                uint cpu = GetCurrentProcessorNumber();
+                UpdateCaption(tslblCurrentProcessor, (int)cpu);
+                cpuStats.Tick(cpu);
+
             }
 
             UpdateGPUInfo();
