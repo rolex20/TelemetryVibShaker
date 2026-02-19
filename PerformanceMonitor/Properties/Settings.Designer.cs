@@ -226,5 +226,53 @@ namespace PerformanceMonitor.Properties {
                 this["chkReassignIdealProcessor"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool rbCpuSetsAffinity {
+            get {
+                return ((bool)(this["rbCpuSetsAffinity"]));
+            }
+            set {
+                this["rbCpuSetsAffinity"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool rbEcoQosAffinity {
+            get {
+                return ((bool)(this["rbEcoQosAffinity"]));
+            }
+            set {
+                this["rbEcoQosAffinity"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool rbHardAffinity {
+            get {
+                return ((bool)(this["rbHardAffinity"]));
+            }
+            set {
+                this["rbHardAffinity"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool rbNoAffinity {
+            get {
+                return ((bool)(this["rbNoAffinity"]));
+            }
+            set {
+                this["rbNoAffinity"] = value;
+            }
+        }
     }
 }

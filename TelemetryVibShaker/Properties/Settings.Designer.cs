@@ -12,7 +12,7 @@ namespace TelemetryVibShaker.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.10.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.14.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -500,6 +500,54 @@ namespace TelemetryVibShaker.Properties {
             }
             set {
                 this["HalfAnHourAlarmSoundEffect"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool rbNoAffinity {
+            get {
+                return ((bool)(this["rbNoAffinity"]));
+            }
+            set {
+                this["rbNoAffinity"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool rbCpuSetsAffinity {
+            get {
+                return ((bool)(this["rbCpuSetsAffinity"]));
+            }
+            set {
+                this["rbCpuSetsAffinity"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool rbEcoQosAffinity {
+            get {
+                return ((bool)(this["rbEcoQosAffinity"]));
+            }
+            set {
+                this["rbEcoQosAffinity"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool rbHardAffinity {
+            get {
+                return ((bool)(this["rbHardAffinity"]));
+            }
+            set {
+                this["rbHardAffinity"] = value;
             }
         }
     }

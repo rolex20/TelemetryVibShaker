@@ -47,7 +47,8 @@ namespace PerformanceMonitor
         private CancellationTokenSource pipeCancellationTokenSource;
 
         private Process currentProcess;
-        private CpuType cpuType;
+        private CpuType CPUType;
+        private int CPUCount = -1;
         private uint maxProcessorNumber = 0;
         private bool needToCallSetNewIdealProcessor = true;
         private ProcessorAssigner processorAssigner = null;  // Must be alive the while the program is running and is assigned only once if it is the right type of processor
@@ -97,6 +98,12 @@ namespace PerformanceMonitor
             Properties.Settings.Default.tcTabControl = tcTabControl.SelectedIndex;
             Properties.Settings.Default.cmbProcessorCounter = cmbProcessorCounter.SelectedIndex;
             Properties.Settings.Default.chkReassignIdealProcessor = chkReassignIdealProcessor.Checked;
+
+            Properties.Settings.Default.rbNoAffinity = rbNoAffinity.Checked ;
+            Properties.Settings.Default.rbHardAffinity = rbHardAffinity.Checked;
+            Properties.Settings.Default.rbEcoQosAffinity = rbEcoQosAffinity.Checked ;
+            Properties.Settings.Default.rbCpuSetsAffinity = rbCpuSetsAffinity.Checked ;
+
 
 
 
@@ -358,33 +365,20 @@ namespace PerformanceMonitor
         [DllImport("user32.dll")]
         private static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
 
-        private void lblCPU3_Click(object sender, EventArgs e)
-        {
-
-        }
 
 
 
-        private void pbCPU17_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void lblCPU17_Click(object sender, EventArgs e)
-        {
-
-        }
 
         private void frmMain_DpiChanged(object sender, DpiChangedEventArgs e)
         {
             tstxtAutoMoveY.Text = Location.X.ToString();
-            LogError("Occurs when form is moved to a monitor with a different resolution and scaling level, or when form's monitor scaling level is changed in the Windows settings.", "DpiChanged()", true);
+            //LogError("Occurs when form is moved to a monitor with a different resolution and scaling level, or when form's monitor scaling level is changed in the Windows settings.", "DpiChanged()", true);
         }
 
         private void frmMain_LocationChanged(object sender, EventArgs e)
         {
             tstxtAutoMoveY.Text = Location.X.ToString();
-            LogError("Event raised when the value of the Location property is changed on Control.", "LocationChanged()", true);
+            //LogError("Event raised when the value of the Location property is changed on Control.", "LocationChanged()", true);
         }
 
         private void cmbProcessorCounter_SelectedIndexChanged(object sender, EventArgs e)
@@ -444,37 +438,59 @@ namespace PerformanceMonitor
 
         private void chkReassignIdealProcessor_CheckedChanged(object sender, EventArgs e)
         {
-            // processor cannot be assigned from the current thread
+            // processor should not be assigned from the current thread
             // let's signal the need for that operation here
             needToCallSetNewIdealProcessor = chkReassignIdealProcessor.Visible && chkReassignIdealProcessor.Checked;
         }
 
-        private void pbCPU18_Click(object sender, EventArgs e)
-        {
 
+
+        private void ReassignAffinity()
+        {
+            if (rbNoAffinity.Checked)
+            {
+                CPU_QoS.SetEcoQoS(false);
+                CPU_QoS.SetCpuSets(CPU_QoS.CpuSetType.None);
+            }
+            else if (rbHardAffinity.Checked)
+            {
+                CPU_QoS.SetEcoQoS(false);
+                CPU_QoS.SetCpuSets(CPU_QoS.CpuSetType.None);
+                AssignEfficiencyCoresOnly();
+            }
+            else if (rbEcoQosAffinity.Checked)
+            {
+                CPU_QoS.SetEcoQoS(true);
+                CPU_QoS.SetCpuSets(CPU_QoS.CpuSetType.None);
+            }
+            else if (rbCpuSetsAffinity.Checked)
+            {
+                CPU_QoS.SetEcoQoS(false);
+                CPU_QoS.SetCpuSets(CPU_QoS.CpuSetType.Efficiency);
+            }
         }
 
-        private void lblCPU18_Click(object sender, EventArgs e)
+        private void rbNoAffinity_CheckedChanged(object sender, EventArgs e)
         {
-
+            ReassignAffinity();
         }
 
-        private void lblCPU7_Click(object sender, EventArgs e)
+        private void rbHardAffinity_CheckedChanged(object sender, EventArgs e)
         {
+            ReassignAffinity();
+        }
 
+        private void rbEcoQosAffinity_CheckedChanged(object sender, EventArgs e)
+        {
+            ReassignAffinity();
+        }
+
+        private void rbCpuSetsAffinity_CheckedChanged(object sender, EventArgs e)
+        {
+            ReassignAffinity();
         }
 
 
-
-        private void pbCPU19_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void lblCPU19_Click(object sender, EventArgs e)
-        {
-
-        }
 
         [DllImport("user32.dll")]
         private static extern bool IsIconic(IntPtr hWnd);
@@ -552,38 +568,38 @@ namespace PerformanceMonitor
             UpdateCaption(tslblIdealProcessor, (int)newIdealProcessor);
         }
 
-
-        private void AssignEfficiencyCoresOnly()
+        private void DetermineCpuTypeAndCount()
         {
             RegistryKey regKey = Registry.LocalMachine.OpenSubKey("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0");
             string processorName = regKey.GetValue("ProcessorNameString").ToString();
             currentProcess = Process.GetCurrentProcess();
 
             // We need to know the number of processors available to determine if Hyperthreading and Efficient cores are enabled
-            int cpuCount = 0;
             regKey = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor");
             if (regKey != null)
             {
                 // The number of subkeys corresponds to the number of CPUs
-                cpuCount = regKey.SubKeyCount;
+                CPUCount = regKey.SubKeyCount;
             }
             regKey.Close();
 
 
-            if (processorName.Contains("12700K")) cpuType = CpuType.Intel_12700K;
-            else if (processorName.Contains("14700K")) cpuType = CpuType.Intel_14700K;
-            else cpuType = CpuType.Other;
+            if (processorName.Contains("12700K")) CPUType = CpuType.Intel_12700K;
+            else if (processorName.Contains("14700K")) CPUType = CpuType.Intel_14700K;
+            else CPUType = CpuType.Other;
 
+        }
 
-
+        private void AssignEfficiencyCoresOnly()
+        {
             // Define the CPU affinity mask for CPUs 17 to 20
             // CPUs are zero-indexed, so CPU 17 is represented by bit 16, and so on.
             IntPtr affinityMask = IntPtr.Zero;
-            switch (cpuType)
+            switch (CPUType)
             {
                 case CpuType.Intel_12700K:                    
                     tslblCpuType.Text = "i7-12700K";
-                    if (cpuCount == 20) // Make sure HyperThreading and Efficient cores are enabled
+                    if (CPUCount == 20) // Make sure HyperThreading and Efficient cores are enabled
                     {
                         affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
                         lblEfficientCoresNote.Text = "12700K" + lblEfficientCoresNote.Text;
@@ -597,7 +613,7 @@ namespace PerformanceMonitor
                     break;
                 case CpuType.Intel_14700K:                    
                     tslblCpuType.Text = "i7-14700K";
-                    if (cpuCount == 28) // Make sure HyperThreading and Efficient cores are enabled
+                    if (CPUCount == 28) // Make sure HyperThreading and Efficient cores are enabled
                     {
                         affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
                         lblEfficientCoresNote.Text = "14700K" + lblEfficientCoresNote.Text;
@@ -630,6 +646,8 @@ namespace PerformanceMonitor
         private void frmMain_Load(object sender, EventArgs e)
         {
             SingleInstanceChecker();
+            DetermineCpuTypeAndCount();
+
 
             ResetTicksCounters();
 
@@ -664,6 +682,20 @@ namespace PerformanceMonitor
 
             tcTabControl.SelectedIndex = Properties.Settings.Default.tcTabControl;
 
+            rbNoAffinity.Checked = Properties.Settings.Default.rbNoAffinity;
+            rbHardAffinity.Checked = Properties.Settings.Default.rbHardAffinity;    
+            rbEcoQosAffinity.Checked = Properties.Settings.Default.rbEcoQosAffinity;
+            rbCpuSetsAffinity.Checked = Properties.Settings.Default.rbCpuSetsAffinity;
+
+            if (CPUType == CpuType.Other)
+            {
+                rbNoAffinity.Checked = true;
+                rbHardAffinity.Enabled = false;
+                rbEcoQosAffinity.Enabled = false;
+                rbCpuSetsAffinity.Enabled = false;
+            }
+
+
             FillAudioDevices();
 
             maxCpuUtil = 0;
@@ -675,8 +707,6 @@ namespace PerformanceMonitor
             timer1.Enabled = false;
             timer1.Tag = false; // flag for one-time control in timer1_Tick(), only needed once
 
-            tscmbCategory.Tag = false;  // flag to avoid changing the GpuPerfCounter the first time
-            tscmbCategory.SelectedIndex = 0;  // otherwise, the combo will appear empty
 
             tslblTop.Tag = 0;  // used to store frmMain.Top
             tslblCurrentProcessor.Tag = 255; // unrealistic processor assigment to force update in timer1
@@ -720,7 +750,9 @@ namespace PerformanceMonitor
             nudPollingInterval.Value = Properties.Settings.Default.TimerInterval;
             timer1.Interval = (int)nudPollingInterval.Value;
 
-            AssignEfficiencyCoresOnly();
+            if (rbHardAffinity.Checked) AssignEfficiencyCoresOnly();
+            else if (rbEcoQosAffinity.Checked) CPU_QoS.SetEcoQoS(true);
+            else if (rbCpuSetsAffinity.Checked) CPU_QoS.SetCpuSets(CPU_QoS.CpuSetType.Efficiency);
 
             // Change the priority class to the previous setting selected (NORMAL, BELOW_NORMAL or IDLE)
             // This call must come after AssignEfficiencyCoresOnly
@@ -771,14 +803,14 @@ namespace PerformanceMonitor
                                     case "RESTART_COUNTERS":
                                         tsbtnResetMaxCounters_Click(null, null);
                                         break;
-                                    case "GPU_UTILIZATION":
-                                        tscmbCategory.SelectedIndex = 0;
+                                    case "GPU_UTILIZATION": //not-needed anymore, but could still come in a command
+                                        //tscmbCategory.SelectedIndex = 0;
                                         break;
-                                    case "GPU_TEMPERATURE":
-                                        tscmbCategory.SelectedIndex = 1;
+                                    case "GPU_TEMPERATURE": //not-needed anymore, but could still come in a command
+                                        //tscmbCategory.SelectedIndex = 1;
                                         break;
-                                    case "GPU_MEMORY_UTILIZATION":
-                                        tscmbCategory.SelectedIndex = 2;
+                                    case "GPU_MEMORY_UTILIZATION": //not-needed anymore, but could still come in a command
+                                        //tscmbCategory.SelectedIndex = 2;
                                         break;
                                     case "CYCLE_CPU_ALARM":
                                         chkCpuAlarm.Checked = !chkCpuAlarm.Checked;
@@ -955,28 +987,18 @@ namespace PerformanceMonitor
             if (mpGpu != null) mpGpu.Volume = newVolume;
 
             float abovePct = (TotalGpuTicksAboveThreshold / TotalTicks) * 100.0f;
-            SmartUpdateColor(lblGpuAbovePct, toolStrip4090Label.ForeColor, Color.Red, abovePct, (float)trkGpuThreshold.Tag);
+            SmartUpdateColor(lblGpuAbovePct, lblRTX4090GPU.ForeColor, Color.Red, abovePct, (float)trkGpuThreshold.Tag);
             UpdateCaption(lblGpuAbovePct, abovePct, "%");
 
-            SmartUpdateColor(lblGpuAlarm, toolStrip4090Label.ForeColor, Color.Red, util, (float)trkGpuThreshold.Tag);
+            SmartUpdateColor(lblGpuAlarm, lblRTX4090GPU.ForeColor, Color.Red, util, (float)trkGpuThreshold.Tag);
             UpdateCaption(lblGpuAlarm, util, "%");
 
 
             ExCounter += myRTX4090.ReadResetExceptionsCounter;
 
-            // update the GPU-Utilization or the GPU-Temperature
-            switch (tscmbCategory.SelectedIndex)
-            {
-                case 0: // %GPU Time
-                    UpdateCounter(util, pbGPU0, lblGPU0, "%", trkMonitorBottleneckThreshold.Value);
-                    break;
-                case 1: // GPU Temperature (in degrees C)
-                    UpdateCounter(temp, pbGPU0, lblGPU0, "°C", 80);
-                    break;
-                case 2: // Memory Utilization
-                    UpdateCounter(myRTX4090.MemoryUtilization, pbGPU0, lblGPU0, "?", trkMonitorBottleneckThreshold.Value);
-                    break;
-            }
+            UpdateCounter(util, pbGPU0, lblGPU0, "%", trkMonitorBottleneckThreshold.Value);
+            UpdateCounter(temp, pbGPUTemp, lblGPUTemp, "°C", 80);
+            UpdateCounter(myRTX4090.MemoryUtilization, pbGPUMem, lblGPUMem, "?", trkMonitorBottleneckThreshold.Value);
 
             // update Fan-Speed
             UpdateCounter(fanspeed, pbGPUFanSpeed, lblGPUFanSpeed, "%", trkMonitorBottleneckThreshold.Value);

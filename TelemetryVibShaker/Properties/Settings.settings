@@ -122,5 +122,17 @@
     <Setting Name="HalfAnHourAlarmSoundEffect" Type="System.String" Scope="User">
       <Value Profile="(Default)">.\30MinuteAlarm.wav</Value>
     </Setting>
+    <Setting Name="rbNoAffinity" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="rbCpuSetsAffinity" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="rbEcoQosAffinity" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="rbHardAffinity" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
