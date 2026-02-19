@@ -177,6 +177,59 @@ namespace MicroTaskScheduler
         {
             try
             {
+                // 1. Startup Sound (Keep existing logic)
+                using (SoundPlayer spWelcome = new SoundPlayer(Properties.Resources.StartCredit))
+                {
+                    spWelcome.PlaySync(); // Use PlaySync to ensure it finishes
+                }
+                await Task.Delay(2000, cancellationToken); // Use Task.Delay instead of Thread.Sleep
+
+                // 2. Startup Casio Beep
+                using (SoundPlayer spCasioStart = new SoundPlayer(Properties.Resources.Casio_Watch_Alarm))
+                {
+                    spCasioStart.PlaySync();
+                }
+                await Task.Delay(2000, cancellationToken);
+
+                // 3. The Hourly Loop
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    DateTime now = DateTime.Now;
+                    DateTime nextHour = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0, 0).AddMinutes(10);
+                    TimeSpan timeToNextHour = nextHour - now;
+
+                    // Wait until the next hour
+                    await Task.Delay(timeToNextHour, cancellationToken);
+
+                    if (!cancellationToken.IsCancellationRequested)
+                    {
+                        // FIX: Create a NEW SoundPlayer instance every hour.
+                        // This ensures a fresh connection to the audio driver.
+                        using (SoundPlayer hourlyChime = new SoundPlayer(Properties.Resources.Casio_Watch_Alarm))
+                        {
+                            hourlyChime.Load(); // Ensure loaded
+                            hourlyChime.PlaySync(); // PlaySync blocks this specific Task thread until sound is done
+                        }
+
+                        // Optional: Wait a bit to ensure we don't trigger twice if calculation was milliseconds off
+                        await Task.Delay(2000, cancellationToken);
+                    }
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                // Normal shutdown behavior, ignore
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry($"HourlyAlarm() Exception: {ex.Message}", EventLogEntryType.Error);
+            }
+        }
+
+        private async Task HourlyAlarm(CancellationToken cancellationToken, float doesntwork)
+        {
+            try
+            {
                 SoundPlayer spWelcome = new SoundPlayer(Properties.Resources.StartCredit);
                 spWelcome.Play();
                 Thread.Sleep(2000); // Wait a couple of seconds to avoid the startup beep being right on the edge of the next hour which would cause a double beep
@@ -192,7 +245,7 @@ namespace MicroTaskScheduler
                     //TimeSpan timeToNextHour = TimeSpan.FromHours(1) - TimeSpan.FromMinutes(DateTime.Now.Minute) - TimeSpan.FromSeconds(DateTime.Now.Second) - TimeSpan.FromMilliseconds(DateTime.Now.Millisecond);
 
                     DateTime now = DateTime.Now;
-                    DateTime nextHour = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0, 0).AddHours(1);
+                    DateTime nextHour = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0, 0).AddMinutes(10);
                     TimeSpan timeToNextHour = nextHour - now;
 
                     await Task.Delay(timeToNextHour, cancellationToken); // wait here and see ya in an hour
@@ -213,57 +266,7 @@ namespace MicroTaskScheduler
             }
         }
 
-        // This is an improved version of the HourlyAlarm method that is more robust and handles edge cases better. Will test later.
-        private async Task HourlyAlarm(CancellationToken cancellationToken, int second_version)
-        {
-            SoundPlayer myWaveFile = new SoundPlayer(Properties.Resources.Casio_Watch_Alarm);
 
-            // Option B:
-            // Beep on service start, BUT if we're very close to the next top-of-hour,
-            // skip the startup beep so you don't get a back-to-back double beep.
-            TimeSpan skipStartupBeepWindow = TimeSpan.FromSeconds(3);
-
-            try
-            {
-                // Robust: compute "time to next hour" from a single timestamp snapshot
-                DateTime now = DateTime.Now;
-                DateTime nextHour = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0, 0).AddHours(1);
-                TimeSpan timeToNextHour = nextHour - now;
-
-                // Startup beep only if we're not within the skip window
-                if (timeToNextHour > skipStartupBeepWindow && !cancellationToken.IsCancellationRequested)
-                {
-                    myWaveFile.Stop();   // defensive: prevent overlap
-                    myWaveFile.Play();
-                    await Task.Delay(1500, cancellationToken);
-                }
-
-                while (!cancellationToken.IsCancellationRequested)
-                {
-                    now = DateTime.Now;
-                    nextHour = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0, 0).AddHours(1);
-                    timeToNextHour = nextHour - now;
-
-                    if (timeToNextHour < TimeSpan.Zero)
-                        timeToNextHour = TimeSpan.Zero; // defensive: handles rare clock/time anomalies
-
-                    await Task.Delay(timeToNextHour, cancellationToken);
-
-                    if (cancellationToken.IsCancellationRequested)
-                        break;
-
-                    myWaveFile.Stop();   // defensive: prevent overlap
-                    myWaveFile.Play();
-
-                    // Replace Thread.Sleep(1500) with an async delay (doesn't block the thread)
-                    await Task.Delay(1500, cancellationToken);
-                }
-            }
-            catch
-            {
-                // Ignore exceptions during shutdown/cancellation
-            }
-        }
 
 
         private void ExecutePowerShellScript()
