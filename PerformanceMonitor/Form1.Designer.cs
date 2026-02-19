@@ -2289,7 +2289,7 @@
             this.lblEfficientCoresNote.AutoSize = true;
             this.lblEfficientCoresNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblEfficientCoresNote.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
-            this.lblEfficientCoresNote.Location = new System.Drawing.Point(553, 268);
+            this.lblEfficientCoresNote.Location = new System.Drawing.Point(475, 268);
             this.lblEfficientCoresNote.Name = "lblEfficientCoresNote";
             this.lblEfficientCoresNote.Size = new System.Drawing.Size(225, 13);
             this.lblEfficientCoresNote.TabIndex = 4;

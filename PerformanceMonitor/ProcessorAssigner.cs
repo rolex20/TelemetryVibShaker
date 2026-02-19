@@ -6,16 +6,13 @@
 // CPU numbers 0-15 are performance
 // CPU numbers 16-27 are efficiency
 
-using System;
-using System.Collections.Generic;
+
 using System.IO;
 using System.IO.MemoryMappedFiles;
-using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+
 
 
 namespace IdealProcessorEnhanced

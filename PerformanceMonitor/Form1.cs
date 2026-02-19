@@ -705,6 +705,8 @@ namespace PerformanceMonitor
                 rbHardAffinity.Enabled = false;
                 rbEcoQosAffinity.Enabled = false;
                 rbCpuSetsAffinity.Enabled = false;
+                lblEfficientCoresNote.Text = "Not an Alder/Raptor Lake gen CPU, efficient cores affinity options are disabled.";
+                lblEfficientCoresNote.Visible = true;
             }
 
 
