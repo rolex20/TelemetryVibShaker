@@ -469,26 +469,38 @@ namespace PerformanceMonitor
 
         private void rbNoAffinity_CheckedChanged(object sender, EventArgs e)
         {
-            cpuStats.Reset("Affinity changed to No Affinity", true);
-            ReassignAffinity();
+            if (rbNoAffinity.Checked)
+            {
+                cpuStats.Reset("Affinity changed to No Affinity", true);
+                ReassignAffinity();
+            }
         }
 
         private void rbHardAffinity_CheckedChanged(object sender, EventArgs e)
         {
-            cpuStats.Reset("Affinity changed to Hard Affinity", true);      
-            ReassignAffinity();
+            if (rbHardAffinity.Checked)
+            {
+                cpuStats.Reset("Affinity changed to Hard Affinity", true);
+                ReassignAffinity();
+            }
         }
 
         private void rbEcoQosAffinity_CheckedChanged(object sender, EventArgs e)
         {
-            cpuStats.Reset("Affinity changed to EcoQoS", true);
-            ReassignAffinity();
+            if (rbEcoQosAffinity.Checked)
+            {
+                cpuStats.Reset("Affinity changed to EcoQoS", true);
+                ReassignAffinity();
+            }
         }
 
         private void rbCpuSetsAffinity_CheckedChanged(object sender, EventArgs e)
         {
-            cpuStats.Reset("Affinity changed to CpuSets", true);
-            ReassignAffinity();
+            if (rbCpuSetsAffinity.Checked)
+            {
+                cpuStats.Reset("Affinity changed to CpuSets", true);
+                ReassignAffinity();
+            }
         }
 
 
