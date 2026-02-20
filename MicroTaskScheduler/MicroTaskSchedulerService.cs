@@ -123,7 +123,8 @@ namespace MicroTaskScheduler
         
         protected override void OnStart(string[] args)
         {
-            Properties.Settings.Default.Save();
+            EventLog.WriteEntry("MicroTaskScheduler service starting.", EventLogEntryType.Information);
+            Properties.Settings.Default.Save();  //provoke the file to be created so the user can edit it if they want to change the alarm interval
             AssignEfficiencyCoresOnly();
 
             string scriptPath = @"C:\Users\ralch\Desktop\DisableAntivirus.ps1";
@@ -138,7 +139,6 @@ namespace MicroTaskScheduler
             cancellationTokenSource = new CancellationTokenSource();
             antivirusDisableTask = Task.Run(() => DisableAntivirus(cancellationTokenSource.Token));
             hourlyAlarmTask = Task.Run(() => HourlyAlarm(cancellationTokenSource.Token));
-            EventLog.WriteEntry("MicroTaskScheduler service started.", EventLogEntryType.Information);
         }
 
         protected override void OnStop()
