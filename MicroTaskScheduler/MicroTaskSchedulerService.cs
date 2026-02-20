@@ -124,7 +124,11 @@ namespace MicroTaskScheduler
         protected override void OnStart(string[] args)
         {
             EventLog.WriteEntry("MicroTaskScheduler service starting.", EventLogEntryType.Information);
-            Properties.Settings.Default.Save();  //provoke the file to be created so the user can edit it if they want to change the alarm interval
+
+            //provoke the file to be created so the user can edit it if they want to change the alarm interval
+            Properties.Settings.Default.LastRunUtc = DateTime.UtcNow.Ticks; // we can set this to anything, it doesn't matter, we just want to make sure the file is created and available for the user to edit before the service starts its main loop where it reads this value
+            Properties.Settings.Default.Save();
+
             AssignEfficiencyCoresOnly();
 
             string scriptPath = @"C:\Users\ralch\Desktop\DisableAntivirus.ps1";

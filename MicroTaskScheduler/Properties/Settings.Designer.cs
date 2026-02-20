@@ -34,5 +34,17 @@ namespace MicroTaskScheduler.Properties {
                 this["AlarmInterval_ms"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public long LastRunUtc {
+            get {
+                return ((long)(this["LastRunUtc"]));
+            }
+            set {
+                this["LastRunUtc"] = value;
+            }
+        }
     }
 }
