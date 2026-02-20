@@ -175,6 +175,114 @@ namespace MicroTaskScheduler
 
         private async Task HourlyAlarm(CancellationToken cancellationToken)
         {
+            // -----------------------------------------------------------------
+            // 1. STARTUP SEQUENCE
+            // -----------------------------------------------------------------
+            try
+            {
+                // Play Startup Credit
+                using (SoundPlayer spWelcome = new SoundPlayer(Properties.Resources.StartCredit))
+                {
+                    spWelcome.PlaySync();
+                }
+                await Task.Delay(2000, cancellationToken);
+
+                // Play Startup Beep
+                using (SoundPlayer spCasio = new SoundPlayer(Properties.Resources.Casio_Watch_Alarm))
+                {
+                    spCasio.Play();
+                    Thread.Sleep(2000);
+                }
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry($"Startup Sound Error: {ex.Message}", EventLogEntryType.Warning);
+            }
+
+            // Wait a safe buffer to ensure we aren't standing exactly on the edge of the start time
+            await Task.Delay(2000, cancellationToken);
+
+            // -----------------------------------------------------------------
+            // 2. THE HOURLY LOOP (CASIO LOGIC)
+            // -----------------------------------------------------------------
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    // SNAPSHOT: Get the time exactly ONCE. 
+                    // This prevents the "Double Chime" bug where the second changes while reading.
+                    DateTime now = DateTime.Now;
+
+                    // CASIO MATH: Ignore Date objects. Just look at the clock face.
+                    // How many milliseconds have passed since the top of the hour?
+                    // Formula: (Minutes * 60 * 1000) + (Seconds * 1000) + Milliseconds
+                    int msPassed = (now.Minute * 60000) + (now.Second * 1000) + now.Millisecond;
+
+                    // There are 3,600,000 milliseconds in one hour.
+                    int msTotalInHour = 3600000;
+
+                    // Calculate exact milliseconds remaining
+                    int msToWait = msTotalInHour - msPassed;
+
+                    // SANITY CHECK: The Clamp (The fix for your crash)
+                    // If the clock drifted or logic was off by 1ms, force it to 0.
+                    if (msToWait < 0) msToWait = 0;
+
+                    // Wait for the rest of the hour
+                    // We use 'int' here, which is safer than TimeSpan for small negative values
+                    // Log msToWait for debugging purposes in the event log
+                    EventLog.WriteEntry($"HourlyAlarm: Waiting {(msToWait/1000)/60} minutes until next chime.", EventLogEntryType.Information);
+                    await Task.Delay(msToWait, cancellationToken);
+
+                    // Log the time we are actually playing the chime for debugging purposes
+                    EventLog.WriteEntry($"HourlyAlarm: Waking up to chime at {DateTime.Now:HH:mm:ss.fff}.", EventLogEntryType.Information);
+
+                    // -----------------------------------------------------------------
+                    // 3. PLAY ALARM
+                    // -----------------------------------------------------------------
+                    if (!cancellationToken.IsCancellationRequested)
+                    {
+                        // CRITICAL FIX: The 'using' block.
+                        // This creates a fresh connection to the Audio Driver every hour.
+                        // This solves the "Silence" issue.
+                        using (SoundPlayer casio = new SoundPlayer(Properties.Resources.Casio_Watch_Alarm))
+                        {
+                            casio.Load();
+                            casio.PlaySync();
+                            EventLog.WriteEntry($"casio.PlaySync() called.", EventLogEntryType.Information);
+
+                        }
+
+                        // CRITICAL FIX: The "Anti-Double-Chime" Wait.
+                        // Wait 2 seconds to push us past the "00:00" mark.
+                        // This ensures we don't accidentally loop fast and hit the same hour twice.
+                        await Task.Delay(2000, cancellationToken);
+                    }
+                }
+                catch (TaskCanceledException)
+                {
+                    // Service is stopping. Exit cleanly.
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    // Log line number and error, but keep the service running!
+                    //EventLog.WriteEntry($"HourlyAlarm Error: {ex.Message}", EventLogEntryType.Error);
+                    // EXTRACT LINE NUMBER
+                    var st = new StackTrace(ex, true);
+                    var frame = st.GetFrame(0);
+                    int line = frame != null ? frame.GetFileLineNumber() : 0;
+
+                    EventLog.WriteEntry($"HourlyAlarm CRASH at Line {line}. Exception: {ex.Message}\nStack: {ex.StackTrace}", EventLogEntryType.Error);
+
+
+                    // If we crashed, wait 1 minute before trying again so we don't flood the logs
+                    await Task.Delay(60000, cancellationToken);
+                }
+            }
+        }
+        private async Task HourlyAlarm(CancellationToken cancellationToken, double neitherwork)
+        {
             try
             {
                 // 1. Startup Sound (Keep existing logic)
