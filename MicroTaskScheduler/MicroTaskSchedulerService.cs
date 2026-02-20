@@ -183,17 +183,17 @@ namespace MicroTaskScheduler
             try
             {
                 // Play Startup Credit
-                using (SoundPlayer spWelcome = new SoundPlayer(Properties.Resources.StartCredit))
-                {
-                    spWelcome.PlaySync();
-                }
-                await Task.Delay(2000, cancellationToken);
+                //using (SoundPlayer spWelcome = new SoundPlayer(Properties.Resources.StartCredit))
+                //{
+                //    spWelcome.PlaySync();
+                //}
+                //await Task.Delay(2000, cancellationToken);
 
                 // Play Startup Beep
                 using (SoundPlayer spCasio = new SoundPlayer(Properties.Resources.Casio_Watch_Alarm))
                 {
-                    spCasio.Play();
-                    Thread.Sleep(2000);
+                    spCasio.PlaySync();
+                    //await Task.Delay(2000, cancellationToken);
                 }
             }
             catch (Exception ex)
@@ -201,39 +201,39 @@ namespace MicroTaskScheduler
                 EventLog.WriteEntry($"Startup Sound Error: {ex.Message}", EventLogEntryType.Warning);
             }
 
-            // Wait a safe buffer to ensure we aren't standing exactly on the edge of the start time
-            await Task.Delay(2000, cancellationToken);
 
             // -----------------------------------------------------------------
             // 2. THE HOURLY LOOP (CASIO LOGIC)
             // -----------------------------------------------------------------
+            int AlarmInterval_ms = Properties.Settings.Default.AlarmInterval_ms;
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
                 {
-                    // SNAPSHOT: Get the time exactly ONCE. 
-                    // This prevents the "Double Chime" bug where the second changes while reading.
-                    DateTime now = DateTime.Now;
+                    int msToWait = AlarmInterval_ms; // Default to user-defined interval
 
-                    // CASIO MATH: Ignore Date objects. Just look at the clock face.
-                    // How many milliseconds have passed since the top of the hour?
-                    // Formula: (Minutes * 60 * 1000) + (Seconds * 1000) + Milliseconds
-                    int msPassed = (now.Minute * 60000) + (now.Second * 1000) + now.Millisecond;
-
+                    // Wait exactly until the next hour-on-the-clock, if the AlarmInterval_ms is set to 1 hour, otherwise just wait the specified interval
                     // There are 3,600,000 milliseconds in one hour.
-                    int msTotalInHour = 3600000;
+                    int msTotalInHour = 60 * 60 * 1000; // relying here on compiler optimization to treat this as a constant and not recalculate every loop
+                    if (AlarmInterval_ms == msTotalInHour)
+                    {
+                        // SNAPSHOT: Get the time exactly ONCE. 
+                        // This prevents the "Double Chime" bug where the second changes while reading.
+                        DateTime now = DateTime.Now;
 
-                    // Calculate exact milliseconds remaining
-                    int msToWait = msTotalInHour - msPassed;
+                        // CASIO MATH: Ignore Date objects. Just look at the clock face.
+                        // How many milliseconds have passed since the top of the hour?
+                        // Formula: (Minutes * 60 * 1000) + (Seconds * 1000) + Milliseconds
+                        int msPassed = (now.Minute * 60000) + (now.Second * 1000) + now.Millisecond;
 
-                    // let's reset msToWait to 5 minutes for testing purposes,
-                    // so we don't have to wait an entire hour to see if the chime plays correctly,
-                    // remember it has to be in milliseconds
-                    msToWait = 5 * 60 * 1000; 
+                        // Calculate exact milliseconds remaining
+                        msToWait = msTotalInHour - msPassed;
+                    }
 
                     // SANITY CHECK: The Clamp (The fix for your crash)
                     // If the clock drifted or logic was off by 1ms, force it to 0.
-                    if (msToWait < 0) msToWait = 0;
+                    if (msToWait < 0) msToWait = msTotalInHour;  // Fall back to a full hour from now if negative
+
 
                     // Wait for the rest of the hour
                     // We use 'int' here, which is safer than TimeSpan for small negative values
@@ -255,19 +255,19 @@ namespace MicroTaskScheduler
                         using (SoundPlayer casio = new SoundPlayer(Properties.Resources.Casio_Watch_Alarm))
                         {
                             // if passes mod 2 == 0 then let's call PlaySync, otherwise let's call Play. This is just to test if PlaySync is the cause of the issue or not, if the issue still occurs with Play then we know it's not related to PlaySync and we can investigate further.
-                            if (passes++ % 2 == 0)
-                            {
-                                casio.Load();
+                           // if (passes++ % 2 == 0)
+                            //{
+                                //casio.Load();
                                 casio.PlaySync();
-                                EventLog.WriteEntry($"casio.PlaySync() called.", EventLogEntryType.Information);
+                                EventLog.WriteEntry($"casio.PlaySync() called and Task.Delay() follows.", EventLogEntryType.Information);
                                 await Task.Delay(2000, cancellationToken);
-                            }
-                            else
-                            {
-                                casio.Play();
-                                EventLog.WriteEntry($"casio.Play() called.", EventLogEntryType.Information);
-                                Thread.Sleep(2000);
-                            }
+                           // }
+                            //else
+                            //{
+                            //    casio.Play();
+                            //    EventLog.WriteEntry($"casio.Play() called and Thread.Sleep() follows.", EventLogEntryType.Information);
+                            //    Thread.Sleep(2000);
+                            //}
                         }
 
                         // CRITICAL FIX: The "Anti-Double-Chime" Wait.
