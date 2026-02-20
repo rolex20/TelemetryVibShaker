@@ -23,15 +23,12 @@ namespace MicroTaskScheduler.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("60000")]
         public int AlarmInterval_ms {
             get {
                 return ((int)(this["AlarmInterval_ms"]));
-            }
-            set {
-                this["AlarmInterval_ms"] = value;
             }
         }
     }

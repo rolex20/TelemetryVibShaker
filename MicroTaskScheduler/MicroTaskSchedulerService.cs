@@ -21,7 +21,6 @@ namespace MicroTaskScheduler
 
     public partial class MicroTaskSchedulerService : ServiceBase
     {
-        int passes = 0;
         private CancellationTokenSource cancellationTokenSource;
         private Task antivirusDisableTask;
         private Task hourlyAlarmTask;
@@ -124,6 +123,7 @@ namespace MicroTaskScheduler
         
         protected override void OnStart(string[] args)
         {
+            Properties.Settings.Default.Save();
             AssignEfficiencyCoresOnly();
 
             string scriptPath = @"C:\Users\ralch\Desktop\DisableAntivirus.ps1";
