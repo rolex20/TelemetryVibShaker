@@ -108,7 +108,7 @@ function Start-GameRuntimeTracker {
     Save-GameRuntimeCpuSnapshot -ProcessId $ProcessId -CpuSeconds $cpuStartSeconds -HourMark 0
 
     $timer = New-Object System.Timers.Timer
-    $timer.Interval = 300000  # 5 minutes for finer-grained CPU sampling and refreshes
+    $timer.Interval = 1800000  # 30 minutes for CPU sampling and refreshes
     $timer.AutoReset = $true
 
     $sourceIdentifier = "GameRuntimeHour_${ProcessId}_$([guid]::NewGuid().ToString('N'))"
@@ -334,6 +334,16 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
             Start-GameRuntimeTracker -ProgramName $programName -ProcessId ([int]$processId)
 			if ($speakText) {
 				Write-VerboseDebug -Timestamp (Get-Date) -Title "PROCESS STARTED:" -ForegroundColor "Yellow" -Speak $true -Message $speakText
+			}
+			
+			if (Get-Stutter -programName $programName) {
+				Write-VerboseDebug -Timestamp (Get-Date) -Title "STUTTER HUNTER STARTED:" -ForegroundColor "Yellow" -Message "$programName"
+				Start-Process powershell.exe -ArgumentList @(
+					'-NoProfile',
+					'-ExecutionPolicy', 'Bypass',
+					'-File', '"C:\MyPrograms\My Apps\FanatecMonitor\Stutter-Hunter.ps1"',
+					'-ProcessId', $processId
+				)
 			}
         }
         "Win32_ProcessStopTrace" { 

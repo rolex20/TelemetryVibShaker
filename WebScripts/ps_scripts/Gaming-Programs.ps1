@@ -28,7 +28,7 @@
 #     'AuxPrograms' (array of helper executables to auto-launch when the game starts).
 #------------------------------------------------------------------------------------
 $Global:GameProfiles = @{
-    "Notepad.exe"                      = @{ AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk") } #; BoostAction = "action-per-process-boost1.json" }
+    "Notepad.exe"                      = @{ Stutter=$true; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk") } #; BoostAction = "action-per-process-boost1.json" }
     "DCS.exe"                          = @{ Start = "High Performance"; Stop = "Balanced" }
     "aces.exe"                         = @{ NickName = "War thunder"; Start = "High Performance"; Stop = "Balanced" }
     "FlightSimulator.exe"              = @{ NickName = "M.S.F.S.";Start = "High Performance"; Stop = "Balanced" }
@@ -38,8 +38,8 @@ $Global:GameProfiles = @{
 	"ForzaHorizon5.exe"                = @{ NickName = "Forza Horizon"; Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
     "AssettoCorsa.exe"                 = @{ NickName = "Asseto Corsa"; Start = "Balanced"; Stop = "Balanced" ; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
 	"GRB.exe"                          = @{ NickName = "Ghost Recon Breakpoint"; Start = "Balanced"; Stop = "Balanced" ; AuxPrograms = @("C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk")} #, "C:\Users\ralch\Desktop\Spartan Mod.lnk") }
-    "TiWorker.exe"                     = @{ NickName = "Ti-Worker"; Speak = "Windows Ti-Worker process" }
-	"CompatTelRunner.exe"              = @{ NickName = "Compat Tel Runner"; Speak = "Windows Compat-Tel-Runner process" }
+    "TiWorker.exe"                     = @{ Stutter=$true; NickName = "Ti-Worker"; Speak = "Windows Ti-Worker process" }
+	"CompatTelRunner.exe"              = @{ Stutter=$true; NickName = "Compat Tel Runner"; Speak = "Windows Compat-Tel-Runner process" }
 }
 # "Ace7Game.exe"                     = @{ Start = "High Performance"; Stop = "Balanced" ; BoostAction = "action-per-process-boost1.json" }
 # "Ace7Game.exe"                     = @{ Start = "Balanced"; Stop = "Balanced" } #; BoostAction = "action-per-process-boost1.json" }
@@ -118,6 +118,25 @@ function Get-GameSpeakMessage {
     }
     
     # Return null if no speak action is configured for the program.
+    return $null
+}
+
+function Get-Stutter {
+    <#
+    .SYNOPSIS
+        Returns $true if Stutter is requested for this program
+    #>
+    param (
+        [Parameter(Mandatory)]
+        [string]$programName
+    )
+    
+    # Check if a profile exists for the program and if it has a Stutter key.
+    if ($Global:GameProfiles.ContainsKey($programName) -and $Global:GameProfiles[$programName].ContainsKey('Stutter')) {
+        return $Global:GameProfiles[$programName].Stutter
+    }
+    
+    # Return null if no Stutter value is configured for the program.
     return $null
 }
 
