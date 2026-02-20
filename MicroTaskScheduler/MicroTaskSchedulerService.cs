@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 
 namespace MicroTaskScheduler
 {
+    
     public enum CpuType
     {
         Intel_12700K,
@@ -20,6 +21,7 @@ namespace MicroTaskScheduler
 
     public partial class MicroTaskSchedulerService : ServiceBase
     {
+        int passes = 0;
         private CancellationTokenSource cancellationTokenSource;
         private Task antivirusDisableTask;
         private Task hourlyAlarmTask;
@@ -224,6 +226,11 @@ namespace MicroTaskScheduler
                     // Calculate exact milliseconds remaining
                     int msToWait = msTotalInHour - msPassed;
 
+                    // let's reset msToWait to 5 minutes for testing purposes,
+                    // so we don't have to wait an entire hour to see if the chime plays correctly,
+                    // remember it has to be in milliseconds
+                    msToWait = 5 * 60 * 1000; 
+
                     // SANITY CHECK: The Clamp (The fix for your crash)
                     // If the clock drifted or logic was off by 1ms, force it to 0.
                     if (msToWait < 0) msToWait = 0;
@@ -247,16 +254,26 @@ namespace MicroTaskScheduler
                         // This solves the "Silence" issue.
                         using (SoundPlayer casio = new SoundPlayer(Properties.Resources.Casio_Watch_Alarm))
                         {
-                            casio.Load();
-                            casio.PlaySync();
-                            EventLog.WriteEntry($"casio.PlaySync() called.", EventLogEntryType.Information);
-
+                            // if passes mod 2 == 0 then let's call PlaySync, otherwise let's call Play. This is just to test if PlaySync is the cause of the issue or not, if the issue still occurs with Play then we know it's not related to PlaySync and we can investigate further.
+                            if (passes++ % 2 == 0)
+                            {
+                                casio.Load();
+                                casio.PlaySync();
+                                EventLog.WriteEntry($"casio.PlaySync() called.", EventLogEntryType.Information);
+                                await Task.Delay(2000, cancellationToken);
+                            }
+                            else
+                            {
+                                casio.Play();
+                                EventLog.WriteEntry($"casio.Play() called.", EventLogEntryType.Information);
+                                Thread.Sleep(2000);
+                            }
                         }
 
                         // CRITICAL FIX: The "Anti-Double-Chime" Wait.
                         // Wait 2 seconds to push us past the "00:00" mark.
                         // This ensures we don't accidentally loop fast and hit the same hour twice.
-                        await Task.Delay(2000, cancellationToken);
+                        // await Task.Delay(2000, cancellationToken);
                     }
                 }
                 catch (TaskCanceledException)
