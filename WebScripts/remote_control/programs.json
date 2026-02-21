@@ -2,7 +2,8 @@
   "programs": [
     {
       "friendlyName": "Spartan Mod for GRB",
-      "processName": "powershell.exe",
+      "processName": "spartanmod",
+	  "comment": "processname is only a unique short name, not the .exe file",
       "path": "C:\\Users\\ralch\\Desktop\\Spartan Mod.lnk"
     },
     {
@@ -12,17 +13,17 @@
     },
     {
       "friendlyName": "Set Headphones as Sound Device",
-      "processName": "powershell.exe",
+      "processName": "headphones",
       "path": "C:\\Users\\ralch\\AppData\\Roaming\\Microsoft\\Internet Explorer\\Quick Launch\\User Pinned\\TaskBar\\Set Realtek Speakers as Sound Device.lnk"
     },		
     {
       "friendlyName": "Set VR as Sound Device",
-      "processName": "powershell.exe",
+      "processName": "VRsound",
       "path": "C:\\Users\\ralch\\AppData\\Roaming\\Microsoft\\Internet Explorer\\Quick Launch\\User Pinned\\TaskBar\\Set VR as Sound Device.lnk"
     },		
     {
       "friendlyName": "Set TV as Sound Device",
-      "processName": "powershell.exe",
+      "processName": "TVSound",
       "path": "C:\\Users\\ralch\\AppData\\Roaming\\Microsoft\\Internet Explorer\\Quick Launch\\User Pinned\\TaskBar\\Set TV as Sound Device.lnk"
     },
     {
