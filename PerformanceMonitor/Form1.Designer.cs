@@ -381,12 +381,11 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label8.ForeColor = System.Drawing.Color.Green;
             this.label8.Location = new System.Drawing.Point(11, 107);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(49, 15);
+            this.label8.Size = new System.Drawing.Size(47, 13);
             this.label8.TabIndex = 15;
             this.label8.Text = "CPU[4]";
             // 
@@ -439,12 +438,11 @@
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label12.ForeColor = System.Drawing.Color.Green;
             this.label12.Location = new System.Drawing.Point(11, 193);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(49, 15);
+            this.label12.Size = new System.Drawing.Size(47, 13);
             this.label12.TabIndex = 21;
             this.label12.Text = "CPU[8]";
             // 
@@ -469,12 +467,11 @@
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label14.ForeColor = System.Drawing.Color.Green;
             this.label14.Location = new System.Drawing.Point(4, 235);
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(56, 15);
+            this.label14.Size = new System.Drawing.Size(54, 13);
             this.label14.TabIndex = 24;
             this.label14.Text = "CPU[10]";
             // 
@@ -2108,57 +2105,62 @@
             // rbCpuSetsAffinity
             // 
             this.rbCpuSetsAffinity.AutoSize = true;
+            this.rbCpuSetsAffinity.Enabled = false;
             this.rbCpuSetsAffinity.Location = new System.Drawing.Point(309, 266);
             this.rbCpuSetsAffinity.Name = "rbCpuSetsAffinity";
             this.rbCpuSetsAffinity.Size = new System.Drawing.Size(96, 17);
             this.rbCpuSetsAffinity.TabIndex = 32;
             this.rbCpuSetsAffinity.Text = "CpuSetsAffinity";
             this.rbCpuSetsAffinity.UseVisualStyleBackColor = true;
-            this.rbCpuSetsAffinity.CheckedChanged += new System.EventHandler(this.rbCpuSetsAffinity_CheckedChanged);
+            this.rbCpuSetsAffinity.CheckedChanged += new System.EventHandler(this.ReassignAffinity);
             // 
             // rbEcoQosAffinity
             // 
             this.rbEcoQosAffinity.AutoSize = true;
+            this.rbEcoQosAffinity.Enabled = false;
             this.rbEcoQosAffinity.Location = new System.Drawing.Point(217, 266);
             this.rbEcoQosAffinity.Name = "rbEcoQosAffinity";
             this.rbEcoQosAffinity.Size = new System.Drawing.Size(86, 17);
             this.rbEcoQosAffinity.TabIndex = 31;
             this.rbEcoQosAffinity.Text = "Intel EcoQos";
             this.rbEcoQosAffinity.UseVisualStyleBackColor = true;
-            this.rbEcoQosAffinity.CheckedChanged += new System.EventHandler(this.rbEcoQosAffinity_CheckedChanged);
+            this.rbEcoQosAffinity.CheckedChanged += new System.EventHandler(this.ReassignAffinity);
             // 
             // label52
             // 
-            this.label52.AutoSize = true;
-            this.label52.Location = new System.Drawing.Point(32, 270);
+            this.label52.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.label52.Location = new System.Drawing.Point(24, 257);
             this.label52.Name = "label52";
-            this.label52.Size = new System.Drawing.Size(112, 13);
+            this.label52.Size = new System.Drawing.Size(115, 35);
             this.label52.TabIndex = 28;
-            this.label52.Text = "Efficient Cores Affinity:";
+            this.label52.Text = "Efficient Cores Affinity (Thread):";
+            this.label52.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // rbHardAffinity
             // 
             this.rbHardAffinity.AutoSize = true;
-            this.rbHardAffinity.Checked = true;
+            this.rbHardAffinity.Enabled = false;
             this.rbHardAffinity.Location = new System.Drawing.Point(412, 266);
             this.rbHardAffinity.Name = "rbHardAffinity";
-            this.rbHardAffinity.Size = new System.Drawing.Size(48, 17);
+            this.rbHardAffinity.Size = new System.Drawing.Size(129, 17);
             this.rbHardAffinity.TabIndex = 30;
-            this.rbHardAffinity.TabStop = true;
-            this.rbHardAffinity.Text = "Hard";
+            this.rbHardAffinity.Text = "Hard (Whole Process)";
             this.rbHardAffinity.UseVisualStyleBackColor = true;
-            this.rbHardAffinity.CheckedChanged += new System.EventHandler(this.rbHardAffinity_CheckedChanged);
+            this.rbHardAffinity.CheckedChanged += new System.EventHandler(this.ReassignAffinity);
             // 
             // rbNoAffinity
             // 
             this.rbNoAffinity.AutoSize = true;
+            this.rbNoAffinity.Checked = true;
+            this.rbNoAffinity.Enabled = false;
             this.rbNoAffinity.Location = new System.Drawing.Point(160, 266);
             this.rbNoAffinity.Name = "rbNoAffinity";
             this.rbNoAffinity.Size = new System.Drawing.Size(51, 17);
             this.rbNoAffinity.TabIndex = 29;
+            this.rbNoAffinity.TabStop = true;
             this.rbNoAffinity.Text = "None";
             this.rbNoAffinity.UseVisualStyleBackColor = true;
-            this.rbNoAffinity.CheckedChanged += new System.EventHandler(this.rbNoAffinity_CheckedChanged);
+            this.rbNoAffinity.CheckedChanged += new System.EventHandler(this.ReassignAffinity);
             // 
             // lblRedStaticHelp
             // 
@@ -2172,7 +2174,7 @@
             // lblReassignIdealProcessor
             // 
             this.lblReassignIdealProcessor.AutoSize = true;
-            this.lblReassignIdealProcessor.Location = new System.Drawing.Point(178, 300);
+            this.lblReassignIdealProcessor.Location = new System.Drawing.Point(178, 306);
             this.lblReassignIdealProcessor.Name = "lblReassignIdealProcessor";
             this.lblReassignIdealProcessor.Size = new System.Drawing.Size(73, 13);
             this.lblReassignIdealProcessor.TabIndex = 26;
@@ -2184,7 +2186,7 @@
             this.chkReassignIdealProcessor.AutoSize = true;
             this.chkReassignIdealProcessor.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.chkReassignIdealProcessor.Enabled = false;
-            this.chkReassignIdealProcessor.Location = new System.Drawing.Point(15, 300);
+            this.chkReassignIdealProcessor.Location = new System.Drawing.Point(15, 306);
             this.chkReassignIdealProcessor.Name = "chkReassignIdealProcessor";
             this.chkReassignIdealProcessor.Size = new System.Drawing.Size(149, 17);
             this.chkReassignIdealProcessor.TabIndex = 25;
@@ -2286,16 +2288,14 @@
             // 
             // lblEfficientCoresNote
             // 
-            this.lblEfficientCoresNote.AutoSize = true;
             this.lblEfficientCoresNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblEfficientCoresNote.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
-            this.lblEfficientCoresNote.Location = new System.Drawing.Point(475, 268);
+            this.lblEfficientCoresNote.Location = new System.Drawing.Point(575, 270);
             this.lblEfficientCoresNote.Name = "lblEfficientCoresNote";
-            this.lblEfficientCoresNote.Size = new System.Drawing.Size(225, 13);
+            this.lblEfficientCoresNote.Size = new System.Drawing.Size(234, 80);
             this.lblEfficientCoresNote.TabIndex = 4;
             this.lblEfficientCoresNote.Tag = "";
-            this.lblEfficientCoresNote.Text = " detected:   Using only efficient cores ";
-            this.lblEfficientCoresNote.Visible = false;
+            this.lblEfficientCoresNote.Text = "CPU Detection: Pending";
             // 
             // cmbPriorityClass
             // 
