@@ -3,10 +3,10 @@
   <Profiles />
   <Settings>
     <Setting Name="AlarmInterval_ms" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">3600000</Value>
+      <Value Profile="(Default)">3600001</Value>
     </Setting>
-    <Setting Name="LastRunUtc" Type="System.Int64" Scope="User">
-      <Value Profile="(Default)">0</Value>
+    <Setting Name="SoundAlarm" Type="System.Int64" Scope="User">
+      <Value Profile="(Default)">-1</Value>
     </Setting>
   </Settings>
 </SettingsFile>

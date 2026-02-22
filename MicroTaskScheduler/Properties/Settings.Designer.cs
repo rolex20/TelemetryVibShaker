@@ -25,7 +25,7 @@ namespace MicroTaskScheduler.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3600000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3600001")]
         public int AlarmInterval_ms {
             get {
                 return ((int)(this["AlarmInterval_ms"]));
@@ -37,13 +37,13 @@ namespace MicroTaskScheduler.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public long LastRunUtc {
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public long SoundAlarm {
             get {
-                return ((long)(this["LastRunUtc"]));
+                return ((long)(this["SoundAlarm"]));
             }
             set {
-                this["LastRunUtc"] = value;
+                this["SoundAlarm"] = value;
             }
         }
     }

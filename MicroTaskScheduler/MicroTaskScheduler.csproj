@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CPU_QoS.cs" />
     <Compile Include="MicroTaskSchedulerService.cs">
       <SubType>Component</SubType>
     </Compile>
