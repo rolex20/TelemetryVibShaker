@@ -187,7 +187,9 @@ namespace MicroTaskScheduler
         private async Task HourlyAlarm(CancellationToken cancellationToken)
         {
 
-            var stream = Properties.Settings.Default.SoundAlarm == 0? Properties.Resources.Casio_Watch_Alarm: Properties.Resources.StartCredit;
+            //cannot cache under the SYSTEM/Task.delay() environments: the wave header is corrupt
+            //and cannot reuse sound/handle in this environment.  Must create a new SoundPlayer every time we want to play the sound, which is every hour.  This is a quirk of the .NET SoundPlayer class and how it interacts with the audio driver in a service environment.  If we tried to reuse the same SoundPlayer instance, it would work for the first hour, but then on subsequent hours it would fail to play any sound due to the corrupted wave header issue.
+            //var stream = Properties.Settings.Default.SoundAlarm == 0? Properties.Resources.Casio_Watch_Alarm: Properties.Resources.StartCredit;
 
             // -----------------------------------------------------------------
             // 1. STARTUP SEQUENCE
@@ -202,7 +204,7 @@ namespace MicroTaskScheduler
                 //await Task.Delay(2000, cancellationToken);
 
                 // Play Startup Beep
-                using (SoundPlayer sp = new SoundPlayer(stream))
+                using (SoundPlayer sp = new SoundPlayer(Properties.Settings.Default.SoundAlarm == 0 ? Properties.Resources.Casio_Watch_Alarm : Properties.Resources.StartCredit))
                 {
                     sp.PlaySync();
                     //await Task.Delay(2000, cancellationToken);
@@ -264,10 +266,10 @@ namespace MicroTaskScheduler
                         // CRITICAL FIX: The 'using' block.
                         // This creates a fresh connection to the Audio Driver every hour.
                         // This solves the "Silence" issue.
-                        using (SoundPlayer sp = new SoundPlayer(stream))
+                        using (SoundPlayer sp = new SoundPlayer(Properties.Settings.Default.SoundAlarm == 0 ? Properties.Resources.Casio_Watch_Alarm : Properties.Resources.StartCredit))
                         {
                                 sp.PlaySync();
-                                EventLog.WriteEntry($"sp.PlaySync() called and Task.Delay() follows.", EventLogEntryType.Information);
+                                //EventLog.WriteEntry($"sp.PlaySync() called and Task.Delay() follows.", EventLogEntryType.Information);
                                 await Task.Delay(2000, cancellationToken); // Wait 2 seconds to push us past the "00:00" mark.
                         }
                     }
