@@ -202,7 +202,7 @@ namespace MicroTaskScheduler
                 //await Task.Delay(2000, cancellationToken);
 
                 // Play Startup Beep
-                using (SoundPlayer sp = new SoundPlayer(Properties.Resources.StartCredit))
+                using (SoundPlayer sp = new SoundPlayer(stream))
                 {
                     sp.PlaySync();
                     //await Task.Delay(2000, cancellationToken);
