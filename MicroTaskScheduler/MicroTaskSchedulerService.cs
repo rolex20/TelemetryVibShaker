@@ -1,12 +1,14 @@
-﻿using Microsoft.Win32;
+﻿using IdealProcessorEnhanced;
+using Microsoft.Win32;
+using PerformanceMonitor;
 using System;
 using System.Diagnostics;
+using System.Media;
+using System.Runtime.InteropServices;
 using System.ServiceProcess;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Media;
-using IdealProcessorEnhanced;
-using System.Runtime.InteropServices;
 
 namespace MicroTaskScheduler
 {
@@ -133,9 +135,6 @@ namespace MicroTaskScheduler
                 Properties.Settings.Default.Save();
             }
 
-            PerformanceMonitor.CPU_QoS.SetHardAffinityProcess(PerformanceMonitor.CPU_QoS.CpuSetType.Efficiency);
-            //AssignEfficiencyCoresOnly();
-
             string scriptPath = @"C:\Users\ralch\Desktop\DisableAntivirus.ps1";
             startInfo = new ProcessStartInfo
             {
@@ -148,6 +147,15 @@ namespace MicroTaskScheduler
             cancellationTokenSource = new CancellationTokenSource();
             antivirusDisableTask = Task.Run(() => DisableAntivirus(cancellationTokenSource.Token));
             hourlyAlarmTask = Task.Run(() => HourlyAlarm(cancellationTokenSource.Token));
+
+            if (PerformanceMonitor.CPU_QoS.IsHybridCpu())
+            {
+                //SetNewIdealProcessor((uint)Environment.ProcessorCount - 1); // Assuming layout where efficient cores are last
+                SetNewIdealProcessor((uint)PerformanceMonitor.CPU_QoS.GetAvailableProcessorCount() - 1); // Get the actual number of available processors to be safe
+                PerformanceMonitor.CPU_QoS.SetHardAffinityProcess(PerformanceMonitor.CPU_QoS.CpuSetType.Efficiency);
+                //AssignEfficiencyCoresOnly();
+            }
+
         }
 
         protected override void OnStop()

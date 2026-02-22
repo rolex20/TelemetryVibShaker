@@ -552,6 +552,73 @@ namespace PerformanceMonitor
                     "Failed to reset thread affinity to process default.");
         }
 
+        
+        /// <summary>
+        /// Returns the number of logical processors that the current thread is permitted to run on —
+        /// i.e., the processors whose indices are valid arguments to <c>SetThreadIdealProcessor()</c>.
+        /// </summary>
+        /// <remarks>
+        /// The count reflects the thread's <b>effective affinity</b>: the set bits in the
+        /// <c>GROUP_AFFINITY.Mask</c> returned by <c>GetThreadGroupAffinity</c> for the calling thread.
+        /// This naturally accounts for any prior calls to <see cref="SetHardAffinity(CpuSetType)"/>,
+        /// since that method writes the restriction directly into the thread's group affinity.
+        /// <para>
+        /// Note: <c>SetThreadIdealProcessor</c> operates within the thread's current processor group.
+        /// On systems with more than 64 logical processors, processors in other groups are not counted
+        /// here — which is exactly correct, because you cannot hint at a processor outside the
+        /// thread's current group via that API.
+        /// </para>
+        /// </remarks>
+        /// <returns>
+        /// The number of logical processors available to this thread (1 or more on any sane system).
+        /// Returns the total processor count from <c>GetProcessAffinityMask</c> as a safe fallback
+        /// if <c>GetThreadGroupAffinity</c> fails.
+        /// </returns>
+        public static int GetAvailableProcessorCount()
+        {
+            IntPtr hThread = GetCurrentThread();
+
+            // Primary path: count set bits in the thread's own group affinity mask.
+            // This is the authoritative set for SetThreadIdealProcessor().
+            if (GetThreadGroupAffinity(hThread, out GROUP_AFFINITY groupAffinity))
+                return PopCount(groupAffinity.Mask);
+
+            // Fallback: thread group query failed (should never happen on a running thread,
+            // but be defensive). Count from the process affinity mask instead.
+            IntPtr hProcess = GetCurrentProcess();
+            if (GetProcessAffinityMask(hProcess, out UIntPtr processMask, out _))
+                return PopCount(processMask);
+
+            // Last resort: ask the environment. Never returns 0.
+            return Math.Max(1, Environment.ProcessorCount);
+        }
+
+        /// <summary>
+        /// Counts the number of set bits (population count) in a <see cref="UIntPtr"/>-sized mask.
+        /// Works correctly on both 32-bit and 64-bit processes.
+        /// </summary>
+        private static int PopCount(UIntPtr mask)
+        {
+            return UIntPtr.Size == 8
+                ? PopCount64(mask.ToUInt64())
+                : PopCount32(mask.ToUInt32());
+        }
+
+        private static int PopCount64(ulong v)
+        {
+            // Brian Kernighan's algorithm — O(set bits), branchless inner loop.
+            int count = 0;
+            while (v != 0) { v &= v - 1; count++; }
+            return count;
+        }
+
+        private static int PopCount32(uint v)
+        {
+            int count = 0;
+            while (v != 0) { v &= v - 1; count++; }
+            return count;
+        }
+
         // ==============================================================
         // Native Structures
         // ==============================================================
