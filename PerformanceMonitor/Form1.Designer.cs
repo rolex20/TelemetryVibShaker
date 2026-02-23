@@ -2179,7 +2179,6 @@
             this.lblReassignIdealProcessor.Size = new System.Drawing.Size(73, 13);
             this.lblReassignIdealProcessor.TabIndex = 26;
             this.lblReassignIdealProcessor.Text = "* 14700K only";
-            this.lblReassignIdealProcessor.Visible = false;
             // 
             // chkReassignIdealProcessor
             // 
@@ -2192,7 +2191,6 @@
             this.chkReassignIdealProcessor.TabIndex = 25;
             this.chkReassignIdealProcessor.Text = "Reassign Ideal Processor:";
             this.chkReassignIdealProcessor.UseVisualStyleBackColor = true;
-            this.chkReassignIdealProcessor.Visible = false;
             this.chkReassignIdealProcessor.CheckedChanged += new System.EventHandler(this.chkReassignIdealProcessor_CheckedChanged);
             // 
             // lblMonitorBottleneckThreshold

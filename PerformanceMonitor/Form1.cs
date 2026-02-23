@@ -49,7 +49,7 @@ namespace PerformanceMonitor
         private Process currentProcess;
         private CpuType CPUType;
         private int CPUCount = -1;
-        private bool needToCallSetNewIdealProcessor = true;
+        private bool needToCallSetNewIdealProcessor = false;
         private ProcessorAssigner processorAssigner = null;  // Must be alive the while the program is running and is assigned only once if it is the right type of processor
 
         private int maxCpuUtil; // Maximum recorded CPU utilization
@@ -433,7 +433,9 @@ namespace PerformanceMonitor
         {
             // processor should not be assigned from the current thread
             // let's signal the need for that operation here
-            needToCallSetNewIdealProcessor = chkReassignIdealProcessor.Visible && chkReassignIdealProcessor.Checked;
+            needToCallSetNewIdealProcessor = needToCallSetNewIdealProcessor || (chkReassignIdealProcessor.Enabled && chkReassignIdealProcessor.Checked);
+            // log what is the new value of needToCallSetNewIdealProcessor for debugging purposes
+            LogError($"Setting needToCallSetNewIdealProcessor to {needToCallSetNewIdealProcessor} because chkReassignIdealProcessor.Checked={chkReassignIdealProcessor.Checked} and chkReassignIdealProcessor.Visible={chkReassignIdealProcessor.Visible}", "chkReassignIdealProcessor_CheckedChanged()", true);
         }
 
 
@@ -552,16 +554,20 @@ namespace PerformanceMonitor
             IntPtr currentThreadHandle = GetCurrentThread();
             int previousProcessor = (int)SetThreadIdealProcessor(currentThreadHandle, newIdealProcessor);
 
-            if (previousProcessor <0 || (previousProcessor > maxProcNumber))
+            if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
             {
                 LogError("Failed to set Ideal Processor", $"SetNewIdealProcessor({newIdealProcessor})={previousProcessor}");
                 tslblIdealProcessor.Text = "ERR";
                 return;
-            } else
+            }
+            else
+            {
                 LogError("Succesfully set new Ideal Processor:", $"SetNewIdealProcessor({newIdealProcessor}), Old={previousProcessor}");
+                UpdateCaption(tslblIdealProcessor, (int)newIdealProcessor, "", true);
+            }
 
-            UpdateCaption(tslblIdealProcessor, (int)newIdealProcessor, "", true);
-        }
+
+            }
 
         private void DetermineCpuTypeAndCount()
         {
@@ -592,11 +598,10 @@ namespace PerformanceMonitor
                     if (CPUCount == 20) // Make sure HyperThreading and Efficient cores are enabled in BIOS
                     {
                         if (processorAssigner == null) processorAssigner = new ProcessorAssigner((uint)CPUCount-1);
-                        needToCallSetNewIdealProcessor = true; // Force flag because chkReassignIdealProcesso() onclick will miss it since the control wasn't enabled yet
 
-                        chkReassignIdealProcessor.Visible = true;
-                        lblReassignIdealProcessor.Visible = true;
                         chkReassignIdealProcessor.Enabled = true;
+                        // needToCallSetNewIdealProcessor needs to be last
+                        needToCallSetNewIdealProcessor = true; // Force flag because chkReassignIdealProcesso() onclick will miss it since the control wasn't enabled yet
 
                         // Highlight my best cores according to my BIOS
                         label8.BorderStyle = BorderStyle.FixedSingle;
@@ -611,12 +616,12 @@ namespace PerformanceMonitor
 
                     if (CPUCount == 28) // Make sure HyperThreading and Efficient cores are enabled in BIOS
                     {
-                        if (processorAssigner == null) processorAssigner = new ProcessorAssigner((uint)CPUCount - 1);
-                        needToCallSetNewIdealProcessor = true; // Force flag because chkReassignIdealProcesso() onclick will miss it since the control wasn't enabled yet
+                        if (processorAssigner == null) processorAssigner = new ProcessorAssigner((uint)CPUCount - 1);                        
 
-                        chkReassignIdealProcessor.Visible = true;
-                        lblReassignIdealProcessor.Visible = true;
                         chkReassignIdealProcessor.Enabled = true;
+                        // needToCallSetNewIdealProcessor needs to be last
+                        needToCallSetNewIdealProcessor = true; // Force flag because chkReassignIdealProcesso() onclick will miss it since the control wasn't enabled yet
+                        LogError("Setting all to true for calling new Ideal Processor", "DetermineCpuTypeAndCount()", true);
 
 
                         // Highlight my best cores according to my BIOS
@@ -1010,6 +1015,7 @@ namespace PerformanceMonitor
             {
                 needToCallSetNewIdealProcessor = false;
                 SetNewIdealProcessor((uint)CPUCount-1); // This one also displays the new ideal processor
+                LogError("Called SetNewIdealProcessor from UpdateMonitorLabels, now needToCallSetNewIdealProcessor = false", "UpdateMonitorLabels()", true);
             }
 
             float incrementalTicks = timer1.Interval; 
@@ -1410,6 +1416,7 @@ namespace PerformanceMonitor
             {
                 L.Tag = value;
                 L.Text = (value is float f ? $"{f:F1}" : value.ToString()) + dimensional;
+                if (force) LogError($"Updated caption with value: {L.Text}", $"UpdateCaption({L.Name})", true);
             }
         }
 
