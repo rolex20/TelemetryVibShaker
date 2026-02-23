@@ -557,9 +557,10 @@ namespace PerformanceMonitor
                 LogError("Failed to set Ideal Processor", $"SetNewIdealProcessor({newIdealProcessor})={previousProcessor}");
                 tslblIdealProcessor.Text = "ERR";
                 return;
-            }
+            } else
+                LogError("Succesfully set new Ideal Processor:", $"SetNewIdealProcessor({newIdealProcessor}), Old={previousProcessor}");
 
-            UpdateCaption(tslblIdealProcessor, (int)newIdealProcessor);
+            UpdateCaption(tslblIdealProcessor, (int)newIdealProcessor, "", true);
         }
 
         private void DetermineCpuTypeAndCount()
@@ -757,10 +758,7 @@ namespace PerformanceMonitor
             // This call must come after AssignEfficiencyCoresOnly
             cmbPriorityClass.SelectedIndex = Properties.Settings.Default.PriorityClassSelectedIndex;
 
-            timer1.Enabled = tschkEnabled.Checked;       
-            lblEfficientCoresNote.Visible = true;
-            
-
+            timer1.Enabled = tschkEnabled.Checked;                 
         }
 
         // When playing in VR I can't conveniently switch to performance monitor to change settings
@@ -1406,9 +1404,9 @@ namespace PerformanceMonitor
             } 
         }
 
-        private void UpdateCaption<TValue>(ToolStripLabel L, TValue value, string dimensional = "")
+        private void UpdateCaption<TValue>(ToolStripLabel L, TValue value, string dimensional = "", bool force=false)
         {
-            if (this.WindowState != FormWindowState.Minimized && !Equals(L.Tag, value))
+            if ((this.WindowState != FormWindowState.Minimized && !Equals(L.Tag, value)) || force)
             {
                 L.Tag = value;
                 L.Text = (value is float f ? $"{f:F1}" : value.ToString()) + dimensional;
