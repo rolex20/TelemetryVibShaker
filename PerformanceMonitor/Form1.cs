@@ -588,7 +588,7 @@ namespace PerformanceMonitor
                     tslblCpuType.Text = "i7-12700K";
                     lblEfficientCoresNote.Text = "12700K  detected.";
 
-                    if (CPUCount == 20) // Make sure HyperThreading and Efficient cores are enabled
+                    if (CPUCount == 20) // Make sure HyperThreading and Efficient cores are enabled in BIOS
                     {
                         if (processorAssigner == null) processorAssigner = new ProcessorAssigner((uint)CPUCount-1);
                         needToCallSetNewIdealProcessor = true; // Force flag because chkReassignIdealProcesso() onclick will miss it since the control wasn't enabled yet
@@ -608,7 +608,7 @@ namespace PerformanceMonitor
                     tslblCpuType.Text = "i7-14700K";
                     lblEfficientCoresNote.Text = "14700K  detected.";
 
-                    if (CPUCount == 28) // Make sure HyperThreading and Efficient cores are enabled
+                    if (CPUCount == 28) // Make sure HyperThreading and Efficient cores are enabled in BIOS
                     {
                         if (processorAssigner == null) processorAssigner = new ProcessorAssigner((uint)CPUCount - 1);
                         needToCallSetNewIdealProcessor = true; // Force flag because chkReassignIdealProcesso() onclick will miss it since the control wasn't enabled yet
@@ -680,17 +680,6 @@ namespace PerformanceMonitor
             rbEcoQosAffinity.Checked = Properties.Settings.Default.rbEcoQosAffinity;
             rbCpuSetsAffinity.Checked = Properties.Settings.Default.rbCpuSetsAffinity;
 
-            if (CPU_QoS.IsHybridCpu())
-            {
-                rbNoAffinity.Enabled = true;
-                rbHardAffinity.Enabled = true;
-                rbEcoQosAffinity.Enabled = true;
-                rbCpuSetsAffinity.Enabled = true;
-                ReassignAffinity(null, null);
-                tschkShowLastProcessor.Checked = true;
-                cpuStats = new ProcessorAssignmentStats(CPUCount);
-            } else
-                lblEfficientCoresNote.Text = "Not an Alder/Raptor Lake gen CPU, (not hybrid) efficient cores affinity options are disabled.";
 
 
 
@@ -748,13 +737,30 @@ namespace PerformanceMonitor
             nudPollingInterval.Value = Properties.Settings.Default.TimerInterval;
             timer1.Interval = (int)nudPollingInterval.Value;
 
-            
+
+            // AssignEfficiencyCoresOnly
+            if (CPU_QoS.IsHybridCpu())
+            {
+                rbNoAffinity.Enabled = true;
+                rbHardAffinity.Enabled = true;
+                rbEcoQosAffinity.Enabled = true;
+                rbCpuSetsAffinity.Enabled = true;
+                ReassignAffinity(null, null);
+                tschkShowLastProcessor.Checked = true;
+                cpuStats = new ProcessorAssignmentStats(CPUCount);
+            }
+            else
+                lblEfficientCoresNote.Text = $"Not an Alder/Raptor Lake gen CPU, (not hybrid) efficient cores affinity options are disabled.  Detected {CPU_QoS.GetAvailableProcessorCount()} cpus";
+
 
             // Change the priority class to the previous setting selected (NORMAL, BELOW_NORMAL or IDLE)
             // This call must come after AssignEfficiencyCoresOnly
             cmbPriorityClass.SelectedIndex = Properties.Settings.Default.PriorityClassSelectedIndex;
 
-            timer1.Enabled = tschkEnabled.Checked;
+            timer1.Enabled = tschkEnabled.Checked;       
+            lblEfficientCoresNote.Visible = true;
+            
+
         }
 
         // When playing in VR I can't conveniently switch to performance monitor to change settings

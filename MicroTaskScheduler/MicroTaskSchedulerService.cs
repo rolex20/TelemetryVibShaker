@@ -125,7 +125,8 @@ namespace MicroTaskScheduler
         
         protected override void OnStart(string[] args)
         {
-            EventLog.WriteEntry("MicroTaskScheduler service starting...", EventLogEntryType.Information);
+            int maxCpus = PerformanceMonitor.CPU_QoS.GetAvailableProcessorCount();
+            EventLog.WriteEntry($"MicroTaskScheduler service starting with {maxCpus} cpus...", EventLogEntryType.Information);
 
             //provoke the file to be created so the user can edit it if they want to change the alarm interval or the sound file (first run only)
             if (Properties.Settings.Default.SoundAlarm == -1)
@@ -150,8 +151,9 @@ namespace MicroTaskScheduler
 
             if (PerformanceMonitor.CPU_QoS.IsHybridCpu())
             {
+                if (processorAssigner == null) processorAssigner = new ProcessorAssigner((uint)maxCpus);
                 //SetNewIdealProcessor((uint)Environment.ProcessorCount - 1); // Assuming layout where efficient cores are last
-                SetNewIdealProcessor((uint)PerformanceMonitor.CPU_QoS.GetAvailableProcessorCount() - 1); // Get the actual number of available processors to be safe
+                SetNewIdealProcessor((uint)maxCpus - 1); // Use the actual number of available processors to be safe
                 PerformanceMonitor.CPU_QoS.SetHardAffinityProcess(PerformanceMonitor.CPU_QoS.CpuSetType.Efficiency);
                 //AssignEfficiencyCoresOnly();
             }
