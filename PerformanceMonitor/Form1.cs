@@ -49,8 +49,7 @@ namespace PerformanceMonitor
         private Process currentProcess;
         private CpuType CPUType;
         private int CPUCount = -1;
-        private uint maxProcessorNumber = 0;
-        private bool needToCallSetNewIdealProcessor = true;
+        private bool needToCallSetNewIdealProcessor = false;
         private ProcessorAssigner processorAssigner = null;  // Must be alive the while the program is running and is assigned only once if it is the right type of processor
 
         private int maxCpuUtil; // Maximum recorded CPU utilization
@@ -77,7 +76,7 @@ namespace PerformanceMonitor
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            cpuStats.WriteReportSnapshot(true, "Final Snapshot on FormClosing()");
+            cpuStats?.WriteReportSnapshot(true, "Final Snapshot on FormClosing()");
 
             timer1.Enabled = false;
             pipeCancellationTokenSource.Cancel();
@@ -142,10 +141,10 @@ namespace PerformanceMonitor
 
         private void tschkShowLastProcessor_Click(object sender, EventArgs e)
         {
-            if (!tschkShowLastProcessor.Checked)
+            if (tschkShowLastProcessor.Checked)
+                tslblCurrentProcessor.Text = String.Empty; 
+            else
                 tslblCurrentProcessor.Text = "----";
-            else 
-                tslblCurrentProcessor.Text = String.Empty;
         }
 
         private void cmbPriorityClass_SelectedIndexChanged(object sender, EventArgs e)
@@ -434,74 +433,58 @@ namespace PerformanceMonitor
         {
             // processor should not be assigned from the current thread
             // let's signal the need for that operation here
-            needToCallSetNewIdealProcessor = chkReassignIdealProcessor.Visible && chkReassignIdealProcessor.Checked;
+            needToCallSetNewIdealProcessor = needToCallSetNewIdealProcessor || (chkReassignIdealProcessor.Enabled && chkReassignIdealProcessor.Checked);
+            // log what is the new value of needToCallSetNewIdealProcessor for debugging purposes
+            LogError($"Setting needToCallSetNewIdealProcessor to {needToCallSetNewIdealProcessor} because chkReassignIdealProcessor.Checked={chkReassignIdealProcessor.Checked} and chkReassignIdealProcessor.Visible={chkReassignIdealProcessor.Visible}", "chkReassignIdealProcessor_CheckedChanged()", true);
         }
 
 
 
-        private void ReassignAffinity()
+        private void ReassignAffinity(object sender, EventArgs e)
         {
             if (rbNoAffinity.Checked)
             {
-                CPU_QoS.SetEcoQoS(false);
-                CPU_QoS.SetCpuSets(CPU_QoS.CpuSetType.None);
-                ResetHardAffinity();
+                CPU_QoS.SetHardAffinityProcess(CPU_QoS.CpuSetType.None); // whole process                
+                CPU_QoS.SetEcoQoS(false); // current thread
+                CPU_QoS.SetCpuSets(CPU_QoS.CpuSetType.None); // current thread
+                                                             // 
+                string msg = "Affinity changed/reset to No Specified Affinity.";
+                cpuStats?.Reset(msg, true);
+                lblEfficientCoresNote.Text = msg;                
+
             }
             else if (rbHardAffinity.Checked)
             {
                 CPU_QoS.SetEcoQoS(false);
                 CPU_QoS.SetCpuSets(CPU_QoS.CpuSetType.None);
-                AssignEfficiencyCoresOnly();
+                CPU_QoS.SetHardAffinityProcess(CPU_QoS.CpuSetType.Efficiency); // whole process
+
+                string msg = "Affinity changed to Hard Affinity (whole process).";
+                cpuStats?.Reset(msg, true);
+                lblEfficientCoresNote.Text = msg;
             }
             else if (rbEcoQosAffinity.Checked)
             {
+                CPU_QoS.SetHardAffinityProcess(CPU_QoS.CpuSetType.None); // whole process                
                 CPU_QoS.SetEcoQoS(true);
                 CPU_QoS.SetCpuSets(CPU_QoS.CpuSetType.None);
-                ResetHardAffinity();
+
+                string msg = "Affinity changed to EcoQoS (current thread only).";
+                cpuStats?.Reset(msg, true);
+                lblEfficientCoresNote.Text = msg;
             }
             else if (rbCpuSetsAffinity.Checked)
             {
+                CPU_QoS.SetHardAffinityProcess(CPU_QoS.CpuSetType.None); // whole process
                 CPU_QoS.SetEcoQoS(false);
                 CPU_QoS.SetCpuSets(CPU_QoS.CpuSetType.Efficiency);
-                ResetHardAffinity();
+
+                string msg = "Affinity changed to Efficient CpuSets (current thread only).";
+                cpuStats?.Reset(msg, true);
+                lblEfficientCoresNote.Text = msg;
             }
         }
 
-        private void rbNoAffinity_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rbNoAffinity.Checked)
-            {
-                cpuStats.Reset("Affinity changed to No Affinity", true);
-                ReassignAffinity();
-            }
-        }
-
-        private void rbHardAffinity_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rbHardAffinity.Checked)
-            {
-                cpuStats.Reset("Affinity changed to Hard Affinity", true);
-                ReassignAffinity();
-            }
-        }
-
-        private void rbEcoQosAffinity_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rbEcoQosAffinity.Checked)
-            {
-                cpuStats.Reset("Affinity changed to EcoQoS", true);
-                ReassignAffinity();
-            }
-        }
-
-        private void rbCpuSetsAffinity_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rbCpuSetsAffinity.Checked)
-            {
-                cpuStats.Reset("Affinity changed to CpuSets", true);
-                ReassignAffinity();
-            }
-        }
 
 
 
@@ -571,15 +554,20 @@ namespace PerformanceMonitor
             IntPtr currentThreadHandle = GetCurrentThread();
             int previousProcessor = (int)SetThreadIdealProcessor(currentThreadHandle, newIdealProcessor);
 
-            if (previousProcessor <0 || (previousProcessor > maxProcNumber))
+            if (previousProcessor < 0 || (previousProcessor > maxProcNumber))
             {
                 LogError("Failed to set Ideal Processor", $"SetNewIdealProcessor({newIdealProcessor})={previousProcessor}");
                 tslblIdealProcessor.Text = "ERR";
                 return;
             }
+            else
+            {
+                LogError("Succesfully set new Ideal Processor:", $"SetNewIdealProcessor({newIdealProcessor}), Old={previousProcessor}");
+                UpdateCaption(tslblIdealProcessor, (int)newIdealProcessor, "", true);
+            }
 
-            UpdateCaption(tslblIdealProcessor, (int)newIdealProcessor);
-        }
+
+            }
 
         private void DetermineCpuTypeAndCount()
         {
@@ -601,50 +589,45 @@ namespace PerformanceMonitor
             else if (processorName.Contains("14700K")) CPUType = CpuType.Intel_14700K;
             else CPUType = CpuType.Other;
 
-        }
-
-        private void ResetHardAffinity()
-        {
-            // Reset the CPU affinity to all available CPUs
-            currentProcess.ProcessorAffinity = (IntPtr)((1 << CPUCount) - 1);
-            lblEfficientCoresNote.Text = "Hard affinity changed to all available cores.";
-        }
-
-
-        private void AssignEfficiencyCoresOnly()
-        {
-            // Define the CPU affinity mask for CPUs 17 to 20
-            // CPUs are zero-indexed, so CPU 17 is represented by bit 16, and so on.
-            IntPtr affinityMask = IntPtr.Zero;
             switch (CPUType)
             {
-                case CpuType.Intel_12700K:                    
+                case CpuType.Intel_12700K:
                     tslblCpuType.Text = "i7-12700K";
-                    if (CPUCount == 20) // Make sure HyperThreading and Efficient cores are enabled
+                    lblEfficientCoresNote.Text = "12700K  detected.";
+
+                    if (CPUCount == 20) // Make sure HyperThreading and Efficient cores are enabled in BIOS
                     {
-                        affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19);
-                        lblEfficientCoresNote.Text = "14700K  detected:   Using only efficient cores.";
-                        lblEfficientCoresNote.Visible = true;
+                        if (processorAssigner == null) processorAssigner = new ProcessorAssigner((uint)CPUCount-1);
+
+                        chkReassignIdealProcessor.Enabled = true;
+                        // needToCallSetNewIdealProcessor needs to be last
+                        needToCallSetNewIdealProcessor = true; // Force flag because chkReassignIdealProcesso() onclick will miss it since the control wasn't enabled yet
+
+                        // Highlight my best cores according to my BIOS
+                        label8.BorderStyle = BorderStyle.FixedSingle;
+                        label12.BorderStyle = BorderStyle.FixedSingle;
+                        label14.BorderStyle = BorderStyle.FixedSingle;
                     }
 
-                    // Highlight my best cores according to my BIOS
-                    label8.BorderStyle = BorderStyle.FixedSingle;
-                    label12.BorderStyle = BorderStyle.FixedSingle;
-                    label14.BorderStyle = BorderStyle.FixedSingle;
                     break;
-                case CpuType.Intel_14700K:                    
+                case CpuType.Intel_14700K:
                     tslblCpuType.Text = "i7-14700K";
-                    if (CPUCount == 28) // Make sure HyperThreading and Efficient cores are enabled
+                    lblEfficientCoresNote.Text = "14700K  detected.";
+
+                    if (CPUCount == 28) // Make sure HyperThreading and Efficient cores are enabled in BIOS
                     {
-                        affinityMask = (IntPtr)(1 << 16 | 1 << 17 | 1 << 18 | 1 << 19 | 1 << 20 | 1 << 21 | 1 << 22 | 1 << 23 | 1 << 24 | 1 << 25 | 1 << 26 | 1 << 27);
-                        lblEfficientCoresNote.Text = "14700K  detected:   Using only efficient cores.";
-                        lblEfficientCoresNote.Visible = true;
-                        chkReassignIdealProcessor.Visible = true;
-                        lblReassignIdealProcessor.Visible = true;
+                        if (processorAssigner == null) processorAssigner = new ProcessorAssigner((uint)CPUCount - 1);                        
+
                         chkReassignIdealProcessor.Enabled = true;
-                        maxProcessorNumber = 27;
-                        if (processorAssigner == null) processorAssigner = new ProcessorAssigner(maxProcessorNumber);
+                        // needToCallSetNewIdealProcessor needs to be last
                         needToCallSetNewIdealProcessor = true; // Force flag because chkReassignIdealProcesso() onclick will miss it since the control wasn't enabled yet
+                        LogError("Setting all to true for calling new Ideal Processor", "DetermineCpuTypeAndCount()", true);
+
+
+                        // Highlight my best cores according to my BIOS
+                        label8.BorderStyle = BorderStyle.FixedSingle;
+                        label12.BorderStyle = BorderStyle.FixedSingle;
+                        label14.BorderStyle = BorderStyle.FixedSingle;
                     }
                     break;
                 default:
@@ -652,17 +635,9 @@ namespace PerformanceMonitor
                     break;
             }
 
-            if (affinityMask != IntPtr.Zero)
-            {
-                try
-                {
-                    // Set the CPU affinity to Efficient Cores only
-                    currentProcess.ProcessorAffinity = affinityMask;
-                }
-                catch { } // Ignore
-            }
 
         }
+      
 
         private void frmMain_Load(object sender, EventArgs e)
         {
@@ -671,7 +646,7 @@ namespace PerformanceMonitor
 
             ResetTicksCounters();
 
-            cpuStats = new ProcessorAssignmentStats(CPUCount);
+            
 
 
 
@@ -711,15 +686,7 @@ namespace PerformanceMonitor
             rbEcoQosAffinity.Checked = Properties.Settings.Default.rbEcoQosAffinity;
             rbCpuSetsAffinity.Checked = Properties.Settings.Default.rbCpuSetsAffinity;
 
-            if (CPUType == CpuType.Other)
-            {
-                rbNoAffinity.Checked = true;
-                rbHardAffinity.Enabled = false;
-                rbEcoQosAffinity.Enabled = false;
-                rbCpuSetsAffinity.Enabled = false;
-                lblEfficientCoresNote.Text = "Not an Alder/Raptor Lake gen CPU, efficient cores affinity options are disabled.";
-                lblEfficientCoresNote.Visible = true;
-            }
+
 
 
             FillAudioDevices();
@@ -776,31 +743,27 @@ namespace PerformanceMonitor
             nudPollingInterval.Value = Properties.Settings.Default.TimerInterval;
             timer1.Interval = (int)nudPollingInterval.Value;
 
-            if (rbHardAffinity.Checked)
+
+            // AssignEfficiencyCoresOnly
+            if (CPU_QoS.IsHybridCpu())
             {
-                AssignEfficiencyCoresOnly();
-                cpuStats.Reset("Affinity changed to Hard Affinity", true);
-            }
-            else if (rbEcoQosAffinity.Checked)
-            {
-                CPU_QoS.SetEcoQoS(true);
-                cpuStats.Reset("Affinity changed to EcoQoS", true);
-            }
-            else if (rbCpuSetsAffinity.Checked)
-            {
-                CPU_QoS.SetCpuSets(CPU_QoS.CpuSetType.Efficiency);
-                cpuStats.Reset("Affinity changed to CpuSets", true);
+                rbNoAffinity.Enabled = true;
+                rbHardAffinity.Enabled = true;
+                rbEcoQosAffinity.Enabled = true;
+                rbCpuSetsAffinity.Enabled = true;
+                ReassignAffinity(null, null);
+                tschkShowLastProcessor.Checked = true;
+                cpuStats = new ProcessorAssignmentStats(CPUCount);
             }
             else
-            {
-                cpuStats.Reset("Affinity changed to No Specified Affinity", true);
-            }
+                lblEfficientCoresNote.Text = $"Not an Alder/Raptor Lake gen CPU, (not hybrid) efficient cores affinity options are disabled.  Detected {CPU_QoS.GetAvailableProcessorCount()} cpus";
+
 
             // Change the priority class to the previous setting selected (NORMAL, BELOW_NORMAL or IDLE)
             // This call must come after AssignEfficiencyCoresOnly
             cmbPriorityClass.SelectedIndex = Properties.Settings.Default.PriorityClassSelectedIndex;
 
-            timer1.Enabled = tschkEnabled.Checked;
+            timer1.Enabled = tschkEnabled.Checked;                 
         }
 
         // When playing in VR I can't conveniently switch to performance monitor to change settings
@@ -1048,10 +1011,11 @@ namespace PerformanceMonitor
 
         private void UpdateMonitorLabels()
         {
-            if (needToCallSetNewIdealProcessor)
+            if (needToCallSetNewIdealProcessor && chkReassignIdealProcessor.Checked && chkReassignIdealProcessor.Enabled)
             {
                 needToCallSetNewIdealProcessor = false;
-                SetNewIdealProcessor(maxProcessorNumber); // This one also displays the new ideal processor
+                SetNewIdealProcessor((uint)CPUCount-1); // This one also displays the new ideal processor
+                LogError("Called SetNewIdealProcessor from UpdateMonitorLabels, now needToCallSetNewIdealProcessor = false", "UpdateMonitorLabels()", true);
             }
 
             float incrementalTicks = timer1.Interval; 
@@ -1067,8 +1031,7 @@ namespace PerformanceMonitor
             {
                 uint cpu = GetCurrentProcessorNumber();
                 UpdateCaption(tslblCurrentProcessor, (int)cpu);
-                cpuStats.Tick(cpu);
-
+                cpuStats?.Tick(cpu);
             }
 
             UpdateGPUInfo();
@@ -1447,12 +1410,13 @@ namespace PerformanceMonitor
             } 
         }
 
-        private void UpdateCaption<TValue>(ToolStripLabel L, TValue value, string dimensional = "")
+        private void UpdateCaption<TValue>(ToolStripLabel L, TValue value, string dimensional = "", bool force=false)
         {
-            if (this.WindowState != FormWindowState.Minimized && !Equals(L.Tag, value))
+            if ((this.WindowState != FormWindowState.Minimized && !Equals(L.Tag, value)) || force)
             {
                 L.Tag = value;
                 L.Text = (value is float f ? $"{f:F1}" : value.ToString()) + dimensional;
+                if (force) LogError($"Updated caption with value: {L.Text}", $"UpdateCaption({L.Name})", true);
             }
         }
 

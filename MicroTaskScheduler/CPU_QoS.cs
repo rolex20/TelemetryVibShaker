@@ -78,13 +78,13 @@ namespace PerformanceMonitor
         {
             var state = new THREAD_POWER_THROTTLING_STATE
             {
-                Version = THREAD_POWER_THROTTLING_CURRENT_VERSION,
+                Version     = THREAD_POWER_THROTTLING_CURRENT_VERSION,
                 ControlMask = THREAD_POWER_THROTTLING_EXECUTION_SPEED,
-                StateMask = enable ? THREAD_POWER_THROTTLING_EXECUTION_SPEED : 0u
+                StateMask   = enable ? THREAD_POWER_THROTTLING_EXECUTION_SPEED : 0u
             };
 
             IntPtr hThread = GetCurrentThread();
-            uint size = (uint)Marshal.SizeOf<THREAD_POWER_THROTTLING_STATE>();
+            uint   size    = (uint)Marshal.SizeOf<THREAD_POWER_THROTTLING_STATE>();
 
             // Try the Windows 11 API first (Class ID 3).
             if (SetThreadInformation(hThread, TIC_THREAD_POWER_THROTTLING_WIN11, ref state, size))
@@ -124,9 +124,9 @@ namespace PerformanceMonitor
 
             // Fallback: partial keyword matching for convenience.
             string m = mode.ToLowerInvariant();
-            if (m.Contains("eff") || m.Contains("eco")) SetCpuSets(CpuSetType.Efficiency);
-            else if (m.Contains("perf")) SetCpuSets(CpuSetType.Performance);
-            else SetCpuSets(CpuSetType.None);
+            if      (m.Contains("eff") || m.Contains("eco")) SetCpuSets(CpuSetType.Efficiency);
+            else if (m.Contains("perf"))                     SetCpuSets(CpuSetType.Performance);
+            else                                             SetCpuSets(CpuSetType.None);
         }
 
         /// <summary>
@@ -150,8 +150,8 @@ namespace PerformanceMonitor
                 return;
             }
 
-            var topo = QueryUsableCpuTopology();
-            uint[] ids = SelectCpuSetIds(type, in topo);
+            var    topo = QueryUsableCpuTopology();
+            uint[] ids  = SelectCpuSetIds(type, in topo);
 
             if (ids.Length > 0)
             {
@@ -195,7 +195,7 @@ namespace PerformanceMonitor
             var topo = QueryUsableCpuTopology();
             if (topo.CpuSets.Count == 0) return; // No usable cores visible; leave unchanged.
 
-            byte targetEff = GetTargetEfficiencyClass(type, in topo);
+            byte   targetEff   = GetTargetEfficiencyClass(type, in topo);
             ushort targetGroup = GetCurrentThreadGroup(hThread);
 
             // Build affinity mask within the thread's current processor group first.
@@ -205,7 +205,7 @@ namespace PerformanceMonitor
             if (mask == 0)
             {
                 targetGroup = FindFirstGroupForEfficiencyClass(in topo, targetEff);
-                mask = BuildGroupAffinityMask(in topo, targetEff, targetGroup);
+                mask        = BuildGroupAffinityMask(in topo, targetEff, targetGroup);
             }
 
             // Nothing matched anywhere — revert to default rather than locking out the thread.
@@ -217,15 +217,15 @@ namespace PerformanceMonitor
 
             var affinity = new GROUP_AFFINITY
             {
-                Mask = UIntPtr.Size == 8 ? new UIntPtr(mask) : new UIntPtr((uint)mask),
+                Mask  = UIntPtr.Size == 8 ? new UIntPtr(mask) : new UIntPtr((uint)mask),
                 Group = targetGroup
             };
 
             if (!SetThreadGroupAffinity(hThread, ref affinity, IntPtr.Zero))
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to set hard thread affinity.");
         }
-
-        // ── Add this method in the Public API region, after SetHardAffinity() ─────────────────────────
+		
+// ── Add this method in the Public API region, after SetHardAffinity() ─────────────────────────
 
         /// <summary>
         /// Sets a hard processor affinity for the <b>entire current process</b> based on the requested
@@ -274,8 +274,8 @@ namespace PerformanceMonitor
                 return;
             }
 
-            byte targetEff = GetTargetEfficiencyClass(type, in topo);
-            ulong mask = BuildGroupAffinityMask(in topo, targetEff, group: 0);
+            byte  targetEff = GetTargetEfficiencyClass(type, in topo);
+            ulong mask      = BuildGroupAffinityMask(in topo, targetEff, group: 0);
 
             // Intersect with the system mask: never request bits the OS won't grant.
             mask &= systemMask;
@@ -305,29 +305,29 @@ namespace PerformanceMonitor
         }
 
 
-
+		
 
         // ==============================================================
         // Internal Data Structures
         // ==============================================================
 
         // Named constants for the AllFlags byte inside SYSTEM_CPU_SET_INFORMATION.
-        private const byte CPUSET_FLAG_ALLOCATED = 0x02;
-        private const byte CPUSET_FLAG_ALLOCATED_TO_TARGET = 0x04;
+        private const byte CPUSET_FLAG_ALLOCATED            = 0x02;
+        private const byte CPUSET_FLAG_ALLOCATED_TO_TARGET  = 0x04;
 
         /// <summary>
         /// Compact representation of one logical CPU, parsed directly from the Win32 buffer.
         /// </summary>
         private struct InternalCpuSet
         {
-            public uint Id;
+            public uint   Id;
             public ushort Group;
-            public byte LogicalProcessorIndex;
-            public byte EfficiencyClass;
-            public byte Flags; // Raw AllFlags byte from SYSTEM_CPU_SET_INFORMATION
+            public byte   LogicalProcessorIndex;
+            public byte   EfficiencyClass;
+            public byte   Flags; // Raw AllFlags byte from SYSTEM_CPU_SET_INFORMATION
 
             // Derived properties — computed from Flags rather than stored as separate booleans.
-            public bool Allocated => (Flags & CPUSET_FLAG_ALLOCATED) != 0;
+            public bool Allocated               => (Flags & CPUSET_FLAG_ALLOCATED)           != 0;
             public bool AllocatedToTargetProcess => (Flags & CPUSET_FLAG_ALLOCATED_TO_TARGET) != 0;
 
             /// <summary>
@@ -362,7 +362,7 @@ namespace PerformanceMonitor
         {
             var topo = new CpuSetTopology
             {
-                CpuSets = new List<InternalCpuSet>(),
+                CpuSets            = new List<InternalCpuSet>(),
                 MinEfficiencyClass = 255,
                 MaxEfficiencyClass = 0
             };
@@ -386,8 +386,8 @@ namespace PerformanceMonitor
 
                 while (ptr < end)
                 {
-                    IntPtr p = new IntPtr(ptr);
-                    int size = Marshal.ReadInt32(p);     // SYSTEM_CPU_SET_INFORMATION.Size
+                    IntPtr p    = new IntPtr(ptr);
+                    int    size = Marshal.ReadInt32(p);     // SYSTEM_CPU_SET_INFORMATION.Size
                     if (size <= 0) break;
 
                     int type = Marshal.ReadInt32(p, 4);     // Type: 0 = CpuSetInformation
@@ -402,11 +402,11 @@ namespace PerformanceMonitor
                         //  +19  : AllFlags              (BYTE   / uint8)
                         var cpu = new InternalCpuSet
                         {
-                            Id = (uint)Marshal.ReadInt32(p, 8),
-                            Group = (ushort)Marshal.ReadInt16(p, 12),
+                            Id                    = (uint)Marshal.ReadInt32(p,  8),
+                            Group                 = (ushort)Marshal.ReadInt16(p, 12),
                             LogicalProcessorIndex = Marshal.ReadByte(p, 14),
-                            EfficiencyClass = Marshal.ReadByte(p, 18),
-                            Flags = Marshal.ReadByte(p, 19)
+                            EfficiencyClass       = Marshal.ReadByte(p, 18),
+                            Flags                 = Marshal.ReadByte(p, 19)
                         };
 
                         // Only track cores this process is allowed to use.
@@ -455,7 +455,7 @@ namespace PerformanceMonitor
         {
             switch (type)
             {
-                case CpuSetType.Efficiency: return topo.MinEfficiencyClass;
+                case CpuSetType.Efficiency:  return topo.MinEfficiencyClass;
                 case CpuSetType.Performance: return topo.MaxEfficiencyClass;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type,
@@ -471,8 +471,8 @@ namespace PerformanceMonitor
         {
             if (topo.CpuSets.Count == 0) return Array.Empty<uint>();
 
-            byte target = GetTargetEfficiencyClass(type, in topo);
-            var ids = new List<uint>();
+            byte       target = GetTargetEfficiencyClass(type, in topo);
+            var        ids    = new List<uint>();
 
             foreach (var cpu in topo.CpuSets)
                 if (cpu.EfficiencyClass == target)
@@ -491,9 +491,9 @@ namespace PerformanceMonitor
             ulong mask = 0;
             foreach (var cpu in topo.CpuSets)
             {
-                if (cpu.Group != group) continue;
-                if (cpu.EfficiencyClass != targetEff) continue;
-                if (cpu.LogicalProcessorIndex >= 64) continue; // 64-bit bitmask ceiling
+                if (cpu.Group != group)                  continue;
+                if (cpu.EfficiencyClass != targetEff)    continue;
+                if (cpu.LogicalProcessorIndex >= 64)     continue; // 64-bit bitmask ceiling
 
                 mask |= 1UL << cpu.LogicalProcessorIndex;
             }
@@ -552,7 +552,7 @@ namespace PerformanceMonitor
                     "Failed to reset thread affinity to process default.");
         }
 
-
+        
         /// <summary>
         /// Returns the number of logical processors that the current thread is permitted to run on —
         /// i.e., the processors whose indices are valid arguments to <c>SetThreadIdealProcessor()</c>.
@@ -635,10 +635,10 @@ namespace PerformanceMonitor
         private struct GROUP_AFFINITY
         {
             public UIntPtr Mask;
-            public ushort Group;
-            public ushort Reserved1;
-            public ushort Reserved2;
-            public ushort Reserved3;
+            public ushort  Group;
+            public ushort  Reserved1;
+            public ushort  Reserved2;
+            public ushort  Reserved3;
         }
 
         // ==============================================================
@@ -647,9 +647,9 @@ namespace PerformanceMonitor
 
         private const uint THREAD_POWER_THROTTLING_CURRENT_VERSION = 1;
         private const uint THREAD_POWER_THROTTLING_EXECUTION_SPEED = 1;
-        private const int TIC_THREAD_POWER_THROTTLING_WIN10 = 1;
-        private const int TIC_THREAD_POWER_THROTTLING_WIN11 = 3;
-        private const int ERROR_INVALID_PARAMETER = 87;
+        private const int  TIC_THREAD_POWER_THROTTLING_WIN10       = 1;
+        private const int  TIC_THREAD_POWER_THROTTLING_WIN11       = 3;
+        private const int  ERROR_INVALID_PARAMETER                 = 87;
 
         // ==============================================================
         // P/Invoke Declarations
@@ -663,51 +663,51 @@ namespace PerformanceMonitor
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool SetThreadInformation(
-            IntPtr hThread,
-            int ThreadInformationClass,
+            IntPtr                           hThread,
+            int                              ThreadInformationClass,
             ref THREAD_POWER_THROTTLING_STATE ThreadInformation,
-            uint ThreadInformationSize);
+            uint                             ThreadInformationSize);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool GetSystemCpuSetInformation(
-            IntPtr Information,
-            uint BufferLength,
-            out uint ReturnedLength,
-            IntPtr Process,
-            uint Flags);
+            IntPtr    Information,
+            uint      BufferLength,
+            out uint  ReturnedLength,
+            IntPtr    Process,
+            uint      Flags);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool SetThreadSelectedCpuSets(
             IntPtr Thread,
             uint[] CpuSetIds,
-            uint CpuSetIdCount);
+            uint   CpuSetIdCount);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool GetThreadGroupAffinity(
-            IntPtr hThread,
+            IntPtr             hThread,
             out GROUP_AFFINITY GroupAffinity);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool SetThreadGroupAffinity(
-            IntPtr hThread,
+            IntPtr             hThread,
             ref GROUP_AFFINITY GroupAffinity,
-            IntPtr PreviousGroupAffinity);
+            IntPtr             PreviousGroupAffinity);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool GetProcessAffinityMask(
-            IntPtr hProcess,
+            IntPtr      hProcess,
             out UIntPtr lpProcessAffinityMask,
             out UIntPtr lpSystemAffinityMask);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern UIntPtr SetThreadAffinityMask(
-            IntPtr hThread,
+            IntPtr  hThread,
             UIntPtr dwThreadAffinityMask);
-
+			
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool SetProcessAffinityMask(
-            IntPtr hProcess,
+            IntPtr  hProcess,
             UIntPtr dwProcessAffinityMask);
-
+			
     }
 }

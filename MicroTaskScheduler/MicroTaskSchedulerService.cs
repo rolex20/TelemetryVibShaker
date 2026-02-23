@@ -1,12 +1,14 @@
-﻿using Microsoft.Win32;
+﻿using IdealProcessorEnhanced;
+using Microsoft.Win32;
+using PerformanceMonitor;
 using System;
 using System.Diagnostics;
+using System.Media;
+using System.Runtime.InteropServices;
 using System.ServiceProcess;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Media;
-using IdealProcessorEnhanced;
-using System.Runtime.InteropServices;
 
 namespace MicroTaskScheduler
 {
@@ -123,16 +125,16 @@ namespace MicroTaskScheduler
         
         protected override void OnStart(string[] args)
         {
-            EventLog.WriteEntry("MicroTaskScheduler service starting.", EventLogEntryType.Information);
+            int maxCpus = PerformanceMonitor.CPU_QoS.GetAvailableProcessorCount();
+            EventLog.WriteEntry($"MicroTaskScheduler service starting with {maxCpus} cpus...", EventLogEntryType.Information);
 
-            //provoke the file to be created so the user can edit it if they want to change the alarm interval
-            if (Properties.Settings.Default.AlarmInterval_ms == 3600001)
+            //provoke the file to be created so the user can edit it if they want to change the alarm interval or the sound file (first run only)
+            if (Properties.Settings.Default.SoundAlarm == -1)
             {
-                Properties.Settings.Default.AlarmInterval_ms = 3600000; // basically 1 hour too
+                Properties.Settings.Default.SoundAlarm = 0; // default to the Casio Alarm sound if the user hasn't set it yet
+                Properties.Settings.Default.AlarmInterval_ms = 3600000; // default to 1 hour in milliseconds if the user hasn't set it yet
                 Properties.Settings.Default.Save();
             }
-
-            AssignEfficiencyCoresOnly();
 
             string scriptPath = @"C:\Users\ralch\Desktop\DisableAntivirus.ps1";
             startInfo = new ProcessStartInfo
@@ -146,6 +148,16 @@ namespace MicroTaskScheduler
             cancellationTokenSource = new CancellationTokenSource();
             antivirusDisableTask = Task.Run(() => DisableAntivirus(cancellationTokenSource.Token));
             hourlyAlarmTask = Task.Run(() => HourlyAlarm(cancellationTokenSource.Token));
+
+            if (PerformanceMonitor.CPU_QoS.IsHybridCpu())
+            {
+                if (processorAssigner == null) processorAssigner = new ProcessorAssigner((uint)maxCpus);
+                //SetNewIdealProcessor((uint)Environment.ProcessorCount - 1); // Assuming layout where efficient cores are last
+                SetNewIdealProcessor((uint)maxCpus - 1); // Use the actual number of available processors to be safe
+                PerformanceMonitor.CPU_QoS.SetHardAffinityProcess(PerformanceMonitor.CPU_QoS.CpuSetType.Efficiency);
+                //AssignEfficiencyCoresOnly();
+            }
+
         }
 
         protected override void OnStop()
@@ -184,6 +196,11 @@ namespace MicroTaskScheduler
 
         private async Task HourlyAlarm(CancellationToken cancellationToken)
         {
+
+            //cannot cache under the SYSTEM/Task.delay() environments: the wave header is corrupt
+            //and cannot reuse sound/handle in this environment.  Must create a new SoundPlayer every time we want to play the sound, which is every hour.  This is a quirk of the .NET SoundPlayer class and how it interacts with the audio driver in a service environment.  If we tried to reuse the same SoundPlayer instance, it would work for the first hour, but then on subsequent hours it would fail to play any sound due to the corrupted wave header issue.
+            //var stream = Properties.Settings.Default.SoundAlarm == 0? Properties.Resources.Casio_Watch_Alarm: Properties.Resources.StartCredit;
+
             // -----------------------------------------------------------------
             // 1. STARTUP SEQUENCE
             // -----------------------------------------------------------------
@@ -197,9 +214,9 @@ namespace MicroTaskScheduler
                 //await Task.Delay(2000, cancellationToken);
 
                 // Play Startup Beep
-                using (SoundPlayer spCasio = new SoundPlayer(Properties.Resources.Casio_Watch_Alarm))
+                using (SoundPlayer sp = new SoundPlayer(Properties.Settings.Default.SoundAlarm == 0 ? Properties.Resources.Casio_Watch_Alarm : Properties.Resources.StartCredit))
                 {
-                    spCasio.PlaySync();
+                    sp.PlaySync();
                     //await Task.Delay(2000, cancellationToken);
                 }
             }
@@ -259,28 +276,12 @@ namespace MicroTaskScheduler
                         // CRITICAL FIX: The 'using' block.
                         // This creates a fresh connection to the Audio Driver every hour.
                         // This solves the "Silence" issue.
-                        using (SoundPlayer casio = new SoundPlayer(Properties.Resources.Casio_Watch_Alarm))
+                        using (SoundPlayer sp = new SoundPlayer(Properties.Settings.Default.SoundAlarm == 0 ? Properties.Resources.Casio_Watch_Alarm : Properties.Resources.StartCredit))
                         {
-                            // if passes mod 2 == 0 then let's call PlaySync, otherwise let's call Play. This is just to test if PlaySync is the cause of the issue or not, if the issue still occurs with Play then we know it's not related to PlaySync and we can investigate further.
-                           // if (passes++ % 2 == 0)
-                            //{
-                                //casio.Load();
-                                casio.PlaySync();
-                                EventLog.WriteEntry($"casio.PlaySync() called and Task.Delay() follows.", EventLogEntryType.Information);
-                                await Task.Delay(2000, cancellationToken);
-                           // }
-                            //else
-                            //{
-                            //    casio.Play();
-                            //    EventLog.WriteEntry($"casio.Play() called and Thread.Sleep() follows.", EventLogEntryType.Information);
-                            //    Thread.Sleep(2000);
-                            //}
+                                sp.PlaySync();
+                                //EventLog.WriteEntry($"sp.PlaySync() called and Task.Delay() follows.", EventLogEntryType.Information);
+                                await Task.Delay(2000, cancellationToken); // Wait 2 seconds to push us past the "00:00" mark.
                         }
-
-                        // CRITICAL FIX: The "Anti-Double-Chime" Wait.
-                        // Wait 2 seconds to push us past the "00:00" mark.
-                        // This ensures we don't accidentally loop fast and hit the same hour twice.
-                        // await Task.Delay(2000, cancellationToken);
                     }
                 }
                 catch (TaskCanceledException)
