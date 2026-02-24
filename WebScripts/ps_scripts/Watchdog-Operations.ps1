@@ -35,6 +35,10 @@ function Watchdog_Operations {
     $additional_sleep = 10
     do
     {
+        if ($Global:Watcher_Continue -eq $false) {
+            return $false # Intentionally return false so the orchestrator does not auto-restart the watcher.
+        }
+
         # Wait-Event waits while staying responsive to events
         # Start-Sleep in contrast would NOT work and ignore incoming events
 		
@@ -64,6 +68,12 @@ function Watchdog_Operations {
         }
 
 		Wait-Event -Timeout $wait_seconds # Check every five minutes or when a manual event has been signaled        
+
+        $stopEvents = Get-Event -SourceIdentifier "StopWatcher" -ErrorAction SilentlyContinue
+        if ($stopEvents) {
+            $stopEvents | ForEach-Object { Remove-Event -EventId $_.EventIdentifier -ErrorAction SilentlyContinue }
+            return $false # Intentionally return false so the orchestrator does not auto-restart the watcher.
+        }
 
         $additional_sleep = 0
     } while ($watchers_OK)
