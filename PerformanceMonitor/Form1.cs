@@ -773,6 +773,8 @@ namespace PerformanceMonitor
                 rbHardAffinityProcess.Enabled = true;
                 rbEcoQosAffinity.Enabled = true;
                 rbCpuSetsAffinity.Enabled = true;
+                rbEcoQoSCpuSets.Enabled = true;
+                rbHardAffinityThread.Enabled = true;
                 ReassignAffinity(null, null);
                 tschkShowLastProcessor.Checked = true;
                 cpuStats = new ProcessorAssignmentStats(CPUCount);
