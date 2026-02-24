@@ -168,6 +168,9 @@ try {
 } #end try block
 
 finally {
+	Set-MpPreference -DisableRealtimeMonitoring $false -Force	
+	Set-MpPreference -ScanOnlyIfIdleEnabled $false
+		
     Send-IPC-ExitCommand "ipc_pipe_vr_server_commands"	
 	
     Write-VerboseDebug -Timestamp (Get-Date) -Title "FINALLY" -Message "Disposing objects" -ForegroundColor "Yellow"
