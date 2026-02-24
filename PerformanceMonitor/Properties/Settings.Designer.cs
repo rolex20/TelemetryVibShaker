@@ -274,5 +274,29 @@ namespace PerformanceMonitor.Properties {
                 this["rbNoAffinity"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool rbEcoQoSCpuSets {
+            get {
+                return ((bool)(this["rbEcoQoSCpuSets"]));
+            }
+            set {
+                this["rbEcoQoSCpuSets"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool rbHardAffinityThread {
+            get {
+                return ((bool)(this["rbHardAffinityThread"]));
+            }
+            set {
+                this["rbHardAffinityThread"] = value;
+            }
+        }
     }
 }

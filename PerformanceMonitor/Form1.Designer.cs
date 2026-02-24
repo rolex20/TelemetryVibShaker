@@ -211,7 +211,7 @@
             this.rbCpuSetsAffinity = new System.Windows.Forms.RadioButton();
             this.rbEcoQosAffinity = new System.Windows.Forms.RadioButton();
             this.label52 = new System.Windows.Forms.Label();
-            this.rbHardAffinity = new System.Windows.Forms.RadioButton();
+            this.rbHardAffinityProcess = new System.Windows.Forms.RadioButton();
             this.rbNoAffinity = new System.Windows.Forms.RadioButton();
             this.lblRedStaticHelp = new System.Windows.Forms.Label();
             this.lblReassignIdealProcessor = new System.Windows.Forms.Label();
@@ -232,6 +232,8 @@
             this.tbErrors = new System.Windows.Forms.TabPage();
             this.txtErrors = new System.Windows.Forms.TextBox();
             this.lblErrorsTitle = new System.Windows.Forms.Label();
+            this.rbEcoQoSCpuSets = new System.Windows.Forms.RadioButton();
+            this.rbHardAffinityThread = new System.Windows.Forms.RadioButton();
             this.toolStrip1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.tcTabControl.SuspendLayout();
@@ -2073,10 +2075,12 @@
             // 
             // tbSettings
             // 
+            this.tbSettings.Controls.Add(this.rbHardAffinityThread);
+            this.tbSettings.Controls.Add(this.rbEcoQoSCpuSets);
             this.tbSettings.Controls.Add(this.rbCpuSetsAffinity);
             this.tbSettings.Controls.Add(this.rbEcoQosAffinity);
             this.tbSettings.Controls.Add(this.label52);
-            this.tbSettings.Controls.Add(this.rbHardAffinity);
+            this.tbSettings.Controls.Add(this.rbHardAffinityProcess);
             this.tbSettings.Controls.Add(this.rbNoAffinity);
             this.tbSettings.Controls.Add(this.lblRedStaticHelp);
             this.tbSettings.Controls.Add(this.lblReassignIdealProcessor);
@@ -2106,11 +2110,11 @@
             // 
             this.rbCpuSetsAffinity.AutoSize = true;
             this.rbCpuSetsAffinity.Enabled = false;
-            this.rbCpuSetsAffinity.Location = new System.Drawing.Point(309, 266);
+            this.rbCpuSetsAffinity.Location = new System.Drawing.Point(288, 266);
             this.rbCpuSetsAffinity.Name = "rbCpuSetsAffinity";
-            this.rbCpuSetsAffinity.Size = new System.Drawing.Size(96, 17);
+            this.rbCpuSetsAffinity.Size = new System.Drawing.Size(65, 17);
             this.rbCpuSetsAffinity.TabIndex = 32;
-            this.rbCpuSetsAffinity.Text = "CpuSetsAffinity";
+            this.rbCpuSetsAffinity.Text = "CpuSets";
             this.rbCpuSetsAffinity.UseVisualStyleBackColor = true;
             this.rbCpuSetsAffinity.CheckedChanged += new System.EventHandler(this.ReassignAffinity);
             // 
@@ -2120,9 +2124,9 @@
             this.rbEcoQosAffinity.Enabled = false;
             this.rbEcoQosAffinity.Location = new System.Drawing.Point(217, 266);
             this.rbEcoQosAffinity.Name = "rbEcoQosAffinity";
-            this.rbEcoQosAffinity.Size = new System.Drawing.Size(86, 17);
+            this.rbEcoQosAffinity.Size = new System.Drawing.Size(65, 17);
             this.rbEcoQosAffinity.TabIndex = 31;
-            this.rbEcoQosAffinity.Text = "Intel EcoQos";
+            this.rbEcoQosAffinity.Text = "EcoQoS";
             this.rbEcoQosAffinity.UseVisualStyleBackColor = true;
             this.rbEcoQosAffinity.CheckedChanged += new System.EventHandler(this.ReassignAffinity);
             // 
@@ -2136,17 +2140,17 @@
             this.label52.Text = "Efficient Cores Affinity (Thread):";
             this.label52.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
-            // rbHardAffinity
+            // rbHardAffinityProcess
             // 
-            this.rbHardAffinity.AutoSize = true;
-            this.rbHardAffinity.Enabled = false;
-            this.rbHardAffinity.Location = new System.Drawing.Point(412, 266);
-            this.rbHardAffinity.Name = "rbHardAffinity";
-            this.rbHardAffinity.Size = new System.Drawing.Size(129, 17);
-            this.rbHardAffinity.TabIndex = 30;
-            this.rbHardAffinity.Text = "Hard (Whole Process)";
-            this.rbHardAffinity.UseVisualStyleBackColor = true;
-            this.rbHardAffinity.CheckedChanged += new System.EventHandler(this.ReassignAffinity);
+            this.rbHardAffinityProcess.AutoSize = true;
+            this.rbHardAffinityProcess.Enabled = false;
+            this.rbHardAffinityProcess.Location = new System.Drawing.Point(601, 266);
+            this.rbHardAffinityProcess.Name = "rbHardAffinityProcess";
+            this.rbHardAffinityProcess.Size = new System.Drawing.Size(129, 17);
+            this.rbHardAffinityProcess.TabIndex = 30;
+            this.rbHardAffinityProcess.Text = "Hard (Whole Process)";
+            this.rbHardAffinityProcess.UseVisualStyleBackColor = true;
+            this.rbHardAffinityProcess.CheckedChanged += new System.EventHandler(this.ReassignAffinity);
             // 
             // rbNoAffinity
             // 
@@ -2288,9 +2292,9 @@
             // 
             this.lblEfficientCoresNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblEfficientCoresNote.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(91)))), ((int)(((byte)(155)))), ((int)(((byte)(213)))));
-            this.lblEfficientCoresNote.Location = new System.Drawing.Point(575, 270);
+            this.lblEfficientCoresNote.Location = new System.Drawing.Point(741, 268);
             this.lblEfficientCoresNote.Name = "lblEfficientCoresNote";
-            this.lblEfficientCoresNote.Size = new System.Drawing.Size(234, 80);
+            this.lblEfficientCoresNote.Size = new System.Drawing.Size(213, 118);
             this.lblEfficientCoresNote.TabIndex = 4;
             this.lblEfficientCoresNote.Tag = "";
             this.lblEfficientCoresNote.Text = "CPU Detection: Pending";
@@ -2388,6 +2392,30 @@
             this.lblErrorsTitle.Size = new System.Drawing.Size(168, 13);
             this.lblErrorsTitle.TabIndex = 0;
             this.lblErrorsTitle.Text = "Errors: (only the first 100 are listed)";
+            // 
+            // rbEcoQoSCpuSets
+            // 
+            this.rbEcoQoSCpuSets.AutoSize = true;
+            this.rbEcoQoSCpuSets.Enabled = false;
+            this.rbEcoQoSCpuSets.Location = new System.Drawing.Point(359, 266);
+            this.rbEcoQoSCpuSets.Name = "rbEcoQoSCpuSets";
+            this.rbEcoQoSCpuSets.Size = new System.Drawing.Size(117, 17);
+            this.rbEcoQoSCpuSets.TabIndex = 33;
+            this.rbEcoQoSCpuSets.Text = "EcoQoS + CpuSets";
+            this.rbEcoQoSCpuSets.UseVisualStyleBackColor = true;
+            this.rbEcoQoSCpuSets.CheckedChanged += new System.EventHandler(this.ReassignAffinity);
+            // 
+            // rbHardAffinityThread
+            // 
+            this.rbHardAffinityThread.AutoSize = true;
+            this.rbHardAffinityThread.Enabled = false;
+            this.rbHardAffinityThread.Location = new System.Drawing.Point(482, 266);
+            this.rbHardAffinityThread.Name = "rbHardAffinityThread";
+            this.rbHardAffinityThread.Size = new System.Drawing.Size(113, 17);
+            this.rbHardAffinityThread.TabIndex = 34;
+            this.rbHardAffinityThread.Text = "Hard (GUI Thread)";
+            this.rbHardAffinityThread.UseVisualStyleBackColor = true;
+            this.rbHardAffinityThread.CheckedChanged += new System.EventHandler(this.ReassignAffinity);
             // 
             // frmMain
             // 
@@ -2627,7 +2655,7 @@
         private System.Windows.Forms.Label lblRedStaticHelp;
         private System.Windows.Forms.RadioButton rbNoAffinity;
         private System.Windows.Forms.Label label52;
-        private System.Windows.Forms.RadioButton rbHardAffinity;
+        private System.Windows.Forms.RadioButton rbHardAffinityProcess;
         private System.Windows.Forms.RadioButton rbEcoQosAffinity;
         private System.Windows.Forms.RadioButton rbCpuSetsAffinity;
         private System.Windows.Forms.Label label54;
@@ -2636,6 +2664,8 @@
         private System.Windows.Forms.Label label55;
         private System.Windows.Forms.ProgressBar pbGPUMem;
         private System.Windows.Forms.Label lblGPUMem;
+        private System.Windows.Forms.RadioButton rbEcoQoSCpuSets;
+        private System.Windows.Forms.RadioButton rbHardAffinityThread;
     }
 }
 

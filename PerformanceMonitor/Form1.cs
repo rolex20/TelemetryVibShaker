@@ -101,9 +101,12 @@ namespace PerformanceMonitor
             Properties.Settings.Default.chkReassignIdealProcessor = chkReassignIdealProcessor.Checked;
 
             Properties.Settings.Default.rbNoAffinity = rbNoAffinity.Checked ;
-            Properties.Settings.Default.rbHardAffinity = rbHardAffinity.Checked;
+            Properties.Settings.Default.rbHardAffinity = rbHardAffinityProcess.Checked;
             Properties.Settings.Default.rbEcoQosAffinity = rbEcoQosAffinity.Checked ;
             Properties.Settings.Default.rbCpuSetsAffinity = rbCpuSetsAffinity.Checked ;
+            Properties.Settings.Default.rbEcoQoSCpuSets = rbEcoQoSCpuSets.Checked;
+            Properties.Settings.Default.rbHardAffinityThread = rbHardAffinityThread.Checked;
+
 
 
 
@@ -450,10 +453,10 @@ namespace PerformanceMonitor
                                                              // 
                 string msg = "Affinity changed/reset to No Specified Affinity.";
                 cpuStats?.Reset(msg, true);
-                lblEfficientCoresNote.Text = msg;                
+                lblEfficientCoresNote.Text = msg;
 
             }
-            else if (rbHardAffinity.Checked)
+            else if (rbHardAffinityProcess.Checked)
             {
                 CPU_QoS.SetEcoQoS(false);
                 CPU_QoS.SetCpuSets(CPU_QoS.CpuSetType.None);
@@ -483,13 +486,31 @@ namespace PerformanceMonitor
                 cpuStats?.Reset(msg, true);
                 lblEfficientCoresNote.Text = msg;
             }
+            else if (rbEcoQoSCpuSets.Checked)
+            {
+                CPU_QoS.SetHardAffinityProcess(CPU_QoS.CpuSetType.None); // whole process
+                CPU_QoS.SetEcoQoS(true);
+                CPU_QoS.SetCpuSets(CPU_QoS.CpuSetType.Efficiency);
+                string msg = "Affinity changed to EcoQoS + Efficient CpuSets (current thread only).";
+                cpuStats?.Reset(msg, true);
+                lblEfficientCoresNote.Text = msg;
+            }
+            else if (rbHardAffinityThread.Checked)
+            {
+                CPU_QoS.SetHardAffinityProcess(CPU_QoS.CpuSetType.None); // whole process
+                CPU_QoS.SetEcoQoS(false);
+                CPU_QoS.SetCpuSets(CPU_QoS.CpuSetType.None);
+                CPU_QoS.SetHardAffinityThread(CPU_QoS.CpuSetType.Efficiency);
+                string msg = "Affinity changed to Hard Affinity (current thread only).";
+                cpuStats?.Reset(msg, true);
+                lblEfficientCoresNote.Text = msg;
+            }
         }
 
 
 
-
         [DllImport("user32.dll")]
-        private static extern bool IsIconic(IntPtr hWnd);
+            private static extern bool IsIconic(IntPtr hWnd);
 
         private const int SW_RESTORE = 9;
 
@@ -682,10 +703,11 @@ namespace PerformanceMonitor
             tcTabControl.SelectedIndex = Properties.Settings.Default.tcTabControl;
 
             rbNoAffinity.Checked = Properties.Settings.Default.rbNoAffinity;
-            rbHardAffinity.Checked = Properties.Settings.Default.rbHardAffinity;    
+            rbHardAffinityProcess.Checked = Properties.Settings.Default.rbHardAffinity;    
             rbEcoQosAffinity.Checked = Properties.Settings.Default.rbEcoQosAffinity;
             rbCpuSetsAffinity.Checked = Properties.Settings.Default.rbCpuSetsAffinity;
-
+            rbHardAffinityThread.Checked = Properties.Settings.Default.rbHardAffinityThread;
+            rbEcoQoSCpuSets.Checked = Properties.Settings.Default.rbEcoQoSCpuSets;
 
 
 
@@ -748,7 +770,7 @@ namespace PerformanceMonitor
             if (CPU_QoS.IsHybridCpu())
             {
                 rbNoAffinity.Enabled = true;
-                rbHardAffinity.Enabled = true;
+                rbHardAffinityProcess.Enabled = true;
                 rbEcoQosAffinity.Enabled = true;
                 rbCpuSetsAffinity.Enabled = true;
                 ReassignAffinity(null, null);
