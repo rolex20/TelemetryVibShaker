@@ -1,4 +1,4 @@
-﻿#watchdog: Make sure the file system watcher is still working properly
+#watchdog: Make sure the file system watcher is still working properly
 
 function Get-NewFileName {
     param (
@@ -39,8 +39,7 @@ function Watchdog_Operations {
             return $false # Intentionally return false so the orchestrator does not auto-restart the watcher.
         }
 
-        # Wait-Event waits while staying responsive to events
-        # Start-Sleep in contrast would NOT work and ignore incoming events
+        # Keep the pre-check delay interruptible so StopWatcher/EXIT_WATCHER can stop quickly.
 		
 		$found = $false
         #Remove manual events if any
@@ -48,10 +47,38 @@ function Watchdog_Operations {
 		if ($found) {
             if ($additional_sleep -EQ 0) { $additional_sleep = 5 } # if foreach failed
 			Write-VerboseDebug -Timestamp (Get-Date) -Title "INFO" -Message "Starting a Watchdog sanity check in $additional_sleep seconds..." -ForegroundColor "DarkGray"
-		} 
-		Start-Sleep -Seconds $additional_sleep #Allow some time of rest from the previous command
+		}
 
-        
+        # Interruptible wait: check stop/manual events every 50ms so EXIT_WATCHER can break out promptly.
+        $sleepDeadline = [System.Diagnostics.Stopwatch]::StartNew()
+        while ($sleepDeadline.ElapsedMilliseconds -lt ($additional_sleep * 1000)) {
+            if ($Global:Watcher_Continue -eq $false) {
+                return $false # Intentionally return false so the orchestrator does not auto-restart the watcher.
+            }
+
+            $stopEvents = Get-Event -SourceIdentifier "StopWatcher" -ErrorAction SilentlyContinue
+            if ($stopEvents) {
+                $stopEvents | ForEach-Object { Remove-Event -EventId $_.EventIdentifier -ErrorAction SilentlyContinue }
+                return $false # Intentionally return false so the orchestrator does not auto-restart the watcher.
+            }
+
+            $manualEvents = Get-Event -SourceIdentifier "DoWatchDogCheck" -ErrorAction SilentlyContinue
+            if ($manualEvents) {
+                $manualEvent = $manualEvents | Select-Object -First 1
+                $manualDelay = 0
+                if ($null -ne $manualEvent.MessageData -and [int]::TryParse($manualEvent.MessageData.ToString(), [ref]$manualDelay) -and $manualDelay -gt 0) {
+                    $additional_sleep = $manualDelay
+                } else {
+                    $additional_sleep = 5
+                }
+                $manualEvents | ForEach-Object { Remove-Event -EventId $_.EventIdentifier -ErrorAction SilentlyContinue }
+                Write-VerboseDebug -Timestamp (Get-Date) -Title "INFO" -Message "Manual watchdog event received; checking now." -ForegroundColor "DarkGray"
+                break
+            }
+
+            Start-Sleep -Milliseconds 50
+        }
+
         if (Test-Path "watchdog.txt") { Remove-Item "watchdog.txt" }
         if (Test-Path $command_file) { Remove-Item $command_file }
         Copy-Item $watchdog_json $tmp_json
