@@ -161,7 +161,13 @@ function Process-CommandFromJson {
 		"GAME_RESTORE" {
 			ScheduleWatchdogCheck 20
 			Restore-Processes-To-Default $parameters.processNames
-		}		
+		}
+
+        "EXIT_WATCHER" {
+            $Global:Watcher_Continue = $false
+            New-Event -SourceIdentifier "StopWatcher" -MessageData "EXIT_WATCHER" | Out-Null
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "EXIT_WATCHER [PID=$PID]" -Message "Watcher stop requested. Signaled StopWatcher event to unblock wait loop." -ForegroundColor "Yellow"
+        }		
 
         default {
             ScheduleWatchdogCheck 
