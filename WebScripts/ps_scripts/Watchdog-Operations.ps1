@@ -48,8 +48,32 @@ function Watchdog_Operations {
 		if ($found) {
             if ($additional_sleep -EQ 0) { $additional_sleep = 5 } # if foreach failed
 			Write-VerboseDebug -Timestamp (Get-Date) -Title "INFO" -Message "Starting a Watchdog sanity check in $additional_sleep seconds..." -ForegroundColor "DarkGray"
-		} 
-		Start-Sleep -Seconds $additional_sleep #Allow some time of rest from the previous command
+		}
+
+        # Keep this delay interruptible so EXIT_WATCHER/StopWatcher can break out in <1s.
+        $remainingSleep = [double]$additional_sleep
+        while ($remainingSleep -gt 0) {
+            if ($Global:Watcher_Continue -eq $false) {
+                return $false # Intentionally return false so the orchestrator does not auto-restart the watcher.
+            }
+
+            $chunk = [Math]::Min(0.5, $remainingSleep)
+            Wait-Event -Timeout $chunk | Out-Null
+
+            $stopEvents = Get-Event -SourceIdentifier "StopWatcher" -ErrorAction SilentlyContinue
+            if ($stopEvents) {
+                $stopEvents | ForEach-Object { Remove-Event -EventId $_.EventIdentifier -ErrorAction SilentlyContinue }
+                return $false # Intentionally return false so the orchestrator does not auto-restart the watcher.
+            }
+
+            # Consume any queued manual watchdog triggers without delaying responsiveness.
+            $manualEvents = Get-Event -SourceIdentifier "DoWatchDogCheck" -ErrorAction SilentlyContinue
+            if ($manualEvents) {
+                $manualEvents | ForEach-Object { Remove-Event -EventId $_.EventIdentifier -ErrorAction SilentlyContinue }
+            }
+
+            $remainingSleep -= $chunk
+        }
 
         
         if (Test-Path "watchdog.txt") { Remove-Item "watchdog.txt" }

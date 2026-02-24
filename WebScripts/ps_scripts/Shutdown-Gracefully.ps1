@@ -106,15 +106,36 @@ $payload = @{
 }
 
 $payloadJson = $payload | ConvertTo-Json -Depth 4 -Compress
-Set-Content -LiteralPath $tempCommandPath -Value $payloadJson -Encoding utf8NoBOM
+$skipGracefulWait = $false
 
-if (Test-Path -LiteralPath $finalCommandPath -PathType Leaf) {
-    Remove-Item -LiteralPath $finalCommandPath -Force
+try {
+    # PowerShell 5.1 does not support utf8NoBOM in Set-Content, so use .NET for explicit UTF-8 without BOM.
+    [System.IO.File]::WriteAllText($tempCommandPath, $payloadJson, (New-Object System.Text.UTF8Encoding($false)))
+
+    # Ensure command.tmp is physically committed before rename so the watcher always sees complete JSON.
+    [System.IO.File]::Open($tempCommandPath, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::Read).Dispose()
+
+    if (Test-Path -LiteralPath $finalCommandPath -PathType Leaf) {
+        Remove-Item -LiteralPath $finalCommandPath -Force
+    }
+
+    # Phase 1 (signal): rename temp -> command.json so the rename watcher reliably detects the trigger.
+    Rename-Item -LiteralPath $tempCommandPath -NewName $CommandFileName -Force
+    Write-Host "EXIT_WATCHER command sent: $finalCommandPath"
 }
+catch {
+    # If we cannot signal EXIT_WATCHER, warn interactively before continuing with forced shutdown.
+    [console]::Beep(1000, 300)
+    Write-Host "Failed to send EXIT_WATCHER command: $($_.Exception.Message)"
 
-# Phase 1 (signal): rename temp -> command.json so the rename watcher reliably detects the trigger.
-Rename-Item -LiteralPath $tempCommandPath -NewName $CommandFileName -Force
-Write-Host "EXIT_WATCHER command sent: $finalCommandPath"
+    $proceed = Read-Host 'Failed to signal watcher for graceful exit. Proceed to shutdown anyway? (Y/N)'
+    if ($proceed -notmatch '^[Yy]$') {
+        Write-Host 'Shutdown cancelled by user.'
+        exit 1
+    }
+
+    $skipGracefulWait = $true
+}
 
 $ipcUp = Test-IpcPipeAvailable -PipeName $ipcPipeName -ConnectTimeoutMs 50
 if (-not $ipcUp) {
@@ -122,24 +143,29 @@ if (-not $ipcUp) {
 }
 
 # Phase 2 (deadline): strict 1s cap prevents hanging the shutdown sequence on watcher teardown.
-$stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
-do {
-    if (-not (Test-MutexExists -Name $mutexName)) {
-        Write-Host "Watcher mutex disappeared; proceeding to shutdown path."
-        break
+if (-not $skipGracefulWait) {
+    $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+    do {
+        if (-not (Test-MutexExists -Name $mutexName)) {
+            Write-Host "Watcher mutex disappeared; proceeding to shutdown path."
+            break
+        }
+
+        Start-Sleep -Milliseconds 50
     }
+    while ($stopwatch.ElapsedMilliseconds -lt 1000)
 
-    Start-Sleep -Milliseconds 50
-}
-while ($stopwatch.ElapsedMilliseconds -lt 1000)
+    $stopwatch.Stop()
 
-$stopwatch.Stop()
-
-if (Test-MutexExists -Name $mutexName) {
-    Write-Host "Watcher mutex still present after $($stopwatch.ElapsedMilliseconds) ms; continuing due to strict time budget."
+    if (Test-MutexExists -Name $mutexName) {
+        Write-Host "Watcher mutex still present after $($stopwatch.ElapsedMilliseconds) ms; continuing due to strict time budget."
+    }
+    else {
+        Write-Host "Watcher exited within $($stopwatch.ElapsedMilliseconds) ms."
+    }
 }
 else {
-    Write-Host "Watcher exited within $($stopwatch.ElapsedMilliseconds) ms."
+    Write-Host 'Proceeding directly to shutdown without graceful wait (signal step failed but user confirmed).'
 }
 
 if ($DryRun.IsPresent) {
