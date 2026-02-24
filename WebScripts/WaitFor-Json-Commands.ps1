@@ -42,6 +42,8 @@ $include_file = Include-Script -FileName "Check-Admin-Privileges.ps1" -Directori
 
 
 $need_restart = $false
+# Used by EXIT_WATCHER to gracefully unwind the watchdog loop into finally {} cleanup.
+$Global:Watcher_Continue = $true
 try {
 	# 0- SET TITLE
 		$title = 'Watcher for JSON Gaming Commands'
@@ -163,6 +165,7 @@ try {
             
 
     # 9- WATCHDOG: Infinite loop to periodically check-alive in filesystem-watch which some times fails or locks
+        $Global:Watcher_Continue = $true
         $need_restart = Watchdog_Operations
 
 } #end try block
