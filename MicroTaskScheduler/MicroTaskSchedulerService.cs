@@ -126,7 +126,7 @@ namespace MicroTaskScheduler
         protected override void OnStart(string[] args)
         {
             int maxCpus = PerformanceMonitor.CPU_QoS.GetAvailableProcessorCount();
-            EventLog.WriteEntry($"MicroTaskScheduler service starting with {maxCpus} cpus...", EventLogEntryType.Information);
+            string logMsg = $"MicroTaskScheduler Service is starting with {maxCpus} cpus.";
 
             //provoke the file to be created so the user can edit it if they want to change the alarm interval or the sound file (first run only)
             if (Properties.Settings.Default.SoundAlarm == -1)
@@ -156,8 +156,13 @@ namespace MicroTaskScheduler
                 SetNewIdealProcessor((uint)maxCpus - 1); // Use the actual number of available processors to be safe
                 PerformanceMonitor.CPU_QoS.SetHardAffinityProcess(PerformanceMonitor.CPU_QoS.CpuSetType.Efficiency);
                 //AssignEfficiencyCoresOnly();
-            }
+                // let's append to logMsg that we are on a hybrid CPU and have set the affinity
+                logMsg += " Detected hybrid CPU, set affinity to efficient cores.";
+            } else 
+                logMsg += " Non-hybrid CPU detected, no affinity changes made.";
 
+
+            EventLog.WriteEntry(logMsg, EventLogEntryType.Information);
         }
 
         protected override void OnStop()
