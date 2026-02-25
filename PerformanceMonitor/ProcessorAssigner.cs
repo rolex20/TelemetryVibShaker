@@ -12,6 +12,7 @@ using System.IO.MemoryMappedFiles;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading;
+using System;
 
 
 
@@ -19,15 +20,63 @@ namespace IdealProcessorEnhanced
 {
     internal class ProcessorAssigner
     {
+        private const string ProcessorAssignerMutex = @"Global\ProcessorAssignerMutex";
+        private const string ProcessorAssignerMMF = @"Global\ProcessorAssignerMMF";
+
         // Static variables to hold the starting processor number, mutex, and memory-mapped file
         private uint startProcessor;
         private Mutex mutex;
         private MemoryMappedFile mmf;
         private MemoryMappedViewAccessor accessor;
+        public string IpcInitMessage { get; private set; }
 
         // Constructor to initialize the starting processor number
         public ProcessorAssigner(uint maxProcessor)
         {
+            InitializeIpcObjects(ProcessorAssignerMutex, ProcessorAssignerMMF);
+
+            accessor = mmf.CreateViewAccessor();
+
+            startProcessor = maxProcessor;
+            InitializeProcessor();
+        }
+
+        private void InitializeIpcObjects(string mutexName, string mmfName, Exception globalOpenFailure = null)
+        {
+            bool isGlobalName = mutexName.StartsWith(@"Global\", StringComparison.OrdinalIgnoreCase)
+                                && mmfName.StartsWith(@"Global\", StringComparison.OrdinalIgnoreCase);
+
+            if (isGlobalName)
+            {
+                try
+                {
+                    mutex = Mutex.OpenExisting(mutexName);
+                    try
+                    {
+                        mmf = MemoryMappedFile.OpenExisting(mmfName, MemoryMappedFileRights.ReadWrite);
+                    }
+                    catch
+                    {
+                        mutex.Dispose();
+                        mutex = null;
+                        throw;
+                    }
+
+                    IpcInitMessage = $"Using Global IPC objects ({mutexName}, {mmfName}) by opening existing shared objects.";
+                    return;
+                }
+                catch (Exception ex) when (ex is WaitHandleCannotBeOpenedException ||
+                                           ex is UnauthorizedAccessException ||
+                                           ex is FileNotFoundException ||
+                                           ex is IOException)
+                {
+                    string localMutexName = RemoveGlobalPrefix(mutexName);
+                    string localMmfName = RemoveGlobalPrefix(mmfName);
+                    InitializeIpcObjects(localMutexName, localMmfName, ex);
+                    return;
+                }
+            }
+
             // Define the security settings for the mutex
             var mutexSecurity = new MutexSecurity();
 
@@ -39,12 +88,8 @@ namespace IdealProcessorEnhanced
 
             mutexSecurity.AddAccessRule(mu_rule);
 
-
             bool createdNew;
-            mutex = new Mutex(false, @"Global\ProcessorAssignerMutex", out createdNew, mutexSecurity);
-            //   mutex = new Mutex(false, "GlobalProcessorAssignerMutex");
-
-
+            mutex = new Mutex(false, mutexName, out createdNew, mutexSecurity);
 
             // Define the security settings for the memory-mapped file
             var security = new MemoryMappedFileSecurity();
@@ -57,14 +102,25 @@ namespace IdealProcessorEnhanced
 
             security.AddAccessRule(mm_rule);
 
-            // Create the global memory-mapped file with the specified security settings
-            mmf = MemoryMappedFile.CreateOrOpen(@"Global\ProcessorAssignerMMF", 4, MemoryMappedFileAccess.ReadWrite, MemoryMappedFileOptions.None, security, HandleInheritability.None);
-            //mmf = MemoryMappedFile.CreateOrOpen("GlobalProcessorAssignerMMF", 4);            
+            // Create/open the local memory-mapped file with the specified security settings
+            mmf = MemoryMappedFile.CreateOrOpen(mmfName, 4, MemoryMappedFileAccess.ReadWrite, MemoryMappedFileOptions.None, security, HandleInheritability.None);
 
-            accessor = mmf.CreateViewAccessor();
+            if (globalOpenFailure == null)
+            {
+                IpcInitMessage = $"Using local IPC objects ({mutexName}, {mmfName}) with create/open mode.";
+            }
+            else
+            {
+                IpcInitMessage = $"Global IPC open failed ({globalOpenFailure.GetType().Name}: {globalOpenFailure.Message}). Falling back to local IPC objects ({mutexName}, {mmfName}).";
+            }
+        }
 
-            startProcessor = maxProcessor;
-            InitializeProcessor();
+        private static string RemoveGlobalPrefix(string name)
+        {
+            const string globalPrefix = @"Global\";
+            return name.StartsWith(globalPrefix, StringComparison.OrdinalIgnoreCase)
+                ? name.Substring(globalPrefix.Length)
+                : name;
         }
 
         // Method to initialize the processor number in the memory-mapped file

@@ -618,7 +618,11 @@ namespace PerformanceMonitor
 
                     if (CPUCount == 20) // Make sure HyperThreading and Efficient cores are enabled in BIOS
                     {
-                        if (processorAssigner == null) processorAssigner = new ProcessorAssigner((uint)CPUCount-1);
+                        if (processorAssigner == null)
+                        {
+                            processorAssigner = new ProcessorAssigner((uint)CPUCount-1);
+                            LogError(processorAssigner.IpcInitMessage, "ProcessorAssigner", true);
+                        }
 
                         chkReassignIdealProcessor.Enabled = true;
                         // needToCallSetNewIdealProcessor needs to be last
@@ -637,7 +641,11 @@ namespace PerformanceMonitor
 
                     if (CPUCount == 28) // Make sure HyperThreading and Efficient cores are enabled in BIOS
                     {
-                        if (processorAssigner == null) processorAssigner = new ProcessorAssigner((uint)CPUCount - 1);                        
+                        if (processorAssigner == null)
+                        {
+                            processorAssigner = new ProcessorAssigner((uint)CPUCount - 1);
+                            LogError(processorAssigner.IpcInitMessage, "ProcessorAssigner", true);
+                        }
 
                         chkReassignIdealProcessor.Enabled = true;
                         // needToCallSetNewIdealProcessor needs to be last
