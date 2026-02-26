@@ -28,10 +28,10 @@
 
 
 # Example utilization 2
-. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1"
+
 
 $writeaction1 = {
-    . "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1"
+    
     $path = $Event.SourceEventArgs.FullPath
     $changeType = $Event.SourceEventArgs.ChangeType
     $formattedTimestamp = $(Get-Date).ToString("yyyy-MM-dd HH:mm:ss.fffffff")
@@ -43,7 +43,7 @@ $writeaction1 = {
 }    
 
 $writeaction2 = { 
-    . "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1"
+    
     $path = $Event.SourceEventArgs.FullPath
     $changeType = $Event.SourceEventArgs.ChangeType
     $formattedTimestamp = $(Get-Date).ToString("yyyy-MM-dd HH:mm:ss.fffffff")

@@ -1,16 +1,8 @@
-﻿function Include-Script {
-    param (
-        [string]$FileName,
-        [string[]]$Directories
-    )
-
-    foreach ($dir in $Directories) {
-        $file = Get-ChildItem -Path $dir -Recurse -Filter $FileName -ErrorAction SilentlyContinue | Select-Object -First 1
-        if ($file) {
-            return $file.FullName
-        }
+function Resolve-LegacyScriptPath {
+    param([string]$FileName,[string[]]$Directories)
+    foreach ($directory in $Directories) {
+        $filePath = Join-Path $directory $FileName
+        if (Test-Path $filePath) { return $filePath }
     }
-
-    return "Include-File-Not-Found"
+    throw "Script file not found: $FileName"
 }
-

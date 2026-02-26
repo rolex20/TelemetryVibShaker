@@ -1,4 +1,4 @@
-﻿#. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1" #Don't forget to include this file for independent testing
+﻿# #Don't forget to include this file for independent testing
 
 function Get-WindowLocation {
     param (
