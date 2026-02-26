@@ -1,0 +1,11 @@
+{
+  "paths": {
+    "commandJson": ".\\runtime\\command.json",
+    "wtMissionJson": ".\\runtime\\mission_data.json",
+    "wtConfigBlk": ".\\runtime\\config.blk"
+  },
+  "names": {
+    "ipcPipeName": "ipc_pipe_vr_server_commands",
+    "ipcMutexName": "Watcher for JSON Gaming Commands"
+  }
+}

@@ -1,35 +1,4 @@
-﻿. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
-
-$search_paths = @("C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts", "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts")
-
-$include_file = Include-Script -FileName "Write-VerboseDebug.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-ForegroundProcess.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-Minimize.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-Maximize.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Send-MessageViaPipe.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-WindowsPosition.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Get-WindowLocation.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-PowerScheme.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-IdealProcessor.ps1" -Directories $search_paths
-. $include_file
-
-function ScheduleWatchdogCheck($delay = 10) {
+﻿function ScheduleWatchdogCheck($delay = 10) {
 Write-Host "DoWatchDogCheck"
 	New-Event -SourceIdentifier "DoWatchDogCheck" -MessageData $delay # This will wake up Watchodg-Operations
 }
@@ -151,11 +120,14 @@ function Process-CommandFromJson {
 
         "SHOW_THREADS" {
             ScheduleWatchdogCheck 20
-			Show-Process-Thread-Times "joystick_gremlin" $parameters.threadsLimit
-            Show-Process-Thread-Times "FlightSimulator" $parameters.threadsLimit
-            #Show-Process-Thread-Times "aces"  $parameters.threadsLimit
-            Show-Process-Thread-Times "dcs"  $parameters.threadsLimit
-            Show-Process-Thread-Times "OVRServer_x64"  $parameters.threadsLimit			
+            $showThreadsScript = Join-Path $script:TvsWebScriptsRoot 'ps_scripts\Show-CPU-Time-PerProcess.ps1'
+            if (Test-Path $showThreadsScript) {
+                . $showThreadsScript
+                Show-Process-Thread-Times "joystick_gremlin" $parameters.threadsLimit
+                Show-Process-Thread-Times "FlightSimulator" $parameters.threadsLimit
+                Show-Process-Thread-Times "dcs"  $parameters.threadsLimit
+                Show-Process-Thread-Times "OVRServer_x64"  $parameters.threadsLimit
+            }
         }
 		
 		"GAME_RESTORE" {

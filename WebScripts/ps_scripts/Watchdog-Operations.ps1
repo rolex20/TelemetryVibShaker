@@ -20,7 +20,7 @@ function Get-NewFileName {
 
 
 function Watchdog_Operations {
-    $watchdog_json = Include-Script "watchdog.json" "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts" "C:\Users\ralch"
+    $watchdog_json = Join-Path $script:TvsWebScriptsRoot "ps_scripts\watchdog.json"
     $tmp_json = Get-NewFileName -FilePath $command_file -NewExtension "tmp"
 
 	$failure = $false
