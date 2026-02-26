@@ -1,33 +1,7 @@
-﻿. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
-
-$search_paths = @("C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts", "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts")
-
-$include_file = Include-Script -FileName "Write-VerboseDebug.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-ForegroundProcess.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-Minimize.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-Maximize.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Send-MessageViaPipe.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-WindowsPosition.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Get-WindowLocation.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-PowerScheme.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-IdealProcessor.ps1" -Directories $search_paths
-. $include_file
+﻿if ($MyInvocation.InvocationName -ne ".") {
+    $modulePath = Join-Path $PSScriptRoot "TelemetryVibShaker.WebScripts\TelemetryVibShaker.WebScripts.psd1"
+    if (Test-Path $modulePath) { Import-Module $modulePath -Force }
+}
 
 function ScheduleWatchdogCheck($delay = 10) {
 Write-Host "DoWatchDogCheck"

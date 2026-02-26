@@ -1,23 +1,4 @@
-﻿. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
-
-$search_paths = @("C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts", "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts")
-
-$include_file = Include-Script -FileName "Write-VerboseDebug.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Gaming-Programs.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-PowerScheme.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-IdealProcessor.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Cpu-Snapshots.ps1" -Directories $search_paths
-. $include_file
-
-function Restore-GameBoost {
+﻿function Restore-GameBoost {
     <#
     .SYNOPSIS
         Restores processes affected by a specific game's boost profile back to a default state intelligently.
@@ -122,19 +103,6 @@ function Start-GameRuntimeTracker {
 
 	$null = Register-ObjectEvent -InputObject $timer -EventName Elapsed -SourceIdentifier $sourceIdentifier -MessageData $messageData -Action {
 		try {
-			#. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1"
-			#. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Set-GamePowerScheme.ps1"
-			
-			. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
-
-			$search_paths = @("C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts", "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts")
-
-			$include_file = Include-Script -FileName "Write-VerboseDebug.ps1" -Directories $search_paths
-			. $include_file			
-			
-			$include_file = Include-Script -FileName "Cpu-Snapshots.ps1" -Directories $search_paths
-			. $include_file			
-			
 
 			$eventPid = [int]$Event.MessageData.ProcessId
 			$eventProgramName = $Event.MessageData.ProgramName

@@ -1,61 +1,46 @@
-﻿#watchdog: Make sure the file system watcher is still working properly
-
 function Get-NewFileName {
     param (
         [string]$FilePath,
         [string]$NewExtension
     )
 
-    # Extract the directory, filename without extension, and current extension
     $directory = [System.IO.Path]::GetDirectoryName($FilePath)
     $filenameWithoutExtension = [System.IO.Path]::GetFileNameWithoutExtension($FilePath)
-
-    # Combine the directory, filename without extension, and new extension to form the new filename
-    $newFileName = [System.IO.Path]::Combine($directory, "$filenameWithoutExtension.$NewExtension")
-
-    return $newFileName
+    return [System.IO.Path]::Combine($directory, "$filenameWithoutExtension.$NewExtension")
 }
 
-
-
-
 function Watchdog_Operations {
-    $watchdog_json = Include-Script "watchdog.json" "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts" "C:\Users\ralch"
-    $tmp_json = Get-NewFileName -FilePath $command_file -NewExtension "tmp"
+    param(
+        [string]$CommandFilePath = ((Get-TvsConfig).paths.commandJson)
+    )
 
-	$failure = $false
+    $watchdog_json = Join-Path $PSScriptRoot 'watchdog.json'
+    $tmp_json = Get-NewFileName -FilePath $CommandFilePath -NewExtension "tmp"
+
+    $failure = $false
     $watchers_OK = $true
-	
-
-    # CHANGE HERE FOR DIFFERENT WAIT TIME
-	$wait_minutes = 10 #Change this	to customize
-	$wait_seconds = 60 * $wait_minutes
-
-
+    $wait_minutes = 10
+    $wait_seconds = 60 * $wait_minutes
     $additional_sleep = 10
-    do
-    {
-        if ($Global:Watcher_Continue -eq $false) {
-            return $false # Intentionally return false so the orchestrator does not auto-restart the watcher.
+
+    do {
+        if ($Global:Watcher_Continue -eq $false) { return $false }
+
+        $found = $false
+        Get-Event -SourceIdentifier "DoWatchDogCheck" -ErrorAction SilentlyContinue | ForEach-Object {
+            $additional_sleep = $_.MessageData
+            Remove-Event -EventId $_.EventIdentifier -ErrorAction SilentlyContinue
+            $found = $true
         }
 
-        # Wait-Event waits while staying responsive to events
-        # Start-Sleep in contrast would NOT work and ignore incoming events
-		
-		$found = $false
-        #Remove manual events if any
-		Get-Event -SourceIdentifier "DoWatchDogCheck" -ErrorAction SilentlyContinue | ForEach-Object { $additional_sleep = $_.MessageData ; Remove-Event -EventId $_.EventIdentifier -ErrorAction SilentlyContinue ; $found = $true}
-		if ($found) {
-            if ($additional_sleep -EQ 0) { $additional_sleep = 5 } # if foreach failed
-			Write-VerboseDebug -Timestamp (Get-Date) -Title "INFO" -Message "Starting a Watchdog sanity check in $additional_sleep seconds..." -ForegroundColor "DarkGray"
-		}
+        if ($found) {
+            if ($additional_sleep -eq 0) { $additional_sleep = 5 }
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "INFO" -Message "Starting a Watchdog sanity check in $additional_sleep seconds..." -ForegroundColor "DarkGray"
+        }
 
-        # Keep this delay interruptible so EXIT_WATCHER/StopWatcher can break out in <1s.
         $remainingSleep = [double]$additional_sleep
         while ($remainingSleep -gt 0) {
-            if ($Global:Watcher_Continue -eq $false) {
-                return $false # Intentionally return false so the orchestrator does not auto-restart the watcher.
-            }
+            if ($Global:Watcher_Continue -eq $false) { return $false }
 
             $chunk = [Math]::Min(0.5, $remainingSleep)
             Wait-Event -Timeout $chunk | Out-Null
@@ -63,10 +48,9 @@ function Watchdog_Operations {
             $stopEvents = Get-Event -SourceIdentifier "StopWatcher" -ErrorAction SilentlyContinue
             if ($stopEvents) {
                 $stopEvents | ForEach-Object { Remove-Event -EventId $_.EventIdentifier -ErrorAction SilentlyContinue }
-                return $false # Intentionally return false so the orchestrator does not auto-restart the watcher.
+                return $false
             }
 
-            # Consume any queued manual watchdog triggers without delaying responsiveness.
             $manualEvents = Get-Event -SourceIdentifier "DoWatchDogCheck" -ErrorAction SilentlyContinue
             if ($manualEvents) {
                 $manualEvents | ForEach-Object { Remove-Event -EventId $_.EventIdentifier -ErrorAction SilentlyContinue }
@@ -75,32 +59,29 @@ function Watchdog_Operations {
             $remainingSleep -= $chunk
         }
 
-        
         if (Test-Path "watchdog.txt") { Remove-Item "watchdog.txt" }
-        if (Test-Path $command_file) { Remove-Item $command_file }
+        if (Test-Path $CommandFilePath) { Remove-Item $CommandFilePath }
         Copy-Item $watchdog_json $tmp_json
-        Rename-Item $tmp_json $command_file
+        Rename-Item $tmp_json $CommandFilePath
 
         Start-Sleep -Milliseconds 200
-        if (Test-Path "watchdog.txt") {
-            # We are good
-        } else {
+        if (-not (Test-Path "watchdog.txt")) {
             Write-VerboseDebug -Timestamp (Get-Date) -Title "ERROR" -Message "Events are not being processed" -ForegroundColor "Red"
             $watchers_OK = $false
-			$failure = $true
-            break;
+            $failure = $true
+            break
         }
 
-		Wait-Event -Timeout $wait_seconds # Check every five minutes or when a manual event has been signaled        
+        Wait-Event -Timeout $wait_seconds | Out-Null
 
         $stopEvents = Get-Event -SourceIdentifier "StopWatcher" -ErrorAction SilentlyContinue
         if ($stopEvents) {
             $stopEvents | ForEach-Object { Remove-Event -EventId $_.EventIdentifier -ErrorAction SilentlyContinue }
-            return $false # Intentionally return false so the orchestrator does not auto-restart the watcher.
+            return $false
         }
 
         $additional_sleep = 0
     } while ($watchers_OK)
-	
-	return $failure
+
+    return $failure
 }
