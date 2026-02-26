@@ -20,8 +20,12 @@ function Get-NewFileName {
 
 
 function Watchdog_Operations {
-    $watchdog_json = Include-Script "watchdog.json" "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts" "C:\Users\ralch"
-    $tmp_json = Get-NewFileName -FilePath $command_file -NewExtension "tmp"
+    param(
+        [Parameter(Mandatory=$true)][string]$CommandFilePath,
+        [string]$WatchdogJsonPath = (Join-Path $PSScriptRoot 'watchdog.json')
+    )
+    $watchdog_json = $WatchdogJsonPath
+    $tmp_json = Get-NewFileName -FilePath $CommandFilePath -NewExtension "tmp"
 
 	$failure = $false
     $watchers_OK = $true
@@ -77,9 +81,9 @@ function Watchdog_Operations {
 
         
         if (Test-Path "watchdog.txt") { Remove-Item "watchdog.txt" }
-        if (Test-Path $command_file) { Remove-Item $command_file }
+        if (Test-Path $CommandFilePath) { Remove-Item $CommandFilePath }
         Copy-Item $watchdog_json $tmp_json
-        Rename-Item $tmp_json $command_file
+        Rename-Item $tmp_json $CommandFilePath
 
         Start-Sleep -Milliseconds 200
         if (Test-Path "watchdog.txt") {

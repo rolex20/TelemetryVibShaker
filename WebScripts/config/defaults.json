@@ -1,0 +1,28 @@
+{
+  "paths": {
+    "commandJson": "runtime/command.json",
+    "wtMissionJson": "runtime/mission_data.json",
+    "wtConfigBlk": "runtime/config.blk",
+    "wtUserMissionsDir": "runtime/wt_user_missions"
+  },
+  "names": {
+    "ipcPipeName": "ipc_pipe_vr_server_commands",
+    "ipcMutexName": "ipc_pipe_vr_server_mutex",
+    "orchestratorMutexName": "Watcher for JSON Gaming Commands"
+  },
+  "legacy": {
+    "commandJson": [
+      "C:/MyPrograms/wamp/www/remote_control/command.json"
+    ],
+    "wtMissionJson": [
+      "C:/MyPrograms/wamp/www/warthunder/mission_data.json",
+      "C:/wamp/www/warthunder/mission_data.json"
+    ],
+    "wtConfigBlk": [
+      "C:/MyPrograms/Steam/steamapps/common/War Thunder/config.blk"
+    ],
+    "wtUserMissionsDir": [
+      "C:/MyPrograms/Steam/steamapps/common/War Thunder/UserMissions"
+    ]
+  }
+}

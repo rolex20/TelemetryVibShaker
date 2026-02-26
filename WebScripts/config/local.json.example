@@ -1,0 +1,9 @@
+{
+  "paths": {
+    "commandJson": "C:/path/to/command.json",
+    "wtMissionJson": "C:/path/to/mission_data.json"
+  },
+  "names": {
+    "ipcPipeName": "ipc_pipe_vr_server_commands"
+  }
+}
