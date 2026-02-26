@@ -2,7 +2,7 @@
 
 I built this watcher to keep my sim-rig alive while I am strapped into VR: it listens for new JSON commands, boosts the right threads, and yells if anything misbehaves so I never have to rip off the headset mid-sortie.
 
-**Tech flex:** PowerShell 7+, CIM/`System.Threading.Mutex` eventing, `System.Diagnostics` affinity tuning, Start-ThreadJob IPC server, JSON-driven orchestration, and WAMP/Apache hand-offs from PHP front ends.
+**Tech flex:** PowerShell 5.1, CIM/`System.Threading.Mutex` eventing, `System.Diagnostics` affinity tuning including EcoQoS and CpuSets, Start-ThreadJob IPC server, JSON-driven orchestration, and WAMP/Apache hand-offs from PHP front ends.
 
 ## What this script does (and why it matters)
 - **Sets its own priorities and affinities** so the watcher stays on efficiency cores and never steals perf-core time from the sim, preventing stutters when VR is already tight. The helper `SetAffinityAndPriority.ps1` and `Check-Admin-Privileges.ps1` keep the process pinned and safe.
