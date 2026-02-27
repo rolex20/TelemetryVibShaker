@@ -1,9 +1,4 @@
-﻿. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
-
-$search_paths = @("C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts", "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts")
-
-$include_file = Include-Script -FileName "Gaming-Programs.ps1" -Directories $search_paths
-. $include_file
+﻿. ".\Gaming-Programs.ps1"
 
 
 function Create-ProcessWatcherQuery {

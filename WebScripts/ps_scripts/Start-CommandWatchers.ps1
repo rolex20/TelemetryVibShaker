@@ -4,41 +4,13 @@
 # for the next modification on the watch file.
 
 
-. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
-
-<#
-. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1"
-. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Get-RenamesWatcher.ps1"
-. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
-. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Watchdog-Operations.ps1"
-#>
-
-
-# INCLUDE COMMON FUNCTIONS
-
-$search_paths = @("C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts", "C:\Users\ralch\source\repos\rolex20\TelemetryVibShaker\WebScripts\ps_scripts")
-
-$include_file = Include-Script -FileName "Write-VerboseDebug.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Get-RenamesWatcher.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Watchdog-Operations.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "SetAffinityAndPriority.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Get-ProcessWatcher.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Send-IPC-ExitCommand.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Check-Admin-Privileges.ps1" -Directories $search_paths
-. $include_file
-
+. ".\Write-VerboseDebug.ps1"
+. ".\Get-RenamesWatcher.ps1"
+. ".\Watchdog-Operations.ps1"
+. ".\SetAffinityAndPriority.ps1"
+. ".\Get-ProcessWatcher.ps1"
+. ".\Send-IPC-ExitCommand.ps1"
+. ".\Check-Admin-Privileges.ps1"
 
 
 $need_restart = $false
@@ -46,7 +18,7 @@ $need_restart = $false
 $Global:Watcher_Continue = $true
 try {
 	# 0- SET TITLE
-		$title = 'Watcher for JSON Gaming Commands'
+		$title = 'Watcher for My Gaming Commands'
 		$Host.UI.RawUI.WindowTitle = $title
 
 	
@@ -98,7 +70,7 @@ try {
     # remote commands are sent in support of my TelemetryVibShaker Apps
 
         $remote_commands = {
-            . "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Process-CommandFromJson.ps1"
+            . ".\Process-CommandFromJson.ps1"
 
             $path = $Event.SourceEventArgs.FullPath
             $changeType = $Event.SourceEventArgs.ChangeType
@@ -121,7 +93,7 @@ try {
     # mission_data.json is created by wamp/apache/http/php/mission1.php script
 
         $generate_mission1 = {
-            . "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\WT_MissionType1.ps1"
+            . ".\WT_MissionType1.ps1"
 
             $path = $Event.SourceEventArgs.FullPath
             $changeType = $Event.SourceEventArgs.ChangeType
@@ -141,7 +113,7 @@ try {
 
     # 5- POWER SCHEME PARAMETERS FOR PROCESS WATCHER
         $processAction = {
-            . "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Set-GamePowerScheme.ps1"
+            . ".\Set-GamePowerScheme.ps1"
 
             $event_pId = $Event.SourceEventArgs.NewEvent.ProcessID.ToString()
             $pName = $Event.SourceEventArgs.NewEvent.ProcessName.ToString()
@@ -154,14 +126,13 @@ try {
         $processWatcher = Get-ProcessWatchers $processAction        
 
     # 7- START NEW IPC PIPE SERVER THREAD FOR SPECIAL COMMANDS (SHOW PROCESS TIMES REQUIRES INITIAL STATE MEMORY)
-        $include_file = Include-Script -FileName "Declare-IPC-Server-Action.ps1" -Directories $search_paths
-        . $include_file
+        . ".\Declare-IPC-Server-Action.ps1" -Directories $search_paths
 
         $job = Start-ThreadJob -ScriptBlock $ipc_job_action -ThrottleLimit 5 -StreamingHost $Host
 
 
     # 8 - Report whenever war-thunder rewrites my customized distance multiplier
-        . "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Monitor-War-Thunder-Distance-Multiplier.ps1"
+        . ".\Monitor-War-Thunder-Distance-Multiplier.ps1"
             
 
     # 9- WATCHDOG: Infinite loop to periodically check-alive in filesystem-watch which some times fails or locks

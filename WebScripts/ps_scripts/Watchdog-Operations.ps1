@@ -1,5 +1,7 @@
 ﻿#watchdog: Make sure the file system watcher is still working properly
 
+. ".\Include-Script.ps1"
+
 function Get-NewFileName {
     param (
         [string]$FilePath,

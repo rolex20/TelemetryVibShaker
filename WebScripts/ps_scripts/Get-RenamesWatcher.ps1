@@ -65,6 +65,7 @@ Write-VerboseDebug -Timestamp $t -Title "STARTING" -Message "Waiting for changes
 #>
 function Get-RenamesWatcher($WatchFile, $Action)
 {
+    Write-VerboseDebug -Timestamp (Get-Date) -Title "STARTING" -Message "Waiting for subscribed filesystem renames."
 
     $filewatcher = New-Object System.IO.FileSystemWatcher
     $filewatcher.Path = [System.IO.Path]::GetDirectoryName($WatchFile)

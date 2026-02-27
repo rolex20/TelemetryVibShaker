@@ -1,8 +1,5 @@
 ﻿$ipc_job_action = {
-. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
-$search_paths = @("C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts", "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts")
-$include_file = Include-Script -FileName "Write-VerboseDebug.ps1" -Directories $search_paths
-. $include_file
+    . ".\Write-VerboseDebug.ps1"
 
     # Define the named pipe
     $pipeName = "ipc_pipe_vr_server_commands"
