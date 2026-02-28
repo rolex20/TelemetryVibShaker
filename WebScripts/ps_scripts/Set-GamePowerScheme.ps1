@@ -121,6 +121,9 @@ function Start-GameRuntimeTracker {
 			
 			$include_file = Include-Script -FileName "Cpu-Snapshots.ps1" -Directories $search_paths
 			. $include_file			
+
+            . ".\Write-VerboseDebug.ps1"
+            . ".\Cpu-Snapshots.ps1"
 			
 
 			$eventPid = [int]$Event.MessageData.ProcessId
@@ -347,7 +350,7 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
 				Start-Process powershell.exe -ArgumentList @(
 					'-NoProfile',
 					'-ExecutionPolicy', 'Bypass',
-					'-File', '"C:\MyPrograms\My Apps\FanatecMonitor\Stutter-Hunter.ps1"',
+					'-File', '".\Stutter-Hunter.ps1"',
 					'-ProcessId', $processId
 				)
 			}
