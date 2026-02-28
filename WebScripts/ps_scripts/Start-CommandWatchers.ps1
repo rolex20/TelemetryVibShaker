@@ -13,7 +13,7 @@
 . ".\Check-Admin-Privileges.ps1"
 
 . ".\Get-HostConfig.ps1"
-Bootstrap-Config
+$glogalcfg = Bootstrap-Config
 
 
 $need_restart = $false
@@ -80,22 +80,12 @@ try {
 		
 
 		# create the object in this scope, outside the if {}
-		$cm_watcher_objects = Get-Date
-		$x = $cfg.features.remoteCommandsWatcher
-		
-		write-host "[$x]"
-		#i put an exit below because $x is comming empty instead of $true
-		Exit
-		
-		if ($cfg.features.remoteCommandsWatcher) {
+		$cm_watcher_objects = $null
+		if ($glogalcfg.features.remoteCommandsWatcher) {
 			# Setup filesystem watch events for json remote control commands
 			$command_file = "C:\MyPrograms\wamp\www\remote_control\command.json"
 			$cm_watcher_objects = Get-RenamesWatcher $command_file $remote_commands
-			write-host "get-renameswatcher called"
 		}
-		Start-Sleep 3600
-
-		
 
 
 
@@ -133,7 +123,10 @@ try {
             Write-VerboseDebug -Timestamp $Event.TimeGenerated -Title "PROCESS" -Message "$traceName - $pName [$event_pId]"
             Set-GamePowerScheme -traceName $traceName -programName $pName -processId $event_pId
         }
-        $processWatcher = Get-ProcessWatchers $processAction        
+		$processWatcher = $null
+		if ($glogalcfg.features.processWatcher) {
+			$processWatcher = Get-ProcessWatchers $processAction
+		}
 
     # 7- START NEW IPC PIPE SERVER THREAD FOR SPECIAL COMMANDS (SHOW PROCESS TIMES REQUIRES INITIAL STATE MEMORY)
         . ".\Declare-IPC-Server-Action.ps1" -Directories $search_paths
@@ -152,12 +145,13 @@ try {
 } #end try block
 
 finally {
+    Write-VerboseDebug -Timestamp (Get-Date) -Title "FINALLY" -Message "Disposing objects" -ForegroundColor "Yellow"
+	
 	Set-MpPreference -DisableRealtimeMonitoring $false -Force	
 	Set-MpPreference -ScanOnlyIfIdleEnabled $false
 		
     Send-IPC-ExitCommand "ipc_pipe_vr_server_commands"	
 	
-    Write-VerboseDebug -Timestamp (Get-Date) -Title "FINALLY" -Message "Disposing objects" -ForegroundColor "Yellow"
   
     if ($cm_watcher_objects) {
         $cm_watcher_objects[1].EnableRaisingEvents = $false
