@@ -879,6 +879,7 @@ function Start-StutterHunterServer {
     }
 }
 
+Write-Host "Requesting Stutter-Hunter for [$GameProcessName] [PID $ProcessId]..." -ForegroundColor Cyan
 if ($Mode -eq 'Client') {
     Invoke-StutterHunterClient
 }
