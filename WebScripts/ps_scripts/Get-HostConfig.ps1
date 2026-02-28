@@ -80,7 +80,7 @@ function Get-WebScriptsConfig {
 
 function Bootstrap-Config {
 	$Global:WebScriptsConfig = Get-WebScriptsConfig
-	return WebScriptsConfig
+	return $WebScriptsConfig
 }
 
 

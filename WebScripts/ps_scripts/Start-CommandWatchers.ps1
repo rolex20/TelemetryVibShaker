@@ -13,7 +13,7 @@
 . ".\Check-Admin-Privileges.ps1"
 
 . ".\Get-HostConfig.ps1"
-$glogalcfg = Bootstrap-Config
+$globalcfg = Bootstrap-Config
 
 
 $need_restart = $false # make sure this object exists outside the  {}
@@ -81,7 +81,7 @@ try {
 
 		# create the object in this scope, outside the if {}
 		$cm_watcher_objects = $null
-		if ($glogalcfg.features.remoteCommandsWatcher) {
+		if ($globalcfg.features.remoteCommandsWatcher) {
 			# Setup filesystem watch events for json remote control commands
 			$command_file = "C:\MyPrograms\wamp\www\remote_control\command.json"
 			$cm_watcher_objects = Get-RenamesWatcher $command_file $remote_commands
@@ -109,7 +109,7 @@ try {
         $mission1 = "C:\wamp\www\warthunder\mission_data.json"  #Alienware
 		$mission1 = "C:\MyPrograms\wamp\www\warthunder\mission_data.json" #Galvatron
 		$wt_watcher_objects = $null # make sure this object exists outside the if {}
-		if ($glogalcfg.features.warThunderMissionWatcher) {
+		if ($globalcfg.features.warThunderMissionWatcher) {
 			$wt_watcher_objects = Get-RenamesWatcher $mission1 $generate_mission1
 		}
 
@@ -127,7 +127,7 @@ try {
             Set-GamePowerScheme -traceName $traceName -programName $pName -processId $event_pId
         }
 		$processWatcher = $null # make sure this object exists outside the if {}
-		if ($glogalcfg.features.processWatcher) {
+		if ($globalcfg.features.processWatcher) {
 			$processWatcher = Get-ProcessWatchers $processAction
 		}
 
@@ -135,7 +135,7 @@ try {
         . ".\Declare-IPC-Server-Action.ps1" -Directories $search_paths
 
 		$job = $null # make sure this object exists outside the if {}
-		if ($glogalcfg.features.ipcServer) {
+		if ($globalcfg.features.ipcServer) {
 			$job = Start-ThreadJob -ScriptBlock $ipc_job_action -ThrottleLimit 5 -StreamingHost $Host
 		}
 
@@ -146,7 +146,7 @@ try {
 		# Start monitoring the file
 		$event = $null # make sure this object exists outside the if {}
 		$filewatcher = $null # make sure this object exists outside the if {}
-		if ($glogalcfg.features.warThunderDistanceMonitor) {
+		if ($globalcfg.features.warThunderDistanceMonitor) {
 			$event, $filewatcher = Get-ModificationWatcher -WatchFile $watchFile -Action $action
 		}
 		
@@ -154,7 +154,7 @@ try {
 
     # 9- WATCHDOG: Infinite loop to periodically check-alive in filesystem-watch which some times fails or locks
         $Global:Watcher_Continue = $true
-		$need_restart = Watchdog_Operations # check for $glogalcfg.features.watchdog needs to be done inside Watchdog-Operations()
+		$need_restart = Watchdog_Operations # check for $globalcfg.features.watchdog needs to be done inside Watchdog-Operations()
 
 
 } #end try block
@@ -165,7 +165,7 @@ finally {
 	Set-MpPreference -DisableRealtimeMonitoring $false -Force	
 	Set-MpPreference -ScanOnlyIfIdleEnabled $false
 		
-    if ($glogalcfg.features.ipcServer) { Send-IPC-ExitCommand "ipc_pipe_vr_server_commands"	}
+    if ($globalcfg.features.ipcServer) { Send-IPC-ExitCommand "ipc_pipe_vr_server_commands"	}
 	
   
     if ($cm_watcher_objects) {

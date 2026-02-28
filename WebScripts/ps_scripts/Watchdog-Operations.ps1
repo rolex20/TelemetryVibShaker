@@ -22,8 +22,14 @@ function Get-NewFileName {
 
 
 function Watchdog_Operations {
+
+if ($globalcfg.features.watchdog) {    
+    $x = $globalcfg.features.watchdog
+    write-host "si entro [$x]"   
+    write-host $globalcfg
     $watchdog_json = Include-Script "watchdog.json" "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts" "C:\Users\ralch"
     $tmp_json = Get-NewFileName -FilePath $command_file -NewExtension "tmp"
+}
 
 	$failure = $false
     $watchers_OK = $true
@@ -77,7 +83,7 @@ function Watchdog_Operations {
             $remainingSleep -= $chunk
         }
 
-if ($glogalcfg.features.watchdog) {        
+if ($globalcfg.features.watchdog) {        
         if (Test-Path "watchdog.txt") { Remove-Item "watchdog.txt" }
         if (Test-Path $command_file) { Remove-Item $command_file }
         Copy-Item $watchdog_json $tmp_json
