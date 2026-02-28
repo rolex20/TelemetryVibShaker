@@ -20,12 +20,12 @@
   "machines": {
     "GALVATRON": {
       "features": {
-		  "remoteCommandsWatcher": true,
-		  "warThunderMissionWatcher": true,
-		  "processWatcher": true,
-		  "ipcServer": true,
-		  "warThunderDistanceMonitor": true,
-		  "watchdog": true
+        "remoteCommandsWatcher": true,
+        "warThunderMissionWatcher": true,
+        "processWatcher": true,
+        "ipcServer": true,
+        "warThunderDistanceMonitor": true,
+        "watchdog": true
       },
       "paths": {
         "seatbeltWav": "N:\\MyPrograms\\MySounds\\Thirdwire\\fasten_seatbelt.wav"
@@ -36,9 +36,16 @@
     },
     "ALIENWARE-V2": {
       "features": {
-			"processWatcher": true,
-      "ipcServer": true,
-			"watchdog": false
+        "processWatcher": true,
+        "ipcServer": true,
+        "watchdog": false
+      }
+    },
+    "HP-PAV-BLACK": {
+      "features": {
+        "processWatcher": true,
+        "ipcServer": true,
+        "watchdog": false
       }
     }
   }

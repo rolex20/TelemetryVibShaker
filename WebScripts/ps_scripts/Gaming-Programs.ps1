@@ -55,10 +55,11 @@ switch ($computerName.ToUpperInvariant()) {
     }
     "HP-PAV-BLACK" {
         $Global:GameProfiles = @{
-            "Notepad.exe"         = @{ ImmediateKill=$true; NickName = "Notepad Editor";  }
-            "TiWorker.exe"        = @{ ImmediateKill=$true; NickName = "Ti-Worker"}
-            "CompatTelRunner.exe" = @{ ImmediateKill=$true; NickName = "Compat Tel Runner"}
-            "ctfmon.exe" = @{ ImmediateKill=$true; NickName = "c.t.f. mon"}
+            "Notepad.exe"         = @{ ImmediateKill=$false; NickName = "Notepad"; Speak = "Notepad" }
+            "TiWorker.exe"        = @{ ImmediateKill=$true; NickName = "Ti-Worker"; AuxPrograms = @("C:\Users\ralch\Desktop\stop-win-updates.ps1.lnk")}
+            "CompatTelRunner.exe" = @{ ImmediateKill=$true; NickName = "Compat Tel Runner"; AuxPrograms = @("C:\Users\ralch\Desktop\stop-win-updates.ps1.lnk")}
+            "ctfmon.exe" = @{ ImmediateKill=$false; NickName = "c.t.f. mon"; Stutter=$true; AuxPrograms = @("C:\Users\ralch\Desktop\stop-win-updates.ps1.lnk")}
+            "svchost.exe" = @{ ImmediateKill=$false; NickName = "Service Host"; Stutter=$true; AuxPrograms = @("C:\Users\ralch\Desktop\stop-win-updates.ps1.lnk")}
         }
     }
     default {
