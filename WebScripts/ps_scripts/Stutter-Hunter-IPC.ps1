@@ -693,9 +693,10 @@ function Start-StutterHunterServer {
                 $reader = $null
                 $writer = $null
                 try {
-                    $reader = New-Object System.IO.StreamReader($pipe, [System.Text.Encoding]::UTF8)
-                    $writer = New-Object System.IO.StreamWriter($pipe, [System.Text.Encoding]::UTF8)
-                    $writer.AutoFlush = $true
+                     # IMPORTANT: leaveOpen = $true so disposing reader/writer does NOT close the pipe stream
+                     $reader = New-Object System.IO.StreamReader($pipe, [System.Text.Encoding]::UTF8, $false, 1024, $true)
+                     $writer = New-Object System.IO.StreamWriter($pipe, [System.Text.Encoding]::UTF8, 1024, $true)
+                     $writer.AutoFlush = $true
 
                     $line = $reader.ReadLine()
                     if ([string]::IsNullOrWhiteSpace($line)) {
