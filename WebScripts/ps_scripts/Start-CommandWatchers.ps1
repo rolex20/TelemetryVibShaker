@@ -12,6 +12,9 @@
 . ".\Send-IPC-ExitCommand.ps1"
 . ".\Check-Admin-Privileges.ps1"
 
+. ".\Get-HostConfig.ps1"
+Bootstrap-Config
+
 
 $need_restart = $false
 # Used by EXIT_WATCHER to gracefully unwind the watchdog loop into finally {} cleanup.
@@ -21,26 +24,7 @@ try {
 		$title = 'Watcher for My Gaming Commands'
 		$Host.UI.RawUI.WindowTitle = $title
 
-	
-
-    # 1- ADJUST PRIORITIES, AFFINITIES, ETC
-
-        Check-Admin-Privileges | Out-Null
-
-        $EfficiencyAffinity = 983040 # HyperThreading enabled
-        try {
-            [System.Diagnostics.Process]::GetCurrentProcess().ProcessorAffinity =  $EfficiencyAffinity
-        } catch {
-            Write-VerboseDebug -Timestamp (Get-Date) -Title "WARNING" -Message "Not an Intel 12700K or 14700K " -ForegroundColor "Yellow"
-        }
-		
-		SetAffinityAndPriority -SetEfficiencyAffinity $true -SetBackgroudPriority $false -SetIdlePriority $true
-
-
-
-
-
-    # 2- DECONFLICT: Make sure this is the only instance running.
+    # 1- DECONFLICT: Make sure this is the only instance running.
 
         # Define the name of the mutex, to prevent other instances
         #$mutexName = "Global\$title"
@@ -62,13 +46,25 @@ try {
 	        Exit 
         }
 
+    # 2- ADJUST PRIORITIES, AFFINITIES, ETC
+
+        Check-Admin-Privileges | Out-Null
+
+        $EfficiencyAffinity = 983040 # HyperThreading enabled
+        try {
+            [System.Diagnostics.Process]::GetCurrentProcess().ProcessorAffinity =  $EfficiencyAffinity
+        } catch {
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "WARNING" -Message "Not an Intel 12700K or 14700K " -ForegroundColor "Yellow"
+        }
+		
+		SetAffinityAndPriority -SetEfficiencyAffinity $true -SetBackgroudPriority $false -SetIdlePriority $true
 
 
 
     # 3- JSON COMMANDS FOR REMOTE CONTROL
     # command.json is created by is created by wamp/apache/http/php/command.php script
     # remote commands are sent in support of my TelemetryVibShaker Apps
-
+	
         $remote_commands = {
             . ".\Process-CommandFromJson.ps1"
 
@@ -80,12 +76,26 @@ try {
 
             Process-CommandFromJson $path
         }
+		
+		
 
+		# create the object in this scope, outside the if {}
+		$cm_watcher_objects = Get-Date
+		$x = $cfg.features.remoteCommandsWatcher
+		
+		write-host "[$x]"
+		#i put an exit below because $x is comming empty instead of $true
+		Exit
+		
+		if ($cfg.features.remoteCommandsWatcher) {
+			# Setup filesystem watch events for json remote control commands
+			$command_file = "C:\MyPrograms\wamp\www\remote_control\command.json"
+			$cm_watcher_objects = Get-RenamesWatcher $command_file $remote_commands
+			write-host "get-renameswatcher called"
+		}
+		Start-Sleep 3600
 
-        # Setup filesystem watch events for json remote control commands
-        $command_file = "C:\MyPrograms\wamp\www\remote_control\command.json"
-        $cm_watcher_objects = Get-RenamesWatcher $command_file $remote_commands
-
+		
 
 
 

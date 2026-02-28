@@ -1,0 +1,44 @@
+{
+  "defaults": {
+    "paths": {
+      "wampRoot": "C:\\MyPrograms\\wamp",
+      "warThunderRoot": "C:\\MyPrograms\\Steam\\steamapps\\common\\War Thunder",
+      "seatbeltWav": null
+    },
+    "features": {
+      "remoteCommandsWatcher": false,
+      "warThunderMissionWatcher": false,
+      "processWatcher": false,
+      "ipcServer": true,
+      "warThunderDistanceMonitor": false,
+      "watchdog": true
+    },
+    "tuning": {
+      "efficiencyAffinityMask": null
+    }
+  },
+  "machines": {
+    "GALVATRON": {
+      "features": {
+      "remoteCommandsWatcher": true,
+      "warThunderMissionWatcher": true,
+      "processWatcher": true,
+      "ipcServer": true,
+      "warThunderDistanceMonitor": true,
+      "watchdog": true
+      },
+      "paths": {
+        "seatbeltWav": "N:\\MyPrograms\\MySounds\\Thirdwire\\fasten_seatbelt.wav"
+      },
+      "tuning": {
+        "efficiencyAffinityMask": 268369920
+      }
+    },
+    "DEVLAPTOP": {
+      "features": {
+        "processWatcher": true,
+        "watchdog": true
+      }
+    }
+  }
+}
