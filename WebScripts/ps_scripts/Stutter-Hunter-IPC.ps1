@@ -40,6 +40,7 @@ param(
 
 $mutexName = 'Global\TelemetryVibShaker.StutterHunter.Server'
 $pipeName = 'TelemetryVibShaker.StutterHunter'
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 
 if (-not ('StutterHunterIpcRunner' -as [type])) {
 $code = @'
@@ -582,20 +583,51 @@ function Invoke-StutterHunterPipeCommand {
         [int]$ConnectTimeoutMs = 600
     )
 
+    $ipcDebug = ($env:STUTTER_HUNTER_IPC_DEBUG -eq '1')
+    function _D([string]$msg) {
+        if ($ipcDebug) { Write-Host ("[IPC-CLIENT] " + $msg) -ForegroundColor DarkCyan }
+    }
+
+    function Read-LineWithTimeout {
+        param(
+            [Parameter(Mandatory)] $Reader,
+            [int] $TimeoutMs = 5000,
+            [string] $Label = 'line'
+        )
+        $task = $Reader.ReadLineAsync()
+        if (-not $task.Wait($TimeoutMs)) {
+            throw "Timeout waiting for $Label after ${TimeoutMs}ms"
+        }
+        return $task.Result
+    }
+
     $client = $null
     $reader = $null
     $writer = $null
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 
     try {
+        _D "creating NamedPipeClientStream pipeName='$pipeName'"
         $client = New-Object System.IO.Pipes.NamedPipeClientStream('.', $pipeName, [System.IO.Pipes.PipeDirection]::InOut)
+
+        _D "CONNECT begin timeout=${ConnectTimeoutMs}ms"
         $client.Connect($ConnectTimeoutMs)
+        _D ("CONNECT ok IsConnected={0}" -f $client.IsConnected)
 
-        $reader = New-Object System.IO.StreamReader($client, [System.Text.Encoding]::UTF8)
-        $writer = New-Object System.IO.StreamWriter($client, [System.Text.Encoding]::UTF8)
-        $writer.AutoFlush = $true
+        _D "constructing reader"
+        $reader = New-Object System.IO.StreamReader($client, $utf8NoBom, $false, 1024, $true)
 
+        _D "constructing writer (no AutoFlush; explicit Flush())"
+        $writer = New-Object System.IO.StreamWriter($client, $utf8NoBom, 1024, $true)
+
+        _D ("WRITE begin: '{0}'" -f $CommandLine)
         $writer.WriteLine($CommandLine)
-        $reply = $reader.ReadLine()
+        $writer.Flush()
+        _D "WRITE ok (flushed)"
+
+        _D "READ begin (reply)"
+        $reply = Read-LineWithTimeout -Reader $reader -TimeoutMs 5000 -Label 'server reply'
+        _D ("READ ok reply='{0}'" -f $reply)
 
         if ([string]::IsNullOrWhiteSpace($reply)) {
             return @{ Ok = $false; Reply = 'ERR empty reply' }
@@ -604,12 +636,14 @@ function Invoke-StutterHunterPipeCommand {
         return @{ Ok = $reply.StartsWith('OK'); Reply = $reply }
     }
     catch {
+        _D ("EXCEPTION: {0}" -f $_.Exception.Message)
         return @{ Ok = $false; Reply = "ERR $($_.Exception.Message)" }
     }
     finally {
-        if ($writer) { $writer.Dispose() }
-        if ($reader) { $reader.Dispose() }
-        if ($client) { $client.Dispose() }
+        if ($writer) { try { $writer.Dispose() } catch {} }
+        if ($reader) { try { $reader.Dispose() } catch {} }
+        if ($client) { try { $client.Dispose() } catch {} }
+        _D "cleanup complete"
     }
 }
 
@@ -660,6 +694,27 @@ function Invoke-StutterHunterClient {
 }
 
 function Start-StutterHunterServer {
+    $ipcDebug = ($env:STUTTER_HUNTER_IPC_DEBUG -eq '1')
+    function _D([string]$msg) {
+        if ($ipcDebug) { Write-Host ("[IPC-SERVER] " + $msg) -ForegroundColor DarkCyan }
+    }
+
+    function Read-LineWithTimeout {
+        param(
+            [Parameter(Mandatory)] $Reader,
+            [int] $TimeoutMs = 5000,
+            [string] $Label = 'line'
+        )
+        $task = $Reader.ReadLineAsync()
+        if (-not $task.Wait($TimeoutMs)) {
+            throw "Timeout waiting for $Label after ${TimeoutMs}ms"
+        }
+        return $task.Result
+    }
+
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+
+    _D "acquiring mutex name='$mutexName'"
     $createdNew = $false
     $mutex = New-Object System.Threading.Mutex($false, $mutexName, [ref]$createdNew)
 
@@ -670,14 +725,17 @@ function Start-StutterHunterServer {
     }
 
     Write-Host 'Starting Stutter-Hunter-IPC server...' -ForegroundColor Cyan
-
+    _D "starting StutterHunterIpcRunner SampleIntervalMs=$SampleIntervalMs CpuSpikeThreshold=$CpuSpikeThreshold HardFaultThreshold=$HardFaultThreshold"
     [StutterHunterIpcRunner]::Start($SampleIntervalMs, $CpuSpikeThreshold, $HardFaultThreshold)
 
+    _D "starting idle watcher IdleExitSeconds=$IdleExitSeconds"
     $idleWatcher = New-Object StutterHunterIdleWatcher($pipeName, $IdleExitSeconds)
+
     $stopRequested = $false
     $pipe = $null
 
     try {
+        _D "creating NamedPipeServerStream pipeName='$pipeName' maxInstances=1"
         $pipe = New-Object System.IO.Pipes.NamedPipeServerStream(
             $pipeName,
             [System.IO.Pipes.PipeDirection]::InOut,
@@ -687,101 +745,125 @@ function Start-StutterHunterServer {
         )
 
         while (-not $stopRequested) {
-Write-Host "PIPE: waiting for client..." -ForegroundColor DarkCyan
-$pipe.WaitForConnection()
-Write-Host "PIPE: client connected" -ForegroundColor DarkCyan        
+            Write-Host "PIPE: waiting for client..." -ForegroundColor DarkCyan
+            _D "WAIT begin (WaitForConnection)"
+            $pipe.WaitForConnection()
+            _D "WAIT end (client connected)"
+            Write-Host "PIPE: client connected" -ForegroundColor DarkCyan
 
+            if (-not $pipe.IsConnected) {
+                _D "pipe not connected after WaitForConnection() (unexpected). continuing."
+                continue
+            }
 
-            if ($pipe.IsConnected) {
-                $reader = $null
-                $writer = $null
-                try {
-                     # IMPORTANT: leaveOpen = $true so disposing reader/writer does NOT close the pipe stream
-                     $reader = New-Object System.IO.StreamReader($pipe, [System.Text.Encoding]::UTF8, $false, 1024, $true)
-                     $writer = New-Object System.IO.StreamWriter($pipe, [System.Text.Encoding]::UTF8, 1024, $true)
-                     $writer.AutoFlush = $true
+            $reader = $null
+            $writer = $null
 
-                     Write-Host "... before ReadLine()..."
-                    $line = $reader.ReadLine()
-                    Write-Host "... after ReadLine()..."
-                    
-                    if ([string]::IsNullOrWhiteSpace($line)) {
-                        $writer.WriteLine('ERR empty command')
-                    }
-                    else {
-                        $parts = $line.Trim().Split(' ')
-                        $verb = $parts[0].ToUpperInvariant()
+            try {
+                _D ("pipe state IsConnected={0} CanRead={1} CanWrite={2}" -f $pipe.IsConnected, $pipe.CanRead, $pipe.CanWrite)
 
-                        switch ($verb) {
-                            'PING' {
-                                $writer.WriteLine('OK PONG')
+                _D "STEP A: constructing reader (UTF8 no BOM, leaveOpen=$true)"
+                $reader = New-Object System.IO.StreamReader($pipe, $utf8NoBom, $false, 1024, $true)
+
+                _D "STEP B: constructing writer (UTF8 no BOM, leaveOpen=$true, no AutoFlush)"
+                $writer = New-Object System.IO.StreamWriter($pipe, $utf8NoBom, 1024, $true)
+
+                _D "STEP C: before ReadLine() (request)"
+                Write-Host "... before ReadLine()..." -ForegroundColor DarkGray
+                $line = Read-LineWithTimeout -Reader $reader -TimeoutMs 5000 -Label 'request line'
+                Write-Host "... after ReadLine()..." -ForegroundColor DarkGray
+                _D ("STEP D: after ReadLine() line='{0}'" -f $line)
+
+                $reply = $null
+
+                if ([string]::IsNullOrWhiteSpace($line)) {
+                    $reply = 'ERR empty command'
+                }
+                else {
+                    $parts = $line.Trim().Split(' ')
+                    $verb = $parts[0].ToUpperInvariant()
+
+                    switch ($verb) {
+                        'PING' {
+                            $reply = 'OK PONG'
+                        }
+                        'LIST' {
+                            $reply = "OK $([StutterHunterIpcRunner]::ListTargets())"
+                        }
+                        'ADD' {
+                            if ($parts.Length -lt 3) {
+                                $reply = 'ERR usage: ADD <pid> <processName>'
                             }
-                            'LIST' {
-                                $writer.WriteLine("OK $([StutterHunterIpcRunner]::ListTargets())")
-                            }
-                            'ADD' {
-                                if ($parts.Length -lt 3) {
-                                    $writer.WriteLine('ERR usage: ADD <pid> <processName>')
+                            else {
+                                $procid = 0
+                                if (-not [int]::TryParse($parts[1], [ref]$procid)) {
+                                    $reply = 'ERR invalid pid'
                                 }
                                 else {
-                                    $pid = 0
-                                    if (-not [int]::TryParse($parts[1], [ref]$pid)) {
-                                        $writer.WriteLine('ERR invalid pid')
-                                    }
-                                    else {
-                                        $name = ($line.Substring($line.IndexOf($parts[2]))).Trim()
-                                        [void][StutterHunterIpcRunner]::AddTarget($pid, $name)
-                                        $writer.WriteLine("OK ADDED $pid")
-                                    }
+                                    $name = ($line.Substring($line.IndexOf($parts[2]))).Trim()
+                                    [void][StutterHunterIpcRunner]::AddTarget($procid, $name)
+                                    $reply = "OK ADDED $procid"
                                 }
                             }
-                            'REMOVE' {
-                                if ($parts.Length -lt 2) {
-                                    $writer.WriteLine('ERR usage: REMOVE <pid>')
+                        }
+                        'REMOVE' {
+                            if ($parts.Length -lt 2) {
+                                $reply = 'ERR usage: REMOVE <pid>'
+                            }
+                            else {
+                                $procid = 0
+                                if (-not [int]::TryParse($parts[1], [ref]$procid)) {
+                                    $reply = 'ERR invalid pid'
                                 }
                                 else {
-                                    $pid = 0
-                                    if (-not [int]::TryParse($parts[1], [ref]$pid)) {
-                                        $writer.WriteLine('ERR invalid pid')
-                                    }
-                                    else {
-                                        [void][StutterHunterIpcRunner]::RemoveTarget($pid)
-                                        $writer.WriteLine("OK REMOVED $pid")
-                                    }
+                                    [void][StutterHunterIpcRunner]::RemoveTarget($procid)
+                                    $reply = "OK REMOVED $procid"
                                 }
                             }
-                            'SHUTDOWN' {
-                                $writer.WriteLine('OK SHUTDOWN')
-                                $stopRequested = $true
-                            }
-                            default {
-                                $writer.WriteLine('ERR unknown command')
-                            }
+                        }
+                        'SHUTDOWN' {
+                            $reply = 'OK SHUTDOWN'
+                            $stopRequested = $true
+                        }
+                        default {
+                            $reply = 'ERR unknown command'
                         }
                     }
                 }
-                catch {
+
+                _D ("WRITE reply begin: '{0}'" -f $reply)
+                $writer.WriteLine($reply)
+                $writer.Flush()
+                _D "WRITE reply ok (flushed)"
+            }
+            catch {
+                _D ("handler EXCEPTION: {0}" -f $_.Exception.Message)
+                try {
                     if ($writer) {
-                        try { $writer.WriteLine("ERR $($_.Exception.Message)") } catch {}
+                        $writer.WriteLine("ERR $($_.Exception.Message)")
+                        $writer.Flush()
                     }
-                }
-                finally {
-                    if ($writer) { $writer.Dispose() }
-                    if ($reader) { $reader.Dispose() }
-                }
+                } catch {}
+            }
+            finally {
+                if ($writer) { try { $writer.Dispose() } catch {} }
+                if ($reader) { try { $reader.Dispose() } catch {} }
             }
 
             if ($pipe -and $pipe.IsConnected) {
+                _D "disconnecting pipe"
                 try { $pipe.Disconnect() } catch {}
             }
 
             if ($stopRequested) {
                 Write-Host 'Received internal shutdown signal. Exiting server.' -ForegroundColor DarkGray
+                _D "stopRequested true -> exiting loop"
             }
         }
     }
     finally {
-        if ($idleWatcher) { $idleWatcher.Dispose() }
+        _D "server cleanup begin"
+        if ($idleWatcher) { try { $idleWatcher.Dispose() } catch {} }
         [StutterHunterIpcRunner]::Stop()
         if ($pipe) {
             if ($pipe.IsConnected) {
@@ -793,6 +875,7 @@ Write-Host "PIPE: client connected" -ForegroundColor DarkCyan
             try { $mutex.ReleaseMutex() } catch {}
             $mutex.Dispose()
         }
+        _D "server cleanup complete"
     }
 }
 
