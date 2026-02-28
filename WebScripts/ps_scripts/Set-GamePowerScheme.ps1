@@ -347,12 +347,21 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
 			
 			if (Get-Stutter -programName $programName) {
 				Write-VerboseDebug -Timestamp (Get-Date) -Title "STUTTER HUNTER STARTED:" -ForegroundColor "Yellow" -Message "$programName"
+				# LEGACY FALLBACK: Uncomment to revert to one-process-per-game legacy behavior.
+				# Start-Process powershell.exe -WindowStyle Minimized -ArgumentList @(
+				# 	'-NoProfile',
+				# 	'-ExecutionPolicy', 'Bypass',
+				# 	'-File', '".\Stutter-Hunter.ps1"',
+				# 	'-ProcessId', $processId,
+				#     '-GameProcessName', $programName
+				# )
 				Start-Process powershell.exe -WindowStyle Minimized -ArgumentList @(
-					'-NoProfile',
-					'-ExecutionPolicy', 'Bypass',
-					'-File', '".\Stutter-Hunter.ps1"',
-					'-ProcessId', $processId, 
-                    '-GameProcessName', $programName
+					'-NoLogo','-NoProfile','-ExecutionPolicy','Bypass',
+					'-File', (Join-Path $PSScriptRoot 'Stutter-Hunter-IPC.ps1'),
+					'-Mode','Client',
+					'-Action','Add',
+					'-ProcessId', $processId,
+					'-GameProcessName', $programName
 				)
 			}
         }
@@ -379,6 +388,16 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
             }
 			if ($speakText) {
 				Write-VerboseDebug -Timestamp (Get-Date) -Title "PROCESS EXIT:" -ForegroundColor "Yellow" -Speak $true -Message $speakText
+			}
+
+			if (Get-Stutter -programName $programName) {
+				Start-Process powershell.exe -WindowStyle Minimized -ArgumentList @(
+					'-NoLogo','-NoProfile','-ExecutionPolicy','Bypass',
+					'-File', (Join-Path $PSScriptRoot 'Stutter-Hunter-IPC.ps1'),
+					'-Mode','Client',
+					'-Action','Remove',
+					'-ProcessId', $processId
+				)
 			}			
 		}
 	}
