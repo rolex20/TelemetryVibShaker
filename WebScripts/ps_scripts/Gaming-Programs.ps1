@@ -27,20 +27,47 @@
 #     and optional fields like 'BoostAction' (JSON file), 'Speak' (text-to-speech), and
 #     'AuxPrograms' (array of helper executables to auto-launch when the game starts).
 #------------------------------------------------------------------------------------
-$Global:GameProfiles = @{
-    "Notepad.exe"                      = @{ Stutter=$false; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk") } #; BoostAction = "action-per-process-boost1.json" }
-    "DCS.exe"                          = @{ Start = "High Performance"; Stop = "Balanced" }
-    "aces.exe"                         = @{ NickName = "War thunder"; Start = "High Performance"; Stop = "Balanced" }
-    "FlightSimulator.exe"              = @{ NickName = "M.S.F.S.";Start = "High Performance"; Stop = "Balanced" }
-    "Ace7Game.exe"                     = @{ NickName = "Ace Comabt"; Start = "Balanced"; Stop = "Balanced" } #; BoostAction = "action-per-process-boost1.json" }
-    "forza_steamworks_release_final.exe" = @{ NickName = "Forza"; Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
-    "forzamotorsport7.exe"             = @{ NickName = "Forza 7"; Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
-	"ForzaHorizon5.exe"                = @{ NickName = "Forza Horizon"; Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
-    "AssettoCorsa.exe"                 = @{ NickName = "Asseto Corsa"; Start = "Balanced"; Stop = "Balanced" ; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
-	"GRB.exe"                          = @{ NickName = "Ghost Recon Breakpoint"; Start = "Balanced"; Stop = "Balanced" ; AuxPrograms = @("C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk")} #, "C:\Users\ralch\Desktop\Spartan Mod.lnk") }
-	"UbisoftConnect.exe	"              = @{ AuxPrograms = @("C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk")} #, "C:\Users\ralch\Desktop\Spartan Mod.lnk") }	
-    "TiWorker.exe"                     = @{ Stutter=$false; NickName = "Ti-Worker"; Speak = "Windows Ti-Worker process" }
-	"CompatTelRunner.exe"              = @{ Stutter=$false; NickName = "Compat Tel Runner"; Speak = "Windows Compat-Tel-Runner process" }
+$computerName = $env:COMPUTERNAME
+switch ($computerName.ToUpperInvariant()) {
+    "GALVATRON" {
+        $Global:GameProfiles = @{
+            "Notepad.exe"                      = @{ NickName = "Notepad"; ImmediateKill=$false; Stutter=$false; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk") } #; BoostAction = "action-per-process-boost1.json" }
+            "DCS.exe"                          = @{ Start = "High Performance"; Stop = "Balanced" }
+            "aces.exe"                         = @{ NickName = "War thunder"; Start = "High Performance"; Stop = "Balanced" }
+            "FlightSimulator.exe"              = @{ NickName = "M.S.F.S.";Start = "High Performance"; Stop = "Balanced" }
+            "Ace7Game.exe"                     = @{ NickName = "Ace Comabt"; Start = "Balanced"; Stop = "Balanced" } #; BoostAction = "action-per-process-boost1.json" }
+            "forza_steamworks_release_final.exe" = @{ NickName = "Forza"; Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
+            "forzamotorsport7.exe"             = @{ NickName = "Forza 7"; Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
+            "ForzaHorizon5.exe"                = @{ NickName = "Forza Horizon"; Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
+            "AssettoCorsa.exe"                 = @{ NickName = "Asseto Corsa"; Start = "Balanced"; Stop = "Balanced" ; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
+            "GRB.exe"                          = @{ NickName = "Ghost Recon Breakpoint"; Start = "Balanced"; Stop = "Balanced" ; AuxPrograms = @("C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk")} #, "C:\Users\ralch\Desktop\Spartan Mod.lnk") }
+            "UbisoftConnect.exe	"              = @{ AuxPrograms = @("C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk")} #, "C:\Users\ralch\Desktop\Spartan Mod.lnk") }
+            "TiWorker.exe"                     = @{ Stutter=$false; NickName = "Ti-Worker"; Speak = "Windows Ti-Worker process" }
+            "CompatTelRunner.exe"              = @{ Stutter=$false; NickName = "Compat Tel Runner"; Speak = "Windows Compat-Tel-Runner process" }
+        }
+    }
+    "ALIENWARE-V2" {
+        $Global:GameProfiles = @{
+            "Notepad.exe"         = @{ NickName = "Notepad Editor"; ImmediateKill=$false }
+            "TiWorker.exe"        = @{ Stutter=$true; NickName = "Ti-Worker"; Speak = "Windows Ti-Worker process" }
+            "CompatTelRunner.exe" = @{ Stutter=$true; NickName = "Compat Tel Runner"; Speak = "Windows Compat-Tel-Runner process" }
+        }
+    }
+    "HP-PAV-BLACK" {
+        $Global:GameProfiles = @{
+            "Notepad.exe"         = @{ ImmediateKill=$true; NickName = "Notepad Editor";  }
+            "TiWorker.exe"        = @{ ImmediateKill=$true; NickName = "Ti-Worker"}
+            "CompatTelRunner.exe" = @{ ImmediateKill=$true; NickName = "Compat Tel Runner"}
+            "ctfmon.exe" = @{ ImmediateKill=$true; NickName = "c.t.f. mon"}
+        }
+    }
+    default {
+        $Global:GameProfiles = @{
+            "Notepad.exe"         = @{ NickName = "Notepad Editor"; ImmediateKill=$false }
+            "TiWorker.exe"        = @{ Stutter=$true; NickName = "Ti-Worker"; Speak = "Windows Ti-Worker process" }
+            "CompatTelRunner.exe" = @{ Stutter=$true; NickName = "Compat Tel Runner"; Speak = "Windows Compat-Tel-Runner process" }
+        }        
+    }
 }
 # "Ace7Game.exe"                     = @{ Start = "High Performance"; Stop = "Balanced" ; BoostAction = "action-per-process-boost1.json" }
 # "Ace7Game.exe"                     = @{ Start = "Balanced"; Stop = "Balanced" } #; BoostAction = "action-per-process-boost1.json" }
@@ -49,6 +76,25 @@ $Global:GameProfiles = @{
 # --- FUNCTIONS ---
 # These functions read from the global configuration above. Do not edit these.
 #------------------------------------------------------------------------------------
+
+function Get-ImmediateKill {
+    <#
+    .SYNOPSIS
+        Returns $true if ImmediateKill is requested for this program
+    #>
+    param (
+        [Parameter(Mandatory)]
+        [string]$programName
+    )
+    
+    # Check if a profile exists for the program and if it has a ImmediateKill key.
+    if ($Global:GameProfiles.ContainsKey($programName) -and $Global:GameProfiles[$programName].ContainsKey('ImmediateKill')) {
+        return $Global:GameProfiles[$programName].ImmediateKill
+    }
+    
+    # Return false if no ImmediateKill value is configured for the program.
+    return $false
+}
 
 function Get-GamingPrograms {
     <#

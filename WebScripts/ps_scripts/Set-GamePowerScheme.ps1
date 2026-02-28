@@ -303,20 +303,39 @@ function Stop-GameRuntimeTracker {
 
 function Set-GamePowerScheme($traceName, $programName, $processId) {
     try {
-    $powerSchemes = $null
+        $powerSchemes = $null
 
         # Check if there is a Speak action defined
         $speakText = Get-GameSpeakMessage -programName $programName
 
         # Resolve a TTS-friendly display name (nickname when configured)
-        $ttsName = Get-GameTtsDisplayName -programName $programName
+        $nickName = Get-GameTtsDisplayName -programName $programName
 
         # Retrieve any auxiliary programs configured for this title
         $auxPrograms = Get-GameAuxPrograms -programName $programName
 
-        # First, do the power scheme
+
     switch ($traceName) {
         "Win32_ProcessStartTrace" {
+
+            if ((Get-ImmediateKill -programName $programName)) {
+                
+
+                try {
+                    $pidToKill = [int]$processId
+                    if ($pidToKill -ne $PID) {
+                        Stop-Process -Id $pidToKill -Force -ErrorAction Stop
+                    }
+                    Write-VerboseDebug -Timestamp (Get-Date) -Title "IMMEDIATE KILL" -ForegroundColor "Red" -Message "Killed $nickName per profile."                    
+                }
+                catch {
+                    Write-VerboseDebug -Timestamp (Get-Date) -Title "IMMEDIATE KILL ERROR" -ForegroundColor "DarkYellow" -Message "Failed to kill $nickName [PID:$processId]: $($_.Exception.Message)"
+                }
+
+                return
+            }
+
+            
             $powerSchemes = Get-StartPowerSchemes
             Start-GameRuntimeTracker -ProgramName $programName -ProcessId ([int]$processId)
 			if ($speakText) {
@@ -334,6 +353,7 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
 			}
         }
         "Win32_ProcessStopTrace" { 
+            
             $powerSchemes = Get-StopPowerSchemes 
             $runtimeSummary = Stop-GameRuntimeTracker -ProgramName $programName -ProcessId ([int]$processId)
             if ($runtimeSummary) {
@@ -350,7 +370,7 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
 
                 if ($runtimeSummary.CpuTotalSeconds -ge 2) {
                     $ttsTotal = Format-GameplayDurationText -TotalSeconds $runtimeSummary.CpuTotalSeconds
-                    Write-VerboseDebug -Timestamp $runtimeSummary.StoppedAt -Title "CPU TIME" -ForegroundColor "Yellow" -Speak $true -Message "$ttsName stopped, $ttsTotal total"
+                    Write-VerboseDebug -Timestamp $runtimeSummary.StoppedAt -Title "CPU TIME" -ForegroundColor "Yellow" -Speak $true -Message "$nickName stopped, $ttsTotal total"
                 }
             }
 			if ($speakText) {
