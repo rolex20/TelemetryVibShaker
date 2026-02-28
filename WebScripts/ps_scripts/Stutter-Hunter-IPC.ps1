@@ -538,9 +538,9 @@ public sealed class StutterHunterIdleWatcher : IDisposable
                     client.Connect(500);
                     using (var writer = new StreamWriter(client, Encoding.UTF8, 1024, true))
                     using (var reader = new StreamReader(client, Encoding.UTF8, false, 1024, true))
-                    {
-                        writer.AutoFlush = true;
+                    {                       
                         writer.WriteLine("SHUTDOWN");
+						writer.Flush();
                         reader.ReadLine();
                     }
                 }
