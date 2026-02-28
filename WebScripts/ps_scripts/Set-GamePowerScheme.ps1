@@ -347,7 +347,7 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
 			
 			if (Get-Stutter -programName $programName) {
 				Write-VerboseDebug -Timestamp (Get-Date) -Title "STUTTER HUNTER STARTED:" -ForegroundColor "Yellow" -Message "$programName"
-				Start-Process powershell.exe -ArgumentList @(
+				Start-Process powershell.exe -WindowStyle Minimized -ArgumentList @(
 					'-NoProfile',
 					'-ExecutionPolicy', 'Bypass',
 					'-File', '".\Stutter-Hunter.ps1"',
@@ -411,7 +411,7 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
 
                 if (Test-Path $aux) {
                     Write-VerboseDebug -Timestamp (Get-Date) -Title "AUX START" -ForegroundColor "Green" -Message "Launching $aux"
-                    Start-Process -FilePath $aux
+                    Start-Process -FilePath $aux  -WindowStyle Minimized 
                 }
                 else {
                     Write-VerboseDebug -Timestamp (Get-Date) -Title "AUX START" -ForegroundColor "DarkYellow" -Message "Aux program not found: $aux"
