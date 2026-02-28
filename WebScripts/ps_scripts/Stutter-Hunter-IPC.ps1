@@ -14,6 +14,11 @@ MANUAL TESTS (Windows PowerShell 5.1)
    - Run multiple ADD commands above.
    - Observe only one minimized powershell.exe running with "-Mode Server".
    - Client invocations should exit quickly.
+
+Server behavior notes:
+   - Server mode uses one long-lived NamedPipeServerStream and blocks on WaitForConnection().
+   - One command is processed per connection, then the server replies once and disconnects.
+   - SHUTDOWN is an internal command used by idle self-poke logic; clients do not need to call it.
 #>
 
 param(
@@ -42,7 +47,10 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.IO.Pipes;
 using System.Linq;
+using System.Text;
 using System.Threading;
 
 public class StutterHunterIpcRunner
@@ -474,6 +482,90 @@ public class StutterHunterIpcRunner
         }
     }
 }
+
+public sealed class StutterHunterIdleWatcher : IDisposable
+{
+    private readonly string _pipeName;
+    private readonly int _idleExitSeconds;
+    private readonly Timer _timer;
+    private readonly object _sync = new object();
+
+    private DateTime _emptySinceUtc;
+    private bool _isArmed;
+    private bool _pokeSent;
+    private bool _disposed;
+
+    public StutterHunterIdleWatcher(string pipeName, int idleExitSeconds)
+    {
+        _pipeName = pipeName;
+        _idleExitSeconds = Math.Max(1, idleExitSeconds);
+        _emptySinceUtc = DateTime.UtcNow;
+        _timer = new Timer(OnTick, null, 1000, 1000);
+    }
+
+    private void OnTick(object state)
+    {
+        lock (_sync)
+        {
+            if (_disposed || _pokeSent)
+                return;
+
+            int count = StutterHunterIpcRunner.TargetCount();
+
+            if (count > 0)
+            {
+                _isArmed = false;
+                _emptySinceUtc = DateTime.UtcNow;
+                return;
+            }
+
+            if (!_isArmed)
+            {
+                _isArmed = true;
+                _emptySinceUtc = DateTime.UtcNow;
+                return;
+            }
+
+            double idleSeconds = (DateTime.UtcNow - _emptySinceUtc).TotalSeconds;
+            if (idleSeconds < _idleExitSeconds)
+                return;
+
+            try
+            {
+                using (var client = new NamedPipeClientStream(".", _pipeName, PipeDirection.InOut))
+                {
+                    client.Connect(500);
+                    using (var writer = new StreamWriter(client, Encoding.UTF8, 1024, true))
+                    using (var reader = new StreamReader(client, Encoding.UTF8, false, 1024, true))
+                    {
+                        writer.AutoFlush = true;
+                        writer.WriteLine("SHUTDOWN");
+                        reader.ReadLine();
+                    }
+                }
+
+                _pokeSent = true;
+                _timer.Change(Timeout.Infinite, Timeout.Infinite);
+            }
+            catch
+            {
+                // Retry on next tick if server is transiently unavailable.
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        lock (_sync)
+        {
+            if (_disposed)
+                return;
+
+            _disposed = true;
+            _timer.Dispose();
+        }
+    }
+}
 '@
 
 Import-OptimizedCSharp `
@@ -581,31 +673,23 @@ function Start-StutterHunterServer {
 
     [StutterHunterIpcRunner]::Start($SampleIntervalMs, $CpuSpikeThreshold, $HardFaultThreshold)
 
-    $lastEmptySince = [datetime]::UtcNow
+    $idleWatcher = New-Object StutterHunterIdleWatcher($pipeName, $IdleExitSeconds)
+    $stopRequested = $false
+    $pipe = $null
 
     try {
-        while ($true) {
-            $pipe = New-Object System.IO.Pipes.NamedPipeServerStream(
-                $pipeName,
-                [System.IO.Pipes.PipeDirection]::InOut,
-                1,
-                [System.IO.Pipes.PipeTransmissionMode]::Byte,
-                [System.IO.Pipes.PipeOptions]::Asynchronous
-            )
+        $pipe = New-Object System.IO.Pipes.NamedPipeServerStream(
+            $pipeName,
+            [System.IO.Pipes.PipeDirection]::InOut,
+            1,
+            [System.IO.Pipes.PipeTransmissionMode]::Byte,
+            [System.IO.Pipes.PipeOptions]::None
+        )
 
-            $connected = $false
-            $async = $pipe.BeginWaitForConnection($null, $null)
-            try {
-                if ($async.AsyncWaitHandle.WaitOne(1000)) {
-                    $pipe.EndWaitForConnection($async)
-                    $connected = $true
-                }
-            }
-            catch {
-                $connected = $false
-            }
+        while (-not $stopRequested) {
+            $pipe.WaitForConnection()
 
-            if ($connected) {
+            if ($pipe.IsConnected) {
                 $reader = $null
                 $writer = $null
                 try {
@@ -659,6 +743,10 @@ function Start-StutterHunterServer {
                                     }
                                 }
                             }
+                            'SHUTDOWN' {
+                                $writer.WriteLine('OK SHUTDOWN')
+                                $stopRequested = $true
+                            }
                             default {
                                 $writer.WriteLine('ERR unknown command')
                             }
@@ -676,24 +764,24 @@ function Start-StutterHunterServer {
                 }
             }
 
-            if ($pipe) {
-                try { $pipe.Dispose() } catch {}
+            if ($pipe -and $pipe.IsConnected) {
+                try { $pipe.Disconnect() } catch {}
             }
 
-            if ([StutterHunterIpcRunner]::TargetCount() -eq 0) {
-                $idleSeconds = ([datetime]::UtcNow - $lastEmptySince).TotalSeconds
-                if ($idleSeconds -ge $IdleExitSeconds) {
-                    Write-Host "No monitored PIDs for $IdleExitSeconds seconds. Exiting server." -ForegroundColor DarkGray
-                    break
-                }
-            }
-            else {
-                $lastEmptySince = [datetime]::UtcNow
+            if ($stopRequested) {
+                Write-Host 'Received internal shutdown signal. Exiting server.' -ForegroundColor DarkGray
             }
         }
     }
     finally {
+        if ($idleWatcher) { $idleWatcher.Dispose() }
         [StutterHunterIpcRunner]::Stop()
+        if ($pipe) {
+            if ($pipe.IsConnected) {
+                try { $pipe.Disconnect() } catch {}
+            }
+            try { $pipe.Dispose() } catch {}
+        }
         if ($mutex) {
             try { $mutex.ReleaseMutex() } catch {}
             $mutex.Dispose()
