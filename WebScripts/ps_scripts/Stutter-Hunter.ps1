@@ -100,8 +100,6 @@ TUNING
 - IncludeSelf switch controls whether the current PowerShell host process is eligible for alerts.
 #>
 
-
-
 param(
     [string]$GameProcessName = "ForzaHorizon5", # without the .exe
     [int[]]$ProcessId = @(),
@@ -110,9 +108,9 @@ param(
     [double]$CpuSpikeThreshold = 25.0,
     [int]$HardFaultThreshold = 10
 )
+. "$PSScriptRoot\Import-OptimizedCSharp.ps1"
 
-$ErrorActionPreference = "SilentlyContinue"
-
+#$ErrorActionPreference = "SilentlyContinue"
 
 
 if (-not ("StutterHunterRunner" -as [type])) {
@@ -596,20 +594,34 @@ public class StutterHunterRunner
 }
 '@
 
-    Add-Type -TypeDefinition $code -Language CSharp
+#Add-Type -TypeDefinition $code -Language CSharp
+Import-OptimizedCSharp `
+  -Source $code `
+  -ExpectedTypeName "StutterHunterRunner" `
+  -Platform "AnyCPU" `
+  -CallerScriptPath $PSCommandPath
 }
 
 Write-Host "Starting Stutter-Hunter for [$GameProcessName]..." -ForegroundColor Cyan
 
-[StutterHunterRunner]::Run(
-    $GameProcessName,
-    $SampleIntervalMs,
-    $CpuSpikeThreshold,
-    $HardFaultThreshold,
-    $ProcessId,
-    $PID,
-    [bool]$IncludeSelf
-)
+try {
+#    $ErrorActionPreference = "Stop"
+    [StutterHunterRunner]::Run(
+        $GameProcessName,
+        $SampleIntervalMs,
+        $CpuSpikeThreshold,
+        $HardFaultThreshold,
+        $ProcessId,
+        $PID,
+        [bool]$IncludeSelf
+    )
+}
+catch {
+#    $ErrorActionPreference = "Continue"
+    Write-Host "StutterHunterRunner threw:" -ForegroundColor Red
+    Write-Host $_.Exception.ToString() -ForegroundColor Red
+    throw
+}
 
-Write-Host "Press Ctrl+C to exit" 
+Write-Host "Press Ctrl+C to exit"
 Start-Sleep 3600
