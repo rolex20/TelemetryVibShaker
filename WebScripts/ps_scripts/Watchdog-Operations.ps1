@@ -24,9 +24,6 @@ function Get-NewFileName {
 function Watchdog_Operations {
 
 if ($globalcfg.features.watchdog) {    
-    $x = $globalcfg.features.watchdog
-    write-host "si entro [$x]"   
-    write-host $globalcfg
     $watchdog_json = Include-Script "watchdog.json" "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts" "C:\Users\ralch"
     $tmp_json = Get-NewFileName -FilePath $command_file -NewExtension "tmp"
 }

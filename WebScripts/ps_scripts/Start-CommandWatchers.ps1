@@ -39,7 +39,8 @@ try {
 		$r = $mutex.WaitOne(1000)
         if ($r) {          
             $mutex_owner = $true
-            Write-VerboseDebug -Timestamp (Get-Date) -Title "STARTING" -Message "This is the only instance running" -ForegroundColor "Gray"
+            $myname = $env:COMPUTERNAME
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "STARTING" -Message "This is the only instance running in $myname" -ForegroundColor "Gray"
         } else {
 	        Write-VerboseDebug -Timestamp (Get-Date) -Title "ERROR" -Message "There is another instance running" -ForegroundColor "Red"
 	        Start-Sleep -Seconds 5
@@ -116,12 +117,11 @@ try {
 
     # 5- POWER SCHEME PARAMETERS FOR PROCESS WATCHER
         $processAction = {
-            . ".\Set-GamePowerScheme.ps1"
-
             $event_pId = $Event.SourceEventArgs.NewEvent.ProcessID.ToString()
             $pName = $Event.SourceEventArgs.NewEvent.ProcessName.ToString()
             $traceName = $Event.SourceEventArgs.NewEvent.ToString()
 
+            . ".\Set-GamePowerScheme.ps1"
             Write-Host " "            
             Write-VerboseDebug -Timestamp $Event.TimeGenerated -Title "PROCESS" -Message "$traceName - $pName [$event_pId]"
             Set-GamePowerScheme -traceName $traceName -programName $pName -processId $event_pId

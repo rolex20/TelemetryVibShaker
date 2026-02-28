@@ -1,21 +1,8 @@
-﻿. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
-
-$search_paths = @("C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts", "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts")
-
-$include_file = Include-Script -FileName "Write-VerboseDebug.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Gaming-Programs.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-PowerScheme.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-IdealProcessor.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Cpu-Snapshots.ps1" -Directories $search_paths
-. $include_file
+﻿. ".\Write-VerboseDebug.ps1"
+. ".\Gaming-Programs.ps1"
+. ".\Set-PowerScheme.ps1"
+. ".\Set-IdealProcessor.ps1"
+. ".\Cpu-Snapshots.ps1"
 
 function Restore-GameBoost {
     <#
