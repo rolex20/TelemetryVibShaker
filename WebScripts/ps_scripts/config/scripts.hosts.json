@@ -6,12 +6,12 @@
       "seatbeltWav": null
     },
     "features": {
-      "remoteCommandsWatcher": false,
-      "warThunderMissionWatcher": false,
-      "processWatcher": false,
-      "ipcServer": true,
-      "warThunderDistanceMonitor": false,
-      "watchdog": true
+		  "remoteCommandsWatcher": false,
+		  "warThunderMissionWatcher": false,
+		  "processWatcher": false,
+		  "ipcServer": false,
+		  "warThunderDistanceMonitor": false,
+		  "watchdog": false
     },
     "tuning": {
       "efficiencyAffinityMask": null
@@ -20,12 +20,12 @@
   "machines": {
     "GALVATRON": {
       "features": {
-      "remoteCommandsWatcher": true,
-      "warThunderMissionWatcher": true,
-      "processWatcher": true,
-      "ipcServer": true,
-      "warThunderDistanceMonitor": true,
-      "watchdog": true
+		  "remoteCommandsWatcher": true,
+		  "warThunderMissionWatcher": true,
+		  "processWatcher": true,
+		  "ipcServer": true,
+		  "warThunderDistanceMonitor": true,
+		  "watchdog": true
       },
       "paths": {
         "seatbeltWav": "N:\\MyPrograms\\MySounds\\Thirdwire\\fasten_seatbelt.wav"
@@ -36,8 +36,8 @@
     },
     "ALIENWARE-V2": {
       "features": {
-        "processWatcher": true,
-        "watchdog": true
+			"processWatcher": true,
+			"watchdog": true
       }
     }
   }

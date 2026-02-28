@@ -154,9 +154,8 @@ try {
 
     # 9- WATCHDOG: Infinite loop to periodically check-alive in filesystem-watch which some times fails or locks
         $Global:Watcher_Continue = $true
-		if ($glogalcfg.features.watchdog) {
-			$need_restart = Watchdog_Operations
-		}
+		$need_restart = Watchdog_Operations # check for $glogalcfg.features.watchdog needs to be done inside Watchdog-Operations()
+
 
 } #end try block
 
@@ -166,7 +165,7 @@ finally {
 	Set-MpPreference -DisableRealtimeMonitoring $false -Force	
 	Set-MpPreference -ScanOnlyIfIdleEnabled $false
 		
-    Send-IPC-ExitCommand "ipc_pipe_vr_server_commands"	
+    if ($glogalcfg.features.ipcServer) { Send-IPC-ExitCommand "ipc_pipe_vr_server_commands"	}
 	
   
     if ($cm_watcher_objects) {

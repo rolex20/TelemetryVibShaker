@@ -77,7 +77,7 @@ function Watchdog_Operations {
             $remainingSleep -= $chunk
         }
 
-        
+if ($glogalcfg.features.watchdog) {        
         if (Test-Path "watchdog.txt") { Remove-Item "watchdog.txt" }
         if (Test-Path $command_file) { Remove-Item $command_file }
         Copy-Item $watchdog_json $tmp_json
@@ -92,6 +92,7 @@ function Watchdog_Operations {
 			$failure = $true
             break;
         }
+}
 
 		Wait-Event -Timeout $wait_seconds # Check every five minutes or when a manual event has been signaled        
 
