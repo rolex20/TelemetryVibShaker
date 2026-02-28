@@ -599,6 +599,8 @@ public class StutterHunterRunner
     Add-Type -TypeDefinition $code -Language CSharp
 }
 
+Write-Host "Starting Stutter-Hunter for [$GameProcessName]..." -ForegroundColor Cyan
+
 [StutterHunterRunner]::Run(
     $GameProcessName,
     $SampleIntervalMs,

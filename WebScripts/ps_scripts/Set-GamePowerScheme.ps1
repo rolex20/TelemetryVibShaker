@@ -351,7 +351,8 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
 					'-NoProfile',
 					'-ExecutionPolicy', 'Bypass',
 					'-File', '".\Stutter-Hunter.ps1"',
-					'-ProcessId', $processId
+					'-ProcessId', $processId, 
+                    '-GameProcessName', $programName
 				)
 			}
         }
