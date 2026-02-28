@@ -687,7 +687,10 @@ function Start-StutterHunterServer {
         )
 
         while (-not $stopRequested) {
-            $pipe.WaitForConnection()
+Write-Host "PIPE: waiting for client..." -ForegroundColor DarkCyan
+$pipe.WaitForConnection()
+Write-Host "PIPE: client connected" -ForegroundColor DarkCyan        
+
 
             if ($pipe.IsConnected) {
                 $reader = $null
@@ -698,7 +701,10 @@ function Start-StutterHunterServer {
                      $writer = New-Object System.IO.StreamWriter($pipe, [System.Text.Encoding]::UTF8, 1024, $true)
                      $writer.AutoFlush = $true
 
+                     Write-Host "... before ReadLine()..."
                     $line = $reader.ReadLine()
+                    Write-Host "... after ReadLine()..."
+                    
                     if ([string]::IsNullOrWhiteSpace($line)) {
                         $writer.WriteLine('ERR empty command')
                     }
