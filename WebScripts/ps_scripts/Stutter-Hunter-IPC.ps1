@@ -745,11 +745,11 @@ function Start-StutterHunterServer {
         )
 
         while (-not $stopRequested) {
-            Write-Host "PIPE: waiting for client..." -ForegroundColor DarkCyan
+            #Write-Host "PIPE: waiting for client..." -ForegroundColor DarkCyan
             _D "WAIT begin (WaitForConnection)"
             $pipe.WaitForConnection()
             _D "WAIT end (client connected)"
-            Write-Host "PIPE: client connected" -ForegroundColor DarkCyan
+            #Write-Host "PIPE: client connected" -ForegroundColor DarkCyan
 
             if (-not $pipe.IsConnected) {
                 _D "pipe not connected after WaitForConnection() (unexpected). continuing."
@@ -769,9 +769,9 @@ function Start-StutterHunterServer {
                 $writer = New-Object System.IO.StreamWriter($pipe, $utf8NoBom, 1024, $true)
 
                 _D "STEP C: before ReadLine() (request)"
-                Write-Host "... before ReadLine()..." -ForegroundColor DarkGray
+                #Write-Host "... before ReadLine()..." -ForegroundColor DarkGray
                 $line = Read-LineWithTimeout -Reader $reader -TimeoutMs 5000 -Label 'request line'
-                Write-Host "... after ReadLine()..." -ForegroundColor DarkGray
+                #Write-Host "... after ReadLine()..." -ForegroundColor DarkGray
                 _D ("STEP D: after ReadLine() line='{0}'" -f $line)
 
                 $reply = $null
