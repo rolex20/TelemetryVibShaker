@@ -1,4 +1,6 @@
-﻿. ".\Gaming-Programs.ps1"
+﻿. ".\Write-VerboseDebug.ps1"
+. ".\Gaming-Programs.ps1"
+
 
 
 function Create-ProcessWatcherQuery {
@@ -20,6 +22,7 @@ function Create-ProcessWatcherQuery {
 
 
 function Get-ProcessWatchers($action) {
+        Write-VerboseDebug -Timestamp (Get-Date) -Title "STARTING" -Message "Process Watchers"
         $programs = Get-GamingPrograms
 
         $startWatcherQuery = Create-ProcessWatcherQuery -ProgramsToMonitor $programs -StartingClause "Select ProcessID, ProcessName from win32_ProcessStartTrace where "

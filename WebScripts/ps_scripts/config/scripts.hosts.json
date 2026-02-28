@@ -38,7 +38,7 @@
       "features": {
 			"processWatcher": true,
       "ipcServer": true,
-			"watchdog": true
+			"watchdog": false
       }
     }
   }
