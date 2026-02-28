@@ -16,7 +16,7 @@
 $glogalcfg = Bootstrap-Config
 
 
-$need_restart = $false
+$need_restart = $false # make sure this object exists outside the  {}
 # Used by EXIT_WATCHER to gracefully unwind the watchdog loop into finally {} cleanup.
 $Global:Watcher_Continue = $true
 try {
@@ -108,7 +108,10 @@ try {
         # Setup filesystem watch events for war thunder mission type 1 generation        
         $mission1 = "C:\wamp\www\warthunder\mission_data.json"  #Alienware
 		$mission1 = "C:\MyPrograms\wamp\www\warthunder\mission_data.json" #Galvatron
-        $wt_watcher_objects = Get-RenamesWatcher $mission1 $generate_mission1
+		$wt_watcher_objects = $null # make sure this object exists outside the if {}
+		if ($glogalcfg.features.warThunderMissionWatcher) {
+			$wt_watcher_objects = Get-RenamesWatcher $mission1 $generate_mission1
+		}
 
 
     # 5- POWER SCHEME PARAMETERS FOR PROCESS WATCHER
@@ -123,7 +126,7 @@ try {
             Write-VerboseDebug -Timestamp $Event.TimeGenerated -Title "PROCESS" -Message "$traceName - $pName [$event_pId]"
             Set-GamePowerScheme -traceName $traceName -programName $pName -processId $event_pId
         }
-		$processWatcher = $null
+		$processWatcher = $null # make sure this object exists outside the if {}
 		if ($glogalcfg.features.processWatcher) {
 			$processWatcher = Get-ProcessWatchers $processAction
 		}
@@ -131,16 +134,29 @@ try {
     # 7- START NEW IPC PIPE SERVER THREAD FOR SPECIAL COMMANDS (SHOW PROCESS TIMES REQUIRES INITIAL STATE MEMORY)
         . ".\Declare-IPC-Server-Action.ps1" -Directories $search_paths
 
-        $job = Start-ThreadJob -ScriptBlock $ipc_job_action -ThrottleLimit 5 -StreamingHost $Host
+		$job = $null # make sure this object exists outside the if {}
+		if ($glogalcfg.features.ipcServer) {
+			$job = Start-ThreadJob -ScriptBlock $ipc_job_action -ThrottleLimit 5 -StreamingHost $Host
+		}
 
 
     # 8 - Report whenever war-thunder rewrites my customized distance multiplier
         . ".\Monitor-War-Thunder-Distance-Multiplier.ps1"
+
+		# Start monitoring the file
+		$event = $null # make sure this object exists outside the if {}
+		$filewatcher = $null # make sure this object exists outside the if {}
+		if ($glogalcfg.features.warThunderDistanceMonitor) {
+			$event, $filewatcher = Get-ModificationWatcher -WatchFile $watchFile -Action $action
+		}
+		
             
 
     # 9- WATCHDOG: Infinite loop to periodically check-alive in filesystem-watch which some times fails or locks
         $Global:Watcher_Continue = $true
-        $need_restart = Watchdog_Operations
+		if ($glogalcfg.features.watchdog) {
+			$need_restart = Watchdog_Operations
+		}
 
 } #end try block
 

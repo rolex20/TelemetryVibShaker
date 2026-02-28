@@ -94,6 +94,4 @@ $action = {
 
 }
 
-# Start monitoring the file
-$event, $filewatcher = Get-ModificationWatcher -WatchFile $watchFile -Action $action
 
