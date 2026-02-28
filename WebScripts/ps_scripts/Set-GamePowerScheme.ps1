@@ -329,7 +329,7 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
                     if ($pidToKill -ne $PID) {
                         Stop-Process -Id $pidToKill -Force -ErrorAction Stop
                     }
-                    Write-VerboseDebug -Timestamp (Get-Date) -Title "IMMEDIATE KILL" -ForegroundColor "Red" -Message "Killed $nickName per profile."                    
+                    Write-VerboseDebug -Timestamp (Get-Date) -Title "IMMEDIATE KILL" -ForegroundColor "Magenta" -Message "Killed $nickName per profile."                    
                 }
                 catch {
                     Write-VerboseDebug -Timestamp (Get-Date) -Title "IMMEDIATE KILL ERROR" -ForegroundColor "DarkYellow" -Message "Failed to kill $nickName [PID:$processId]: $($_.Exception.Message)"
