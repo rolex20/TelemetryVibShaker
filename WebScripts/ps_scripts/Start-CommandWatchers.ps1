@@ -119,14 +119,26 @@ try {
         $processAction = {
             $event_pId = $Event.SourceEventArgs.NewEvent.ProcessID.ToString()
             $pName = $Event.SourceEventArgs.NewEvent.ProcessName.ToString()
-            $traceName = $Event.SourceEventArgs.NewEvent.ToString()
-
-            $parent_pId = (Get-CimInstance Win32_Process -Filter "ProcessId = $event_pId").ParentProcessId
-            $parent_pName = (Get-CimInstance Win32_Process -Filter "ProcessId = $parent_pId").Name            
+            $traceName = $Event.SourceEventArgs.NewEvent.ToString()        
 
             . ".\Set-GamePowerScheme.ps1"
+
+            # if $traceName contains ProcessStartTrace, then get the parent process name and id
+            $parentMsg = ""
+            if ($traceName.Contains("ProcessStartTrace")) {
+                $parent_pId = $null
+                $parent_pName = '<unknown>'
+
+                $parent_pId = $Event.SourceEventArgs.NewEvent.ParentProcessID
+                if ($parent_pId) {
+                    $parent_pName = (Get-Process -Id $parent_pId -ErrorAction SilentlyContinue).ProcessName
+                }
+                $parentMsg = " - PARENT: $parent_pName [$parent_pId]"
+            }
+
             Write-Host " "            
-            Write-VerboseDebug -Timestamp $Event.TimeGenerated -Title "PROCESS" -Message "$traceName - $pName [$event_pId] - PARENT: $parent_pName [$parent_pId]"
+            Write-VerboseDebug -Timestamp $Event.TimeGenerated -Title "PROCESS" -Message "$traceName - $pName [$event_pId] $parentMsg"
+
             Set-GamePowerScheme -traceName $traceName -programName $pName -processId $event_pId
         }
 		
