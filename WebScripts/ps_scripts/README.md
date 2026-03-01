@@ -1,37 +1,161 @@
-# WaitFor-Json-Commands.ps1
+# WebScripts/ps_scripts — Performance-first Windows watcher toolkit (PowerShell 5.1)
 
-I built this watcher to keep my sim-rig alive while I am strapped into VR: it listens for new JSON commands, boosts the right threads, and yells if anything misbehaves so I never have to rip off the headset mid-sortie.
+This folder contains the PowerShell side of my “hands-off” gaming/VR rig automation: lightweight watchers that react to **file events**, **process start/stop events**, and **IPC commands** to help me find stutters, diagnose scheduling drift, and apply repeatable tuning without touching the desktop mid-session.
 
-**Tech flex:** PowerShell 5.1, CIM/`System.Threading.Mutex` eventing, `System.Diagnostics` affinity tuning including EcoQoS and CpuSets, Start-ThreadJob IPC server, JSON-driven orchestration, and WAMP/Apache hand-offs from PHP front ends.
+**Tech flex:** deep **Windows scheduling control via PowerShell + C# Win32 interop**—CPU Sets topology discovery and per-process/per-thread CPU-set steering (`GetSystemCpuSetInformation`, `SetProcessDefaultCpuSets`, `SetThreadSelectedCpuSets`) combined with **thread-level EcoQoS / Efficiency Mode** via `SetThreadInformation` (Win11 class 3 → Win10 class 1 fallback) so background/support threads stay “cheap” on hybrid Alder/Raptor Lake rigs; **real-time process lifecycle automation** using `Register-CimIndicationEvent` on `Win32_ProcessStartTrace/StopTrace` to apply per-game policies the moment a sim starts/exits; an **asynchronous Named Pipe IPC layer** (`NamedPipeServerStream`) with explicit **PipeSecurity/ACL**, command parsing, and CPU-time delta introspection for stutter hunting; **kernel32 priority + background I/O tuning** (`SetPriorityClass(PROCESS_MODE_BACKGROUND_BEGIN)` and idle priority) to keep the watcher from stealing performance; and a PS 5.1-friendly **precompiled + disk-cached C# pipeline** that builds an optimized (`/optimize+`) DLL once, reuses it when valid, and loads from a byte array to avoid file locking—so even older laptops don’t pay the “recompile every run” tax. Rounding it out: **event-driven filesystem orchestration** with `FileSystemWatcher` + atomic rename handoffs (PHP/WAMP drops `.tmp` → `.json`), **multi-machine config layering** (defaults + per-host overrides) via `config/scripts.hosts.json`, **multithreaded background execution** with `Start-ThreadJob`, and **TTS feedback** (System.Speech) so state changes are audible when you’re busy / in VR with the headset strapped to your face.
 
-## What this script does (and why it matters)
-- **Sets its own priorities and affinities** so the watcher stays on efficiency cores and never steals perf-core time from the sim, preventing stutters when VR is already tight. The helper `SetAffinityAndPriority.ps1` and `Check-Admin-Privileges.ps1` keep the process pinned and safe.
-- **Single-instance guard** via a named mutex so two watchers never collide and double-apply affinity changes.
-- **Remote command execution** by tailing `command.json` and delegating to `Process-CommandFromJson.ps1`, which can launch/kill apps, move windows, change power plans, or broadcast IPC messages—all without leaving VR.
-- **War Thunder mission automation** by watching `mission_data.json` and invoking `WT_MissionType1.ps1` to regenerate missions on the fly.
-- **Power plan auto-switching** with `Get-ProcessWatchers` and `Set-GamePowerScheme.ps1`, meaning MSFS/DCS/Warthunder hit High Performance the moment they spawn and fall back to Balanced afterward.
-- **IPC side channel** spun up by `Declare-IPC-Server-Action.ps1` to feed debug data (thread times, watchdog checks) without blocking the main file watchers.
-- **Watchdog and restart safety net** (`Watchdog-Operations.ps1` plus `Send-IPC-ExitCommand.ps1`) that re-arms the watcher if filesystem events ever hang—critical when flightsim plugins misbehave mid-session.
-- **War Thunder distance monitor** (`Monitor-War-Thunder-Distance-Multiplier.ps1`) to catch the game silently resetting my preferred VR scale.
+---
+
+## Why this exists (hybrid-core reality, no marketing)
+
+This setup is optimized today for my Alder/Raptor Lake hybrid gaming CPU. Early on, VR sims + Windows background activity could end up on the wrong cores at the wrong time. I wanted flexibility beyond generic tooling: per-process policies, per-thread steering, and quick visibility into CPU time while the sim is running.
+
+Everything here is modular. You can enable/disable watchers per-machine and customize game profiles to match your rig.
+
+---
+
+## Quick start (PowerShell 5.1)
+
+1. Edit host config: `ps_scripts/config/scripts.hosts.json`
+   - Enable only the watchers you want for your machine.
+2. Run: `Start-CommandWatchers.ps1`
+
+> Note on paths: some watchers reference real paths from my rig (ex: WAMP locations). Treat them as working examples—if you enable that watcher, you’ll likely customize the paths.
+
+---
 
 ## Architecture and file map
-- **Entry point:** `WaitFor-Json-Commands.ps1` wires everything together: loads shared helpers via `Include-Script.ps1`, sets CPU affinity, creates mutex, spins up file watchers, and maintains the watchdog loop.
-- **Command pipeline:** `Process-CommandFromJson.ps1` reads JSON commands and calls into:
-  - `Set-ForegroundProcess.ps1`, `Set-Minimize.ps1`, `Set-Maximize.ps1`, `Set-WindowsPosition.ps1`, `Get-WindowLocation.ps1` for window control.
-  - `Set-PowerScheme.ps1`, `Set-IdealProcessor.ps1`, `Set-GamePowerScheme.ps1`, `SetAffinityAndPriority.ps1` for power/affinity tweaks (great for fixing core assignment when the sim scheduler drifts to E-cores).
-  - `Send-MessageViaPipe.ps1` and `Declare-IPC-Server-Action.ps1` for pipe-based telemetry and long-running stats like `Show-CPU-Time-PerProcess.ps1`.
-- **Game-aware config:** `Gaming-Programs.ps1` defines the authoritative list of games, power schemes, boost JSONs (`action-per-process-boost*.json`), and auxiliary tools to auto-launch. Add or tweak games here first; everything else consumes this table.
-- **File watchers:** `Get-RenamesWatcher.ps1` wraps `FileSystemWatcher` to listen for rename events from PHP pages (remote control and War Thunder mission forms).
-- **Support utilities:** `Watchdog-Operations.ps1` keeps the watchers alive; `MonitorJoystickGremlin.ps1` and other helpers can be dropped in via `Include-Script.ps1` without touching the entry script.
 
-## Common tweaks
-- **Add a new game or change power plans:** edit `$Global:GameProfiles` in `ps_scripts/Gaming-Programs.ps1` to set High Performance/ Balanced plans, boost JSON, and any auxiliary launchers.
-- **Create a new boost profile:** copy an existing `action-per-process-boost*.json` and adjust thread affinities/priorities per process; reference it from `GameProfiles` or the PHP remote commands.
-- **Adjust watchdog cadence:** tune intervals in `Watchdog-Operations.ps1` and the `ScheduleWatchdogCheck` calls inside `Process-CommandFromJson.ps1`.
+### Entry point / orchestrator
+**`Start-CommandWatchers.ps1` wires everything together:**
+- Enforces single instance (named mutex)
+- Tunes itself to stay out of the way (efficiency-core affinity + idle/background behavior)
+- Loads shared helpers via `Include-Script.ps1`
+- Conditionally spins up watchers based on `config/scripts.hosts.json`
+- Maintains a watchdog loop and can self-restart if eventing gets stuck
 
-## Future plans
-1. **Modularize watchers**: split file-system, process, and IPC watchers into independent modules with unit tests so a crash in one cannot starve the others.
-2. **Config over code**: move hard-coded paths (WAMP roots, JSON names, boost files) into a single JSON/YAML config to reduce brittle string edits.
-3. **Stronger error telemetry**: push watcher health and last command status into a minimal web dashboard/API so I can see failures from the phone while in VR.
-4. **Per-core policy presets**: generate affinity masks dynamically based on detected CPU topology instead of fixed masks, keeping pace with new Intel/AMD layouts.
-5. **Remove spaghetti includes**: replace chained `Include-Script` calls with a manifest loader and Pester tests to ensure every dependency resolves before the watcher arms.
+### Event sources (inputs)
+There are three main “inputs” that can drive actions:
+
+1) **Process start/stop watcher (game lifecycle)**
+- Implemented via CIM indication events on:
+  - `Win32_ProcessStartTrace`
+  - `Win32_ProcessStopTrace`
+- The authoritative game list is `Gaming-Programs.ps1` (see below).
+- On start/stop it can switch power schemes and trigger “boost” actions.
+
+2) **Remote JSON command pipeline (file rename handoff)**
+- A `FileSystemWatcher` listens for **rename** events (atomic handoff).
+- Typical flow: a PHP page writes `command.tmp` then renames to `command.json`.
+- On rename, `Process-CommandFromJson.ps1` reads the JSON and dispatches actions.
+
+3) **IPC (named pipe commands)**
+- `Declare-IPC-Server-Action.ps1` runs a NamedPipe server (thread job).
+- It accepts simple commands (speak, window ops, show-process CPU deltas, etc.).
+- Designed as a fast side-channel for “do X now” commands or lightweight introspection.
+
+### Command dispatcher (the “router”)
+**`Process-CommandFromJson.ps1` reads JSON commands and calls into:**
+
+- **Window control**
+  - `Set-ForegroundProcess.ps1`
+  - `Set-Minimize.ps1`
+  - `Set-Maximize.ps1`
+  - `Set-WindowsPosition.ps1`
+  - `Get-WindowLocation.ps1`
+
+- **Power / scheduling / affinity tuning**
+  - `Set-PowerScheme.ps1`
+  - `Set-GamePowerScheme.ps1`
+  - `SetAffinityAndPriority.ps1`
+  - CPU-set + hybrid-core helpers (C# `Add-Type` tooling used by the tuning layer)
+
+- **IPC and telemetry**
+  - `Send-MessageViaPipe.ps1` (client)
+  - `Declare-IPC-Server-Action.ps1` (server)
+  - `Show-CPU-Time-PerProcess.ps1` (CPU-time deltas / stutter-hunt support)
+
+- **Boost profiles**
+  - JSON-driven profiles: `action-per-process-boost*.json`
+  - Used by game profiles and/or remote commands to apply repeatable tuning
+
+### Game-aware configuration (the source of truth)
+**`Gaming-Programs.ps1` defines `$Global:GameProfiles`:**
+- This is intentionally *host-specific* (my different PCs have different needs).
+- It defines:
+  - which games are watched
+  - start/stop power plans
+  - optional `BoostAction` JSON
+  - auxiliary tools to auto-launch
+- Everything else consumes this table (process watcher queries, boost triggers, etc.).
+
+### File watcher wrapper + support utilities
+- **`Get-RenamesWatcher.ps1`** wraps `FileSystemWatcher` to listen for rename events (used by remote control + optional War Thunder modules).
+- **`Watchdog-Operations.ps1`** keeps the system honest (detect stuck eventing, help restart cleanly).
+- Optional helpers can be dropped in and wired via `Include-Script.ps1` without bloating the entry script.
+
+---
+
+## Game profiles and customization
+
+### `Gaming-Programs.ps1`
+This is the place you customize first.
+
+- Add games by adding entries under your machine hostname block.
+- Set per-game start/stop power schemes.
+- Optionally reference a boost JSON (`action-per-process-boost*.json`).
+- Add auxiliary tools to auto-launch with a game if you want.
+
+The design is: **my defaults are my rig**, but anyone can fork/tune it to match their own CPU, GPU, VR stack, and “background junk” profile.
+
+---
+
+## Common tweaks (most common edits)
+
+### 1) Add a new game / change power plans
+Edit `$Global:GameProfiles` in `ps_scripts/Gaming-Programs.ps1`:
+- Choose start/stop schemes (High Performance / Balanced / your custom scheme)
+- Optionally attach a `BoostAction`
+- Optionally add auxiliary launchers
+
+### 2) Create a new boost profile
+Copy an existing `action-per-process-boost*.json` and adjust:
+- per-process priority
+- per-process CPU affinity / CPU sets intent
+- per-thread steering (when applicable)
+Then reference it from:
+- `Gaming-Programs.ps1` (`BoostAction`)
+- or a remote JSON `GAME_BOOST` command (if you use the web remote)
+
+### 3) Enable/disable watchers per PC (feature flags)
+Edit `ps_scripts/config/scripts.hosts.json`:
+- `defaults.features.*` are the baseline
+- `machines.<HOSTNAME>.features.*` overrides per machine
+This is how you keep one PC minimal (just process watcher + IPC) while another runs optional modules.
+
+### 4) Adjust watchdog behavior / cadence
+Two places matter:
+- `Watchdog-Operations.ps1` (watchdog logic + check behavior)
+- The watchdog scheduling calls inside the watcher/orchestrator loop and/or command dispatcher paths
+Goal: keep it responsive but not noisy (event-driven first; watchdog as a safety net, not a poller).
+
+### 5) Update “example paths” for your layout
+If you enable the remote JSON watcher or War Thunder file watchers, you’ll likely need to customize file paths (WAMP roots, mission json locations, etc.). The repo contains real working examples from my machines—not a universal layout.
+
+---
+
+## Troubleshooting
+
+- **Nothing happens:** confirm the relevant feature flag is enabled for your hostname in `scripts.hosts.json`.
+- **Remote commands not firing:** validate the watched path (and that your PHP page uses rename handoff).
+- **IPC server conflicts:** single-instance protections may prevent a second server from starting.
+- **Watcher restarts:** if the watchdog detects stuck event processing, the orchestrator can restart after cleanup.
+
+---
+
+## Future roadmap
+
+- Move remaining hard-coded paths into the main config file (so enabling a watcher never requires editing script strings).
+- Detect CPU topology dynamically and generate affinity/cpu-set strategies based on the machine (instead of fixed masks).
+- Make each watcher a cleaner module with sharper boundaries and fewer cross-dependencies.
+- Lightweight “health/status” output (minimal dashboard/API) for headset-first workflows.
