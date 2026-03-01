@@ -54,11 +54,15 @@ switch ($computerName.ToUpperInvariant()) {
         }
     }
     "HP-PAV-BLACK" {
+        # This pc is very old, however it works great with Visual Studio 2026 and everything else but,
+        # windows-updates, TiWorker.exe, and CompatTelRunner.exe and ctfmon.exe cause severe issues, including cpu hangs and blue-screens due probably to dryed cpu paste. 
+        # For this reason, I set them to be immediately killed when detected.
+        # I do manual windows updates only when i need to, and I don't care about the potential consequences of killing these processes, since this PC is only used for testing and debugging, and I have good backups.
         $Global:GameProfiles = @{
-            "Notepad.exe"         = @{ ImmediateKill=$false; NickName = "Notepad"; ; Stutter=$true; Speak = "Notepad" }
+            "Notepad.exe"         = @{ ImmediateKill=$false; NickName = "Notepad"; ; Stutter=$true; Speak = "Notepad"; Comment="For debugging only" }
             "TiWorker.exe"        = @{ ImmediateKill=$true; NickName = "Ti-Worker"; AuxPrograms = @("C:\Users\ralch\Desktop\stop-win-updates.ps1.lnk")}
             "CompatTelRunner.exe" = @{ ImmediateKill=$true; NickName = "Compat Tel Runner"; AuxPrograms = @("C:\Users\ralch\Desktop\stop-win-updates.ps1.lnk")}
-            "ctfmon.exe" = @{ ImmediateKill=$true; NickName = "c.t.f. mon"; Stutter=$false; AuxPrograms = @("C:\Users\ralch\Desktop\stop-win-updates.ps1.lnk")}
+            "ctfmon.exe" = @{ ImmediateKill=$false; NickName = "c.t.f. mon"; Stutter=$true; AuxPrograms = @("C:\Users\ralch\Desktop\stop-win-updates.ps1.lnk")}
             "svchost.exe" = @{ ImmediateKill=$false; NickName = "Service Host"; Stutter=$true; AuxPrograms = @("C:\Users\ralch\Desktop\stop-win-updates.ps1.lnk")}
         }
     }

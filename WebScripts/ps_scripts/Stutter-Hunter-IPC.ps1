@@ -33,10 +33,15 @@ param(
     [int]$SampleIntervalMs = 100,
     [double]$CpuSpikeThreshold = 25.0,
     [int]$HardFaultThreshold = 10,
-    [int]$IdleExitSeconds = 15
+    [int]$IdleExitSeconds = 60
 )
 
+if ($Mode -eq 'Client') { # Server logs later
+    Write-Host "Requesting Stutter-Hunter [Action $Action] for [$GameProcessName] [PID $ProcessId] ..." -ForegroundColor Cyan
+}
+
 . "$PSScriptRoot\Import-OptimizedCSharp.ps1"
+
 
 $mutexName = 'Global\TelemetryVibShaker.StutterHunter.Server'
 $pipeName = 'TelemetryVibShaker.StutterHunter'
@@ -657,6 +662,7 @@ function Start-StutterHunterServerIfNeeded {
 }
 
 function Invoke-StutterHunterClient {
+
     if ($Action -eq 'Add' -and [string]::IsNullOrWhiteSpace($GameProcessName)) {
         throw 'GameProcessName is required when Action is Add.'
     }
@@ -671,13 +677,13 @@ function Invoke-StutterHunterClient {
         "REMOVE $ProcessId"
     }
 
-    $result = Invoke-StutterHunterPipeCommand -CommandLine $commandLine -ConnectTimeoutMs 500
+    $result = Invoke-StutterHunterPipeCommand -CommandLine $commandLine -ConnectTimeoutMs 200
     if (-not $result.Ok) {
         Start-StutterHunterServerIfNeeded
 
         for ($i = 0; $i -lt 10; $i++) {
             Start-Sleep -Milliseconds 200
-            $result = Invoke-StutterHunterPipeCommand -CommandLine $commandLine -ConnectTimeoutMs 700
+            $result = Invoke-StutterHunterPipeCommand -CommandLine $commandLine -ConnectTimeoutMs 500
             if ($result.Ok) {
                 break
             }
@@ -744,12 +750,10 @@ function Start-StutterHunterServer {
             [System.IO.Pipes.PipeOptions]::None
         )
 
-        while (-not $stopRequested) {
-            #Write-Host "PIPE: waiting for client..." -ForegroundColor DarkCyan
+        while (-not $stopRequested) {            
             _D "WAIT begin (WaitForConnection)"
             $pipe.WaitForConnection()
             _D "WAIT end (client connected)"
-            #Write-Host "PIPE: client connected" -ForegroundColor DarkCyan
 
             if (-not $pipe.IsConnected) {
                 _D "pipe not connected after WaitForConnection() (unexpected). continuing."
@@ -769,9 +773,7 @@ function Start-StutterHunterServer {
                 $writer = New-Object System.IO.StreamWriter($pipe, $utf8NoBom, 1024, $true)
 
                 _D "STEP C: before ReadLine() (request)"
-                #Write-Host "... before ReadLine()..." -ForegroundColor DarkGray
-                $line = Read-LineWithTimeout -Reader $reader -TimeoutMs 5000 -Label 'request line'
-                #Write-Host "... after ReadLine()..." -ForegroundColor DarkGray
+                $line = Read-LineWithTimeout -Reader $reader -TimeoutMs 5000 -Label 'request line'               
                 _D ("STEP D: after ReadLine() line='{0}'" -f $line)
 
                 $reply = $null
@@ -801,6 +803,7 @@ function Start-StutterHunterServer {
                                 }
                                 else {
                                     $name = ($line.Substring($line.IndexOf($parts[2]))).Trim()
+                                    Write-Host ("Adding target PID={0} Name='{1}'" -f $procid, $name) -ForegroundColor Green
                                     [void][StutterHunterIpcRunner]::AddTarget($procid, $name)
                                     $reply = "OK ADDED $procid"
                                 }
@@ -816,6 +819,7 @@ function Start-StutterHunterServer {
                                     $reply = 'ERR invalid pid'
                                 }
                                 else {
+                                    Write-Host ("Removing target PID={0} Name='{1}'" -f $procid, $name) -ForegroundColor Green
                                     [void][StutterHunterIpcRunner]::RemoveTarget($procid)
                                     $reply = "OK REMOVED $procid"
                                 }
@@ -879,7 +883,7 @@ function Start-StutterHunterServer {
     }
 }
 
-Write-Host "Requesting Stutter-Hunter for [$GameProcessName] [PID $ProcessId]..." -ForegroundColor Cyan
+
 if ($Mode -eq 'Client') {
     Invoke-StutterHunterClient
 }

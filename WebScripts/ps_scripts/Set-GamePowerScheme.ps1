@@ -340,11 +340,8 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
 
             
             $powerSchemes = Get-StartPowerSchemes
-            Start-GameRuntimeTracker -ProgramName $programName -ProcessId ([int]$processId)
-			if ($speakText) {
-				Write-VerboseDebug -Timestamp (Get-Date) -Title "PROCESS STARTED:" -ForegroundColor "Yellow" -Speak $true -Message $speakText
-			}
-			
+            Start-GameRuntimeTracker -ProgramName $programName -ProcessId ([int]$processId)		
+            
 			if (Get-Stutter -programName $programName) {
 				Write-VerboseDebug -Timestamp (Get-Date) -Title "STUTTER HUNTER STARTED:" -ForegroundColor "Yellow" -Message "$programName"
 				# LEGACY FALLBACK: Uncomment to revert to one-process-per-game legacy behavior.
@@ -354,7 +351,7 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
 				# 	'-File', '".\Stutter-Hunter.ps1"',
 				# 	'-ProcessId', $processId,
 				#     '-GameProcessName', $programName
-				# )
+				# )                
 				Start-Process powershell.exe -WindowStyle Minimized -ArgumentList @(
 					'-NoLogo','-NoProfile','-ExecutionPolicy','Bypass',
 					'-File', (Join-Path $PSScriptRoot 'Stutter-Hunter-IPC.ps1'),
@@ -364,6 +361,11 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
 					'-GameProcessName', $programName
 				)
 			}
+
+			if ($speakText) {
+				Write-VerboseDebug -Timestamp (Get-Date) -Title "PROCESS STARTED:" -ForegroundColor "Yellow" -Speak $true -Message $speakText
+			}
+
         }
         "Win32_ProcessStopTrace" { 
             
@@ -386,9 +388,6 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
                     Write-VerboseDebug -Timestamp $runtimeSummary.StoppedAt -Title "CPU TIME" -ForegroundColor "Yellow" -Speak $true -Message "$nickName stopped, $ttsTotal total"
                 }
             }
-			if ($speakText) {
-				Write-VerboseDebug -Timestamp (Get-Date) -Title "PROCESS EXIT:" -ForegroundColor "Yellow" -Speak $true -Message $speakText
-			}
 
 			if (Get-Stutter -programName $programName) {
 				Start-Process powershell.exe -WindowStyle Minimized -ArgumentList @(
@@ -398,7 +397,12 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
 					'-Action','Remove',
 					'-ProcessId', $processId
 				)
-			}			
+			}
+            
+			if ($speakText) {
+				Write-VerboseDebug -Timestamp (Get-Date) -Title "PROCESS EXIT:" -ForegroundColor "Yellow" -Speak $true -Message $speakText
+			}
+
 		}
 	}
 	
