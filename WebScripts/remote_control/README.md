@@ -15,7 +15,7 @@ This PHP page is my lifeline when I am blindfolded by a VR headset: from the pho
 
 ## Architecture and flow
 1. **Front-end form** renders program choices from `programs.json` and posts actions back to `commander.php`.
-2. **Command builder** (`createJsonCommand`) writes the chosen action to `command.tmp` then renames it to `command.json`—the rename event is what `WaitFor-Json-Commands.ps1` listens for.
+2. **Command builder** (`createJsonCommand`) writes the chosen action to `command.tmp` then renames it to `command.json`—the rename event is what `ps_scripts/Start-CommandWatchers.ps1` listens for.
 3. **JSON consumers**: the PowerShell watcher calls `Process-CommandFromJson.ps1`, which dispatches to window movers, power plan setters, IPC pipe senders, or boost routines.
 4. **Program catalog**: update `programs.json` when adding a new sim/utility so the drop-down shows it and launch/foreground commands know the executable path.
 5. **Output files**: commands like `GET-LOCATION` write to `outfile.txt`; `commander.php` reopens it with retries (`tryOpenFile`) so coordinates appear without racing the watcher.
@@ -30,6 +30,9 @@ This PHP page is my lifeline when I am blindfolded by a VR headset: from the pho
 - **Add a program**: append an entry to `programs.json` with `friendlyName`, `processName`, and `path` (exe or shortcut). Ensure the same process name is covered in `ps_scripts/Gaming-Programs.ps1` if you want power/boost automation.
 - **Tune boost profiles**: edit the `action-per-process-boost*.json` files in `ps_scripts` and point the dropdown to the one you prefer.
 - **Change default threads/instances**: adjust the default `Instance` value handling near the POST block if your sim spins more (or fewer) busy threads worth corralling.
+
+## Experimental GUI variants
+You may see additional `commander_by_*.php` pages (AI-generated UI experiments). They’re optional and may change or be removed later; the stable contract is the JSON output (`command.tmp` → `command.json`).
 
 ## Future plans
 1. **Split UI from logic** with a lightweight controller class so adding buttons doesn’t bloat the single PHP file.
