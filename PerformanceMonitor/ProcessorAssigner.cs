@@ -31,13 +31,13 @@ namespace IdealProcessorEnhanced
         public string IpcInitMessage { get; private set; }
 
         // Constructor to initialize the starting processor number
-        public ProcessorAssigner(uint maxProcessor)
+        public ProcessorAssigner(uint maxProcessorIndexInclusive)
         {
             InitializeIpcObjects(ProcessorAssignerMutex, ProcessorAssignerMMF);
 
             accessor = mmf.CreateViewAccessor();
 
-            startProcessor = maxProcessor;
+            startProcessor = maxProcessorIndexInclusive;
             InitializeProcessor();
         }
 

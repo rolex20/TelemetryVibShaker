@@ -29,7 +29,7 @@ namespace IdealProcessorEnhanced
         private MemoryMappedViewAccessor accessor;
 
         // Constructor to initialize the starting processor number
-        public ProcessorAssigner(uint maxProcessor)
+        public ProcessorAssigner(uint maxProcessorIndexInclusive)
         {
             // Define the security settings for the mutex
             var mutexSecurity = new MutexSecurity();
@@ -66,7 +66,7 @@ namespace IdealProcessorEnhanced
             
             accessor = mmf.CreateViewAccessor();
 
-            startProcessor = maxProcessor;
+            startProcessor = maxProcessorIndexInclusive;
             InitializeProcessor();
         }
 

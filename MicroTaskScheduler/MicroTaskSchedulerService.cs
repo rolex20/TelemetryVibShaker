@@ -151,9 +151,12 @@ namespace MicroTaskScheduler
 
             if (PerformanceMonitor.CPU_QoS.IsHybridCpu())
             {
-                if (processorAssigner == null) processorAssigner = new ProcessorAssigner((uint)maxCpus);
-                //SetNewIdealProcessor((uint)Environment.ProcessorCount - 1); // Assuming layout where efficient cores are last
-                SetNewIdealProcessor((uint)maxCpus - 1); // Use the actual number of available processors to be safe
+                uint maxProcIndex = (uint)maxCpus - 1;
+
+                if (processorAssigner == null)
+                    processorAssigner = new ProcessorAssigner(maxProcIndex);
+
+                SetNewIdealProcessor(maxProcIndex);
                 PerformanceMonitor.CPU_QoS.SetHardAffinityProcess(PerformanceMonitor.CPU_QoS.CpuSetType.Efficiency);
                 //AssignEfficiencyCoresOnly();
                 // let's append to logMsg that we are on a hybrid CPU and have set the affinity
