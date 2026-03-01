@@ -126,22 +126,20 @@ namespace IdealProcessorEnhanced
         // Method to initialize the processor number in the memory-mapped file
         private void InitializeProcessor()
         {
-            // Wait for the mutex to ensure exclusive access
             mutex.WaitOne();
             try
             {
-                int currentProcessor;
-                // Read the current processor number from the memory-mapped file
+                uint currentProcessor;
                 accessor.Read(0, out currentProcessor);
-                // If the current processor number is 0 (uninitialized), set it to the starting processor number
-                if (currentProcessor == 0)
+
+                // Clamp/repair invalid values
+                if (currentProcessor == 0 || currentProcessor < 16 || currentProcessor > startProcessor)
                 {
                     accessor.Write(0, startProcessor);
                 }
             }
             finally
             {
-                // Release the mutex to allow other processes to access the critical section
                 mutex.ReleaseMutex();
             }
         }
@@ -156,6 +154,12 @@ namespace IdealProcessorEnhanced
                 uint currentProcessor;
                 // Read the current processor number from the memory-mapped file
                 accessor.Read(0, out currentProcessor);
+
+                // Clamp/repair invalid values *before* decrementing/returning
+                if (currentProcessor == 0 || currentProcessor < 16 || currentProcessor > startProcessor)
+                {
+                    currentProcessor = startProcessor;
+                }
                 // Decrement the processor number
                 uint nextProcessor = currentProcessor - 1;
                 // If the processor number goes below 16, reset it to the starting processor number
