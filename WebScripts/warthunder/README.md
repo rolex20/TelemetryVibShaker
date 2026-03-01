@@ -2,7 +2,7 @@
 
 These PHP pages let me design and launch dogfights from the couch: I tweak loadouts, terrain, and AI skill on my phone, and a PowerShell watcher instantly regenerates missions so I can dive back into VR without touching the desktop.
 
-**Tech flex:** PHP 8+, JSON hand-off to PowerShell, cookie-based state, dynamic form rendering, mission templates driven by `warthunder.json`, and a rename-triggered pipeline caught by `ps_scripts/Start-CommandWatchers.ps1` + `WT_MissionType1.ps1`.
+**Tech flex:** PHP 5.3.x, JSON hand-off to PowerShell, cookie-based state, dynamic form rendering, mission templates driven by `warthunder.json`, and a rename-triggered pipeline caught by `ps_scripts/Start-CommandWatchers.ps1` + `WT_MissionType1.ps1`.
 
 This module is optional and intended to be enabled per-PC (via `ps_scripts/config/scripts.hosts.json`) depending on how you use each machine.
 
@@ -32,3 +32,16 @@ This module is optional and intended to be enabled per-PC (via `ps_scripts/confi
 3. **Async status callbacks** from `WT_MissionType1.ps1` back to the page (via AJAX or a small status file) to confirm mission build success.
 4. **Modular CSS/JS** shared across the forms for faster UI tweaks and a consistent mobile feel.
 5. **Mission history** stored server-side so I can replay or tweak recent sorties without re-entering everything.
+
+# Keywords
+War Thunder dogfight mission maker, custom mission generator, VR-friendly mission builder, instant mission regeneration, couch/phone mission editor, dynamic dogfight setup, AI skill/loadout selector, aircraft/armament presets, mission template system, JSON-driven mission configuration, cookie-saved presets, quick mission iteration, War Thunder simulator battles practice, custom dogfight scenarios, single-player dogfight creator, mission scripting helper, WTRTI/VR workflow, local PHP mission tool, WAMP/XAMPP War Thunder mission page, `.tmp → .json` atomic handoff, PowerShell watcher pipeline, fast no-restart mission updates, War Thunder mission_data.json generator, War Thunder custom missions automation, dogfight sandbox builder, rapid loadout testing tool.
+
+
+
+
+
+
+
+
+
+
