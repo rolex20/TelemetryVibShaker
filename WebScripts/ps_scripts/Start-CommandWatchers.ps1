@@ -121,9 +121,12 @@ try {
             $pName = $Event.SourceEventArgs.NewEvent.ProcessName.ToString()
             $traceName = $Event.SourceEventArgs.NewEvent.ToString()
 
+            $parent_pId = (Get-CimInstance Win32_Process -Filter "ProcessId = $event_pId").ParentProcessId
+            $parent_pName = (Get-CimInstance Win32_Process -Filter "ProcessId = $parent_pId").Name            
+
             . ".\Set-GamePowerScheme.ps1"
             Write-Host " "            
-            Write-VerboseDebug -Timestamp $Event.TimeGenerated -Title "PROCESS" -Message "$traceName - $pName [$event_pId]"
+            Write-VerboseDebug -Timestamp $Event.TimeGenerated -Title "PROCESS" -Message "$traceName - $pName [$event_pId] - PARENT: $parent_pName [$parent_pId]"
             Set-GamePowerScheme -traceName $traceName -programName $pName -processId $event_pId
         }
 		
