@@ -3,8 +3,8 @@
         "comment": "Peksy windows process while i am busy",
         "process_name": "TiWorker",
         "parameters": {
-            "process_affinity": "DoNotChange",
-            "process_priority": "E-Cores",
+            "process_affinity": "E-Cores",
+            "process_priority": "Idle",
             "thread_ideal_processor": "DoNotChange",
             "thread_priority": "Idle",
             "thread_cpu_sets": "DoNotChange",
@@ -13,8 +13,9 @@
             "dependencies": [
                 {
                     "process_name": "CompatTelRunner",
-                    "process_affinity": "E-Cores",
-                    "process_priority": "Idle",
+                    "dont_restore_boost": true,
+                    "process_affinity": "Idle",
+                    "process_priority": "E-Cores",
                     "thread_ideal_processor": "DoNotChange",
                     "thread_priority": "Idle",
                     "thread_cpu_sets": "DoNotChange",
@@ -28,8 +29,8 @@
         "comment": "Peksy windows process while i am busy",
         "process_name": "CompatTelRunner",
         "parameters": {
-            "process_affinity": "DoNotChange",
-            "process_priority": "E-Cores",
+            "process_affinity": "E-Cores",
+            "process_priority": "Idle",
             "thread_ideal_processor": "DoNotChange",
             "thread_priority": "Idle",
             "thread_cpu_sets": "DoNotChange",
@@ -38,8 +39,9 @@
             "dependencies": [
                 {
                     "process_name": "TiWorker",
-                    "process_affinity": "E-Cores",
-                    "process_priority": "Idle",
+                    "dont_restore_boost": true,
+                    "process_affinity": "Idle",
+                    "process_priority": "E-Cores",
                     "thread_ideal_processor": "DoNotChange",
                     "thread_priority": "Idle",
                     "thread_cpu_sets": "DoNotChange",
