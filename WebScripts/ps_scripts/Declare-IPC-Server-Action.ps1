@@ -155,6 +155,10 @@ Add-Type @"
                 # Respond with "ECHO"
                 $writer.WriteLine("ECHO")
             }
+			"PING" = {
+				# also, just a verification that this script is alive
+			    $writer.WriteLine("PONG")
+			}			
             "EXIT" {
                 # Exit flag is consumed by the outer while-loop after current client disconnects.
                 $global:IPC_ContinueServer = $false
