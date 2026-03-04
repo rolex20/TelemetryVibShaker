@@ -11,6 +11,9 @@ function Create-ProcessWatcherQuery {
 
     $conditions = @()
     foreach ($program in $ProgramsToMonitor) {
+        # Query is intentionally explicit OR conditions per process name.
+        # We control these names via GameProfiles, so direct string interpolation is acceptable here.
+        # If this ever accepts untrusted input, switch to stricter escaping/validation.
         $conditions += "processname = '$program'"
     }
 
@@ -30,9 +33,14 @@ function Get-ProcessWatchers($action) {
         $stopWatcherQuery  = Create-ProcessWatcherQuery -ProgramsToMonitor $programs -StartingClause "Select ProcessID, ProcessName, ParentProcessID from win32_ProcessStopTrace where "
         
 
+        # These source identifiers are stable names used elsewhere for bulk event cleanup.
+        # If multiple watcher instances were ever allowed in one process, these would collide.
+        # Current orchestrator design prevents that via single-instance mutex.
         $startWatcher = Register-CimIndicationEvent -Query $startWatcherQuery -SourceIdentifier startSI -Action $action
         $stopWatcher = Register-CimIndicationEvent -Query $stopWatcherQuery -SourceIdentifier stopSI -Action $action
 
+        # Return subscribers so caller can explicitly dispose/unregister in finally{}.
+        # Relying only on process-exit cleanup makes restarts noisier and less deterministic.
         $retValues = @($startWatcher, $stopWatcher)
         return $retValues
 }

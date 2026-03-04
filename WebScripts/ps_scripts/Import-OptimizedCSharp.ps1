@@ -101,6 +101,8 @@ function Import-OptimizedCSharp {
     )
 
     # Already loaded?
+    # Important PS/.NET behavior: once an assembly is loaded into an AppDomain, it cannot be unloaded
+    # individually. Short-circuiting here avoids duplicate-type confusion and unnecessary recompiles.
     $already = [AppDomain]::CurrentDomain.GetAssemblies() |
         ForEach-Object { $_.GetType($ExpectedTypeName, $false, $false) } |
         Where-Object { $_ } |
@@ -117,6 +119,9 @@ function Import-OptimizedCSharp {
     }
 
     # Cache key = per-script + per-source + platform (+ refs)
+    # Including caller path + caller LastWriteTimeUtc intentionally invalidates cache when
+    # the parent script changes, even if C# text is unchanged. This keeps behavior tied to
+    # script revisions and avoids stale assumptions across refactors.
     $scriptId = [IO.Path]::GetFileNameWithoutExtension($CallerScriptPath)
 
     $sha = [System.Security.Cryptography.SHA256]::Create()
@@ -135,6 +140,8 @@ function Import-OptimizedCSharp {
     $dllPath = Join-Path $CacheRoot $dllName
 
     $dllItem = Get-Item -LiteralPath $dllPath -ErrorAction SilentlyContinue
+    # Recompile if forced, missing, or older than caller script.
+    # Timestamp check gives a simple "script changed => rebuild" rule in addition to hash-keying.
     $needsCompile = $Force.IsPresent -or (-not $dllItem) -or ($dllItem.LastWriteTimeUtc -lt $callerItem.LastWriteTimeUtc)
 
     if ($needsCompile) {
@@ -142,7 +149,8 @@ function Import-OptimizedCSharp {
         Add-Type -AssemblyName "Microsoft.CSharp" -ErrorAction Stop
         Add-Type -AssemblyName "System" -ErrorAction Stop
 
-        # IMPORTANT: use parameterless ctor (PS 5.1-friendly)
+        # IMPORTANT: use parameterless ctor (PS 5.1-friendly).
+        # Some newer overload assumptions are unreliable in Windows PowerShell 5.1.
         $provider = New-Object Microsoft.CSharp.CSharpCodeProvider
 
         $cp = New-Object System.CodeDom.Compiler.CompilerParameters
@@ -156,6 +164,7 @@ function Import-OptimizedCSharp {
         foreach ($ref in $ReferencedAssemblies) { [void]$cp.ReferencedAssemblies.Add($ref) }
 
         $platOpt = if ($Platform -eq "x64") { "/platform:x64" } else { "/platform:anycpu" }
+        # Keep compile flags explicit for reproducibility; defaults vary between environments.
         $cp.CompilerOptions = "/target:library /optimize+ /debug- $platOpt"
 
         $results = $provider.CompileAssemblyFromSource($cp, $Source)
@@ -170,7 +179,9 @@ function Import-OptimizedCSharp {
         throw "Compile step did not produce DLL: $dllPath"
     }
 
-    # Load without locking the DLL
+    # Load without locking the DLL.
+    # Reading bytes + Assembly.Load(byte[]) prevents file locking issues that break overwrite/rebuild
+    # on subsequent runs (a common Add-Type pain point when iterating quickly).
     $raw = [IO.File]::ReadAllBytes($dllPath)
     [void][System.Reflection.Assembly]::Load([byte[]]$raw)
 
