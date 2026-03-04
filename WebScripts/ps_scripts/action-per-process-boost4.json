@@ -14,8 +14,8 @@
                 {
                     "process_name": "CompatTelRunner",
                     "dont_restore_boost": true,
-                    "process_affinity": "Idle",
-                    "process_priority": "E-Cores",
+                    "process_affinity": "E-Cores",
+                    "process_priority": "Idle",
                     "thread_ideal_processor": "DoNotChange",
                     "thread_priority": "Idle",
                     "thread_cpu_sets": "DoNotChange",
@@ -40,8 +40,8 @@
                 {
                     "process_name": "TiWorker",
                     "dont_restore_boost": true,
-                    "process_affinity": "Idle",
-                    "process_priority": "E-Cores",
+                    "process_affinity": "E-Cores",
+                    "process_priority": "Idle",
                     "thread_ideal_processor": "DoNotChange",
                     "thread_priority": "Idle",
                     "thread_cpu_sets": "DoNotChange",
