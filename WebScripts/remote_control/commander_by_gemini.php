@@ -368,7 +368,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             border-top: 3px solid var(--amber); text-shadow: 0 0 5px var(--amber-glow);
         }
 
-        .main-content { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 100px; }
+        .main-content { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 200px; }
 
         .bezel {
             background-color: var(--panel-bg); border: 4px solid #1a1510; border-radius: 6px;
@@ -473,7 +473,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="bezel">
                 <div class="part-number">PN: TGT-SLCT-01</div>
                 <div class="bezel-title">TARGET SELECT</div>
-                <div class="grid-3" id="app-grid">
+                <div class="grid-2" id="app-grid">
                     <?php
                     $programs = getProgramsList();
                     foreach ($programs as $prog) {
