@@ -88,6 +88,7 @@ There are three main “inputs” that can drive actions:
   - optional `BoostAction` JSON
   - auxiliary tools to auto-launch
   - optional `AuxProgramsDelaySeconds` (integer seconds, `>= 0`, default fallback `5`)
+  - optional `WindowStyle` for AuxPrograms (`Normal|Hidden|Minimized|Maximized`, default `Minimized`; invalid values warn and fall back)
 - Everything else consumes this table (process watcher queries, boost triggers, etc.).
 
 ### File watcher wrapper + support utilities
@@ -107,6 +108,7 @@ This is the place you customize first.
 - Optionally reference a boost JSON (`action-per-process-boost*.json`).
 - Add auxiliary tools to auto-launch with a game if you want.
 - Optionally set `AuxProgramsDelaySeconds` per game to control when auxiliaries launch.
+- Optionally set `WindowStyle` per game to control how all AuxPrograms windows are shown.
 
 Example profile snippet:
 ```json
@@ -117,7 +119,8 @@ Example profile snippet:
   "AuxPrograms": [
     "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk"
   ],
-  "AuxProgramsDelaySeconds": 12
+  "AuxProgramsDelaySeconds": 12,
+  "WindowStyle": "Hidden"
 }
 ```
 
@@ -133,6 +136,7 @@ Edit `$Global:GameProfiles` in `ps_scripts/Gaming-Programs.ps1`:
 - Optionally attach a `BoostAction`
 - Optionally add auxiliary launchers
 - Optionally set `AuxProgramsDelaySeconds` for per-game delayed aux launch
+- Optionally set `WindowStyle` (`Normal|Hidden|Minimized|Maximized`) for AuxPrograms; default is `Minimized` and invalid values are auto-fallbacked with a warning
 
 ### 2) Create a new boost profile
 Copy an existing `action-per-process-boost*.json` and adjust:

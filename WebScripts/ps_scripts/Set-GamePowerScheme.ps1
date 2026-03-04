@@ -77,8 +77,39 @@ function Wait-UntilDueTime {
 function Start-ConfiguredAuxPrograms {
     param(
         [Parameter(Mandatory)]
-        [string[]]$AuxPrograms
+        [string[]]$AuxPrograms,
+
+        [string]$WindowStyle = 'Minimized'
     )
+
+    # Resolve/validate once before the loop so we avoid repeating the same validation
+    # and avoid flooding logs with the same warning for each aux entry.
+    # Canonical tokens match Start-Process accepted enum names.
+    $canonicalWindowStyles = @{
+        'normal'    = 'Normal'
+        'hidden'    = 'Hidden'
+        'minimized' = 'Minimized'
+        'maximized' = 'Maximized'
+    }
+
+    $resolvedWindowStyle = 'Minimized'
+    $rawWindowStyle = [string]$WindowStyle
+    if ([string]::IsNullOrWhiteSpace($rawWindowStyle)) {
+        $resolvedWindowStyle = 'Minimized'
+    }
+    else {
+        $normalizedWindowStyle = $rawWindowStyle.Trim().ToLowerInvariant()
+        if ($canonicalWindowStyles.ContainsKey($normalizedWindowStyle)) {
+            $resolvedWindowStyle = $canonicalWindowStyles[$normalizedWindowStyle]
+        }
+        else {
+            # Invalid styles should not block aux launch entirely.
+            # We warn and degrade to Minimized so one bad value does not break the
+            # rest of the startup pipeline or hide other useful aux tools.
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "AUX START" -ForegroundColor "DarkYellow" -Message "Invalid AuxPrograms WindowStyle '$rawWindowStyle'. Valid values: Normal, Hidden, Minimized, Maximized. Falling back to Minimized."
+            $resolvedWindowStyle = 'Minimized'
+        }
+    }
 
     foreach ($aux in $AuxPrograms) {
         # Profiles often contain blank placeholders while being edited.
@@ -91,8 +122,8 @@ function Start-ConfiguredAuxPrograms {
         # We log and continue instead of throwing; one bad aux path should not block
         # other aux tools or the rest of the start pipeline.
         if (Test-Path $aux) {
-            Write-VerboseDebug -Timestamp (Get-Date) -Title "AUX START" -ForegroundColor "Green" -Message "Launching $aux"
-            Start-Process -FilePath $aux -WindowStyle Minimized
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "AUX START" -ForegroundColor "Green" -Message "Launching $aux (WindowStyle=$resolvedWindowStyle)"
+            Start-Process -FilePath $aux -WindowStyle $resolvedWindowStyle
         }
         else {
             Write-VerboseDebug -Timestamp (Get-Date) -Title "AUX START" -ForegroundColor "DarkYellow" -Message "Aux program not found: $aux"
@@ -370,6 +401,9 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
 
         # Retrieve any auxiliary programs configured for this title
         $auxPrograms = Get-GameAuxPrograms -programName $programName
+        # WindowStyle is profile-scoped and applies to all AuxPrograms for this game.
+        # Getter fallback keeps old behavior (Minimized) when key is absent/empty.
+        $auxWindowStyle = Get-GameAuxProgramsWindowStyle -programName $programName
 
 
     # First phase: core lifecycle actions (kill, power scheme, runtime tracking, stutter enrollment).
@@ -519,7 +553,7 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
                 # Aux should happen first (or same time as boost).
                 # Using absolute waits prevents us from accidentally adding 5s twice.
                 Wait-UntilDueTime -DueAt $auxDueAt
-                Start-ConfiguredAuxPrograms -AuxPrograms $auxPrograms
+                Start-ConfiguredAuxPrograms -AuxPrograms $auxPrograms -WindowStyle $auxWindowStyle
 
                 Wait-UntilDueTime -DueAt $boostDueAt
                 & $runBoost
@@ -531,7 +565,7 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
                 & $runBoost
 
                 Wait-UntilDueTime -DueAt $auxDueAt
-                Start-ConfiguredAuxPrograms -AuxPrograms $auxPrograms
+                Start-ConfiguredAuxPrograms -AuxPrograms $auxPrograms -WindowStyle $auxWindowStyle
             }
         }
         "Win32_ProcessStopTrace" { 

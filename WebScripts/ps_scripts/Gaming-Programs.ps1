@@ -26,7 +26,8 @@
 #   - The 'Value' is another hash table containing the 'Start' and 'Stop' power schemes,
 #     and optional fields like 'BoostAction' (JSON file), 'Speak' (text-to-speech), and
 #     'AuxPrograms' (array of helper executables to auto-launch when the game starts),
-#     and optional 'AuxProgramsDelaySeconds' (integer >= 0, fallback 5 when missing/invalid).
+#     optional 'AuxProgramsDelaySeconds' (integer >= 0, fallback 5 when missing/invalid),
+#     and optional 'WindowStyle' (Normal/Hidden/Minimized/Maximized for AuxPrograms launch).
 #------------------------------------------------------------------------------------
 
 # Prefer GameProfiles from host config (loaded by Start-CommandWatchers via Bootstrap-Config)
@@ -198,6 +199,46 @@ function Get-GameAuxPrograms {
     }
 
     return @()
+}
+
+function Get-GameAuxProgramsWindowStyle {
+    <#
+    .SYNOPSIS
+        Retrieves per-game window style to use when launching AuxPrograms.
+        Returns Minimized when missing/empty.
+    #>
+    param (
+        [Parameter(Mandatory)]
+        [string]$programName
+    )
+
+    # Backward compatibility baseline:
+    # Aux programs have historically launched minimized. Keeping that default means
+    # existing profiles do not change behavior just because this optional key exists now.
+    $defaultWindowStyle = 'Minimized'
+
+    # We intentionally avoid throwing from config getters because this code runs in
+    # event-driven watcher paths. A resilient fallback is safer than breaking an event
+    # callback due to one malformed profile entry.
+    if (-not $Global:GameProfiles.ContainsKey($programName)) {
+        return $defaultWindowStyle
+    }
+
+    $profile = $Global:GameProfiles[$programName]
+    if (-not ($profile -is [System.Collections.IDictionary])) {
+        return $defaultWindowStyle
+    }
+
+    if (-not $profile.ContainsKey('WindowStyle')) {
+        return $defaultWindowStyle
+    }
+
+    $rawWindowStyle = [string]$profile.WindowStyle
+    if ([string]::IsNullOrWhiteSpace($rawWindowStyle)) {
+        return $defaultWindowStyle
+    }
+
+    return $rawWindowStyle.Trim()
 }
 
 function Get-GameAuxProgramsDelaySeconds {

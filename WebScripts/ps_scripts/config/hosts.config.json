@@ -204,8 +204,9 @@
         "Notepad.exe": {
           "ImmediateKill": false,
           "NickName": "Notepad",
-          "Stutter": true,
+          "Stutter": false,
           "Speak": "Notepad",
+          "WindowStyle": "Hidden",
           "comments": [
             "For debugging only (migrated from PS 'Comment' field)."
           ]
