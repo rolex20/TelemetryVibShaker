@@ -44,9 +44,15 @@ if ($globalcfg.features.watchdog) {
             return $false # Intentionally return false so the orchestrator does not auto-restart the watcher.
         }
 
+        # Poll config at the watchdog cadence (minutes), not via a tight loop.
+        # This keeps overhead near-zero and piggybacks on an already-existing wait cycle.
         $configRefresh = Refresh-WebScriptsConfigIfChanged
         if ($configRefresh.RestartWillOccur) {
+            # Reuse the normal StopWatcher signal so any pending waits/event checks unwind
+            # through the same cleanup path used by manual EXIT_WATCHER.
             New-Event -SourceIdentifier "StopWatcher" -MessageData "CONFIG_RESTART" | Out-Null
+            # Returning $true tells Start-CommandWatchers to relaunch the whole orchestrator.
+            # Restarting centrally avoids partially-rewired watchers.
             return $true
         }
 

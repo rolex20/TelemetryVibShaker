@@ -52,6 +52,9 @@ function Merge-Hashtable {
     return $out
 }
 
+# Script-scope state survives across function calls while this script remains loaded.
+# We intentionally keep cache metadata here so repeated callers (watchdog, startup, etc.)
+# do not re-read/parse JSON unless the file timestamp changed.
 if (-not (Get-Variable -Name ConfigPath -Scope Script -ErrorAction SilentlyContinue)) {
     $script:ConfigPath = $null
 }
@@ -63,6 +66,8 @@ if (-not (Get-Variable -Name CachedLastWriteTimeUtc -Scope Script -ErrorAction S
 }
 
 function Get-WebScriptsConfigPath {
+    # Resolve once, reuse many times: this avoids rebuilding the path string every poll
+    # and keeps all callers aligned to one canonical config location.
     if (-not $script:ConfigPath) {
         $script:ConfigPath = Join-Path $PSScriptRoot "config\hosts.config.json"
     }
@@ -82,7 +87,9 @@ function Read-WebScriptsConfigRawWithRetry {
 
     for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
         try {
-            # Editors/OS writes can briefly expose partial JSON; retry to avoid false failures.
+            # Some editors save in phases (truncate/write/rename). During that short window
+            # we may read malformed/partial content and ConvertFrom-Json will fail.
+            # Retry avoids crashing on transient "file in flux" states.
             $rawText = Get-Content -LiteralPath $ConfigPath -Raw -ErrorAction Stop
             $rawObj = $rawText | ConvertFrom-Json -ErrorAction Stop
             $rawHashtable = ConvertTo-Hashtable $rawObj
@@ -91,6 +98,7 @@ function Read-WebScriptsConfigRawWithRetry {
         catch {
             $lastError = $_
             if ($attempt -lt $MaxAttempts) {
+                # Back off briefly, then re-read a stable version.
                 Start-Sleep -Milliseconds $RetryDelayMilliseconds
                 continue
             }
@@ -126,6 +134,8 @@ function New-WebScriptsConfigFromFile {
         $hostCfg = $machines[$myhostname]
     }
 
+    # Merge defaults first, then host overrides. This keeps one baseline schema
+    # and lets each machine override only the keys it needs.
     $final = Merge-Hashtable $defaults $hostCfg
     $final["webScriptsRoot"] = $webScriptsRoot.Path
     $final["host"] = $myhostname
@@ -139,6 +149,8 @@ function Get-ConfigSectionAsHashtable {
         [string]$Key
     )
 
+    # Callers use this helper before diffing. Returning an empty hashtable (instead of $null)
+    # keeps diff logic simple and prevents null-guard noise everywhere else.
     if ($Config -and $Config.ContainsKey($Key) -and ($Config[$Key] -is [System.Collections.IDictionary])) {
         return (ConvertTo-Hashtable $Config[$Key])
     }
@@ -181,6 +193,7 @@ function Test-DeepEqual {
 
         if ($leftArray.Count -ne $rightArray.Count) { return $false }
 
+        # Arrays remain order-sensitive by design. If order changes, we treat it as changed.
         for ($i = 0; $i -lt $leftArray.Count; $i++) {
             if (-not (Test-DeepEqual -Left $leftArray[$i] -Right $rightArray[$i])) {
                 return $false
@@ -201,6 +214,8 @@ function Get-RestartReasonsForConfigChange {
 
     $reasons = @()
 
+    # features.* controls which watchers/jobs are wired at startup.
+    # Runtime toggles would leave stale subscriptions alive, so these changes require restart.
     $oldFeatures = Get-ConfigSectionAsHashtable -Config $OldConfig -Key "features"
     $newFeatures = Get-ConfigSectionAsHashtable -Config $NewConfig -Key "features"
     $featureKeys = @($oldFeatures.Keys + $newFeatures.Keys | ForEach-Object { [string]$_ } | Sort-Object -Unique)
@@ -221,6 +236,8 @@ function Get-RestartReasonsForConfigChange {
         }
     }
 
+    # Only keys matter for restart: adding/removing programs changes the watcher "wiring" set.
+    # Value-only edits (NickName, Speak, BoostAction, etc.) are safe to apply live.
     $oldGameProfiles = Get-ConfigSectionAsHashtable -Config $OldConfig -Key "gameProfiles"
     $newGameProfiles = Get-ConfigSectionAsHashtable -Config $NewConfig -Key "gameProfiles"
     $oldGameProfileKeys = @($oldGameProfiles.Keys | ForEach-Object { [string]$_ } | Sort-Object -Unique)
@@ -236,6 +253,9 @@ function Get-RestartReasonsForConfigChange {
         $reasons += ("gameProfiles keys removed: " + ($removedGameProfiles -join ", "))
     }
 
+    # Paths can affect where watchers point and where helper files are resolved.
+    # Even if some path values are not fully consumed yet, mark restart-needed now to avoid
+    # mixed old/new runtime state and to keep future path wiring predictable.
     $oldPaths = Get-ConfigSectionAsHashtable -Config $OldConfig -Key "paths"
     $newPaths = Get-ConfigSectionAsHashtable -Config $NewConfig -Key "paths"
     $pathKeys = @($oldPaths.Keys + $newPaths.Keys | ForEach-Object { [string]$_ } | Sort-Object -Unique)
@@ -264,6 +284,8 @@ function Get-WebScriptsConfig {
     $cfgItem = Get-Item -LiteralPath $cfgPath -ErrorAction Stop
     $currentLastWriteTimeUtc = $cfgItem.LastWriteTimeUtc
 
+    # Fast path: if LastWriteTimeUtc is identical, assume content is unchanged and return cache.
+    # UTC avoids local-time ambiguity (DST/locale differences).
     if (($null -ne $script:CachedConfig) -and
         ($null -ne $script:CachedLastWriteTimeUtc) -and
         ($script:CachedLastWriteTimeUtc -eq $currentLastWriteTimeUtc)) {
@@ -290,6 +312,8 @@ function Refresh-WebScriptsConfigIfChanged {
     $cfgItem = Get-Item -LiteralPath $cfgPath -ErrorAction Stop
     $currentLastWriteTimeUtc = $cfgItem.LastWriteTimeUtc
 
+    # First-call bootstrap path (or cache lost): load once, but report Changed=$false.
+    # This avoids spurious "config changed" logs at startup.
     if (($null -eq $script:CachedConfig) -or ($null -eq $script:CachedLastWriteTimeUtc)) {
         $Global:WebScriptsConfig = Get-WebScriptsConfig
         if ($Global:WebScriptsConfig.ContainsKey("gameProfiles") -and $Global:WebScriptsConfig["gameProfiles"]) {
@@ -312,6 +336,8 @@ function Refresh-WebScriptsConfigIfChanged {
         $newConfig = New-WebScriptsConfigFromFile -ConfigPath $cfgPath
     }
     catch {
+        # Soft-fail: keep the last known-good config so watchers continue running.
+        # This is important when a save is mid-flight or temporarily malformed.
         Write-VerboseDebug -Timestamp (Get-Date) -Title "CONFIG" -Message "Configuration reload failed after retries: $($_.Exception.Message)" -ForegroundColor "DarkYellow" -Speak $false
         $result["Config"] = $Global:WebScriptsConfig
         return $result
@@ -321,6 +347,8 @@ function Refresh-WebScriptsConfigIfChanged {
     $script:CachedLastWriteTimeUtc = $currentLastWriteTimeUtc
     $Global:WebScriptsConfig = $newConfig
 
+    # Keep runtime profile lookup in sync with refreshed config so process events see
+    # the latest value-only edits immediately (no restart required for those).
     if ($Global:WebScriptsConfig.ContainsKey("gameProfiles") -and $Global:WebScriptsConfig["gameProfiles"]) {
         $Global:GameProfiles = $Global:WebScriptsConfig["gameProfiles"]
     }
@@ -328,6 +356,7 @@ function Refresh-WebScriptsConfigIfChanged {
     $reasons = Get-RestartReasonsForConfigChange -OldConfig $oldConfig -NewConfig $newConfig
     $restartNeeded = ($reasons.Count -gt 0)
 
+    # Safe default is "auto-restart on restart-required changes". Hosts can opt out.
     $restartOnConfigChange = $true
     if ($newConfig.ContainsKey("restart_on_config_change") -and ($null -ne $newConfig["restart_on_config_change"])) {
         $restartOnConfigChange = [bool]$newConfig["restart_on_config_change"]
@@ -343,6 +372,7 @@ function Refresh-WebScriptsConfigIfChanged {
             $message = "Configuration changed; restart required. Reasons: $reasonsText; restart scheduled."
         }
         else {
+            # Speak=true here is intentional: operator still needs to act manually.
             $message = "Configuration changed; restart required. Reasons: $reasonsText; restart recommended (restart_on_config_change=false)."
         }
 
