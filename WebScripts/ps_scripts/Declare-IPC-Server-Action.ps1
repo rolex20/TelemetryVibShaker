@@ -174,7 +174,7 @@ Add-Type @"
                     $writer.WriteLine("ERROR $err")
                 }
             }
-			"PING" = {
+			"PING" {
 				# also, just a verification that this script is alive
 			    $writer.WriteLine("PONG")
 			}			
