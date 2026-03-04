@@ -44,6 +44,12 @@ if ($globalcfg.features.watchdog) {
             return $false # Intentionally return false so the orchestrator does not auto-restart the watcher.
         }
 
+        $configRefresh = Refresh-WebScriptsConfigIfChanged
+        if ($configRefresh.RestartWillOccur) {
+            New-Event -SourceIdentifier "StopWatcher" -MessageData "CONFIG_RESTART" | Out-Null
+            return $true
+        }
+
         # Wait-Event waits while staying responsive to events
         # Start-Sleep in contrast would NOT work and ignore incoming events
 		

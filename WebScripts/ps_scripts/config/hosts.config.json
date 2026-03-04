@@ -1,5 +1,6 @@
 {
   "defaults": {
+    "restart_on_config_change": true,
     "paths": {
       "wampRoot": "C:\\MyPrograms\\wamp",
       "warThunderRoot": "C:\\MyPrograms\\Steam\\steamapps\\common\\War Thunder",

@@ -4,7 +4,7 @@ These PHP pages let me design and launch dogfights from the couch: I tweak loado
 
 **Tech flex:** PHP 5.3.x, JSON hand-off to PowerShell, cookie-based state, dynamic form rendering, mission templates driven by `warthunder.json`, and a rename-triggered pipeline caught by `ps_scripts/Start-CommandWatchers.ps1` + `WT_MissionType1.ps1`.
 
-This module is optional and intended to be enabled per-PC (via `ps_scripts/config/scripts.hosts.json`) depending on how you use each machine.
+This module is optional and intended to be enabled per-PC (via `ps_scripts/config/hosts.config.json`) depending on how you use each machine.
 
 ## Why the features matter
 - **Dogfight builder (`dogfight_generator.php`/`dogfight_setup_1.php`)** saves every selection to cookies so my favorite aircraft/armament combos are one tap away—perfect for rapid VR testing.

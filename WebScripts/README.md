@@ -17,7 +17,7 @@ If you only read one thing: **`ps_scripts/Start-CommandWatchers.ps1` is the main
   - Keeps itself low-impact (priority/QoS/affinity strategies) and uses a watchdog loop for resilience
 - **Customization:**
   - `Gaming-Programs.ps1` holds per-host game profiles (power schemes, optional boosts, aux tools)
-  - `config/scripts.hosts.json` enables/disables features per machine and overrides tuning
+  - `config/hosts.config.json` enables/disables features per machine and overrides tuning
 
 ➡️ Start here: `ps_scripts/README.md`
 
@@ -43,7 +43,7 @@ There are also a few **experimental “commander” variants** (generated with d
 ### `warthunder/` — optional War Thunder mission tooling
 PHP pages that generate `mission_data.tmp` → rename to `mission_data.json`, which the PowerShell side can consume **when enabled for that PC**.
 
-This is intentionally optional: I use it on one machine but not others, and it’s controlled via the same per-host feature toggles in `ps_scripts/config/scripts.hosts.json`.
+This is intentionally optional: I use it on one machine but not others, and it’s controlled via the same per-host feature toggles in `ps_scripts/config/hosts.config.json`.
 
 ➡️ Read: `warthunder/README.md`
 
@@ -67,18 +67,18 @@ This same “event-in / action-out” approach is used across modules to keep ov
 ## Quick start
 
 ### Minimal (no web UI)
-- Edit `ps_scripts/config/scripts.hosts.json` to enable only what you want (often: process watcher + IPC)
+- Edit `ps_scripts/config/hosts.config.json` to enable only what you want (often: process watcher + IPC)
 - Run: `ps_scripts/Start-CommandWatchers.ps1`
 - Customize per-game policies in `ps_scripts/Gaming-Programs.ps1`
 
 ### With web remote control
 - Set up a local PHP environment (WAMP/XAMPP/etc.)
 - Update paths in config/scripts as needed (paths in this repo are real examples from my rigs)
-- Enable the remote command watcher for your machine in `scripts.hosts.json`
+- Enable the remote command watcher for your machine in `hosts.config.json`
 - Use the pages in `remote_control/` to emit `command.json`
 
 ### With War Thunder module
-- Enable the War Thunder watcher for your machine in `scripts.hosts.json`
+- Enable the War Thunder watcher for your machine in `hosts.config.json`
 - Use the pages in `warthunder/` to emit `mission_data.json`
 
 ---

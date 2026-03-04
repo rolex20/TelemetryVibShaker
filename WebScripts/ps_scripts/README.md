@@ -2,7 +2,7 @@
 
 This folder contains the PowerShell side of my “hands-off” gaming/VR rig automation: lightweight watchers that react to **file events**, **process start/stop events**, and **IPC commands** to help me find stutters, diagnose scheduling drift, and apply repeatable tuning without touching the desktop mid-session.
 
-**Tech flex:** deep **Windows scheduling control via PowerShell + C# Win32 interop**—CPU Sets topology discovery and per-process/per-thread CPU-set steering (`GetSystemCpuSetInformation`, `SetProcessDefaultCpuSets`, `SetThreadSelectedCpuSets`) combined with **thread-level EcoQoS / Efficiency Mode** via `SetThreadInformation` (Win11 class 3 → Win10 class 1 fallback) so background/support threads stay “cheap” on hybrid Alder/Raptor Lake rigs; **real-time process lifecycle automation** using `Register-CimIndicationEvent` on `Win32_ProcessStartTrace/StopTrace` to apply per-game policies the moment a sim starts/exits; an **asynchronous Named Pipe IPC layer** (`NamedPipeServerStream`) with explicit **PipeSecurity/ACL**, command parsing, and CPU-time delta introspection for stutter hunting; **kernel32 priority + background I/O tuning** (`SetPriorityClass(PROCESS_MODE_BACKGROUND_BEGIN)` and idle priority) to keep the watcher from stealing performance; and a PS 5.1-friendly **precompiled + disk-cached C# pipeline** that builds an optimized (`/optimize+`) DLL once, reuses it when valid, and loads from a byte array to avoid file locking—so even older laptops don’t pay the “recompile every run” tax. Rounding it out: **event-driven filesystem orchestration** with `FileSystemWatcher` + atomic rename handoffs (PHP/WAMP drops `.tmp` → `.json`), **multi-machine config layering** (defaults + per-host overrides) via `config/scripts.hosts.json`, **multithreaded background execution** with `Start-ThreadJob`, and **TTS feedback** (System.Speech) so state changes are audible when you’re busy / in VR with the headset strapped to your face.
+**Tech flex:** deep **Windows scheduling control via PowerShell + C# Win32 interop**—CPU Sets topology discovery and per-process/per-thread CPU-set steering (`GetSystemCpuSetInformation`, `SetProcessDefaultCpuSets`, `SetThreadSelectedCpuSets`) combined with **thread-level EcoQoS / Efficiency Mode** via `SetThreadInformation` (Win11 class 3 → Win10 class 1 fallback) so background/support threads stay “cheap” on hybrid Alder/Raptor Lake rigs; **real-time process lifecycle automation** using `Register-CimIndicationEvent` on `Win32_ProcessStartTrace/StopTrace` to apply per-game policies the moment a sim starts/exits; an **asynchronous Named Pipe IPC layer** (`NamedPipeServerStream`) with explicit **PipeSecurity/ACL**, command parsing, and CPU-time delta introspection for stutter hunting; **kernel32 priority + background I/O tuning** (`SetPriorityClass(PROCESS_MODE_BACKGROUND_BEGIN)` and idle priority) to keep the watcher from stealing performance; and a PS 5.1-friendly **precompiled + disk-cached C# pipeline** that builds an optimized (`/optimize+`) DLL once, reuses it when valid, and loads from a byte array to avoid file locking—so even older laptops don’t pay the “recompile every run” tax. Rounding it out: **event-driven filesystem orchestration** with `FileSystemWatcher` + atomic rename handoffs (PHP/WAMP drops `.tmp` → `.json`), **multi-machine config layering** (defaults + per-host overrides) via `config/hosts.config.json`, **multithreaded background execution** with `Start-ThreadJob`, and **TTS feedback** (System.Speech) so state changes are audible when you’re busy / in VR with the headset strapped to your face.
 
 ---
 
@@ -16,7 +16,7 @@ Everything here is modular. You can enable/disable watchers per-machine and cust
 
 ## Quick start (PowerShell 5.1)
 
-1. Edit host config: `ps_scripts/config/scripts.hosts.json`
+1. Edit host config: `ps_scripts/config/hosts.config.json`
    - Enable only the watchers you want for your machine.
 2. Run: `Start-CommandWatchers.ps1`
 
@@ -31,7 +31,7 @@ Everything here is modular. You can enable/disable watchers per-machine and cust
 - Enforces single instance (named mutex)
 - Tunes itself to stay out of the way (efficiency-core affinity + idle/background behavior)
 - Loads shared helpers via `Include-Script.ps1`
-- Conditionally spins up watchers based on `config/scripts.hosts.json`
+- Conditionally spins up watchers based on `config/hosts.config.json`
 - Maintains a watchdog loop and can self-restart if eventing gets stuck
 
 ### Event sources (inputs)
@@ -128,7 +128,7 @@ Then reference it from:
 - or a remote JSON `GAME_BOOST` command (if you use the web remote)
 
 ### 3) Enable/disable watchers per PC (feature flags)
-Edit `ps_scripts/config/scripts.hosts.json`:
+Edit `ps_scripts/config/hosts.config.json`:
 - `defaults.features.*` are the baseline
 - `machines.<HOSTNAME>.features.*` overrides per machine
 This is how you keep one PC minimal (just process watcher + IPC) while another runs optional modules.
@@ -146,7 +146,7 @@ If you enable the remote JSON watcher or War Thunder file watchers, you’ll lik
 
 ## Troubleshooting
 
-- **Nothing happens:** confirm the relevant feature flag is enabled for your hostname in `scripts.hosts.json`.
+- **Nothing happens:** confirm the relevant feature flag is enabled for your hostname in `hosts.config.json`.
 - **Remote commands not firing:** validate the watched path (and that your PHP page uses rename handoff).
 - **IPC server conflicts:** single-instance protections may prevent a second server from starting.
 - **Watcher restarts:** if the watchdog detects stuck event processing, the orchestrator can restart after cleanup.
