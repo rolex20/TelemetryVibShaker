@@ -82,7 +82,8 @@ try {
             Write-VerboseDebug -Timestamp $Event.TimeGenerated -Title "CHANGE_TYPE:$changeType" -Message $path
 
             # Router stays centralized here so all remote command behavior remains consistent.
-            Process-CommandFromJson $path
+            # Be explicit for clarity: file watcher path binds to the file-based parameter set.
+            Process-CommandFromJson -FilePath $path
         }
 		
 		
