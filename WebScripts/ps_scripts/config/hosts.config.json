@@ -144,6 +144,7 @@
           ]
         },
         "UbisoftConnect.exe": {
+          "WindowStyle": "Normal",
           "AuxPrograms": [
             "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk",
             "C:\\Users\\ralch\\Desktop\\Spartan Mod.lnk"
@@ -250,3 +251,4 @@
     }
   }
 }
+
