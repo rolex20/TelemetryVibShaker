@@ -6,15 +6,41 @@
       "seatbeltWav": null
     },
     "features": {
-		  "remoteCommandsWatcher": false,
-		  "warThunderMissionWatcher": false,
-		  "processWatcher": false,
-		  "ipcServer": false,
-		  "warThunderDistanceMonitor": false,
-		  "watchdog": false
+      "remoteCommandsWatcher": false,
+      "warThunderMissionWatcher": false,
+      "processWatcher": false,
+      "ipcServer": false,
+      "warThunderDistanceMonitor": false,
+      "watchdog": false
     },
     "tuning": {
       "efficiencyAffinityMask": null
+    },
+    "gameProfiles": {
+      "Notepad.exe": {
+        "NickName": "Notepad Editor",
+        "Speak": "Default Notepad",
+        "ImmediateKill": false,
+        "comments": [
+          "Default profile"
+        ]
+      },
+      "TiWorker.exe": {
+        "Stutter": false,
+        "NickName": "Ti-Worker",
+        "Speak": "Default Windows Ti-Worker process",
+        "comments": [
+          "Default profile"
+        ]
+      },
+      "CompatTelRunner.exe": {
+        "Stutter": false,
+        "NickName": "Compat Tel Runner",
+        "Speak": "Default Windows Compat-Tel-Runner process",
+        "comments": [
+          "Default profile"
+        ]
+      }
     }
   },
   "machines": {
@@ -32,6 +58,109 @@
       },
       "tuning": {
         "efficiencyAffinityMask": 268369920
+      },
+      "gameProfiles": {
+        "Notepad.exe": {
+          "Speak": "Notepad",
+          "NickName": "Notepad",
+          "ImmediateKill": false,
+          "Stutter": false,
+          "AuxPrograms": [
+            "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk"
+          ],
+          "comments": [
+            "BoostAction was commented out in Gaming-Programs.ps1 for Notepad (not enabled).",
+            "Host-specific AuxPrograms."
+          ]
+        },
+        "DCS.exe": {
+          "Start": "High Performance",
+          "Stop": "Balanced"
+        },
+        "aces.exe": {
+          "NickName": "War thunder",
+          "Start": "High Performance",
+          "Stop": "Balanced"
+        },
+        "FlightSimulator.exe": {
+          "NickName": "M.S.F.S.",
+          "Start": "High Performance",
+          "Stop": "Balanced"
+        },
+        "Ace7Game.exe": {
+          "NickName": "Ace Comabt",
+          "Start": "Balanced",
+          "Stop": "Balanced",
+          "BoostAction": "action-per-process-boost1.json"
+        },
+        "forza_steamworks_release_final.exe": {
+          "NickName": "Forza",
+          "Start": "Balanced",
+          "Stop": "Balanced",
+          "AuxPrograms": [
+            "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
+            "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk"
+          ]
+        },
+        "forzamotorsport7.exe": {
+          "NickName": "Forza 7",
+          "Start": "Balanced",
+          "Stop": "Balanced",
+          "AuxPrograms": [
+            "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
+            "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk"
+          ]
+        },
+        "ForzaHorizon5.exe": {
+          "NickName": "Forza Horizon",
+          "Start": "Balanced",
+          "Stop": "Balanced",
+          "AuxPrograms": [
+            "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
+            "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk"
+          ]
+        },
+        "AssettoCorsa.exe": {
+          "NickName": "Asseto Corsa",
+          "Start": "Balanced",
+          "Stop": "Balanced",
+          "AuxPrograms": [
+            "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
+            "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk"
+          ]
+        },
+        "GRB.exe": {
+          "NickName": "Ghost Recon Breakpoint",
+          "Start": "Balanced",
+          "Stop": "Balanced",
+          "AuxPrograms": [
+            "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk"
+          ],
+          "comments": [
+            "Gaming-Programs.ps1 showed Spartan Mod as previously considered (commented out)."
+          ]
+        },
+        "UbisoftConnect.exe": {
+          "AuxPrograms": [
+            "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk",
+            "C:\\Users\\ralch\\Desktop\\Spartan Mod.lnk"
+          ],
+          "comments": [
+            "Key normalized (no trailing tab)."
+          ]
+        },
+        "TiWorker.exe": {
+          "Stutter": false,
+          "NickName": "Ti-Worker",
+          "Speak": "Windows Ti-Worker process",
+          "BoostAction": "action-per-process-boost4.json"
+        },
+        "CompatTelRunner.exe": {
+          "Stutter": false,
+          "NickName": "Compat Tel Runner",
+          "Speak": "Windows Compat-Tel-Runner process",
+          "BoostAction": "action-per-process-boost4.json"
+        }
       }
     },
     "ALIENWARE-V2": {
@@ -39,6 +168,22 @@
         "processWatcher": true,
         "ipcServer": true,
         "watchdog": false
+      },
+      "gameProfiles": {
+        "Notepad.exe": {
+          "NickName": "Notepad Editor",
+          "ImmediateKill": false
+        },
+        "TiWorker.exe": {
+          "Stutter": true,
+          "NickName": "Ti-Worker",
+          "Speak": "Windows Ti-Worker process"
+        },
+        "CompatTelRunner.exe": {
+          "Stutter": true,
+          "NickName": "Compat Tel Runner",
+          "Speak": "Windows Compat-Tel-Runner process"
+        }
       }
     },
     "HP-PAV-BLACK": {
@@ -46,6 +191,52 @@
         "processWatcher": true,
         "ipcServer": true,
         "watchdog": false
+      },
+      "comments": [
+        "This PC is very old. Windows updates / TiWorker.exe / CompatTelRunner.exe / ctfmon.exe can cause severe issues (CPU hangs/BSOD), likely due to dried CPU paste.",
+        "Configured to immediately kill some processes when detected.",
+        "Manual Windows updates only when needed; acceptable risk because this PC is for testing/debugging and backups exist."
+      ],
+      "gameProfiles": {
+        "Notepad.exe": {
+          "ImmediateKill": false,
+          "NickName": "Notepad",
+          "Stutter": true,
+          "Speak": "Notepad",
+          "comments": [
+            "For debugging only (migrated from PS 'Comment' field)."
+          ]
+        },
+        "TiWorker.exe": {
+          "ImmediateKill": true,
+          "NickName": "Ti-Worker",
+          "AuxPrograms": [
+            "C:\\Users\\ralch\\Desktop\\stop-win-updates.ps1.lnk"
+          ]
+        },
+        "CompatTelRunner.exe": {
+          "ImmediateKill": true,
+          "NickName": "Compat Tel Runner",
+          "AuxPrograms": [
+            "C:\\Users\\ralch\\Desktop\\stop-win-updates.ps1.lnk"
+          ]
+        },
+        "ctfmon.exe": {
+          "ImmediateKill": false,
+          "NickName": "c.t.f. mon",
+          "Stutter": false,
+          "AuxPrograms": [
+            "C:\\Users\\ralch\\Desktop\\stop-win-updates.ps1.lnk"
+          ]
+        },
+        "svchost.exe": {
+          "ImmediateKill": false,
+          "NickName": "Service Host",
+          "Stutter": false,
+          "AuxPrograms": [
+            "C:\\Users\\ralch\\Desktop\\stop-win-updates.ps1.lnk"
+          ]
+        }
       }
     }
   }

@@ -27,51 +27,19 @@
 #     and optional fields like 'BoostAction' (JSON file), 'Speak' (text-to-speech), and
 #     'AuxPrograms' (array of helper executables to auto-launch when the game starts).
 #------------------------------------------------------------------------------------
-$computerName = $env:COMPUTERNAME
-switch ($computerName.ToUpperInvariant()) {
-    "GALVATRON" {
-        $Global:GameProfiles = @{
-            "Notepad.exe"                        = @{ Speak = "Notepad"; NickName = "Notepad"; ImmediateKill = $false; Stutter = $false; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk") } #; BoostAction = "action-per-process-boost1.json" }
-            "DCS.exe"                            = @{ Start = "High Performance"; Stop = "Balanced" }
-            "aces.exe"                           = @{ NickName = "War thunder"; Start = "High Performance"; Stop = "Balanced" }
-            "FlightSimulator.exe"                = @{ NickName = "M.S.F.S."; Start = "High Performance"; Stop = "Balanced" }
-            "Ace7Game.exe"                       = @{ NickName = "Ace Comabt"; Start = "Balanced"; Stop = "Balanced"; BoostAction = "action-per-process-boost1.json" }
-            "forza_steamworks_release_final.exe" = @{ NickName = "Forza"; Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
-            "forzamotorsport7.exe"               = @{ NickName = "Forza 7"; Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
-            "ForzaHorizon5.exe"                  = @{ NickName = "Forza Horizon"; Start = "Balanced"; Stop = "Balanced"; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
-            "AssettoCorsa.exe"                   = @{ NickName = "Asseto Corsa"; Start = "Balanced"; Stop = "Balanced" ; AuxPrograms = @("C:\Users\ralch\Desktop\C-Fanatec Monitor.lnk", "C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") }
-            "GRB.exe"                            = @{ NickName = "Ghost Recon Breakpoint"; Start = "Balanced"; Stop = "Balanced" ; AuxPrograms = @("C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk") } #, "C:\Users\ralch\Desktop\Spartan Mod.lnk") }
-            "UbisoftConnect.exe"                 = @{ AuxPrograms = @("C:\Users\ralch\Desktop\Disable-Antivirus.ps1.lnk", "C:\Users\ralch\Desktop\Spartan Mod.lnk") }
-            "TiWorker.exe"                       = @{ Stutter = $false; NickName = "Ti-Worker"; Speak = "Windows Ti-Worker process" ; BoostAction = "action-per-process-boost4.json" }
-            "CompatTelRunner.exe"                = @{ Stutter = $false; NickName = "Compat Tel Runner"; Speak = "Windows Compat-Tel-Runner process" ; BoostAction = "action-per-process-boost4.json" }
-        }
-    }
-    "ALIENWARE-V2" {
-        $Global:GameProfiles = @{
-            "Notepad.exe"         = @{ NickName = "Notepad Editor"; ImmediateKill = $false }
-            "TiWorker.exe"        = @{ Stutter = $true; NickName = "Ti-Worker"; Speak = "Windows Ti-Worker process" }
-            "CompatTelRunner.exe" = @{ Stutter = $true; NickName = "Compat Tel Runner"; Speak = "Windows Compat-Tel-Runner process" }
-        }
-    }
-    "HP-PAV-BLACK" {
-        # This pc is very old, however it works great with Visual Studio 2026 and everything else but,
-        # windows-updates, TiWorker.exe, and CompatTelRunner.exe and ctfmon.exe cause severe issues, including cpu hangs and blue-screens due probably to dryed cpu paste. 
-        # For this reason, I set them to be immediately killed when detected.
-        # I do manual windows updates only when i need to, and I don't care about the potential consequences of killing these processes, since this PC is only used for testing and debugging, and I have good backups.
-        $Global:GameProfiles = @{
-            "Notepad.exe"         = @{ ImmediateKill = $false; NickName = "Notepad"; ; Stutter = $true; Speak = "Notepad"; Comment = "For debugging only" }
-            "TiWorker.exe"        = @{ ImmediateKill = $true; NickName = "Ti-Worker"; AuxPrograms = @("C:\Users\ralch\Desktop\stop-win-updates.ps1.lnk") }
-            "CompatTelRunner.exe" = @{ ImmediateKill = $true; NickName = "Compat Tel Runner"; AuxPrograms = @("C:\Users\ralch\Desktop\stop-win-updates.ps1.lnk") }
-            "ctfmon.exe"          = @{ ImmediateKill = $false; NickName = "c.t.f. mon"; Stutter = $false; AuxPrograms = @("C:\Users\ralch\Desktop\stop-win-updates.ps1.lnk") }
-            "svchost.exe"         = @{ ImmediateKill = $false; NickName = "Service Host"; Stutter = $false; AuxPrograms = @("C:\Users\ralch\Desktop\stop-win-updates.ps1.lnk") }
-        }
-    }
-    default {
-        $Global:GameProfiles = @{
-            "Notepad.exe"         = @{ NickName = "Notepad Editor"; ImmediateKill = $false }
-            "TiWorker.exe"        = @{ Stutter = $true; NickName = "Ti-Worker"; Speak = "Windows Ti-Worker process" }
-            "CompatTelRunner.exe" = @{ Stutter = $true; NickName = "Compat Tel Runner"; Speak = "Windows Compat-Tel-Runner process" }
-        }        
+
+# Prefer GameProfiles from host config (loaded by Start-CommandWatchers via Bootstrap-Config)
+if ($Global:WebScriptsConfig -and
+    ($Global:WebScriptsConfig -is [hashtable]) -and
+    $Global:WebScriptsConfig.ContainsKey('gameProfiles') -and
+    $Global:WebScriptsConfig.gameProfiles -and
+    $Global:WebScriptsConfig.gameProfiles.Count -gt 0) {
+    $Global:GameProfiles = $Global:WebScriptsConfig.gameProfiles
+}
+else {
+    # Fallback (keep tiny, just enough to not break standalone calls)
+    $Global:GameProfiles = @{
+        "Notepad.exe" = @{ NickName = "Notepad"; ImmediateKill = $false }
     }
 }
 # "Ace7Game.exe"                     = @{ Start = "High Performance"; Stop = "Balanced" ; BoostAction = "action-per-process-boost1.json" }
