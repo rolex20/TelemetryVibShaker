@@ -206,9 +206,13 @@
           "NickName": "Notepad",
           "Stutter": false,
           "Speak": "Notepad",
+          "AuxProgramsDelaySeconds": 0,
           "WindowStyle": "Hidden",
+          "AuxPrograms": [
+            "C:\\Users\\ralch\\Desktop\\stop-win-updates.ps1.lnk"
+          ],
           "comments": [
-            "For debugging only (migrated from PS 'Comment' field)."
+            "For debugging only"
           ]
         },
         "TiWorker.exe": {

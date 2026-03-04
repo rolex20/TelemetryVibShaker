@@ -13,6 +13,7 @@
             "dependencies": [
                 {
                     "process_name": "steamwebhelper",
+                    "dont_restore_boost": true,
                     "process_affinity": "E-Cores",
                     "process_priority": "Idle",
                     "thread_ideal_processor": "E-Cores",
@@ -58,6 +59,7 @@
             "dependencies": [
                 {
                     "process_name": "steamwebhelper",
+                    "dont_restore_boost": true,
                     "process_affinity": "E-Cores",
                     "process_priority": "Idle",
                     "thread_ideal_processor": "E-Cores",
@@ -105,6 +107,7 @@
             "dependencies": [
                 {
                     "process_name": "steamwebhelper",
+                    "dont_restore_boost": true,
                     "process_affinity": "E-Cores",
                     "process_priority": "Idle",
                     "thread_ideal_processor": "E-Cores",
@@ -152,6 +155,7 @@
             "dependencies": [
                 {
                     "process_name": "steamwebhelper",
+                    "dont_restore_boost": true,
                     "process_affinity": "E-Cores",
                     "process_priority": "Idle",
                     "thread_ideal_processor": "E-Cores",

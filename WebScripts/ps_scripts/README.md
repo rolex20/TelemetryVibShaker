@@ -143,6 +143,9 @@ Copy an existing `action-per-process-boost*.json` and adjust:
 - per-process priority
 - per-process CPU affinity / CPU sets intent
 - per-thread steering (when applicable)
+- optional per-dependency `dont_restore_boost` flag (`true/false`):
+  - when `true`, that dependency is skipped by stop-time restore logic
+  - when key is missing, restore behavior stays unchanged (backward compatible default)
 Then reference it from:
 - `Gaming-Programs.ps1` (`BoostAction`)
 - or a remote JSON `GAME_BOOST` command (if you use the web remote)

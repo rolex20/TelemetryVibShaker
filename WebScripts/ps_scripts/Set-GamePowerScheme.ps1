@@ -37,6 +37,33 @@ function Restore-GameBoost {
     # The main game process is already stopped, so we only need to restore its dependencies that may still be running.
     if ($gameAction.parameters.dependencies) {
         foreach ($dependence in $gameAction.parameters.dependencies) {
+            # Optional dependency-level escape hatch:
+            # Some helper processes (for example steamwebhelper) are intentionally left in their
+            # boosted state even after the game exits. We check this flag BEFORE expanding process
+            # names or querying running processes so we avoid unnecessary work and noise.
+            #
+            # Important: only a JSON boolean true should skip restore.
+            # - Missing key -> default false (legacy restore behavior)
+            # - null/strings/numbers -> treated as false for safety and predictability
+            # This keeps schema evolution resilient without letting malformed values silently alter behavior.
+            $rawDontRestoreBoost = $null
+            if ($dependence -is [System.Collections.IDictionary]) {
+                if ($dependence.Contains('dont_restore_boost')) {
+                    $rawDontRestoreBoost = $dependence['dont_restore_boost']
+                }
+            }
+            elseif ($dependence.PSObject -and ($dependence.PSObject.Properties.Name -contains 'dont_restore_boost')) {
+                $rawDontRestoreBoost = $dependence.dont_restore_boost
+            }
+
+            $skipDependencyRestore = (($rawDontRestoreBoost -is [bool]) -and $rawDontRestoreBoost)
+            if ($skipDependencyRestore) {
+                # Non-fatal by design: one dependency opt-out should not impact other dependencies.
+                # We log explicitly so operators can confirm why a dependency was not restored.
+                Write-VerboseDebug -Timestamp (Get-Date) -Title "RESTORE" -Message "Skipping restore for dependency '$($dependence.process_name)' because dont_restore_boost=true in '$boostJsonPath'." -ForegroundColor "DarkYellow"
+                continue
+            }
+
             $dep_proc_names_array = Get-TrimmedProcessNames $dependence.process_name
             foreach ($dep_proc_name in $dep_proc_names_array) {
                 $depProcesses = Get-Process -Name $dep_proc_name -ErrorAction SilentlyContinue
