@@ -212,28 +212,16 @@ function Start-GameRuntimeTracker {
         ProgramName = $ProgramName
         TtsDisplayName = $ttsDisplayName
         StartedAt = $startedAt
+        ScriptDir = $PSScriptRoot
     }
 
 	$null = Register-ObjectEvent -InputObject $timer -EventName Elapsed -SourceIdentifier $sourceIdentifier -MessageData $messageData -Action {
 		try {
-			#. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1"
-			#. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Set-GamePowerScheme.ps1"
-			
             # Timer callbacks run in an event runspace, which may not inherit all function definitions.
             # Re-importing dependencies here avoids "function not found" failures during long sessions.
-			. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
-
-			$search_paths = @("C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts", "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts")
-
-			$include_file = Include-Script -FileName "Write-VerboseDebug.ps1" -Directories $search_paths
-			. $include_file			
-			
-			$include_file = Include-Script -FileName "Cpu-Snapshots.ps1" -Directories $search_paths
-			. $include_file			
-
-            . ".\Write-VerboseDebug.ps1"
-            . ".\Cpu-Snapshots.ps1"
-			
+            $scriptDir = $Event.MessageData.ScriptDir
+            . (Join-Path $scriptDir 'Write-VerboseDebug.ps1')
+            . (Join-Path $scriptDir 'Cpu-Snapshots.ps1')
 
 			$eventPid = [int]$Event.MessageData.ProcessId
 			$eventProgramName = $Event.MessageData.ProgramName
