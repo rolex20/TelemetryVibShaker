@@ -17,7 +17,7 @@ header("Access-Control-Allow-Headers: Content-Type");
 
 // Handle CORS preflight cleanly (doesn't affect GET/POST behavior)
 if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
-    http_response_code(204);
+    header("HTTP/1.1 204 No Content");
     exit;
 }
 
@@ -104,7 +104,11 @@ function getPathByProcessName($jsonFilePath, $processName) {
 }
 
 function h($s) {
-    return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $flags = ENT_QUOTES;
+    if (defined('ENT_SUBSTITUTE')) {
+        $flags = $flags | ENT_SUBSTITUTE;
+    }
+    return htmlspecialchars((string)$s, $flags, 'UTF-8');
 }
 
 // -------------------------
