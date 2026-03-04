@@ -17,13 +17,42 @@ Write-Host "DoWatchDogCheck"
 }
 
 function Process-CommandFromJson {
+    [CmdletBinding(DefaultParameterSetName = 'FromFile')]
     param (
-        [string]$JsonFilePath
+        [Parameter(Mandatory = $true, Position = 0, ParameterSetName = 'FromFile')]
+        [Alias('JsonFilePath')]
+        [string]$FilePath,
+
+        [Parameter(Mandatory = $true, ParameterSetName = 'FromJson')]
+        [string]$Json
     )
 
-    # Read all at once so we parse a consistent snapshot of the command payload.
-    # The producer writes via .tmp -> rename, so -Raw should typically see a complete JSON blob.
-    $jsonContent = Get-Content -Path $JsonFilePath -Raw | ConvertFrom-Json
+    # Support two input sources (file watcher and IPC payload) while keeping a single dispatcher.
+    # File mode preserves the existing command.json rename flow exactly as before.
+    # JSON mode allows IPC clients to invoke the same command routing without a filesystem hop.
+    try {
+        if ($PSCmdlet.ParameterSetName -eq 'FromJson') {
+            if ([string]::IsNullOrWhiteSpace($Json)) {
+                throw 'JSON payload is empty.'
+            }
+            $jsonText = $Json
+        } else {
+            if (-not (Test-Path -LiteralPath $FilePath)) {
+                throw "JSON command file not found: $FilePath"
+            }
+
+            # Read all at once so we parse a consistent snapshot of the command payload.
+            # The producer writes via .tmp -> rename, so -Raw should typically see a complete JSON blob.
+            $jsonText = Get-Content -LiteralPath $FilePath -Raw
+        }
+
+        $jsonContent = $jsonText | ConvertFrom-Json -ErrorAction Stop
+    }
+    catch {
+        $sourceDesc = if ($PSCmdlet.ParameterSetName -eq 'FromJson') { 'inline JSON payload' } else { "file '$FilePath'" }
+        throw "Failed to parse command JSON from $sourceDesc. $($_.Exception.Message)"
+    }
+
     #Remove-Item -Path $JsonFilePath
 
     # Extract command type and parameters
@@ -167,6 +196,12 @@ function Process-CommandFromJson {
 			
         }
     }
+}
+
+# Backward-compatible script entrypoint:
+# powershell -File .\Process-CommandFromJson.ps1 command.json
+if (($MyInvocation.InvocationName -ne '.') -and $args.Count -gt 0) {
+    Process-CommandFromJson -FilePath $args[0]
 }
 
 

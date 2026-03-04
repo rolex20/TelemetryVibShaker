@@ -40,3 +40,11 @@ You may see additional `commander_by_*.php` pages (AI-generated UI experiments).
 3. **Mobile-first polish** (bigger tap targets, dark mode) to make phone use effortless in VR gloves.
 4. **Persistent presets** stored per-game (power plan, boost level, window slot) so I can fire a whole profile with one tap.
 5. **Better status polling** via AJAX to show command completion, current power plan, and last watchdog state without refreshing the page.
+
+## Pipe IPC quick smoke test (JSONB64)
+1. Run `WebScripts/ps_scripts/Start-CommandWatchers.ps1` with `ipcServer` enabled.
+2. Open `remote_control/pipetest.php`.
+3. Click **Send ECHO** and verify the response is `ECHO`.
+4. Click **Run Notepad (JSONB64)** and verify response `OK` plus Notepad launch.
+5. Click **Read Power Scheme (JSONB64)** and verify response `OK`.
+6. Open `commander.php` and run a normal action to confirm `command.tmp -> command.json` rename flow still works.

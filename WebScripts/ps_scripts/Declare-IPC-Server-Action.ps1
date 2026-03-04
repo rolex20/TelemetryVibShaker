@@ -1,5 +1,6 @@
 ﻿$ipc_job_action = {
     . ".\Write-VerboseDebug.ps1"
+    . ".\Process-CommandFromJson.ps1"
 
     # Define the named pipe
     $pipeName = "ipc_pipe_vr_server_commands"
@@ -154,6 +155,24 @@ Add-Type @"
             "ECHO" {
                 # Respond with "ECHO"
                 $writer.WriteLine("ECHO")
+            }
+            "JSONB64" {
+                try {
+                    if ([string]::IsNullOrWhiteSpace($payload)) {
+                        throw 'Missing base64 payload.'
+                    }
+
+                    $jsonBytes = [System.Convert]::FromBase64String($payload)
+                    $jsonText = [System.Text.Encoding]::UTF8.GetString($jsonBytes)
+
+                    # JSONB64 uses the inline-JSON parameter set (no -FilePath required).
+                    Process-CommandFromJson -Json $jsonText
+                    $writer.WriteLine("OK")
+                } catch {
+                    $err = $_.Exception.Message -replace '[\r\n]+', ' '
+                    Write-VerboseDebug -Timestamp (Get-Date) -Title "IPC JSONB64 ERROR" -Message $err -ForegroundColor "Red"
+                    $writer.WriteLine("ERROR $err")
+                }
             }
 			"PING" = {
 				# also, just a verification that this script is alive
