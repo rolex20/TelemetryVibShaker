@@ -30,7 +30,7 @@ Everything here is modular. You can enable/disable watchers per-machine and cust
 **`Start-CommandWatchers.ps1` wires everything together:**
 - Enforces single instance (named mutex)
 - Tunes itself to stay out of the way (efficiency-core affinity + idle/background behavior)
-- Loads shared helpers via `Include-Script.ps1`
+- Loads shared helpers via deterministic `$PSScriptRoot` dot-sourcing
 - Conditionally spins up watchers based on `config/hosts.config.json`
 - Maintains a watchdog loop and can self-restart if eventing gets stuck
 
@@ -94,7 +94,7 @@ There are three main “inputs” that can drive actions:
 ### File watcher wrapper + support utilities
 - **`Get-RenamesWatcher.ps1`** wraps `FileSystemWatcher` to listen for rename events (used by remote control + optional War Thunder modules).
 - **`Watchdog-Operations.ps1`** keeps the system honest (detect stuck eventing, help restart cleanly).
-- Optional helpers can be dropped in and wired via `Include-Script.ps1` without bloating the entry script.
+- Optional helpers can be dropped in and wired via explicit `Join-Path $PSScriptRoot ...` dot-sourcing without bloating the entry script.
 
 ---
 

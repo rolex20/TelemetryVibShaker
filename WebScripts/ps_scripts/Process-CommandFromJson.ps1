@@ -1,33 +1,12 @@
-﻿. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
-
-$search_paths = @("C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts", "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts")
-
-$include_file = Include-Script -FileName "Write-VerboseDebug.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-ForegroundProcess.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-Minimize.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-Maximize.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Send-MessageViaPipe.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-WindowsPosition.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Get-WindowLocation.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-PowerScheme.ps1" -Directories $search_paths
-. $include_file
-
-$include_file = Include-Script -FileName "Set-IdealProcessor.ps1" -Directories $search_paths
-. $include_file
+﻿. (Join-Path $PSScriptRoot 'Write-VerboseDebug.ps1')
+. (Join-Path $PSScriptRoot 'Set-ForegroundProcess.ps1')
+. (Join-Path $PSScriptRoot 'Set-Minimize.ps1')
+. (Join-Path $PSScriptRoot 'Set-Maximize.ps1')
+. (Join-Path $PSScriptRoot 'Send-MessageViaPipe.ps1')
+. (Join-Path $PSScriptRoot 'Set-WindowsPosition.ps1')
+. (Join-Path $PSScriptRoot 'Get-WindowLocation.ps1')
+. (Join-Path $PSScriptRoot 'Set-PowerScheme.ps1')
+. (Join-Path $PSScriptRoot 'Set-IdealProcessor.ps1')
 
 function ScheduleWatchdogCheck($delay = 10) {
     # This is a "nudge" event, not a hard timer. We use it to wake the watchdog loop early

@@ -1,9 +1,6 @@
 ﻿# Generate mission type 1 for War Thunder (Type 1 Dogfight with previewer)
 
-. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
-$search_paths = @("C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts", "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts")
-$include_file = Include-Script -FileName "Write-VerboseDebug.ps1" -Directories $search_paths
-. $include_file
+. (Join-Path $PSScriptRoot 'Write-VerboseDebug.ps1')
 
 # create a sound player
 $sound = New-Object System.Media.SoundPlayer;
