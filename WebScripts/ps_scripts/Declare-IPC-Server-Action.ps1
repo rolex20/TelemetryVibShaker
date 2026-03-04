@@ -18,6 +18,8 @@
     $everyoneSid = New-Object System.Security.Principal.SecurityIdentifier([System.Security.Principal.WellKnownSidType]::WorldSid, $null)
 
     # 3. Create the Access Rule (Grant Everyone Read/Write access)
+    # Tradeoff: broad access keeps local automation clients simple across user contexts,
+    # but this pipe should remain local-only and command set must stay constrained.
     $accessRule = New-Object System.IO.Pipes.PipeAccessRule(
         $everyoneSid, 
         [System.IO.Pipes.PipeAccessRights]::ReadWrite, 
@@ -38,7 +40,8 @@
         $pipeSecurity
     )
 
-    # Variable to control the server loop
+    # Variable to control the server loop.
+    # Global scope is used because command handlers and outer loop share this flag.
     $global:IPC_ContinueServer = $true
 
     # ---------------------------------------------------------
@@ -64,7 +67,9 @@ Add-Type @"
     }
 "@
 
-    # Function to handle commands
+    # Function to handle commands.
+    # Keep handlers short; long-running operations should be delegated to other scripts/processes
+    # to keep the pipe responsive for subsequent commands.
     function Handle-Command {
         param (
             [string]$command,
@@ -76,7 +81,7 @@ Add-Type @"
 
         # ---------------------------------------------------------
         # CLEAN PARSING: Verb + Payload
-        # Split the string into maximum 2 parts using space as delimiter.
+        # Split into max 2 parts so payload can preserve spaces.
         # Example: "SPEAK Hello World" -> $verb="SPEAK", $payload="Hello World"
         # Example: "MINIMIZE"          -> $verb="MINIMIZE", $payload=$null
         # ---------------------------------------------------------
@@ -103,6 +108,9 @@ Add-Type @"
             }
             "SHOW_PROCESS" {
 
+                    # This compares current CPU time against startup snapshot.
+                    # It is meant as a quick "what consumed CPU recently" diagnostic,
+                    # not as a precise profiler.
                     # Get the updated list of processes
                     $updatedProcesses = Get-Process | Select-Object Id, Name, CPU
                 
@@ -148,7 +156,7 @@ Add-Type @"
                 $writer.WriteLine("ECHO")
             }
             "EXIT" {
-                # Exit the server loop
+                # Exit flag is consumed by the outer while-loop after current client disconnects.
                 $global:IPC_ContinueServer = $false
             }
             default {
@@ -159,6 +167,7 @@ Add-Type @"
 
 
     # First, make sure this is the only instance running.
+    # Duplicate servers on the same pipe name lead to hard-to-debug command routing issues.
 
     # Define the name of the mutex, to prevent other instances
     $mutexName = "ipc_pipe_vr_server_mutex"
@@ -189,7 +198,9 @@ Add-Type @"
     #$initialProcesses | Format-Table -Property Name, CPU -AutoSize
 
 
-    # Start the server loop
+    # Start the server loop.
+    # NamedPipeServerStream accepts one connection at a time per instance;
+    # after a client disconnects we call Disconnect() and wait for the next one.
     while ($global:IPC_ContinueServer) {
 		Write-VerboseDebug -Timestamp (Get-Date) -Title "IPC SERVER" -Message "Listening on pipe [$pipeName]"
         $pipeServer.WaitForConnection()
@@ -206,6 +217,7 @@ Add-Type @"
                 }
             }
         } finally {
+            # Always disconnect so the same server instance can accept the next client.
             $pipeServer.Disconnect()
         }
     }

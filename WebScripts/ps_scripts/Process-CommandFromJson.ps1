@@ -30,6 +30,9 @@ $include_file = Include-Script -FileName "Set-IdealProcessor.ps1" -Directories $
 . $include_file
 
 function ScheduleWatchdogCheck($delay = 10) {
+    # This is a "nudge" event, not a hard timer. We use it to wake the watchdog loop early
+    # after interactive commands so health checks happen soon after a state-changing action.
+    # Keeping this event-driven avoids tight polling.
 Write-Host "DoWatchDogCheck"
 	New-Event -SourceIdentifier "DoWatchDogCheck" -MessageData $delay # This will wake up Watchodg-Operations
 }
@@ -39,7 +42,8 @@ function Process-CommandFromJson {
         [string]$JsonFilePath
     )
 
-    # Read the JSON file
+    # Read all at once so we parse a consistent snapshot of the command payload.
+    # The producer writes via .tmp -> rename, so -Raw should typically see a complete JSON blob.
     $jsonContent = Get-Content -Path $JsonFilePath -Raw | ConvertFrom-Json
     #Remove-Item -Path $JsonFilePath
 
@@ -47,7 +51,9 @@ function Process-CommandFromJson {
     $commandType = $jsonContent.command_type
     $parameters = $jsonContent.parameters
 
-    # Process the command based on the command type
+    # Dispatcher contract: each command should stay small and predictable.
+    # Complex policy belongs in specialized scripts so this router stays maintainable.
+    # Most commands schedule a watchdog check to validate event + IPC health soon after changes.
     switch ($commandType) {
         "RUN" {
             ScheduleWatchdogCheck
@@ -99,6 +105,8 @@ function Process-CommandFromJson {
 
 
         "PIPE" {
+            # Pipe commands can trigger follow-up activity (UI/telemetry scripts), so give watchdog
+            # a longer window before forcing a check to reduce false alarms while work is in-flight.
             ScheduleWatchdogCheck 60
             Send-MessageViaPipe -pipeName $parameters.pipename -message $parameters.message
 			
@@ -125,6 +133,8 @@ function Process-CommandFromJson {
 
 			#Let's send a simple request to the ipc pipe server to see if it still responding ok to commands
             if (Send-MessageViaPipe -pipeName "ipc_pipe_vr_server_commands" -message "ECHO") {
+                # watchdog.txt is the handshake artifact consumed by Watchdog-Operations.ps1.
+                # Writing this file is the success signal that both file events and IPC are alive.
                 Set-Content -Path $parameters.outFile "WATCHDOG" # This file is expected by Watchdog-Operations.ps1 
                 Write-VerboseDebug -Timestamp (Get-Date) -Title "WATCHDOG [PID=$PID]" -Message "File System events are still active: OK." -ForegroundColor "Green"
                 if ($parameters.sound) {
@@ -164,6 +174,9 @@ function Process-CommandFromJson {
 		}
 
         "EXIT_WATCHER" {
+            # Two-part shutdown signal:
+            # 1) global flag handles normal loop checks
+            # 2) StopWatcher event unblocks Wait-Event immediately (fast exit, no long timeout wait)
             $Global:Watcher_Continue = $false
             New-Event -SourceIdentifier "StopWatcher" -MessageData "EXIT_WATCHER" | Out-Null
             Write-VerboseDebug -Timestamp (Get-Date) -Title "EXIT_WATCHER [PID=$PID]" -Message "Watcher stop requested. Signaled StopWatcher event to unblock wait loop." -ForegroundColor "Yellow"

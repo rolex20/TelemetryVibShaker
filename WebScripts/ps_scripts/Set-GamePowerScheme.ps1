@@ -60,6 +60,8 @@ function Play-SeatBelt() {
 
 
 if (-not $Global:GameRuntimeByPid) {
+    # Runtime state is keyed by PID (not process name) to handle multiple instances safely.
+    # This prevents one process exit from accidentally tearing down another instance's tracker.
     $Global:GameRuntimeByPid = @{}
 }
 
@@ -75,6 +77,7 @@ function Start-GameRuntimeTracker {
         [int]$ProcessId
     )
 
+    # Defensive cleanup: if we get duplicate start events for same PID, reset prior tracker first.
     if ($Global:GameRuntimeByPid.ContainsKey($ProcessId)) {
         Stop-GameRuntimeTracker -ProgramName $ProgramName -ProcessId $ProcessId | Out-Null
     }
@@ -92,9 +95,13 @@ function Start-GameRuntimeTracker {
 
     $startedAt = Get-Date
 
+    # Persist an initial snapshot immediately so stop-time logic has at least one fallback source
+    # even if the process exits before the first timer tick.
     Save-GameRuntimeCpuSnapshot -ProcessId $ProcessId -CpuSeconds $cpuStartSeconds -HourMark 0
 
     $timer = New-Object System.Timers.Timer
+    # 30-minute cadence keeps long-session visibility without high overhead.
+    # CPU is still sampled at stop-time, so this is telemetry/fallback cadence, not precision timing.
     $timer.Interval = 1800000  # 30 minutes for CPU sampling and refreshes
     $timer.AutoReset = $true
 
@@ -112,6 +119,8 @@ function Start-GameRuntimeTracker {
 			#. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Write-VerboseDebug.ps1"
 			#. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Set-GamePowerScheme.ps1"
 			
+            # Timer callbacks run in an event runspace, which may not inherit all function definitions.
+            # Re-importing dependencies here avoids "function not found" failures during long sessions.
 			. "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts\Include-Script.ps1"
 
 			$search_paths = @("C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts", "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts")
@@ -136,11 +145,13 @@ function Start-GameRuntimeTracker {
 
 			$isRunning = Get-Process -Id $eventPid -ErrorAction SilentlyContinue
 			if (-not $isRunning) {
+                # If process is gone, unsubscribe immediately to avoid zombie timer events.
 				Unregister-Event -SourceIdentifier $EventSubscriber.SourceIdentifier -ErrorAction SilentlyContinue
 				return
 			}
 
-			# Refresh the stored ProcessObject to keep its CPU time updated
+			# Refresh the stored ProcessObject to keep its CPU time updated.
+            # Refresh can occasionally fail on transient process states; we intentionally continue.
 			if ($Global:GameRuntimeByPid.ContainsKey($eventPid) -and $Global:GameRuntimeByPid[$eventPid].ProcessObject) {
 				try {
 					$Global:GameRuntimeByPid[$eventPid].ProcessObject.Refresh()
@@ -164,7 +175,7 @@ function Start-GameRuntimeTracker {
 			$snapshotData = Read-GameRuntimeCpuSnapshot -ProcessId $eventPid
 			$prevHourMark = if ($snapshotData) { [int]$snapshotData.HourMark } else { 0 }
 
-			# Always save the snapshot on every tick for accuracy
+			# Always persist latest sample so stop-time code can recover from dead process handles.
 			Save-GameRuntimeCpuSnapshot -ProcessId $eventPid -CpuSeconds $cpuNowSeconds -HourMark $totalWholeHours
 
 			# Format the CPU seconds (User + Kernel) using your existing helper function
@@ -212,7 +223,7 @@ function Stop-GameRuntimeTracker {
 
     $runtimeInfo = $Global:GameRuntimeByPid[$ProcessId]
 
-    # Stop timers
+    # Stop/unregister first to prevent race where timer fires while we are dismantling state.
     if ($runtimeInfo.Timer) {
         $runtimeInfo.Timer.Stop()
     }
@@ -232,7 +243,7 @@ function Stop-GameRuntimeTracker {
     $cpuReadUsedFallback = $false
     $cpuFallbackHourMark = 0
 
-    # 1. Attempt to get the final live reading from the process object
+    # 1. Attempt live reading from process object first (best source when still valid).
     if ($runtimeInfo.ProcessObject) {
         try {
             # Attempt to refresh stats. On an exited process, this often zeroes out data or throws.
@@ -253,14 +264,14 @@ function Stop-GameRuntimeTracker {
         }
     }
 
-    # 2. Retrieve the last saved snapshot (Hourly data)
+    # 2. Pull persisted snapshot (survives process-handle edge cases).
     $snapshotData = Read-GameRuntimeCpuSnapshot -ProcessId $ProcessId
     $snapshotCpu = -1.0
     if ($snapshotData -and ($null -ne $snapshotData.CpuSeconds)) {
         $snapshotCpu = [double]$snapshotData.CpuSeconds
     }
 
-    # 3. Validation Logic:
+    # 3. Validation logic:
     # If the live read failed (-1) OR returned 0 (zombie handle), 
     # check if we have better data in the snapshot.
     # This specifically fixes the "0 seconds" bug when the process handle dies before reading.
@@ -276,7 +287,8 @@ function Stop-GameRuntimeTracker {
         $cpuFallbackHourMark = [int]$snapshotData.HourMark
     }
 
-    # 4. Last resort: In-memory fallback (usually just the start time, but included for completeness)
+    # 4. Last resort: in-memory fallback.
+    # This is weaker than persisted snapshot but still better than returning garbage/null.
     if ($cpuTotalSeconds -le 0 -and ($null -ne $runtimeInfo.LastKnownCpuSeconds)) {
          $memCpu = [double]$runtimeInfo.LastKnownCpuSeconds
          if ($memCpu -gt $cpuTotalSeconds) {
@@ -318,9 +330,13 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
         $auxPrograms = Get-GameAuxPrograms -programName $programName
 
 
+    # First phase: core lifecycle actions (kill, power scheme, runtime tracking, stutter enrollment).
+    # Boost/restore actions run later in a second phase after a short settle delay.
     switch ($traceName) {
         "Win32_ProcessStartTrace" {
 
+            # ImmediateKill is evaluated before any side effects so killed processes do not
+            # accidentally trigger aux launches, boost actions, or tracker state.
             if ((Get-ImmediateKill -programName $programName)) {
                 
 
@@ -352,6 +368,7 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
 				# 	'-ProcessId', $processId,
 				#     '-GameProcessName', $programName
 				# )                
+                # IPC mode centralizes stutter tracking state in one coordinator process.
 				Start-Process powershell.exe -WindowStyle Minimized -ArgumentList @(
 					'-NoLogo','-NoProfile','-ExecutionPolicy','Bypass',
 					'-File', (Join-Path $PSScriptRoot 'Stutter-Hunter-IPC.ps1'),
@@ -406,7 +423,8 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
 		}
 	}
 	
-    # The power scheme logic remains correct because it uses the original name (with .exe)
+    # Power schemes are keyed by full executable name.
+    # Keep this lookup separate from boost JSON normalization (which strips .exe).
     # which matches the keys in the hash table returned by Get-Start/StopPowerSchemes.
     if ($powerSchemes) {		
         $newPowerScheme = $powerSchemes[$programName]
@@ -420,7 +438,9 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
     }	
             
  			
-	# Next, do the boost if required by the game
+	# Second phase: boost/restore.
+    # Delay is intentional: many games spawn helper processes seconds after main process start.
+    # Waiting a bit improves chance that dependent processes exist before applying policies.
 	Start-Sleep -Seconds 5	
     switch ($traceName) {
         "Win32_ProcessStartTrace" {

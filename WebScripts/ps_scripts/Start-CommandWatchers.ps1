@@ -17,7 +17,8 @@ $globalcfg = Bootstrap-Config
 
 
 $need_restart = $false # make sure this object exists outside the  {}
-# Used by EXIT_WATCHER to gracefully unwind the watchdog loop into finally {} cleanup.
+# Used by EXIT_WATCHER (and other stop paths) to gracefully unwind loops into finally{} cleanup.
+# This flag is intentionally global because several scripts/event actions run in sibling scopes.
 $Global:Watcher_Continue = $true
 try {
 	# 0- SET TITLE
@@ -25,6 +26,8 @@ try {
 		$Host.UI.RawUI.WindowTitle = $title
 
     # 1- DECONFLICT: Make sure this is the only instance running.
+    # Multiple instances would duplicate event subscriptions and process actions,
+    # causing conflicting power-plan switches and noisy command handling.
 
         # Define the name of the mutex, to prevent other instances
         #$mutexName = "Global\$title"
@@ -34,6 +37,8 @@ try {
         $isNew = $false
 
         # Create the Mutex
+        # We still call WaitOne() even after construction to avoid rare races where another
+        # process created the mutex first but this script reaches startup logic concurrently.
         $mutex_owner = $false
         $mutex = New-Object System.Threading.Mutex($false, $mutexName, [ref]$isNew)
 		$r = $mutex.WaitOne(1000)
@@ -58,6 +63,7 @@ try {
             Write-VerboseDebug -Timestamp (Get-Date) -Title "WARNING" -Message "Not an Intel 12700K or 14700K " -ForegroundColor "Yellow"
         }
 		
+        # This keeps the watcher responsive but "cheap" relative to the games it supervises.
 		SetAffinityAndPriority -SetEfficiencyAffinity $true -SetBackgroudPriority $false -SetIdlePriority $true
 
 
@@ -75,12 +81,14 @@ try {
             Write-Host " "
             Write-VerboseDebug -Timestamp $Event.TimeGenerated -Title "CHANGE_TYPE:$changeType" -Message $path
 
+            # Router stays centralized here so all remote command behavior remains consistent.
             Process-CommandFromJson $path
         }
 		
 		
 
-		# create the object in this scope, outside the if {}
+		# Keep these refs in outer scope so finally{} can dispose cleanly even when
+        # feature toggles disable some watchers or startup fails mid-way.
 		$cm_watcher_objects = $null
 		if ($globalcfg.features.remoteCommandsWatcher) {
 			# Setup filesystem watch events for json remote control commands
@@ -106,7 +114,8 @@ try {
 
         }
 
-        # Setup filesystem watch events for war thunder mission type 1 generation        
+        # Setup filesystem watch events for war thunder mission type 1 generation.
+        # Last assignment wins by design: this host-specific path is what GALVATRON uses.
         $mission1 = "C:\wamp\www\warthunder\mission_data.json"  #Alienware
 		$mission1 = "C:\MyPrograms\wamp\www\warthunder\mission_data.json" #Galvatron
 		$wt_watcher_objects = $null # make sure this object exists outside the if {}
@@ -123,7 +132,7 @@ try {
 
             . ".\Set-GamePowerScheme.ps1"
 
-            # if $traceName contains ProcessStartTrace, then get the parent process name and id
+            # Parent metadata is purely diagnostic, but useful when launchers spawn games indirectly.
             $parentMsg = ""
             if ($traceName.Contains("ProcessStartTrace")) {
                 $parent_pId = $null
@@ -147,7 +156,9 @@ try {
 			$processWatcher = Get-ProcessWatchers $processAction
 		}
 
-    # 7- START NEW IPC PIPE SERVER THREAD FOR SPECIAL COMMANDS (SHOW PROCESS TIMES REQUIRES INITIAL STATE MEMORY)
+    # 7- START NEW IPC PIPE SERVER THREAD FOR SPECIAL COMMANDS
+    # IPC is isolated in a thread job so expensive or blocking pipe operations do not stall
+    # event handlers on the main watcher thread.
         . ".\Declare-IPC-Server-Action.ps1" -Directories $search_paths
 
 		$job = $null # make sure this object exists outside the if {}
@@ -168,7 +179,9 @@ try {
 		
             
 
-    # 9- WATCHDOG: Infinite loop to periodically check-alive in filesystem-watch which some times fails or locks
+    # 9- WATCHDOG:
+    # This loop is the runtime heartbeat and now also the config hot-reload poll cadence.
+    # Returning $true from Watchdog_Operations means "intentional orchestrator restart".
         $Global:Watcher_Continue = $true
 		$need_restart = Watchdog_Operations # check for $globalcfg.features.watchdog needs to be done inside Watchdog-Operations()
 
@@ -181,6 +194,8 @@ finally {
 	Set-MpPreference -DisableRealtimeMonitoring $false -Force	
 	Set-MpPreference -ScanOnlyIfIdleEnabled $false
 		
+    # Ask IPC server to exit before tearing down event infrastructure.
+    # This minimizes orphaned thread jobs and pipe handles.
     if ($globalcfg.features.ipcServer) { Send-IPC-ExitCommand "ipc_pipe_vr_server_commands"	}
 	
   
@@ -203,11 +218,13 @@ finally {
     $mutex.Dispose()
 
 	Write-VerboseDebug -Timestamp (Get-Date) -Title "FINALLY" -Message "Removing CimIndicationEvents" -ForegroundColor "Yellow"	
+    # Broad cleanup is intentional here: we prefer a known-clean restart over retaining stale subscribers.
     Get-Event | Remove-Event -ErrorAction SilentlyContinue
     Get-EventSubscriber | Unregister-Event -ErrorAction SilentlyContinue
 } #end finally block
 
 if ($need_restart) {
+    # Restart is launched as a fresh process after cleanup to avoid partially disposed state.
     $delay_sec = 5
     $message = "WARNING: Restarting the Watcher in $delay_sec seconds."
     Write-VerboseDebug -Timestamp (Get-Date) -Title "WARNING.  " -Message $message -ForegroundColor "Red"
