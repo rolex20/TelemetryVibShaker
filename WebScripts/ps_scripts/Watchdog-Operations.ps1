@@ -23,10 +23,26 @@ function Get-NewFileName {
 
 function Watchdog_Operations {
 
-if ($globalcfg.features.watchdog) {    
-    $watchdog_json = Include-Script "watchdog.json" "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts" "C:\Users\ralch"
-    $tmp_json = Get-NewFileName -FilePath $command_file -NewExtension "tmp"
-}
+    # Guard: watchdog sanity check requires command_file (set only when remoteCommandsWatcher is enabled)
+    $watchdogCheckEnabled = $false
+    $watchdogWarnedMissingCommandFile = $false
+
+    if ($globalcfg.features.watchdog) {
+        if ([string]::IsNullOrWhiteSpace($command_file)) {
+            # Avoid crash: without command_file we cannot do the rename-based watchdog test.
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "WATCHDOG" `
+                -Message "Watchdog enabled but command_file is not set (remoteCommandsWatcher likely off). Skipping watchdog sanity check." `
+                -ForegroundColor "Yellow" -Speak $true
+            $watchdogCheckEnabled = $false
+            $watchdogWarnedMissingCommandFile = $true
+        }
+        else {
+            #$watchdog_json = Include-Script "watchdog.json" "C:\MyPrograms\My Apps\TelemetryVibShaker\WebScripts\ps_scripts" "C:\Users\ralch"
+            $watchdog_json = "watchdog.json"
+            $tmp_json = Get-NewFileName -FilePath $command_file -NewExtension "tmp"
+            $watchdogCheckEnabled = $true
+        }
+    }
 
 	$failure = $false
     $watchers_OK = $true
@@ -92,22 +108,22 @@ if ($globalcfg.features.watchdog) {
             $remainingSleep -= $chunk
         }
 
-if ($globalcfg.features.watchdog) {        
-        if (Test-Path "watchdog.txt") { Remove-Item "watchdog.txt" }
-        if (Test-Path $command_file) { Remove-Item $command_file }
-        Copy-Item $watchdog_json $tmp_json
-        Rename-Item $tmp_json $command_file
+        if ($watchdogCheckEnabled) {    
+                if (Test-Path "watchdog.txt") { Remove-Item "watchdog.txt" }
+                if (Test-Path $command_file) { Remove-Item $command_file }
+                Copy-Item $watchdog_json $tmp_json
+                Rename-Item $tmp_json $command_file
 
-        Start-Sleep -Milliseconds 200
-        if (Test-Path "watchdog.txt") {
-            # We are good
-        } else {
-            Write-VerboseDebug -Timestamp (Get-Date) -Title "ERROR" -Message "Events are not being processed" -ForegroundColor "Red"
-            $watchers_OK = $false
-			$failure = $true
-            break;
+                Start-Sleep -Milliseconds 200
+                if (Test-Path "watchdog.txt") {
+                    # We are good
+                } else {
+                    Write-VerboseDebug -Timestamp (Get-Date) -Title "ERROR" -Message "Events are not being processed" -ForegroundColor "Red"
+                    $watchers_OK = $false
+                    $failure = $true
+                    break;
+                }
         }
-}
 
 		Wait-Event -Timeout $wait_seconds # Check every five minutes or when a manual event has been signaled        
 
