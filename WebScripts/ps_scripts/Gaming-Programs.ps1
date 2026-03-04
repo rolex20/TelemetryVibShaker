@@ -25,7 +25,8 @@
 #   - The 'Key' is the process name including the .exe extension (e.g., "DCS.exe").
 #   - The 'Value' is another hash table containing the 'Start' and 'Stop' power schemes,
 #     and optional fields like 'BoostAction' (JSON file), 'Speak' (text-to-speech), and
-#     'AuxPrograms' (array of helper executables to auto-launch when the game starts).
+#     'AuxPrograms' (array of helper executables to auto-launch when the game starts),
+#     and optional 'AuxProgramsDelaySeconds' (integer >= 0, fallback 5 when missing/invalid).
 #------------------------------------------------------------------------------------
 
 # Prefer GameProfiles from host config (loaded by Start-CommandWatchers via Bootstrap-Config)
@@ -199,3 +200,58 @@ function Get-GameAuxPrograms {
     return @()
 }
 
+function Get-GameAuxProgramsDelaySeconds {
+    <#
+    .SYNOPSIS
+        Retrieves per-game aux launch delay in seconds.
+        Returns 5 when missing or invalid.
+    #>
+    param (
+        [Parameter(Mandatory)]
+        [string]$programName
+    )
+
+    # Backward-compat baseline:
+    # Old profiles had an implicit ~5s wait before aux launch (because second phase slept 5s).
+    # We keep 5 as the default so existing configs do not suddenly change behavior.
+    $defaultDelaySeconds = 5
+
+    # Unknown game profile: do not throw inside watcher event handlers.
+    # Falling back keeps the pipeline resilient even if config is mid-edit/reload.
+    if (-not $Global:GameProfiles.ContainsKey($programName)) {
+        return $defaultDelaySeconds
+    }
+
+    $profile = $Global:GameProfiles[$programName]
+    # JSON objects should land as dictionaries after config normalization.
+    # This guard protects us from malformed/hand-built profile values.
+    if (-not ($profile -is [System.Collections.IDictionary])) {
+        return $defaultDelaySeconds
+    }
+
+    # Optional key by design. Missing key means "use legacy behavior".
+    if (-not $profile.ContainsKey('AuxProgramsDelaySeconds')) {
+        return $defaultDelaySeconds
+    }
+
+    $rawDelay = $profile.AuxProgramsDelaySeconds
+    # Null is treated as "not configured" instead of an error.
+    if ($null -eq $rawDelay) {
+        return $defaultDelaySeconds
+    }
+
+    $parsedDelay = 0
+    # TryParse prevents exceptions for values like "abc" and keeps watcher flow stable.
+    # Casting first to string lets us accept numeric strings from JSON/editor input.
+    if (-not [int]::TryParse([string]$rawDelay, [ref]$parsedDelay)) {
+        return $defaultDelaySeconds
+    }
+
+    # Negative delays are nonsensical for scheduling. Clamp via fallback.
+    if ($parsedDelay -lt 0) {
+        return $defaultDelaySeconds
+    }
+
+    # At this point we have a valid, non-negative integer delay in seconds.
+    return $parsedDelay
+}

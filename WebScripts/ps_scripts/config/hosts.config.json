@@ -69,6 +69,7 @@
           "AuxPrograms": [
             "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk"
           ],
+          "AuxProgramsDelaySeconds": 1,
           "comments": [
             "BoostAction was commented out in Gaming-Programs.ps1 for Notepad (not enabled).",
             "Host-specific AuxPrograms."
@@ -134,6 +135,7 @@
           "NickName": "Ghost Recon Breakpoint",
           "Start": "Balanced",
           "Stop": "Balanced",
+          "AuxProgramsDelaySeconds": 0,          
           "AuxPrograms": [
             "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk"
           ],
@@ -234,6 +236,7 @@
           "ImmediateKill": false,
           "NickName": "Service Host",
           "Stutter": false,
+          "AuxProgramsDelaySeconds": 0,
           "AuxPrograms": [
             "C:\\Users\\ralch\\Desktop\\stop-win-updates.ps1.lnk"
           ]

@@ -87,6 +87,7 @@ There are three main “inputs” that can drive actions:
   - start/stop power plans
   - optional `BoostAction` JSON
   - auxiliary tools to auto-launch
+  - optional `AuxProgramsDelaySeconds` (integer seconds, `>= 0`, default fallback `5`)
 - Everything else consumes this table (process watcher queries, boost triggers, etc.).
 
 ### File watcher wrapper + support utilities
@@ -105,6 +106,20 @@ This is the place you customize first.
 - Set per-game start/stop power schemes.
 - Optionally reference a boost JSON (`action-per-process-boost*.json`).
 - Add auxiliary tools to auto-launch with a game if you want.
+- Optionally set `AuxProgramsDelaySeconds` per game to control when auxiliaries launch.
+
+Example profile snippet:
+```json
+"forza_steamworks_release_final.exe": {
+  "NickName": "Forza",
+  "Start": "Balanced",
+  "Stop": "Balanced",
+  "AuxPrograms": [
+    "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk"
+  ],
+  "AuxProgramsDelaySeconds": 12
+}
+```
 
 The design is: **my defaults are my rig**, but anyone can fork/tune it to match their own CPU, GPU, VR stack, and “background junk” profile.
 
@@ -117,6 +132,7 @@ Edit `$Global:GameProfiles` in `ps_scripts/Gaming-Programs.ps1`:
 - Choose start/stop schemes (High Performance / Balanced / your custom scheme)
 - Optionally attach a `BoostAction`
 - Optionally add auxiliary launchers
+- Optionally set `AuxProgramsDelaySeconds` for per-game delayed aux launch
 
 ### 2) Create a new boost profile
 Copy an existing `action-per-process-boost*.json` and adjust:

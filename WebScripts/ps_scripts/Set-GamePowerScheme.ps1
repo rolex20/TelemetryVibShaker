@@ -58,6 +58,48 @@ function Play-SeatBelt() {
 		Start-Sleep -Seconds 1
 }
 
+function Wait-UntilDueTime {
+    param(
+        [Parameter(Mandatory)]
+        [datetime]$DueAt
+    )
+
+    # This helper is intentionally "absolute-time based" instead of "sleep N seconds".
+    # Why: when a flow has multiple milestones (aux + boost), some work may already have
+    # consumed time before the next wait. Sleeping a fixed duration again can drift or
+    # overshoot. Sleeping only the remaining delta keeps the timeline predictable.
+    $remainingMs = [int][Math]::Ceiling(($DueAt - (Get-Date)).TotalMilliseconds)
+    if ($remainingMs -gt 0) {
+        Start-Sleep -Milliseconds $remainingMs
+    }
+}
+
+function Start-ConfiguredAuxPrograms {
+    param(
+        [Parameter(Mandatory)]
+        [string[]]$AuxPrograms
+    )
+
+    foreach ($aux in $AuxPrograms) {
+        # Profiles often contain blank placeholders while being edited.
+        # Skipping whitespace-only entries avoids noisy "path not found" logs.
+        if ([string]::IsNullOrWhiteSpace($aux)) {
+            continue
+        }
+
+        # Validate before launch so failures are explicit and non-fatal.
+        # We log and continue instead of throwing; one bad aux path should not block
+        # other aux tools or the rest of the start pipeline.
+        if (Test-Path $aux) {
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "AUX START" -ForegroundColor "Green" -Message "Launching $aux"
+            Start-Process -FilePath $aux -WindowStyle Minimized
+        }
+        else {
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "AUX START" -ForegroundColor "DarkYellow" -Message "Aux program not found: $aux"
+        }
+    }
+}
+
 
 if (-not $Global:GameRuntimeByPid) {
     # Runtime state is keyed by PID (not process name) to handle multiple instances safely.
@@ -438,42 +480,66 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
     }	
             
  			
-	# Second phase: boost/restore.
-    # Delay is intentional: many games spawn helper processes seconds after main process start.
-    # Waiting a bit improves chance that dependent processes exist before applying policies.
-	Start-Sleep -Seconds 5	
+	# Second phase: boost/restore + aux launches.
+    # Boost/restore keeps a fixed 5-second settle delay.
+    # Aux launch delay is per-profile and can be earlier/later than boost.
+    # We anchor both schedules to the SAME timestamp to avoid cumulative drift:
+    # - boostDueAt = start + 5s
+    # - auxDueAt   = start + configuredDelay
+    # This guarantees boost timing stays stable even when aux is delayed longer.
+    $secondPhaseStartedAt = Get-Date
+    $boostDueAt = $secondPhaseStartedAt.AddSeconds(5)
     switch ($traceName) {
         "Win32_ProcessStartTrace" {
-            #$powerSchemes = Get-StartPowerSchemes
+            $auxDelaySeconds = Get-GameAuxProgramsDelaySeconds -programName $programName
+            $auxDueAt = $secondPhaseStartedAt.AddSeconds($auxDelaySeconds)
+            # Precompute whether we actually have any usable aux entries.
+            # Important pitfall: if no aux entries exist but delay is large, we should NOT
+            # wait that delay. We only keep the fixed boost timing in that case.
+            $hasAuxPrograms = (@($auxPrograms | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }).Count -gt 0)
 
-            # Launch auxiliaries linked to the game
-            foreach ($aux in $auxPrograms) {
-                if ([string]::IsNullOrWhiteSpace($aux)) {
-                    continue
-                }
-
-                if (Test-Path $aux) {
-                    Write-VerboseDebug -Timestamp (Get-Date) -Title "AUX START" -ForegroundColor "Green" -Message "Launching $aux"
-                    Start-Process -FilePath $aux  -WindowStyle Minimized 
-                }
-                else {
-                    Write-VerboseDebug -Timestamp (Get-Date) -Title "AUX START" -ForegroundColor "DarkYellow" -Message "Aux program not found: $aux"
+            $runBoost = {
+                # Look for a boost action using the full program name (with .exe).
+                $boostJsonPath = Get-GameBoostActions -programName $programName
+                if ($boostJsonPath -and (Test-Path $boostJsonPath)) {
+                    Play-SeatBelt
+                    Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST" -Message "Applying boost for '$programName' from '$boostJsonPath' [PID:$processId]" -ForegroundColor "Green"
+                    # Call Run-Actions-Per-Game with the EXTENSION-LESS name for JSON compatibility.
+                    $normalizedProgramName = $programName -replace '\.exe$', ''
+                    Run-Actions-Per-Game -processName $normalizedProgramName -fileName $boostJsonPath -threadsLimit 50
                 }
             }
 
-            # Look for a boost action using the full program name (with .exe).
-            $boostJsonPath = Get-GameBoostActions -programName $programName
-            if ($boostJsonPath -and (Test-Path $boostJsonPath)) {
-                                Play-SeatBelt
-                Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST" -Message "Applying boost for '$programName' from '$boostJsonPath' [PID:$processId]" -ForegroundColor "Green"
-                # Call Run-Actions-Per-Game with the EXTENSION-LESS name for JSON compatibility.
-                $normalizedProgramName = $programName -replace '\.exe$', ''
-                Run-Actions-Per-Game -processName $normalizedProgramName -fileName $boostJsonPath -threadsLimit 50
+            if (-not $hasAuxPrograms) {
+                # No aux work to schedule. Preserve legacy boost timing only.
+                Wait-UntilDueTime -DueAt $boostDueAt
+                & $runBoost
+            }
+            elseif ($auxDueAt -le $boostDueAt) {
+                # Aux should happen first (or same time as boost).
+                # Using absolute waits prevents us from accidentally adding 5s twice.
+                Wait-UntilDueTime -DueAt $auxDueAt
+                Start-ConfiguredAuxPrograms -AuxPrograms $auxPrograms
+
+                Wait-UntilDueTime -DueAt $boostDueAt
+                & $runBoost
+            }
+            else {
+                # Boost is due before aux. Run boost at fixed +5s, then wait remaining
+                # time until aux is due.
+                Wait-UntilDueTime -DueAt $boostDueAt
+                & $runBoost
+
+                Wait-UntilDueTime -DueAt $auxDueAt
+                Start-ConfiguredAuxPrograms -AuxPrograms $auxPrograms
             }
         }
         "Win32_ProcessStopTrace" { 
             #$powerSchemes = Get-StopPowerSchemes 
-            
+            # Stop flow intentionally keeps the original fixed settle delay before restore.
+            # This avoids behavior changes on stop events while adding start-side aux delay.
+            Wait-UntilDueTime -DueAt $boostDueAt
+
             # Look for a boost action using the full program name (with .exe).
             $boostJsonPath = Get-GameBoostActions -programName $programName
             if ($boostJsonPath -and (Test-Path $boostJsonPath)) {
