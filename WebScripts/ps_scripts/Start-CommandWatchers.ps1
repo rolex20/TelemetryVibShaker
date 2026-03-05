@@ -186,7 +186,6 @@ try {
         $Global:Watcher_Continue = $true
 		$need_restart = Watchdog_Operations # check for $globalcfg.features.watchdog needs to be done inside Watchdog-Operations()
 
-
 } #end try block
 
 finally {
@@ -197,8 +196,12 @@ finally {
 		
     # Ask IPC server to exit before tearing down event infrastructure.
     # This minimizes orphaned thread jobs and pipe handles.
-    if ($globalcfg.features.ipcServer) { Send-IPC-ExitCommand "ipc_pipe_vr_server_commands"	}
+    if ($globalcfg.features.ipcServer) { Send-IPC-ExitCommand "ipc_pipe_vr_server_commands"	 | Out-Null }
 	
+    # Broad cleanup is intentional here: we prefer a known-clean restart over retaining stale subscribers.
+    Get-Event | Remove-Event -ErrorAction SilentlyContinue
+    Get-EventSubscriber | Unregister-Event -ErrorAction SilentlyContinue
+
   
     if ($cm_watcher_objects) {
         $cm_watcher_objects[1].EnableRaisingEvents = $false
@@ -212,17 +215,17 @@ finally {
         $wt_watcher_objects[0].Dispose() #Dispose the Handler
     }
 
+
+	Write-VerboseDebug -Timestamp (Get-Date) -Title "FINALLY" -Message "Removing CimIndicationEvents" -ForegroundColor "Yellow"	
+	
     if ($mutex_owner) {
         $mutex.ReleaseMutex()
     }
     $mutex.Close()  
     $mutex.Dispose()
-
-	Write-VerboseDebug -Timestamp (Get-Date) -Title "FINALLY" -Message "Removing CimIndicationEvents" -ForegroundColor "Yellow"	
-    # Broad cleanup is intentional here: we prefer a known-clean restart over retaining stale subscribers.
-    Get-Event | Remove-Event -ErrorAction SilentlyContinue
-    Get-EventSubscriber | Unregister-Event -ErrorAction SilentlyContinue
+	
 } #end finally block
+
 
 if ($need_restart) {
     # Restart is launched as a fresh process after cleanup to avoid partially disposed state.
