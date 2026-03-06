@@ -270,11 +270,11 @@ namespace MicroTaskScheduler
                     // Wait for the rest of the hour
                     // We use 'int' here, which is safer than TimeSpan for small negative values
                     // Log msToWait for debugging purposes in the event log
-                    EventLog.WriteEntry($"HourlyAlarm: Waiting {(msToWait/1000)/60} minutes until next chime.", EventLogEntryType.Information);
+                    // EventLog.WriteEntry($"HourlyAlarm: Waiting {(msToWait/1000)/60} minutes until next chime.", EventLogEntryType.Information);
                     await Task.Delay(msToWait, cancellationToken);
 
                     // Log the time we are actually playing the chime for debugging purposes
-                    EventLog.WriteEntry($"HourlyAlarm: Waking up to chime at {DateTime.Now:HH:mm:ss.fff}.", EventLogEntryType.Information);
+                    // EventLog.WriteEntry($"HourlyAlarm: Waking up to chime at {DateTime.Now:HH:mm:ss.fff}.", EventLogEntryType.Information);
 
                     // -----------------------------------------------------------------
                     // 3. PLAY ALARM
@@ -286,9 +286,10 @@ namespace MicroTaskScheduler
                         // This solves the "Silence" issue.
                         using (SoundPlayer sp = new SoundPlayer(Properties.Settings.Default.SoundAlarm == 0 ? Properties.Resources.Casio_Watch_Alarm : Properties.Resources.StartCredit))
                         {
-                                sp.PlaySync();
+                                // making sure we are not awaking at the wrong time after hibernation/sleep
+                                if (AlarmInterval_ms == msTotalInHour && now.Minute == 0)  sp.PlaySync();
                                 //EventLog.WriteEntry($"sp.PlaySync() called and Task.Delay() follows.", EventLogEntryType.Information);
-                                await Task.Delay(2000, cancellationToken); // Wait 2 seconds to push us past the "00:00" mark.
+                                await Task.Delay(2000, cancellationToken); // Critical: Wait 2 seconds to push us past the "00:00" mark.
                         }
                     }
                 }
