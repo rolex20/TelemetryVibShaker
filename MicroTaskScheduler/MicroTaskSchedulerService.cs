@@ -286,9 +286,11 @@ namespace MicroTaskScheduler
                         // This solves the "Silence" issue.
                         using (SoundPlayer sp = new SoundPlayer(Properties.Settings.Default.SoundAlarm == 0 ? Properties.Resources.Casio_Watch_Alarm : Properties.Resources.StartCredit))
                         {
-                                // making sure we are not awaking at the wrong time after hibernation/sleep
-                                if (AlarmInterval_ms == msTotalInHour && now.Minute == 0)  sp.PlaySync();
-                                //EventLog.WriteEntry($"sp.PlaySync() called and Task.Delay() follows.", EventLogEntryType.Information);
+                                // If we woke up late (sleep/hibernate), don't chime off-the-hour; just loop again.
+                                if (AlarmInterval_ms == msTotalInHour && DateTime.Now.Minute != 0)
+                                    continue;
+                                
+                                sp.PlaySync();                                //EventLog.WriteEntry($"sp.PlaySync() called and Task.Delay() follows.", EventLogEntryType.Information);
                                 await Task.Delay(2000, cancellationToken); // Critical: Wait 2 seconds to push us past the "00:00" mark.
                         }
                     }
