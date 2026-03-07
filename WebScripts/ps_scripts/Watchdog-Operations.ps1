@@ -322,12 +322,19 @@ function Watchdog_Operations {
             return $false
         }
 
+        
+        # Poll for config changes at the watchdog cadence.
+        # If the new config requires watchers/jobs to be rewired, request a clean stop
+        # through the normal StopWatcher path and return $true so the orchestrator restarts.
         $configRefresh = Refresh-WebScriptsConfigIfChanged
         if ($configRefresh.RestartWillOccur) {
             New-Event -SourceIdentifier "StopWatcher" -MessageData "CONFIG_RESTART" | Out-Null
             return $true
         }
 
+        # Consume any queued manual watchdog requests.
+        # These events let command handlers pull the next health check closer without
+        # changing the normal watchdog cadence for future iterations.
         $manualCheckRequest = Get-Watchdog2PreCheckDelay -CurrentDelaySeconds $preCheckDelaySeconds
         if ($manualCheckRequest.Found) {
             $preCheckDelaySeconds = $manualCheckRequest.DelaySeconds
@@ -340,6 +347,9 @@ function Watchdog_Operations {
             return $false
         }
 
+        # Run the watchdog handshake only when the feature is fully wired.
+        # A failed probe means the rename-driven command path is no longer healthy,
+        # so we mark the watcher loop as failed and exit with the legacy failure contract.
         if ($watchdogState.WatchdogCheckIsEnabled) {
             $probeSucceeded = Invoke-Watchdog2Probe `
                 -WatchdogProbeTemplate $watchdogState.WatchdogProbeTemplate `
@@ -353,11 +363,17 @@ function Watchdog_Operations {
             }
         }
 
+        # Sleep until the next watchdog cadence, but stay event-driven while idle.
+        # Check once more for StopWatcher afterward so shutdown requests do not wait
+        # for another full loop iteration before returning.
         Wait-Event -Timeout $watchdogState.LoopCadenceSeconds | Out-Null
         if (Test-Watchdog2StopRequested) {
             return $false
         }
 
+        # Clear the one-shot pre-check delay after this iteration.
+        # Future loops should use the normal cadence again unless another DoWatchDogCheck
+        # event schedules an earlier watchdog check.
         $preCheckDelaySeconds = 0
     }
 
