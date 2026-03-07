@@ -715,7 +715,7 @@ function Run-Actions-Per-Game($processName, $fileName, $threadsLimit) {
                 }
 
 				Write-Host " "
-				Write-Host "STARTING [$($process.Name)]"  -ForegroundColor Yellow
+				Write-Host "BOOSTING [$($process.Name)]"  -ForegroundColor Yellow
 				
 				
 				Set-ProcessAffinityAndPriority -Process $process -ProcessAffinity $paffinity -ProcessPriority $action.parameters.process_priority -ThreadIdealProcessor $taffinity -ThreadPriority $action.parameters.thread_priority -CpuSet $cpuset -ChangeCpuSetForProcessAlso $changeCpuSetForProcesses -MaximumThreadsToChange $threadsLimit -OverrideHigherPriority $overrideHigherPriority
@@ -738,7 +738,7 @@ function Run-Actions-Per-Game($processName, $fileName, $threadsLimit) {
 							
 
 							Write-Host " "
-							Write-Host "STARTING SUB [$($depProcess.Name)]" -ForegroundColor Yellow
+							Write-Host "BOOSTING SUB [$($depProcess.Name)]" -ForegroundColor Yellow
 
 							Set-ProcessAffinityAndPriority -Process $depProcess -ProcessAffinity $paffinity -ProcessPriority $dependence.process_priority -ThreadIdealProcessor $taffinity -ThreadPriority $dependence.thread_priority -CpuSet $cpuset -ChangeCpuSetForProcessAlso $changeCpuSetForProcesses -MaximumThreadsToChange $threadsLimit -OverrideHigherPriority $overrideHigherPriority
 						}

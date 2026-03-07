@@ -551,12 +551,12 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
             $runBoost = {
                 # Look for a boost action using the full program name (with .exe).
                 $boostJsonPath = Get-GameBoostActions -programName $programName
-                if ($boostJsonPath -and (Test-Path $boostJsonPath)) {
-                    Play-SeatBelt
+                if ($boostJsonPath -and (Test-Path $boostJsonPath)) {                    
                     Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST" -Message "Applying boost for '$programName' from '$boostJsonPath' [PID:$processId]" -ForegroundColor "Green"
                     # Call Run-Actions-Per-Game with the EXTENSION-LESS name for JSON compatibility.
                     $normalizedProgramName = $programName -replace '\.exe$', ''
                     Run-Actions-Per-Game -processName $normalizedProgramName -fileName $boostJsonPath -threadsLimit 50
+                    Play-SeatBelt                    
                 }
             }
 
@@ -593,10 +593,10 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
             # Look for a boost action using the full program name (with .exe).
             $boostJsonPath = Get-GameBoostActions -programName $programName
             if ($boostJsonPath -and (Test-Path $boostJsonPath)) {
-				Play-SeatBelt
                 Write-VerboseDebug -Timestamp (Get-Date) -Title "RESTORE" -Message "Restoring processes related to '$programName' using '$boostJsonPath' [PID:$processId]" -ForegroundColor "Cyan"
                 # Call our corrected restore function.
                 Restore-GameBoost -programNameWithExt $programName -boostJsonPath $boostJsonPath -threadsLimit 50
+				Play-SeatBelt                
             }
         }
     }
