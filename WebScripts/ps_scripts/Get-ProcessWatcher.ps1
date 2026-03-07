@@ -1,7 +1,6 @@
-﻿. ".\Write-VerboseDebug.ps1"
-. ".\Gaming-Programs.ps1"
-
-
+﻿$scriptDir = $PSScriptRoot
+. (Join-Path $scriptDir 'Write-VerboseDebug.ps1')
+. (Join-Path $scriptDir 'Gaming-Programs.ps1')
 
 function Create-ProcessWatcherQuery {
     param (

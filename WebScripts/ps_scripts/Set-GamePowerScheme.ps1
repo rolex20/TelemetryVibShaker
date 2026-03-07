@@ -1,8 +1,9 @@
-﻿. ".\Write-VerboseDebug.ps1"
-. ".\Gaming-Programs.ps1"
-. ".\Set-PowerScheme.ps1"
-. ".\Set-IdealProcessor.ps1"
-. ".\Cpu-Snapshots.ps1"
+﻿$scriptDir = $PSScriptRoot
+. (Join-Path $scriptDir 'Write-VerboseDebug.ps1')
+. (Join-Path $scriptDir 'Gaming-Programs.ps1')
+. (Join-Path $scriptDir 'Set-PowerScheme.ps1')
+. (Join-Path $scriptDir 'Set-IdealProcessor.ps1')
+. (Join-Path $scriptDir 'Cpu-Snapshots.ps1')
 
 function Restore-GameBoost {
     <#

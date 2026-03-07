@@ -1,18 +1,13 @@
-﻿# This script monitors a specified file for changes. When the file is modified,
-# the script downloads a file from a provided URL and saves it to a designated path.
-# The script then sleeps for a set duration and repeats the process, waiting
-# for the next modification on the watch file.
-
-
-. ".\Write-VerboseDebug.ps1"
-. ".\Get-RenamesWatcher.ps1"
-. ".\Watchdog-Operations.ps1"
-. ".\SetAffinityAndPriority.ps1"
-. ".\Get-ProcessWatcher.ps1"
-. ".\Send-IPC-ExitCommand.ps1"
-. ".\Check-Admin-Privileges.ps1"
-
-. ".\Get-HostConfig.ps1"
+﻿Set-Location $PSScriptRoot
+$scriptDir = $PSScriptRoot
+. (Join-Path $scriptDir 'Write-VerboseDebug.ps1')
+. (Join-Path $scriptDir 'Get-RenamesWatcher.ps1')
+. (Join-Path $scriptDir 'Watchdog-Operations.ps1')
+. (Join-Path $scriptDir 'SetAffinityAndPriority.ps1')
+. (Join-Path $scriptDir 'Get-ProcessWatcher.ps1')
+. (Join-Path $scriptDir 'Send-IPC-ExitCommand.ps1')
+. (Join-Path $scriptDir 'Check-Admin-Privileges.ps1')
+. (Join-Path $scriptDir 'Get-HostConfig.ps1')
 $globalcfg = Bootstrap-Config
 
 

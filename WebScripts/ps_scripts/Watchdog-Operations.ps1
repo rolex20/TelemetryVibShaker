@@ -19,7 +19,7 @@ function Get-NewFileName {
 
 
 
-function Watchdog_Operations {
+function Watchdog_Operationsold {
 
     # Guard: watchdog sanity check requires command_file (set only when remoteCommandsWatcher is enabled)
     $watchdogCheckEnabled = $false
@@ -135,4 +135,231 @@ function Watchdog_Operations {
     } while ($watchers_OK)
 	
 	return $failure
+}
+
+function Write-Watchdog2MissingCommandFileWarning {
+    Write-VerboseDebug -Timestamp (Get-Date) -Title "WATCHDOG" `
+        -Message "Watchdog enabled but command_file is not set (remoteCommandsWatcher likely off). Skipping watchdog sanity check." `
+        -ForegroundColor "Yellow" -Speak $true
+}
+
+function New-Watchdog2State {
+    $state = @{
+        WatchdogCheckIsEnabled = $false
+        WatchdogProbeTemplate = $null
+        WatchdogProbeCommandFile = $null
+        WatchdogProbeTempFile = $null
+        InitialPreCheckDelaySeconds = 10
+        LoopCadenceSeconds = 60 * 10
+    }
+
+    if (-not $globalcfg.features.watchdog) {
+        return $state
+    }
+
+    if ([string]::IsNullOrWhiteSpace($command_file)) {
+        Write-Watchdog2MissingCommandFileWarning
+        return $state
+    }
+
+    $state.WatchdogCheckIsEnabled = $true
+    $state.WatchdogProbeTemplate = "watchdog.json"
+    $state.WatchdogProbeCommandFile = $command_file
+    $state.WatchdogProbeTempFile = Get-NewFileName -FilePath $command_file -NewExtension "tmp"
+
+    return $state
+}
+
+function Test-Watchdog2StopRequested {
+    if ($Global:Watcher_Continue -eq $false) {
+        return $true
+    }
+
+    $stopEvents = Get-Event -SourceIdentifier "StopWatcher" -ErrorAction SilentlyContinue
+    if (-not $stopEvents) {
+        return $false
+    }
+
+    $stopEvents | ForEach-Object {
+        Remove-Event -EventId $_.EventIdentifier -ErrorAction SilentlyContinue
+    } | Out-Null
+
+    return $true
+}
+
+function Get-Watchdog2PreCheckDelay {
+    param(
+        [int]$CurrentDelaySeconds = 0
+    )
+
+    $nextDelaySeconds = $CurrentDelaySeconds
+    $foundManualRequest = $false
+
+    Get-Event -SourceIdentifier "DoWatchDogCheck" -ErrorAction SilentlyContinue | ForEach-Object {
+        $nextDelaySeconds = $_.MessageData
+        Remove-Event -EventId $_.EventIdentifier -ErrorAction SilentlyContinue
+        $foundManualRequest = $true
+    } | Out-Null
+
+    if ($foundManualRequest -and $nextDelaySeconds -eq 0) {
+        $nextDelaySeconds = 5
+    }
+
+    return @{
+        Found = $foundManualRequest
+        DelaySeconds = $nextDelaySeconds
+    }
+}
+
+function Wait-Watchdog2InterruptibleDelay {
+    param(
+        [double]$DelaySeconds
+    )
+
+    $remainingDelay = $DelaySeconds
+    while ($remainingDelay -gt 0) {
+        $chunkSeconds = [Math]::Min(0.5, $remainingDelay)
+        Wait-Event -Timeout $chunkSeconds | Out-Null
+
+        if (Test-Watchdog2StopRequested) {
+            return $false
+        }
+
+        # Once the watchdog is already on its way to a check, extra nudges do not need
+        # to reschedule anything. We consume them here to keep the queue clean.
+        Get-Event -SourceIdentifier "DoWatchDogCheck" -ErrorAction SilentlyContinue | ForEach-Object {
+            Remove-Event -EventId $_.EventIdentifier -ErrorAction SilentlyContinue
+        } | Out-Null
+
+        $remainingDelay -= $chunkSeconds
+    }
+
+    return $true
+}
+
+function Invoke-Watchdog2Probe {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$WatchdogProbeTemplate,
+
+        [Parameter(Mandatory = $true)]
+        [string]$WatchdogProbeTempFile,
+
+        [Parameter(Mandatory = $true)]
+        [string]$WatchdogProbeCommandFile
+    )
+
+    if (Test-Path "watchdog.txt") {
+        Remove-Item "watchdog.txt"
+    }
+
+    if (Test-Path $WatchdogProbeCommandFile) {
+        Remove-Item $WatchdogProbeCommandFile
+    }
+
+    Copy-Item $WatchdogProbeTemplate $WatchdogProbeTempFile | Out-Null
+    Rename-Item $WatchdogProbeTempFile $WatchdogProbeCommandFile | Out-Null
+
+    # The downstream watcher writes watchdog.txt only after the rename event is observed
+    # and the JSON command is fully dispatched, so this file is the end-to-end handshake.
+    Start-Sleep -Milliseconds 200 | Out-Null
+
+    if (Test-Path "watchdog.txt") {
+        return $true
+    }
+
+    Write-VerboseDebug -Timestamp (Get-Date) -Title "ERROR" -Message "Events are not being processed" -ForegroundColor "Red"
+    return $false
+}
+
+<#
+.SYNOPSIS
+Runs the watchdog heartbeat loop for the watcher orchestrator.
+
+.DESCRIPTION
+Watchdog_Operations2 is a refactored, narrative version of Watchdog_Operations.
+It keeps the same operational role while separating the loop into clear phases:
+configuration polling, interruptible waiting, and rename-based health probing.
+
+The loop has three responsibilities.
+First, it polls the shared host configuration at the watchdog cadence and asks the
+orchestrator to restart when a config change requires a clean rewire of watchers.
+Second, it waits in an event-responsive way so EXIT_WATCHER and StopWatcher can
+break long sleeps immediately. Third, when the watchdog feature is enabled, it
+performs a rename-based handshake that proves both file-system event handling and
+downstream command processing are still alive.
+
+.OUTPUTS
+System.Boolean. Returns $true when the orchestrator should restart itself, returns
+$false when the watcher should stop without restart, and returns $true on watchdog
+probe failure to preserve the legacy failure contract of Watchdog_Operations.
+
+.NOTES
+Dependencies:
+- $globalcfg.features.watchdog decides whether the probe is enabled.
+- $command_file supplies the rename target for the watchdog command handoff.
+- Refresh-WebScriptsConfigIfChanged is used for hot-reload polling.
+- Write-VerboseDebug is the operator-visible logging path.
+- DoWatchDogCheck nudges the loop into an earlier health check.
+- StopWatcher unblocks waits and requests a clean stop path.
+- $Global:Watcher_Continue is the shared cross-scope stop flag.
+
+Behavioral contract:
+- The old Watchdog_Operations function remains untouched.
+- Event names and handshake files are intentionally preserved.
+- Wait-Event is used instead of Start-Sleep so the loop remains responsive while idle.
+#>
+function Watchdog_Operations {
+    $watchdogState = New-Watchdog2State
+    $watchdogFailed = $false
+    $watchersHealthy = $true
+    $preCheckDelaySeconds = $watchdogState.InitialPreCheckDelaySeconds
+
+    while ($watchersHealthy) {
+        # Guard clauses keep the control flow honest: stop and restart requests win
+        # immediately so the caller never has to wait for a long timeout to expire.
+        if (Test-Watchdog2StopRequested) {
+            return $false
+        }
+
+        $configRefresh = Refresh-WebScriptsConfigIfChanged
+        if ($configRefresh.RestartWillOccur) {
+            New-Event -SourceIdentifier "StopWatcher" -MessageData "CONFIG_RESTART" | Out-Null
+            return $true
+        }
+
+        $manualCheckRequest = Get-Watchdog2PreCheckDelay -CurrentDelaySeconds $preCheckDelaySeconds
+        if ($manualCheckRequest.Found) {
+            $preCheckDelaySeconds = $manualCheckRequest.DelaySeconds
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "INFO" -Message "Starting a Watchdog sanity check in $preCheckDelaySeconds seconds..." -ForegroundColor "DarkGray"
+        }
+
+        # This short pre-check wait is deliberately interruptible. The loop must be able
+        # to honor EXIT_WATCHER quickly even if the cadence between checks is long.
+        if (-not (Wait-Watchdog2InterruptibleDelay -DelaySeconds $preCheckDelaySeconds)) {
+            return $false
+        }
+
+        if ($watchdogState.WatchdogCheckIsEnabled) {
+            $probeSucceeded = Invoke-Watchdog2Probe `
+                -WatchdogProbeTemplate $watchdogState.WatchdogProbeTemplate `
+                -WatchdogProbeTempFile $watchdogState.WatchdogProbeTempFile `
+                -WatchdogProbeCommandFile $watchdogState.WatchdogProbeCommandFile
+
+            if (-not $probeSucceeded) {
+                $watchdogFailed = $true
+                $watchersHealthy = $false
+                break
+            }
+        }
+
+        Wait-Event -Timeout $watchdogState.LoopCadenceSeconds | Out-Null
+        if (Test-Watchdog2StopRequested) {
+            return $false
+        }
+
+        $preCheckDelaySeconds = 0
+    }
+
+    return $watchdogFailed
 }
