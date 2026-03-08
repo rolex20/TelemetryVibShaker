@@ -99,6 +99,7 @@
           "NickName": "Forza",
           "Start": "Balanced",
           "Stop": "Balanced",
+          "AuxProgramsDelaySeconds": 0,          
           "AuxPrograms": [
             "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
             "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk"
@@ -157,11 +158,13 @@
           "Stutter": false,
           "NickName": "Ti-Worker",
           "Speak": "Windows Ti-Worker process",
+          "AuxProgramsDelaySeconds": 0,          
           "BoostAction": "action-per-process-boost4.json"
         },
         "CompatTelRunner.exe": {
           "Stutter": false,
           "NickName": "Compat Tel Runner",
+          "AuxProgramsDelaySeconds": 0,          
           "Speak": "Windows Compat-Tel-Runner process",
           "BoostAction": "action-per-process-boost4.json"
         }
