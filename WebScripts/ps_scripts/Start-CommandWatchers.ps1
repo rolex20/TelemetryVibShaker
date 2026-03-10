@@ -130,6 +130,7 @@ try {
 
             # Parent metadata is purely diagnostic, but useful when launchers spawn games indirectly.
             $parentMsg = ""
+            $cmdLineMsg = ""
             if ($traceName.Contains("ProcessStartTrace")) {
                 $parent_pId = $null
                 $parent_pName = '<unknown>'
@@ -139,10 +140,40 @@ try {
                     $parent_pName = (Get-Process -Id $parent_pId -ErrorAction SilentlyContinue).ProcessName
                 }
                 $parentMsg = " - PARENT: $parent_pName [$parent_pId]"
+
+                # Command-line capture is optional per process profile because querying CIM on
+                # every process start can add overhead and produce unnecessary log noise.
+                $profile = $null
+                if ($Global:GameProfiles -and $Global:GameProfiles.ContainsKey($pName)) {
+                    $profile = $Global:GameProfiles[$pName]
+                }
+
+                $logCommandLine = $false
+                if ($profile) {
+                    if ($profile.ContainsKey('CommandLine')) {
+                        $logCommandLine = [bool]$profile.CommandLine
+                    }
+                    elseif ($profile.ContainsKey('ComandLine')) {
+                        # Keep typo-compatible key support in case existing profiles use it.
+                        $logCommandLine = [bool]$profile.ComandLine
+                    }
+                }
+
+                if ($logCommandLine) {
+                    try {
+                        $cmdLine = (Get-CimInstance -ClassName Win32_Process -Filter "ProcessId = $event_pId" -ErrorAction SilentlyContinue).CommandLine
+                        if (-not [string]::IsNullOrWhiteSpace($cmdLine)) {
+                            $cmdLineMsg = " - CMD: $cmdLine"
+                        }
+                    }
+                    catch {
+                        # Best-effort diagnostic only; ignore lookup failures for short-lived/system processes.
+                    }
+                }
             }
 
             Write-Host " "            
-            Write-VerboseDebug -Timestamp $Event.TimeGenerated -Title "PROCESS" -Message "$traceName - $pName [$event_pId] $parentMsg"
+            Write-VerboseDebug -Timestamp $Event.TimeGenerated -Title "PROCESS" -Message "$traceName - $pName [$event_pId] $parentMsg$cmdLineMsg"
 
             Set-GamePowerScheme -traceName $traceName -programName $pName -processId $event_pId
         }

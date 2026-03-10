@@ -159,14 +159,16 @@
           "NickName": "Ti-Worker",
           "Speak": "Windows Ti-Worker process",
           "AuxProgramsDelaySeconds": 0,          
-          "BoostAction": "action-per-process-boost4.json"
+          "BoostAction": "action-per-process-boost4.json",
+          "CommandLine": true
         },
         "CompatTelRunner.exe": {
           "Stutter": false,
           "NickName": "Compat Tel Runner",
           "AuxProgramsDelaySeconds": 0,          
           "Speak": "Windows Compat-Tel-Runner process",
-          "BoostAction": "action-per-process-boost4.json"
+          "BoostAction": "action-per-process-boost4.json",
+          "CommandLine": true
         }
       }
     },
