@@ -144,6 +144,58 @@
         }
     },
     {
+        "process_name": "forzamotorsport7",
+        "parameters": {
+            "process_affinity": "DoNotChange",
+            "process_priority": "AboveNormal",
+            "thread_ideal_processor": "DoNotChange",
+            "thread_priority": "DoNotChange",
+            "thread_cpu_sets": "DoNotChange",
+            "process_change_cpu_sets": false,
+            "override_higher_priority": false,
+            "dependencies": []
+        }
+    },
+    {
+        "process_name": "SmartersIPTV",
+        "parameters": {
+            "process_affinity": "P-Cores",
+            "process_priority": "High",
+            "thread_ideal_processor": "DoNotChange",
+            "thread_priority": "DoNotChange",
+            "thread_cpu_sets": "DoNotChange",
+            "process_change_cpu_sets": false,
+            "override_higher_priority": false,
+            "dependencies": []
+        }
+    },
+    {
+        "process_name": "sfvipbblayer",
+        "parameters": {
+            "process_affinity": "P-Cores",
+            "process_priority": "High",
+            "thread_ideal_processor": "DoNotChange",
+            "thread_priority": "DoNotChange",
+            "thread_cpu_sets": "DoNotChange",
+            "process_change_cpu_sets": false,
+            "override_higher_priority": false,
+            "dependencies": []
+        }
+    },    
+    {
+        "process_name": "sfvip player",
+        "parameters": {
+            "process_affinity": "DoNotChange",
+            "process_priority": "High",
+            "thread_ideal_processor": "P-Cores",
+            "thread_priority": "AboveNormal",
+            "thread_cpu_sets": "P-Cores",
+            "process_change_cpu_sets": true,
+            "override_higher_priority": false,
+            "dependencies": []
+        }
+    },
+    {
         "process_name": "Ace7Game",
         "parameters": {
             "process_affinity": "P-Cores",

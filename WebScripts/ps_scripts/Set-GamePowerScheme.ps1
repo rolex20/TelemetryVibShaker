@@ -218,6 +218,8 @@ function Start-GameRuntimeTracker {
 
 	$null = Register-ObjectEvent -InputObject $timer -EventName Elapsed -SourceIdentifier $sourceIdentifier -MessageData $messageData -Action {
 		try {
+            [System.Diagnostics.Process]::GetCurrentProcess().PriorityClass = [System.Diagnostics.ProcessPriorityClass]::Idle
+                        
             # Timer callbacks run in an event runspace, which may not inherit all function definitions.
             # Re-importing dependencies here avoids "function not found" failures during long sessions.
             $scriptDir = $Event.MessageData.ScriptDir

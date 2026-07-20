@@ -95,6 +95,18 @@
           "Stop": "Balanced",
           "BoostAction": "action-per-process-boost1.json"
         },
+        "SmartersIPTV.exe": {
+          "NickName": "Smarters IPTV",
+          "Start": "High Performance",
+          "Stop": "Balanced",
+          "BoostAction": "action-per-process-boost1.json"
+        },        
+        "sfvip player.exe": {
+          "NickName": "SFVIP Player",
+          "Start": "High Performance",
+          "Stop": "Balanced",
+          "BoostAction": "action-per-process-boost1.json"
+        },                
         "forza_steamworks_release_final.exe": {
           "NickName": "Forza",
           "Start": "Balanced",
@@ -102,16 +114,19 @@
           "AuxProgramsDelaySeconds": 0,          
           "AuxPrograms": [
             "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
-            "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk"
+            "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk",
+            "C:\\Users\\ralch\\Desktop\\Joystick Gremlin.lnk"
           ]
         },
         "forzamotorsport7.exe": {
           "NickName": "Forza",
           "Start": "Balanced",
           "Stop": "Balanced",
+          "BoostAction": "action-per-process-boost1.json",
           "AuxPrograms": [
             "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
-            "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk"
+            "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk",
+            "C:\\Users\\ralch\\Desktop\\Joystick Gremlin.lnk"
           ]
         },
         "ForzaHorizon5.exe": {
@@ -120,7 +135,8 @@
           "Stop": "Balanced",
           "AuxPrograms": [
             "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
-            "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk"
+            "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk",
+            "C:\\Users\\ralch\\Desktop\\Joystick Gremlin.lnk"
           ]
         },
         "forzahorizon6.exe": {
@@ -129,7 +145,8 @@
           "Stop": "Balanced",
           "AuxPrograms": [
             "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
-            "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk"
+            "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk",
+            "C:\\Users\\ralch\\Desktop\\Joystick Gremlin.lnk"
           ]
         },
         "AssettoCorsa.exe": {
@@ -166,7 +183,7 @@
         "TiWorker.exe": {
           "Stutter": false,
           "NickName": "Ti-Worker",
-          "Speak": "Windows Ti-Worker process",
+          "Speak": "Windows Ti-Worker",
           "AuxProgramsDelaySeconds": 0,          
           "BoostAction": "action-per-process-boost4.json"
         },
@@ -174,7 +191,7 @@
           "Stutter": false,
           "NickName": "Compat Tel Runner",
           "AuxProgramsDelaySeconds": 0,          
-          "Speak": "Windows Compat-Tel-Runner process",
+          "Speak": "Windows Compat-Tel-Runner",
           "BoostAction": "action-per-process-boost4.json"
         }
       }
@@ -193,12 +210,12 @@
         "TiWorker.exe": {
           "Stutter": true,
           "NickName": "Ti-Worker",
-          "Speak": "Windows Ti-Worker process"
+          "Speak": "Windows Ti-Worker"
         },
         "CompatTelRunner.exe": {
           "Stutter": true,
           "NickName": "Compat Tel Runner",
-          "Speak": "Windows Compat-Tel-Runner process"
+          "Speak": "Windows Compat-Tel-Runner"
         }
       }
     },

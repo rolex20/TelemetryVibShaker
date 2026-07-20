@@ -1,0 +1,8 @@
+[2026-07-19 20:31:50] Starting...
+[2026-07-19 20:31:50] Set process priority to Idle
+[2026-07-19 20:31:50] Using API endpoint: https://iptracker.up.railway.app/update.php
+[2026-07-19 20:31:50] IP capture attempt 1 of 20
+[2026-07-19 20:31:50] IP capture successful: 192.168.1.38
+[2026-07-19 20:31:50] Requesting geolocation from ip-api.com
+[2026-07-19 20:31:50] Posting telemetry payload to server
+[2026-07-19 20:31:52] Telemetry POST succeeded. Exiting with success
