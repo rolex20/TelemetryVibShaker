@@ -128,6 +128,179 @@ The design is: **my defaults are my rig**, but anyone can fork/tune it to match 
 
 ---
 
+### Auxiliary program lifecycle formats
+
+`AuxPrograms` accepts legacy strings, two shorthand matcher formats, and structured
+objects in the same JSON array. All examples below use JSON escaping, so Windows path
+backslashes are doubled.
+
+#### Legacy path string
+
+```json
+"AuxPrograms": [
+  "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk"
+]
+```
+
+Legacy strings preserve the original behavior exactly:
+
+- launch the path every time the monitored game starts;
+- do not look for an existing process;
+- do not track ownership;
+- never stop the launched process.
+
+This is equivalent to `LaunchMode = Always` and `StopMode = Never`.
+
+#### Executable shorthand
+
+```json
+"AuxPrograms": [
+  "[FanatecMonitor.exe]C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk"
+]
+```
+
+The value inside `[...]` is the process-name matcher. The `.exe` suffix is optional,
+and matching is case-insensitive. The launch path is skipped when at least one matching
+process is already running.
+
+Executable shorthand always means `LaunchMode = IfNotRunning` and `StopMode = Never`.
+It suppresses duplicates but never claims or terminates a process. A short in-memory
+pending marker also prevents simultaneous game-start callbacks from relaunching a
+shortcut before its target becomes visible.
+
+#### PowerShell-script shorthand
+
+Prefer a full script path:
+
+```json
+"AuxPrograms": [
+  "[ps1:C:\\MyPrograms\\Helpers\\MyHelper.ps1]C:\\Users\\ralch\\Desktop\\My Helper.lnk"
+]
+```
+
+A filename-only matcher is also supported:
+
+```json
+"AuxPrograms": [
+  "[ps1:MyHelper.ps1]C:\\Users\\ralch\\Desktop\\My Helper.lnk"
+]
+```
+
+The watcher searches `powershell.exe` processes through `Win32_Process` and inspects
+their command lines. Full paths are normalized for slash, quote, and case differences.
+Filename-only matching uses complete path-leaf boundaries, so `MyHelper.ps1` does not
+match `NotMyHelper.ps1`. Use a full path when scripts in different directories may have
+the same filename.
+
+PowerShell shorthand also always means `IfNotRunning` plus `Never`. It intentionally
+targets Windows PowerShell 5.1 (`powershell.exe`), not every PowerShell host.
+
+If a shortcut runs a temporary script that starts another executable and then exits,
+the script is no longer represented by a running PowerShell command line. Match the
+persistent child executable instead.
+
+Strings beginning with `[` are treated as lifecycle shorthand. Malformed bracket
+syntax is logged and skipped rather than silently launched as a legacy path.
+
+#### Structured executable definition
+
+```json
+"AuxPrograms": [
+  {
+    "Id": "FanatecMonitor",
+    "Path": "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
+    "MatchType": "ProcessName",
+    "ProcessName": "FanatecMonitor.exe",
+    "LaunchMode": "IfNotRunning",
+    "StopMode": "OwnedOnly",
+    "StartupTimeoutSeconds": 10
+  }
+]
+```
+
+#### Structured PowerShell definitions
+
+Full-path form:
+
+```json
+"AuxPrograms": [
+  {
+    "Id": "MyPowerShellHelper",
+    "Path": "C:\\Users\\ralch\\Desktop\\My Helper.lnk",
+    "MatchType": "PowerShellScript",
+    "ScriptPath": "C:\\MyPrograms\\Helpers\\MyHelper.ps1",
+    "PowerShellHostProcessName": "powershell.exe",
+    "LaunchMode": "IfNotRunning",
+    "StopMode": "OwnedOnly",
+    "StartupTimeoutSeconds": 10
+  }
+]
+```
+
+Filename-only form:
+
+```json
+"AuxPrograms": [
+  {
+    "Id": "MyPowerShellHelper",
+    "Path": "C:\\Users\\ralch\\Desktop\\My Helper.lnk",
+    "MatchType": "PowerShellScript",
+    "ScriptName": "MyHelper.ps1",
+    "PowerShellHostProcessName": "powershell.exe",
+    "LaunchMode": "IfNotRunning",
+    "StopMode": "Never",
+    "StartupTimeoutSeconds": 10
+  }
+]
+```
+
+Structured fields:
+
+- `Id` is optional but strongly recommended. IDs are case-insensitive and identify one
+  logical shared auxiliary. Without an ID, identity is derived from the normalized matcher.
+  Duplicate or incompatible definitions for one identity are logged and skipped while active.
+- `Path` and `MatchType` are required. Missing paths or malformed entries are logged and
+  skipped without stopping the event handler.
+- `MatchType` is `ProcessName` or `PowerShellScript`.
+- `ScriptPath` takes precedence when both `ScriptPath` and `ScriptName` are supplied.
+- `PowerShellHostProcessName` defaults to `powershell.exe`; a different host is searched
+  only when explicitly configured.
+- `LaunchMode` is `Always` or `IfNotRunning`. Structured entries default to `Always`.
+- `StopMode` is `Never` or `OwnedOnly`. Structured entries default to `Never`.
+- `StartupTimeoutSeconds` is a non-negative integer and defaults to 10.
+- The profile-level `AuxProgramsDelaySeconds` and `WindowStyle` still apply to all formats.
+
+#### Exact ownership and shared consumers
+
+`OwnedOnly` never means "stop everything with this name." Before launching, the watcher
+captures matching PIDs. After launching, it polls for a short bounded window and records
+only new matching PIDs plus their creation times. This before/after discovery is required
+for `.lnk` files because `Start-Process -PassThru` may describe a shell or intermediary
+launcher instead of the persistent target.
+
+On game exit, the watcher uses `Stop-Process -Id` only after the exact PID, matcher, and
+creation time still agree. A pre-existing process is never claimed. An unverifiable,
+reused, or already-replaced PID is left running.
+
+For `IfNotRunning + OwnedOnly`, monitored game PIDs are consumers of one logical
+auxiliary. Multiple games or game instances can share it. The owned helper remains
+running until the final consumer exits. For `Always + OwnedOnly`, each game PID owns
+only the new process instances discovered for its own launch.
+
+Ownership is kept in memory. If the watcher restarts, existing auxiliaries are treated
+as pre-existing and will not be terminated. The general watcher cleanup path also does
+not stop auxiliaries, because a configuration or watchdog restart may occur while a game
+is still running. Leaving an unverifiable helper running is safer than terminating an
+unrelated process.
+
+Run the dependency-free lifecycle tests with Windows PowerShell 5.1:
+
+```powershell
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File ".\tests\Aux-Programs.Tests.ps1"
+```
+
+---
+
 ## Common tweaks (most common edits)
 
 ### 1) Add a new game / change power plans
