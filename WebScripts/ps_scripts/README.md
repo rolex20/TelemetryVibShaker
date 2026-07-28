@@ -2,25 +2,27 @@
 
 This folder contains the PowerShell side of my “hands-off” gaming/VR rig automation: lightweight watchers that react to **file events**, **process start/stop events**, and **IPC commands** to help me find stutters, diagnose scheduling drift, and apply repeatable tuning without touching the desktop mid-session.
 
-**Tech flex:** deep **Windows scheduling control via PowerShell + C# Win32 interop**—CPU Sets topology discovery and per-process/per-thread CPU-set steering (`GetSystemCpuSetInformation`, `SetProcessDefaultCpuSets`, `SetThreadSelectedCpuSets`) combined with **thread-level EcoQoS / Efficiency Mode** via `SetThreadInformation` (Win11 class 3 → Win10 class 1 fallback) so background/support threads stay “cheap” on hybrid Alder/Raptor Lake rigs; **real-time process lifecycle automation** using `Register-CimIndicationEvent` on `Win32_ProcessStartTrace/StopTrace` to apply per-game policies the moment a sim starts/exits; an **asynchronous Named Pipe IPC layer** (`NamedPipeServerStream`) with explicit **PipeSecurity/ACL**, command parsing, and CPU-time delta introspection for stutter hunting; **kernel32 priority + background I/O tuning** (`SetPriorityClass(PROCESS_MODE_BACKGROUND_BEGIN)` and idle priority) to keep the watcher from stealing performance; and a PS 5.1-friendly **precompiled + disk-cached C# pipeline** that builds an optimized (`/optimize+`) DLL once, reuses it when valid, and loads from a byte array to avoid file locking—so even older laptops don’t pay the “recompile every run” tax. Rounding it out: **event-driven filesystem orchestration** with `FileSystemWatcher` + atomic rename handoffs (PHP/WAMP drops `.tmp` → `.json`), **multi-machine config layering** (defaults + per-host overrides) via `config/hosts.config.json`, **multithreaded background execution** with `Start-ThreadJob`, and **TTS feedback** (System.Speech) so state changes are audible when you’re busy / in VR with the headset strapped to your face.
+**Tech flex:** deep **Windows scheduling control via PowerShell + C# Win32 interop**—CPU Sets topology discovery and per-process/per-thread CPU-set steering (`GetSystemCpuSetInformation`, `SetProcessDefaultCpuSets`, `SetThreadSelectedCpuSets`) combined with **thread-level EcoQoS / Efficiency Mode** via `SetThreadInformation` (Win11 class 3 → Win10 class 1 fallback) so background/support threads stay “cheap” on hybrid Alder/Raptor Lake rigs; **real-time process lifecycle automation** using `Register-CimIndicationEvent` on `Win32_ProcessStartTrace/StopTrace` with instant process termination (`ImmediateKill`) for unwanted background hogs before any side effects fire; an **asynchronous Named Pipe IPC layer** (`NamedPipeServerStream`) with explicit **PipeSecurity/ACL**, command parsing, and CPU-time delta introspection for stutter hunting (`Stutter-Hunter-IPC.ps1`); **kernel32 priority + background I/O tuning** (`SetPriorityClass(PROCESS_MODE_BACKGROUND_BEGIN)` and idle priority) to keep the watcher from stealing performance; **PID-based gameplay runtime telemetry** with persistent disk snapshots (`Cpu-Snapshots.ps1`) to reliably capture CPU/wall-clock usage across process handle exits; and a PS 5.1-friendly **precompiled + disk-cached C# pipeline** (`Import-OptimizedCSharp.ps1`) that builds an optimized (`/optimize+`) DLL once, reuses it when valid, and loads from a byte array to avoid file locking—so even older laptops don’t pay the “recompile every run” tax. Rounding it out: **event-driven filesystem orchestration** with `FileSystemWatcher` + atomic rename handoffs (PHP/WAMP drops `.tmp` → `.json`), **multi-machine host configuration layering** with dynamic hot-reloading (`config/hosts.config.json` + `Get-HostConfig.ps1`), **multithreaded background execution** with `Start-ThreadJob`, and **TTS feedback** (System.Speech) so state changes are audible when you’re busy / in VR with the headset strapped to your face.
 
 ---
 
-## Why this exists (hybrid-core reality, no marketing)
+## Why this exists (hybrid-core reality & multi-machine automation)
 
-This setup is optimized today for my Alder/Raptor Lake hybrid gaming CPU. Early on, VR sims + Windows background activity could end up on the wrong cores at the wrong time. I wanted flexibility beyond generic tooling: per-process policies, per-thread steering, and quick visibility into CPU time while the sim is running.
+This setup is optimized for my Alder/Raptor Lake hybrid gaming CPU as well as my fleet of gaming and utility machines. Early on, VR sims + Windows background activity could end up on the wrong cores at the wrong time. Furthermore, legacy/older laptops (such as test machines with thermal paste issues) needed aggressive background process killing to avoid BSODs and CPU hangs. I wanted flexibility beyond generic tooling: per-process policies, immediate process termination on launch, per-thread steering, auxiliary tool lifecycle management, and quick visibility into CPU time while a sim is running.
 
-Everything here is modular. You can enable/disable watchers per-machine and customize game profiles to match your rig.
+Everything here is modular and host-aware. You can enable/disable watchers per-machine and customize game profiles via `config/hosts.config.json` without modifying script code.
 
 ---
 
 ## Quick start (PowerShell 5.1)
 
 1. Edit host config: `ps_scripts/config/hosts.config.json`
-   - Enable only the watchers you want for your machine.
+   - Configure global `defaults` or add a host-specific block under `machines.<HOSTNAME>`.
+   - Enable only the feature flags (`processWatcher`, `ipcServer`, `remoteCommandsWatcher`, etc.) you want for your machine.
+   - Define game profiles, TTS options, auxiliary programs, or `ImmediateKill` targets.
 2. Run: `Start-CommandWatchers.ps1`
 
-> Note on paths: some watchers reference real paths from my rig (ex: WAMP locations). Treat them as working examples—if you enable that watcher, you’ll likely customize the paths.
+> **Note on configuration**: `Gaming-Programs.ps1` automatically consumes `config/hosts.config.json` via `Bootstrap-Config` / `Get-WebScriptsConfig`. You do **not** edit `Gaming-Programs.ps1` to configure games—all profiles, power plans, TTS messages, and auxiliary applications are declared in `config/hosts.config.json`.
 
 ---
 
@@ -28,181 +30,165 @@ Everything here is modular. You can enable/disable watchers per-machine and cust
 
 ### Entry point / orchestrator
 **`Start-CommandWatchers.ps1` wires everything together:**
-- Enforces single instance (named mutex)
-- Tunes itself to stay out of the way (efficiency-core affinity + idle/background behavior)
+- Enforces single instance (named mutex protection with explicit owner checks)
+- Tunes itself to stay out of the way (efficiency-core affinity + idle/background priority via kernel32 interop)
+- Bootstraps host configuration via `Get-HostConfig.ps1` / `Bootstrap-Config`
 - Loads shared helpers via deterministic `$PSScriptRoot` dot-sourcing
-- Conditionally spins up watchers based on `config/hosts.config.json`
-- Maintains a watchdog loop and can self-restart if eventing gets stuck
+- Conditionally spins up watchers based on `config/hosts.config.json` feature flags
+- Initializes auxiliary program lifecycle state tracking (`New-AuxProgramLifecycleState`)
+- Maintains a watchdog loop (`Watchdog-Operations.ps1`) and self-restarts cleanly if eventing gets stuck or critical config sections change
+
+### Multi-Machine Host Configuration (`config/hosts.config.json` & `Get-HostConfig.ps1`)
+Configuration is centralized in `config/hosts.config.json` and parsed by `Get-HostConfig.ps1`:
+- **Defaults vs Host Overrides**: Base settings land under `defaults`, while host-specific overrides live under `machines.<HOSTNAME>` (e.g. `GALVATRON`, `ALIENWARE-V2`, `HP-PAV-BLACK`).
+- **Feature Flags**: Toggles per-machine functionality (`processWatcher`, `ipcServer`, `remoteCommandsWatcher`, `warThunderMissionWatcher`, `warThunderDistanceMonitor`, `watchdog`).
+- **Dynamic Hot-Reloading (`Refresh-WebScriptsConfigIfChanged`)**: On every watchdog interval, the watcher checks file timestamps.
+  - **Live Updates**: Value-only edits (e.g. TTS speak text, nicknames, boost actions) are applied live without interrupting watchers.
+  - **Auto-Restart**: Structural edits (changing feature flags, adding/removing game profiles, modifying paths) automatically trigger a clean orchestrator restart when `restart_on_config_change: true`.
 
 ### Event sources (inputs)
-There are three main “inputs” that can drive actions:
+There are three main “inputs” that drive actions:
 
-1) **Process start/stop watcher (game lifecycle)**
-- Implemented via CIM indication events on:
-  - `Win32_ProcessStartTrace`
-  - `Win32_ProcessStopTrace`
-- The authoritative game list is `Gaming-Programs.ps1` (see below).
-- On start/stop it can switch power schemes and trigger “boost” actions.
+1) **Process start/stop watcher (game lifecycle & immediate kill)**
+- Implemented via CIM indication events on `Win32_ProcessStartTrace` and `Win32_ProcessStopTrace` (`Get-ProcessWatcher.ps1`).
+- Passes process events to `Set-GamePowerScheme.ps1`.
+- **Immediate Kill**: Evaluates `"ImmediateKill": true` on start trace *before* any power scheme, aux launch, boost, or telemetry side-effects occur.
+- On standard start/stop events, it handles power scheme switching, stutter hunter enrollment, auxiliary tool launching, boost action execution, and gameplay runtime tracking.
 
 2) **Remote JSON command pipeline (file rename handoff)**
-- A `FileSystemWatcher` listens for **rename** events (atomic handoff).
-- Typical flow: a PHP page writes `command.tmp` then renames to `command.json`.
-- On rename, `Process-CommandFromJson.ps1` reads the JSON and dispatches actions.
+- A `FileSystemWatcher` wrapped by `Get-RenamesWatcher.ps1` listens for **rename** events (atomic handoff).
+- Typical flow: a PHP page or TelemetryVibShaker app writes `command.tmp` then renames to `command.json`.
+- On rename, `Process-CommandFromJson.ps1` parses the JSON payload and dispatches actions.
 
 3) **IPC (named pipe commands)**
-- `Declare-IPC-Server-Action.ps1` runs a NamedPipe server (thread job).
-- It accepts simple commands (speak, window ops, show-process CPU deltas, etc.).
-- Designed as a fast side-channel for “do X now” commands or lightweight introspection.
-
-### Command dispatcher (the “router”)
-**`Process-CommandFromJson.ps1` reads JSON commands and calls into:**
-
-- **Window control**
-  - `Set-ForegroundProcess.ps1`
-  - `Set-Minimize.ps1`
-  - `Set-Maximize.ps1`
-  - `Set-WindowsPosition.ps1`
-  - `Get-WindowLocation.ps1`
-
-- **Power / scheduling / affinity tuning**
-  - `Set-PowerScheme.ps1`
-  - `Set-GamePowerScheme.ps1`
-  - `SetAffinityAndPriority.ps1`
-  - CPU-set + hybrid-core helpers (C# `Add-Type` tooling used by the tuning layer)
-
-- **IPC and telemetry**
-  - `Send-MessageViaPipe.ps1` (client)
-  - `Declare-IPC-Server-Action.ps1` (server)
-  - `Show-CPU-Time-PerProcess.ps1` (CPU-time deltas / stutter-hunt support)
-
-- **Boost profiles**
-  - JSON-driven profiles: `action-per-process-boost*.json`
-  - Used by game profiles and/or remote commands to apply repeatable tuning
-
-### Game-aware configuration (the source of truth)
-**`Gaming-Programs.ps1` defines `$Global:GameProfiles`:**
-- This is intentionally *host-specific* (my different PCs have different needs).
-- It defines:
-  - which games are watched
-  - start/stop power plans
-  - optional `BoostAction` JSON
-  - auxiliary tools to auto-launch
-  - optional `AuxProgramsDelaySeconds` (integer seconds, `>= 0`, default fallback `5`)
-  - optional `WindowStyle` for AuxPrograms (`Normal|Hidden|Minimized|Maximized`, default `Minimized`; invalid values warn and fall back)
-- Everything else consumes this table (process watcher queries, boost triggers, etc.).
-
-### File watcher wrapper + support utilities
-- **`Get-RenamesWatcher.ps1`** wraps `FileSystemWatcher` to listen for rename events (used by remote control + optional War Thunder modules).
-- **`Watchdog-Operations.ps1`** keeps the system honest (detect stuck eventing, help restart cleanly).
-- Optional helpers can be dropped in and wired via explicit `Join-Path $PSScriptRoot ...` dot-sourcing without bloating the entry script.
+- `Declare-IPC-Server-Action.ps1` runs an asynchronous NamedPipe server in a thread job (`Start-ThreadJob`).
+- Accepts simple commands (speak, window positioning, foregrounding, show-process CPU deltas, exit commands).
+- Serves as a fast side-channel for real-time control without disk I/O overhead.
 
 ---
 
-## Game profiles and customization
+### File Index & Module Breakdown
 
-### `Gaming-Programs.ps1`
-This is the place you customize first.
+| Script / File | Category | Description |
+| :--- | :--- | :--- |
+| **`Start-CommandWatchers.ps1`** | Orchestrator | Main entry point; handles mutex lock, self-tuning, watcher setup, watchdog loop, and cleanup. |
+| **`config/hosts.config.json`** | Configuration | Central multi-machine configuration file for defaults, machine overrides, feature flags, and game profiles. |
+| **`Get-HostConfig.ps1`** | Config Engine | JSON parser, hashtable recursive converter, host override merger, and hot-reload diff detector. |
+| **`Gaming-Programs.ps1`** | Profile Helper | Exposes profile lookup functions (`Get-StartPowerSchemes`, `Get-GameAuxPrograms`, `Get-ImmediateKill`, etc.) backed by `hosts.config.json`. |
+| **`Aux-Programs.ps1`** | Aux Lifecycle | Auxiliary program parser, process/ps1 matcher, PID ownership discovery (`OwnedOnly`), and cleanup controller. |
+| **`Set-GamePowerScheme.ps1`** | Lifecycle Handler | Core event handler for process start/stop events; coordinates ImmediateKill, power plans, AuxPrograms, Stutter Hunter, runtime tracking, and two-phase boost actions. |
+| **`Cpu-Snapshots.ps1`** | Telemetry | Persistent disk snapshot helper (`Save-GameRuntimeCpuSnapshot`, `Read-GameRuntimeCpuSnapshot`) for tracking process CPU time across exits. |
+| **`Stutter-Hunter-IPC.ps1`** | Telemetry / IPC | Centralized IPC coordinator and client script for monitoring CPU time deltas and identifying micro-stutters. |
+| **`Stutter-Hunter.ps1`** | Telemetry | Legacy standalone process stutter tracking script. |
+| **`Show-CPU-Time-PerProcess.ps1`** | Introspection | Formats and outputs process CPU time deltas over configurable sampling windows. |
+| **`Set-PowerScheme.ps1`** | Power Control | Switches Windows power plans (High Performance, Balanced, Power Saver, custom GUIDs). |
+| **`Set-IdealProcessor.ps1`** | Scheduling | Configures CPU affinity, thread ideal processors, and process priority. |
+| **`SetGet-DefaultCpuSets.ps1`** | Scheduling | Query and set system/process default CPU Sets via Win32 API. |
+| **`SetAffinityAndPriority.ps1`** | Scheduling | Self-tuning script to move the watcher onto Efficiency Cores and background priority. |
+| **`Import-OptimizedCSharp.ps1`** | Interop Engine | Compiles `/optimize+` C# Win32 interop DLLs on demand with disk caching and byte-array loading to avoid file locking. |
+| **`Process-CommandFromJson.ps1`** | Dispatcher | Parses remote control JSON commands (window style, focus, power, boost) and invokes target functions. |
+| **`Declare-IPC-Server-Action.ps1`** | IPC Server | Named Pipe server implementation running in a dedicated thread job for async IPC command processing. |
+| **`Send-MessageViaPipe.ps1`** | IPC Client | Client script for sending commands to the Named Pipe IPC server. |
+| **`Send-IPC-ExitCommand.ps1`** | IPC Client | Client helper to signal the IPC pipe server to terminate gracefully. |
+| **`Get-ProcessWatcher.ps1`** | Event Source | Registers CIM indication events on `Win32_ProcessStartTrace` and `Win32_ProcessStopTrace`. |
+| **`Get-RenamesWatcher.ps1`** | Event Source | Wraps `FileSystemWatcher` to listen specifically for atomic rename events (`.tmp` → `.json`). |
+| **`Watchdog-Operations.ps1`** | Monitoring | Health monitor loop that checks event subscription integrity and signals orchestrator restarts if stuck. |
+| **`Check-Admin-Privileges.ps1`** | Utility | Verifies elevation and warns if running without administrative rights required for scheduling/power tweaks. |
+| **`Write-VerboseDebug.ps1`** | Utility | Centralized logging helper with timestamp formatting, color coding, and TTS speech integration (`System.Speech`). |
+| **`Set-ForegroundProcess.ps1`** | Window Control | Brings target window to foreground via Win32 `SetForegroundWindow` interop. |
+| **`Set-Minimize.ps1`** | Window Control | Minimizes target process windows. |
+| **`Set-Maximize.ps1`** | Window Control | Maximizes target process windows. |
+| **`Set-WindowsPosition.ps1`** | Window Control | Sets exact window position and dimensions via `MoveWindow`. |
+| **`Get-WindowLocation.ps1`** | Window Control | Queries exact rectangle coordinates of process windows. |
+| **`IP_Tracker_Agent.ps1`** | Network Agent | Tracks external IP changes and records network status. |
+| **`Monitor-War-Thunder-Distance-Multiplier.ps1`** | Sim Helper | Watches War Thunder configuration files and restores custom distance multipliers if rewritten by the game. |
+| **`WT_MissionType1.ps1`** | Sim Helper | Generates custom War Thunder mission configurations from JSON templates. |
 
-- Add games by adding entries under your machine hostname block.
-- Set per-game start/stop power schemes.
-- Optionally reference a boost JSON (`action-per-process-boost*.json`).
-- Add auxiliary tools to auto-launch with a game if you want.
-- Optionally set `AuxProgramsDelaySeconds` per game to control when auxiliaries launch.
-- Optionally set `WindowStyle` per game to control how all AuxPrograms windows are shown.
+---
 
-Example profile snippet:
+## Game profiles and customization (`config/hosts.config.json`)
+
+To add or modify games, edit `config/hosts.config.json` under your machine's entry in `machines.<HOSTNAME>.gameProfiles` (or under `defaults.gameProfiles`).
+
+### Profile Schema Example
+
 ```json
-"forza_steamworks_release_final.exe": {
-  "NickName": "Forza",
-  "Start": "Balanced",
+"DCS.exe": {
+  "NickName": "DCS World",
+  "Speak": "Starting Digital Combat Simulator",
+  "Start": "High Performance",
   "Stop": "Balanced",
+  "ImmediateKill": false,
+  "Stutter": true,
+  "BoostAction": "action-per-process-boost1.json",
+  "AuxProgramsDelaySeconds": 5,
+  "WindowStyle": "Minimized",
   "AuxPrograms": [
-    "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk"
-  ],
-  "AuxProgramsDelaySeconds": 12,
-  "WindowStyle": "Hidden"
+    "[FanatecMonitor.exe]C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
+    {
+      "Id": "MyPowerShellHelper",
+      "Path": "C:\\Users\\ralch\\Desktop\\My Helper.lnk",
+      "MatchType": "PowerShellScript",
+      "ScriptPath": "C:\\MyPrograms\\Helpers\\MyHelper.ps1",
+      "LaunchMode": "IfNotRunning",
+      "StopMode": "OwnedOnly",
+      "StartupTimeoutSeconds": 10
+    }
+  ]
 }
 ```
 
-The design is: **my defaults are my rig**, but anyone can fork/tune it to match their own CPU, GPU, VR stack, and “background junk” profile.
+### Formal Profile Field Reference
+
+| Profile Field | Data Type | Default Value | Allowed Options / Values | Description & Functionality |
+| :--- | :--- | :--- | :--- | :--- |
+| **`NickName`** | String | Process Name | Any string | Human-readable / TTS-friendly display name (used in session notifications, log titles, and exit summaries). |
+| **`Speak`** | String | `null` | Any text string | Custom text-to-speech phrase spoken by `System.Speech` when the process starts or exits. If omitted, default TTS is generated from `NickName`. |
+| **`Start`** | String | `null` | Power scheme name (e.g. `"High Performance"`, `"Balanced"`, or GUID) | Windows power plan applied when the monitored game process starts. |
+| **`Stop`** | String | `null` | Power scheme name (e.g. `"Balanced"`, `"Power Saver"`, or GUID) | Windows power plan applied when the monitored game process exits. |
+| **`ImmediateKill`** | Boolean | `false` | `true`, `false` | When `true`, forcibly terminates (`Stop-Process -Force`) the process immediately upon detection *before* any power schemes, aux programs, boost actions, TTS, or runtime trackers execute. Designed for blocking background hogs (`TiWorker.exe`, `CompatTelRunner.exe`) on legacy machines. |
+| **`Stutter`** | Boolean | `false` | `true`, `false` | When `true`, registers the process with `Stutter-Hunter-IPC.ps1` for real-time stutter tracking and CPU time delta introspection. |
+| **`BoostAction`** | String | `null` | Path to JSON file (e.g. `"action-per-process-boost1.json"`) | Relative JSON policy path containing process priority, CPU affinity masks, CPU Sets, or thread EcoQoS settings applied 5 seconds post-launch. |
+| **`AuxProgramsDelaySeconds`** | Integer | `5` | Non-negative integer (`>= 0`) | Delay in seconds after game launch before auxiliary programs are started. Allows anchoring aux program launches relative to game startup. |
+| **`WindowStyle`** | String | `"Minimized"` | `"Normal"`, `"Hidden"`, `"Minimized"`, `"Maximized"` | Window state passed to `Start-Process -WindowStyle` when launching auxiliary program shortcuts or executables. |
+| **`AuxPrograms`** | Array | `[]` | Array of Strings or JSON objects | List of auxiliary tools, shortcuts, or scripts to launch and optionally track alongside the game process lifecycle. |
 
 ---
 
-### Auxiliary program lifecycle formats
+## Auxiliary program lifecycle formats (`Aux-Programs.ps1`)
 
-`AuxPrograms` accepts legacy strings, two shorthand matcher formats, and structured
-objects in the same JSON array. All examples below use JSON escaping, so Windows path
-backslashes are doubled.
+The `AuxPrograms` array accepts **four distinct formats** to accommodate simple shortcuts, duplicate suppression, script execution, and exact PID ownership cleanup:
 
-#### Legacy path string
-
+### 1. Legacy Path String
 ```json
 "AuxPrograms": [
   "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk"
 ]
 ```
+- **Behavior**: Launches the path every time the game starts. Does not check for existing instances, does not track PID ownership, and **never terminates** the program when the game exits (`LaunchMode = Always`, `StopMode = Never`).
 
-Legacy strings preserve the original behavior exactly:
-
-- launch the path every time the monitored game starts;
-- do not look for an existing process;
-- do not track ownership;
-- never stop the launched process.
-
-This is equivalent to `LaunchMode = Always` and `StopMode = Never`.
-
-#### Executable shorthand
-
+### 2. Executable Shorthand
 ```json
 "AuxPrograms": [
   "[FanatecMonitor.exe]C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk"
 ]
 ```
+- **Behavior**: Checks if a process named `FanatecMonitor.exe` is already running. If running, launch is skipped. **Never terminates** the process on game exit (`LaunchMode = IfNotRunning`, `StopMode = Never`).
 
-The value inside `[...]` is the process-name matcher. The `.exe` suffix is optional,
-and matching is case-insensitive. The launch path is skipped when at least one matching
-process is already running.
-
-Executable shorthand always means `LaunchMode = IfNotRunning` and `StopMode = Never`.
-It suppresses duplicates but never claims or terminates a process. A short in-memory
-pending marker also prevents simultaneous game-start callbacks from relaunching a
-shortcut before its target becomes visible.
-
-#### PowerShell-script shorthand
-
-Prefer a full script path:
-
+### 3. PowerShell Script Shorthand
 ```json
 "AuxPrograms": [
   "[ps1:C:\\MyPrograms\\Helpers\\MyHelper.ps1]C:\\Users\\ralch\\Desktop\\My Helper.lnk"
 ]
 ```
+*(Or filename-only form: `"[ps1:MyHelper.ps1]C:\\Users\\ralch\\Desktop\\My Helper.lnk"`)*
+- **Behavior**: Inspects running `powershell.exe` processes via CIM (`Win32_Process`) and parses their command lines for the script path. If matching, launch is skipped (`LaunchMode = IfNotRunning`, `StopMode = Never`).
 
-A filename-only matcher is also supported:
+---
 
-```json
-"AuxPrograms": [
-  "[ps1:MyHelper.ps1]C:\\Users\\ralch\\Desktop\\My Helper.lnk"
-]
-```
+### 4. Structured Definition (Full Lifecycle & Ownership Control)
 
-The watcher searches `powershell.exe` processes through `Win32_Process` and inspects
-their command lines. Full paths are normalized for slash, quote, and case differences.
-Filename-only matching uses complete path-leaf boundaries, so `MyHelper.ps1` does not
-match `NotMyHelper.ps1`. Use a full path when scripts in different directories may have
-the same filename.
-
-PowerShell shorthand also always means `IfNotRunning` plus `Never`. It intentionally
-targets Windows PowerShell 5.1 (`powershell.exe`), not every PowerShell host.
-
-If a shortcut runs a temporary script that starts another executable and then exits,
-the script is no longer represented by a running PowerShell command line. Match the
-persistent child executable instead.
-
-Strings beginning with `[` are treated as lifecycle shorthand. Malformed bracket
-syntax is logged and skipped rather than silently launched as a legacy path.
-
-#### Structured executable definition
+Structured JSON definitions provide complete precision over matching rules, duplicate checks, ownership tracking, and termination semantics on game exit.
 
 ```json
 "AuxPrograms": [
@@ -218,140 +204,136 @@ syntax is logged and skipped rather than silently launched as a legacy path.
 ]
 ```
 
-#### Structured PowerShell definitions
+#### Formal Field Reference for Structured AuxPrograms Definitions
 
-Full-path form:
+| Field | Data Type | Default Value | Required? | Allowed Options / Format | Detailed Explanation & Mechanics |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **`Id`** | String | Derived from Matcher | Optional (Recommended) | Case-insensitive string identifier (e.g. `"FanatecMonitor"`) | Uniquely identifies a logical shared auxiliary tool. When multiple running games share the same `Id`, the watcher registers them as joint consumers. The auxiliary process remains running until the **final** consumer game exits. |
+| **`Path`** | String | *None* | **Required** | Absolute file path, executable, or `.lnk` shortcut | The target shortcut or binary path passed to `Start-Process` when launching the auxiliary program. Backslashes must be doubled (`\\\\`) in JSON. |
+| **`MatchType`** | String | *None* | **Required** | `"ProcessName"`, `"PowerShellScript"` | Defines the mechanism used to inspect `Win32_Process` instances when querying running programs before or after launch: <br>• `"ProcessName"`: Matches process image names (e.g., `FanatecMonitor.exe`).<br>• `"PowerShellScript"`: Matches running `powershell.exe` processes by inspecting their command lines. |
+| **`ProcessName`** | String | `null` | Required if `MatchType` = `"ProcessName"` | Executable name with or without `.exe` (e.g. `"FanatecMonitor.exe"`) | The exact process image name to match when `MatchType` is `"ProcessName"`. Automatically normalized by stripping `.exe` and trailing spaces for WQL queries. |
+| **`ScriptPath`** | String | `null` | Optional (`MatchType` = `"PowerShellScript"`) | Absolute path to `.ps1` file (e.g. `"C:\\Helpers\\Script.ps1"`) | Matches `powershell.exe` processes whose command lines contain this exact absolute script path. Takes precedence over `ScriptName` if both are supplied. |
+| **`ScriptName`** | String | `null` | Optional (`MatchType` = `"PowerShellScript"`) | Script filename ending in `.ps1` without path slashes (e.g. `"Script.ps1"`) | Matches `powershell.exe` processes whose command lines contain this script filename. Uses word/path boundary matching so `Script.ps1` does not match `NotScript.ps1`. |
+| **`PowerShellHostProcessName`** | String | `"powershell.exe"` | Optional (`MatchType` = `"PowerShellScript"`) | Executable leaf name (e.g. `"powershell.exe"`, `"pwsh.exe"`) | The host process image name searched when inspecting command lines for PowerShell script execution. Defaults to Windows PowerShell 5.1 (`powershell.exe`). |
+| **`LaunchMode`** | String | `"Always"` | Optional | `"Always"`, `"IfNotRunning"` | Controls when the `Start-Process` call is triggered upon game start:<br>• **`"Always"`**: Always execute the launch path every time the monitored game starts, regardless of whether a matching process is already running.<br>• **`"IfNotRunning"`**: Query `Win32_Process` first. Skip launching if a matching process (or pending in-flight launch) already exists. |
+| **`StopMode`** | String | `"Never"` | Optional | `"Never"`, `"OwnedOnly"` | Controls cleanup behavior when the monitored game exits:<br>• **`"Never"`**: The auxiliary process is left running indefinitely. The watcher takes no termination action when the game exits.<br>• **`"OwnedOnly"`**: The watcher terminates **only** verified process instances that were launched and claimed by this watcher instance for this game. Pre-existing processes are **never** stopped. |
+| **`StartupTimeoutSeconds`** | Integer | `10` | Optional | Non-negative integer (`>= 0`) | The maximum bounded window (in seconds) after calling `Start-Process` during which the watcher polls `Win32_Process` to discover newly spawned PID(s) and their creation timestamps for `OwnedOnly` ownership tracking. |
 
+#### Detailed Mechanics of `StopMode = "OwnedOnly"` and Shared Consumers
+
+1. **Before-and-After PID Discovery**:
+   - Because Windows shortcuts (`.lnk` files) or intermediate launchers invoke `Start-Process` without returning the final persistent PID directly, `OwnedOnly` uses bounded polling:
+     - **Before Launch**: Captures all existing PIDs matching `MatchType`.
+     - **Launch**: Executes `Start-Process -FilePath Path -WindowStyle WindowStyle`.
+     - **After Launch**: Polls `Win32_Process` for up to `StartupTimeoutSeconds` (until PIDs stabilize for 500ms).
+     - **Claiming**: Records only newly appeared PIDs whose WQL `CreationDate` is greater than or equal to the launch timestamp. Pre-existing processes are left unowned.
+2. **Shared Consumers across Games**:
+   - If Game A launches an auxiliary defined with `Id: "FanatecMonitor"` and `StopMode: "OwnedOnly"`, PID 1234 is claimed.
+   - If Game B starts while Game A is still running, Game B checks `Id: "FanatecMonitor"`. Since PID 1234 is running, `LaunchMode: "IfNotRunning"` suppresses relaunching and registers Game B as a second consumer of PID 1234.
+   - When Game A exits, the watcher detects that Game B is still active. PID 1234 is **retained**.
+   - When Game B exits, the final consumer count drops to 0, and the watcher safely invokes `Stop-Process -Id 1234 -Force`.
+3. **Watcher Restart Safety**:
+   - Ownership records are maintained in memory. If `Start-CommandWatchers.ps1` restarts or reloads, surviving auxiliary processes are treated as pre-existing and will **never** be forcefully terminated on subsequent exits.
+
+---
+
+## Gameplay Telemetry & CPU Runtime Tracking (`Cpu-Snapshots.ps1`)
+
+The toolkit provides "hands-off" session tracking without polling overhead:
+
+1. **PID-Keyed Tracking**: Monitored games spawn a runtime tracking timer (`Start-GameRuntimeTracker`). Tracking is keyed by PID (not process name) so multiple concurrent instances do not collide.
+2. **Persistent Disk Snapshots (`Cpu-Snapshots.ps1`)**:
+   - Every 30 minutes (and on startup), CPU time is sampled and persisted to disk via `Save-GameRuntimeCpuSnapshot`.
+   - **Zombie Handle Protection**: When a process exits, OS process handle stats can occasionally report 0 seconds or fail to refresh. The stop handler (`Stop-GameRuntimeTracker`) cross-checks live data against disk snapshots to guarantee accurate total CPU time reporting.
+3. **Audio Feedback**:
+   - Speaks hourly milestones during long gaming sessions (*"DCS World - 2 hours"*).
+   - Speaks total gameplay duration on exit (*"War Thunder stopped, 1 hour 15 minutes total"*).
+
+---
+
+## Boost profiles and process tuning (`action-per-process-boost*.json`)
+
+Boost profiles define hardware scheduling, affinity masks, CPU Sets, and thread priorities for games and their dependencies.
+
+Example snippet (`action-per-process-boost1.json`):
 ```json
-"AuxPrograms": [
+[
   {
-    "Id": "MyPowerShellHelper",
-    "Path": "C:\\Users\\ralch\\Desktop\\My Helper.lnk",
-    "MatchType": "PowerShellScript",
-    "ScriptPath": "C:\\MyPrograms\\Helpers\\MyHelper.ps1",
-    "PowerShellHostProcessName": "powershell.exe",
-    "LaunchMode": "IfNotRunning",
-    "StopMode": "OwnedOnly",
-    "StartupTimeoutSeconds": 10
+    "process_name": "Ace7Game-Win64-Shipping",
+    "parameters": {
+      "priority": "High",
+      "cpu_affinity": [0, 2, 4, 6, 8, 10, 12, 14],
+      "dependencies": [
+        {
+          "process_name": "steamwebhelper",
+          "priority": "BelowNormal",
+          "dont_restore_boost": true
+        }
+      ]
+    }
   }
 ]
 ```
 
-Filename-only form:
-
-```json
-"AuxPrograms": [
-  {
-    "Id": "MyPowerShellHelper",
-    "Path": "C:\\Users\\ralch\\Desktop\\My Helper.lnk",
-    "MatchType": "PowerShellScript",
-    "ScriptName": "MyHelper.ps1",
-    "PowerShellHostProcessName": "powershell.exe",
-    "LaunchMode": "IfNotRunning",
-    "StopMode": "Never",
-    "StartupTimeoutSeconds": 10
-  }
-]
-```
-
-Structured fields:
-
-- `Id` is optional but strongly recommended. IDs are case-insensitive and identify one
-  logical shared auxiliary. Without an ID, identity is derived from the normalized matcher.
-  Duplicate or incompatible definitions for one identity are logged and skipped while active.
-- `Path` and `MatchType` are required. Missing paths or malformed entries are logged and
-  skipped without stopping the event handler.
-- `MatchType` is `ProcessName` or `PowerShellScript`.
-- `ScriptPath` takes precedence when both `ScriptPath` and `ScriptName` are supplied.
-- `PowerShellHostProcessName` defaults to `powershell.exe`; a different host is searched
-  only when explicitly configured.
-- `LaunchMode` is `Always` or `IfNotRunning`. Structured entries default to `Always`.
-- `StopMode` is `Never` or `OwnedOnly`. Structured entries default to `Never`.
-- `StartupTimeoutSeconds` is a non-negative integer and defaults to 10.
-- The profile-level `AuxProgramsDelaySeconds` and `WindowStyle` still apply to all formats.
-
-#### Exact ownership and shared consumers
-
-`OwnedOnly` never means "stop everything with this name." Before launching, the watcher
-captures matching PIDs. After launching, it polls for a short bounded window and records
-only new matching PIDs plus their creation times. This before/after discovery is required
-for `.lnk` files because `Start-Process -PassThru` may describe a shell or intermediary
-launcher instead of the persistent target.
-
-On game exit, the watcher uses `Stop-Process -Id` only after the exact PID, matcher, and
-creation time still agree. A pre-existing process is never claimed. An unverifiable,
-reused, or already-replaced PID is left running.
-
-For `IfNotRunning + OwnedOnly`, monitored game PIDs are consumers of one logical
-auxiliary. Multiple games or game instances can share it. The owned helper remains
-running until the final consumer exits. For `Always + OwnedOnly`, each game PID owns
-only the new process instances discovered for its own launch.
-
-Ownership is kept in memory. If the watcher restarts, existing auxiliaries are treated
-as pre-existing and will not be terminated. The general watcher cleanup path also does
-not stop auxiliaries, because a configuration or watchdog restart may occur while a game
-is still running. Leaving an unverifiable helper running is safer than terminating an
-unrelated process.
-
-Run the dependency-free lifecycle tests with Windows PowerShell 5.1:
-
-```powershell
-powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File ".\tests\Aux-Programs.Tests.ps1"
-```
+- **`dont_restore_boost` Flag**: When set to `true` on a dependency block, `Restore-GameBoost` will skip restoring that dependency back to default priorities when the game exits. This keeps background helper processes (like Steam overlay components) pinned to low-priority efficiency cores permanently.
 
 ---
 
 ## Common tweaks (most common edits)
 
 ### 1) Add a new game / change power plans
-Edit `$Global:GameProfiles` in `ps_scripts/Gaming-Programs.ps1`:
-- Choose start/stop schemes (High Performance / Balanced / your custom scheme)
-- Optionally attach a `BoostAction`
-- Optionally add auxiliary launchers
-- Optionally set `AuxProgramsDelaySeconds` for per-game delayed aux launch
-- Optionally set `WindowStyle` (`Normal|Hidden|Minimized|Maximized`) for AuxPrograms; default is `Minimized` and invalid values are auto-fallbacked with a warning
+Edit `config/hosts.config.json` under your machine's `gameProfiles` block:
+```json
+"ForzaHorizon5.exe": {
+  "NickName": "Forza Horizon 5",
+  "Start": "High Performance",
+  "Stop": "Balanced"
+}
+```
 
-### 2) Create a new boost profile
-Copy an existing `action-per-process-boost*.json` and adjust:
-- per-process priority
-- per-process CPU affinity / CPU sets intent
-- per-thread steering (when applicable)
-- optional per-dependency `dont_restore_boost` flag (`true/false`):
-  - when `true`, that dependency is skipped by stop-time restore logic
-  - when key is missing, restore behavior stays unchanged (backward compatible default)
-Then reference it from:
-- `Gaming-Programs.ps1` (`BoostAction`)
-- or a remote JSON `GAME_BOOST` command (if you use the web remote)
+### 2) Immediately terminate an unwanted background process
+Edit `config/hosts.config.json` to enable `ImmediateKill`:
+```json
+"CompatTelRunner.exe": {
+  "ImmediateKill": true,
+  "NickName": "Compat Tel Runner"
+}
+```
 
-### 3) Enable/disable watchers per PC (feature flags)
-Edit `ps_scripts/config/hosts.config.json`:
-- `defaults.features.*` are the baseline
-- `machines.<HOSTNAME>.features.*` overrides per machine
-This is how you keep one PC minimal (just process watcher + IPC) while another runs optional modules.
-
-### 4) Adjust watchdog behavior / cadence
-Two places matter:
-- `Watchdog-Operations.ps1` (watchdog logic + check behavior)
-- The watchdog scheduling calls inside the watcher/orchestrator loop and/or command dispatcher paths
-Goal: keep it responsive but not noisy (event-driven first; watchdog as a safety net, not a poller).
-
-### 5) Update “example paths” for your layout
-If you enable the remote JSON watcher or War Thunder file watchers, you’ll likely need to customize file paths (WAMP roots, mission json locations, etc.). The repo contains real working examples from my machines—not a universal layout.
+### 3) Enable or disable feature flags per machine
+In `config/hosts.config.json`, toggle flags under `machines.<HOSTNAME>.features`:
+```json
+"features": {
+  "remoteCommandsWatcher": true,
+  "processWatcher": true,
+  "ipcServer": true,
+  "watchdog": true
+}
+```
 
 ---
 
 ## Troubleshooting
 
-- **Nothing happens:** confirm the relevant feature flag is enabled for your hostname in `hosts.config.json`.
-- **Remote commands not firing:** validate the watched path (and that your PHP page uses rename handoff).
-- **IPC server conflicts:** single-instance protections may prevent a second server from starting.
-- **Watcher restarts:** if the watchdog detects stuck event processing, the orchestrator can restart after cleanup.
+- **Nothing happens on process launch:**
+  - Verify `processWatcher` is set to `true` for your hostname in `hosts.config.json`.
+  - Verify `Start-CommandWatchers.ps1` is running (check window title or Task Manager).
+- **Process is killed unexpectedly:**
+  - Check if `"ImmediateKill": true` is set for that process name in `hosts.config.json`.
+- **Remote JSON commands not executing:**
+  - Confirm `remoteCommandsWatcher` is enabled.
+  - Verify that your external tool/PHP script is performing an atomic **rename handoff** (`.tmp` → `.json`).
+- **IPC Pipe connection issues:**
+  - Verify `ipcServer` is enabled.
+  - Check that only a single instance of `Start-CommandWatchers.ps1` is running (mutex prevents dual IPC servers).
+- **Auxiliary program not stopping on game exit:**
+  - Verify the entry uses `StopMode = "OwnedOnly"` (legacy strings and shorthand matchers default to `StopMode = "Never"`).
+  - Ensure the auxiliary process was launched by the watcher and discovered during `StartupTimeoutSeconds`.
 
 ---
 
 ## Future roadmap
 
-- Move remaining hard-coded paths into the main config file (so enabling a watcher never requires editing script strings).
-- Detect CPU topology dynamically and generate affinity/cpu-set strategies based on the machine (instead of fixed masks).
-- Make each watcher a cleaner module with sharper boundaries and fewer cross-dependencies.
-- Lightweight “health/status” output (minimal dashboard/API) for headset-first workflows.
+- Move remaining static file paths into `config/hosts.config.json`.
+- Dynamic CPU topology generation (auto-detecting P-cores / E-cores at startup to construct affinity masks dynamically).
+- Web-based status dashboard for VR headset viewable status.
