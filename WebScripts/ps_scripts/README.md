@@ -153,21 +153,45 @@ To add or modify games, edit `config/hosts.config.json` under your machine's ent
 | **`WindowStyle`** | String | `"Minimized"` | `"Normal"`, `"Hidden"`, `"Minimized"`, `"Maximized"` | Window state passed to `Start-Process -WindowStyle` when launching auxiliary program shortcuts or executables. |
 | **`AuxPrograms`** | Array | `[]` | Array of Strings or JSON objects | List of auxiliary tools, shortcuts, or scripts to launch and optionally track alongside the game process lifecycle. |
 
----
-
 ## Auxiliary program lifecycle formats (`Aux-Programs.ps1`)
 
-The `AuxPrograms` array accepts **four distinct formats** to accommodate simple shortcuts, duplicate suppression, script execution, and exact PID ownership cleanup:
+The `AuxPrograms` array accepts **four distinct formats** that can be **freely mixed in the same array**. Each entry is evaluated independently, so you can combine legacy paths, shorthand strings, and structured objects in any order within the same game profile.
+
+> **Tip**: All shorthand string entries start with `[` and all structured entries are JSON objects `{}`. Anything else is treated as a legacy path string.
+
+---
 
 ### 1. Legacy Path String
+
 ```json
 "AuxPrograms": [
   "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk"
 ]
 ```
-- **Behavior**: Launches the path every time the game starts. Does not check for existing instances, does not track PID ownership, and **never terminates** the program when the game exits (`LaunchMode = Always`, `StopMode = Never`).
+
+**Behavior**: Launches the path every time the game starts, unconditionally. Does not check for existing instances, does not track PID ownership, and **never terminates** the program when the game exits.
+
+- `LaunchMode = Always`
+- `StopMode = Never`
+
+---
 
 ### 2. Executable Shorthand
+
+General syntax: `"[<prefix>ExeName.exe]C:\path\to\launch.lnk"`
+
+The prefix controls the launch and stop behavior. All prefixes are **case-insensitive**.
+
+#### Complete Prefix Reference
+
+| Prefix | Example | LaunchMode | StopMode | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| *(none)* | `[Proc.exe]Path` | `IfNotRunning` | `Never` | Skip launch if already running. Never stops the process on game exit. |
+| `kill:` | `[kill:Proc.exe]Path` | `KillExistingAndLaunch` | `OwnedOnly` | Kill pre-existing instances before launch. Track and stop the newly spawned instance on game exit. |
+| `killall:` | `[killall:Proc.exe]Path` | `KillExistingAndLaunch` | `ForceAll` | Kill pre-existing instances before launch. Unconditionally kill **all** matching instances on game exit. |
+| `kill-all:` | `[kill-all:Proc.exe]Path` | `KillExistingAndLaunch` | `ForceAll` | Alias for `killall:`. Identical behavior. |
+| `forceall:` | `[forceall:Proc.exe]Path` | `KillExistingAndLaunch` | `ForceAll` | Alias for `killall:`. Identical behavior. |
+
 ```json
 "AuxPrograms": [
   "[FanatecMonitor.exe]C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
@@ -175,25 +199,50 @@ The `AuxPrograms` array accepts **four distinct formats** to accommodate simple 
   "[killall:FanatecMonitor.exe]C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk"
 ]
 ```
-- **Standard Shorthand** (`[Proc.exe]Path`): Checks if `FanatecMonitor.exe` is running. If running, launch is skipped. Never stops the process on game exit (`LaunchMode = IfNotRunning`, `StopMode = Never`).
-- **Pre-Launch Kill Shorthand** (`[kill:Proc.exe]Path`): Forcibly kills any pre-existing `FanatecMonitor.exe` processes *before* launching a fresh copy, and tracks the new instance to stop it on game exit (`LaunchMode = KillExistingAndLaunch`, `StopMode = OwnedOnly`).
-- **Force-All Kill Shorthand** (`[killall:Proc.exe]Path`): Forcibly kills pre-existing processes before launch, AND unconditionally kills **all** matching processes on game exit (`LaunchMode = KillExistingAndLaunch`, `StopMode = ForceAll`).
+
+> **Note**: The `.exe` extension is optional in the matcher. `[FanatecMonitor]` and `[FanatecMonitor.exe]` both match the same process.
+
+---
 
 ### 3. PowerShell Script Shorthand
+
+Used when the auxiliary tool is a `powershell.exe` process running a specific `.ps1` script. The watcher detects it by inspecting the command lines of running `powershell.exe` processes via `Win32_Process` CIM queries rather than just the process name.
+
+General syntax: `"[<prefix>ps1:<scriptMatcher>]C:\path\to\launch.lnk"`
+
+The `ps1:` token always follows any kill prefix. The `<scriptMatcher>` can be either:
+- **A filename only** (e.g. `MyHelper.ps1`) — matches any running `powershell.exe` whose command line contains that filename at a word/path boundary.
+- **An absolute path** (e.g. `C:\Scripts\MyHelper.ps1`) — matches only the exact absolute path. Forward slashes are also accepted.
+
+#### Complete Prefix Reference
+
+| Prefix | Example | LaunchMode | StopMode | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| *(none)* | `[ps1:Script.ps1]Path` | `IfNotRunning` | `Never` | Skip launch if script is already running. Never stops it on game exit. |
+| *(none, full path)* | `[ps1:C:\dir\Script.ps1]Path` | `IfNotRunning` | `Never` | Same as above using absolute path matching. |
+| `kill:` | `[kill:ps1:Script.ps1]Path` | `KillExistingAndLaunch` | `OwnedOnly` | Kill pre-existing script instances before launch. Track and stop the newly spawned instance on game exit. |
+| `kill:` | `[kill:ps1:C:\dir\Script.ps1]Path` | `KillExistingAndLaunch` | `OwnedOnly` | Same with absolute path matching. |
+| `killall:` | `[killall:ps1:Script.ps1]Path` | `KillExistingAndLaunch` | `ForceAll` | Kill pre-existing instances before launch. Unconditionally kill **all** matching `powershell.exe` running this script on game exit. |
+| `killall:` | `[killall:ps1:C:\dir\Script.ps1]Path` | `KillExistingAndLaunch` | `ForceAll` | Same with absolute path matching. |
+| `kill-all:` | `[kill-all:ps1:Script.ps1]Path` | `KillExistingAndLaunch` | `ForceAll` | Alias for `killall:`. |
+| `forceall:` | `[forceall:ps1:Script.ps1]Path` | `KillExistingAndLaunch` | `ForceAll` | Alias for `killall:`. |
+
 ```json
 "AuxPrograms": [
+  "[ps1:MyHelper.ps1]C:\\Users\\ralch\\Desktop\\My Helper.lnk",
   "[ps1:C:\\MyPrograms\\Helpers\\MyHelper.ps1]C:\\Users\\ralch\\Desktop\\My Helper.lnk",
-  "[kill:ps1:MyHelper.ps1]C:\\Users\\ralch\\Desktop\\My Helper.lnk"
+  "[kill:ps1:MyHelper.ps1]C:\\Users\\ralch\\Desktop\\My Helper.lnk",
+  "[killall:ps1:C:\\MyPrograms\\Helpers\\MyHelper.ps1]C:\\Users\\ralch\\Desktop\\My Helper.lnk"
 ]
 ```
-*(Or filename-only form: `"[ps1:MyHelper.ps1]C:\\Users\\ralch\\Desktop\\My Helper.lnk"`)*
-- **Behavior**: Inspects running `powershell.exe` processes via CIM (`Win32_Process`) and parses their command lines for the script path/name. Supports `ps1:`, `kill:ps1:`, and `killall:ps1:` prefixes.
+
+> **Note**: Relative paths (e.g. `[ps1:subdir\Script.ps1]`) are **not supported** and will be rejected with a warning. Use a filename only or a full absolute path.
 
 ---
 
 ### 4. Structured Definition (Full Lifecycle & Ownership Control)
 
-Structured JSON definitions provide complete precision over matching rules, duplicate checks, pre-launch cleanup, ownership tracking, and termination semantics on game exit.
+Structured JSON objects provide the most precise control over every aspect of the auxiliary lifecycle. Any field that the shorthand formats set implicitly can be configured explicitly here, and additional fields like `Id`, `PowerShellHostProcessName`, and `StartupTimeoutSeconds` are only available in this format.
 
 ```json
 "AuxPrograms": [
@@ -211,36 +260,39 @@ Structured JSON definitions provide complete precision over matching rules, dupl
 
 #### Formal Field Reference for Structured AuxPrograms Definitions
 
-| Field | Data Type | Default Value | Required? | Allowed Options / Format | Detailed Explanation & Mechanics |
+| Field | Data Type | Default | Required? | Allowed Values | Description |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **`Id`** | String | Derived from Matcher | Optional (Recommended) | Case-insensitive string identifier (e.g. `"FanatecMonitor"`) | Uniquely identifies a logical shared auxiliary tool. When multiple running games share the same `Id`, the watcher registers them as joint consumers. The auxiliary process remains running until the **final** consumer game exits. |
+| **`Id`** | String | Derived from matcher | Optional (Recommended) | Any case-insensitive string (e.g. `"FanatecMonitor"`) | Uniquely identifies a logical shared auxiliary tool. When multiple running games share the same `Id`, the watcher registers them as joint consumers. The auxiliary process remains running until the **final** consumer game exits. |
 | **`Path`** | String | *None* | **Required** | Absolute file path, executable, or `.lnk` shortcut | The target shortcut or binary path passed to `Start-Process` when launching the auxiliary program. Backslashes must be doubled (`\\\\`) in JSON. |
-| **`MatchType`** | String | *None* | **Required** | `"ProcessName"`, `"PowerShellScript"` | Defines the mechanism used to inspect `Win32_Process` instances when querying running programs before or after launch: <br>• `"ProcessName"`: Matches process image names (e.g., `FanatecMonitor.exe`).<br>• `"PowerShellScript"`: Matches running `powershell.exe` processes by inspecting their command lines. |
-| **`ProcessName`** | String | `null` | Required if `MatchType` = `"ProcessName"` | Executable name with or without `.exe` (e.g. `"FanatecMonitor.exe"`) | The exact process image name to match when `MatchType` is `"ProcessName"`. Automatically normalized by stripping `.exe` and trailing spaces for WQL queries. |
-| **`ScriptPath`** | String | `null` | Optional (`MatchType` = `"PowerShellScript"`) | Absolute path to `.ps1` file (e.g. `"C:\\Helpers\\Script.ps1"`) | Matches `powershell.exe` processes whose command lines contain this exact absolute script path. Takes precedence over `ScriptName` if both are supplied. |
-| **`ScriptName`** | String | `null` | Optional (`MatchType` = `"PowerShellScript"`) | Script filename ending in `.ps1` without path slashes (e.g. `"Script.ps1"`) | Matches `powershell.exe` processes whose command lines contain this script filename. Uses word/path boundary matching so `Script.ps1` does not match `NotScript.ps1`. |
-| **`PowerShellHostProcessName`** | String | `"powershell.exe"` | Optional (`MatchType` = `"PowerShellScript"`) | Executable leaf name (e.g. `"powershell.exe"`, `"pwsh.exe"`) | The host process image name searched when inspecting command lines for PowerShell script execution. Defaults to Windows PowerShell 5.1 (`powershell.exe`). |
-| **`LaunchMode`** | String | `"Always"` | Optional | `"Always"`, `"IfNotRunning"`, `"KillExistingAndLaunch"` | Controls when `Start-Process` is triggered upon game start:<br>• **`"Always"`**: Always executes `Start-Process` when game starts, leaving existing processes untouched.<br>• **`"IfNotRunning"`**: Queries `Win32_Process` first. Skips launch if a matching process already exists.<br>• **`"KillExistingAndLaunch"`**: Forcibly terminates (`Stop-Process -Force`) any pre-existing matching processes *before* launching a fresh copy. |
-| **`StopMode`** | String | `"Never"` | Optional | `"Never"`, `"OwnedOnly"`, `"ForceAll"` | Controls cleanup behavior when the monitored game exits:<br>• **`"Never"`**: The auxiliary process is left running indefinitely. The watcher takes no action on exit.<br>• **`"OwnedOnly"`**: The watcher terminates **only** verified process instances that were launched and claimed by this watcher instance for this game. Pre-existing processes are **never** stopped.<br>• **`"ForceAll"`** (or `"KillAll"`): On game exit, unconditionally terminates **all** matching processes (`Stop-Process -Force`), regardless of PID creation time, ownership tracking, or pre-existence. |
-| **`StartupTimeoutSeconds`** | Integer | `10` | Optional | Non-negative integer (`>= 0`) | The maximum bounded window (in seconds) after calling `Start-Process` during which the watcher polls `Win32_Process` to discover newly spawned PID(s) and their creation timestamps for `OwnedOnly` ownership tracking. |
+| **`MatchType`** | String | *None* | **Required** | `"ProcessName"`, `"PowerShellScript"` | Defines how the watcher identifies running instances via `Win32_Process`:<br>• `"ProcessName"`: Matches by process image name (e.g. `FanatecMonitor.exe`).<br>• `"PowerShellScript"`: Matches `powershell.exe` processes by inspecting their command lines for the configured script. |
+| **`ProcessName`** | String | `null` | Required if `MatchType = "ProcessName"` | Executable name with or without `.exe` (e.g. `"FanatecMonitor.exe"`) | The process image name to match. `.exe` suffix is normalized automatically. |
+| **`ScriptPath`** | String | `null` | Optional (`MatchType = "PowerShellScript"`) | Absolute `.ps1` path (e.g. `"C:\\Helpers\\Script.ps1"`) | Matches `powershell.exe` processes whose command lines reference this exact absolute path. Forward slashes are accepted. Takes precedence over `ScriptName` when both are provided. |
+| **`ScriptName`** | String | `null` | Optional (`MatchType = "PowerShellScript"`) | Script filename ending in `.ps1`, no path separators (e.g. `"Script.ps1"`) | Matches `powershell.exe` processes whose command lines contain this filename at a word/path boundary. `Script.ps1` will **not** match `NotScript.ps1`. |
+| **`PowerShellHostProcessName`** | String | `"powershell.exe"` | Optional | Executable leaf name (e.g. `"powershell.exe"`, `"pwsh.exe"`) | The host process image name to inspect. Defaults to Windows PowerShell 5.1. Change to `"pwsh.exe"` for PowerShell 7+. |
+| **`LaunchMode`** | String | `"Always"` | Optional | `"Always"`, `"IfNotRunning"`, `"KillExistingAndLaunch"` | Controls when `Start-Process` fires on game start:<br>• **`"Always"`**: Launches unconditionally every time, regardless of existing instances.<br>• **`"IfNotRunning"`**: Skips launch if a matching process already exists.<br>• **`"KillExistingAndLaunch"`** (aliases: `"KillExisting"`, `"KillExistingBeforeLaunch"`): Forcibly terminates all pre-existing matching processes, then launches a fresh copy. |
+| **`StopMode`** | String | `"Never"` | Optional | `"Never"`, `"OwnedOnly"`, `"ForceAll"` | Controls cleanup when the monitored game exits:<br>• **`"Never"`**: The auxiliary process is left running indefinitely.<br>• **`"OwnedOnly"`**: Stops only the specific PID(s) this watcher launched and claimed for this game session. Pre-existing processes are never touched.<br>• **`"ForceAll"`** (aliases: `"KillAll"`, `"AllMatching"`): Unconditionally kills every matching process on game exit, regardless of ownership or creation time. |
+| **`StartupTimeoutSeconds`** | Integer | `10` | Optional | Non-negative integer (`>= 0`) | How long (in seconds) the watcher polls `Win32_Process` after launch to discover and claim the new PID(s). Only meaningful when `StopMode = "OwnedOnly"`. |
 
-#### Detailed Mechanics of `StopMode = "OwnedOnly"` vs `"ForceAll"` and Shared Consumers
+#### Detailed Mechanics
 
 1. **Before-and-After PID Discovery (`OwnedOnly`)**:
-   - Because Windows shortcuts (`.lnk` files) or intermediate launchers invoke `Start-Process` without returning the final persistent PID directly, `OwnedOnly` uses bounded polling:
-     - **Before Launch**: Captures all existing PIDs matching `MatchType`.
-     - **Launch**: Executes `Start-Process -FilePath Path -WindowStyle WindowStyle`.
-     - **After Launch**: Polls `Win32_Process` for up to `StartupTimeoutSeconds` (until PIDs stabilize for 500ms).
-     - **Claiming**: Records only newly appeared PIDs whose WQL `CreationDate` is greater than or equal to the launch timestamp. Pre-existing processes are left unowned.
+   Because `.lnk` shortcuts and indirect launchers don't return a final PID from `Start-Process`, `OwnedOnly` uses bounded polling:
+   - **Before Launch**: Snapshots all existing PIDs matching `MatchType`.
+   - **Launch**: Calls `Start-Process`.
+   - **After Launch**: Polls `Win32_Process` for up to `StartupTimeoutSeconds` until the set of PIDs is stable for 500ms.
+   - **Claiming**: Records only newly appeared PIDs whose `CreationDate` is at or after the launch timestamp. Pre-existing PIDs are never claimed.
+
 2. **Unconditional Exit Cleanup (`ForceAll`)**:
-   - When `StopMode = "ForceAll"` (or `"KillAll"`), the watcher does not depend on startup PID discovery. Upon game exit, it queries `Win32_Process` for all matching processes and forcibly terminates every single instance, ensuring a 100% clean teardown.
+   No PID tracking is needed at launch time. On game exit the watcher simply queries `Win32_Process` for all currently matching processes and force-kills each one.
+
 3. **Shared Consumers across Games**:
-   - If Game A launches an auxiliary defined with `Id: "FanatecMonitor"` and `StopMode: "OwnedOnly"`, PID 1234 is claimed.
-   - If Game B starts while Game A is still running, Game B checks `Id: "FanatecMonitor"`. Since PID 1234 is running, `LaunchMode: "IfNotRunning"` suppresses relaunching and registers Game B as a second consumer of PID 1234.
-   - When Game A exits, the watcher detects that Game B is still active. PID 1234 is **retained**.
-   - When Game B exits, the final consumer count drops to 0, and the watcher safely invokes cleanup.
+   - Game A starts → auxiliary `"FanatecMonitor"` (PID 1234) is launched and claimed.
+   - Game B starts → the auxiliary is already running, so launch is skipped. Game B is registered as a second consumer.
+   - Game A exits → one consumer remains (Game B). PID 1234 is **retained**.
+   - Game B exits → zero consumers remain. Cleanup runs.
+
 4. **Watcher Restart Safety**:
-   - Ownership records are maintained in memory. If `Start-CommandWatchers.ps1` restarts or reloads, surviving `OwnedOnly` auxiliary processes are treated as pre-existing and will **never** be forcefully terminated on subsequent exits. `ForceAll` entries, by design, clean up matching processes unconditionally on game exit.
+   Ownership records live in memory only. If the watcher restarts, surviving auxiliary processes are treated as pre-existing and will not be terminated by `OwnedOnly` on future exits. `ForceAll` is immune to this because it does not rely on ownership records.
 
 ---
 
