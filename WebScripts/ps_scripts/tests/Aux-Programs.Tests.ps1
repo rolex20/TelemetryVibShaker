@@ -108,6 +108,25 @@ try {
     Assert-Equal 'Always' $structuredPs.LaunchMode 'Structured LaunchMode default'
     Assert-Equal 'Never' $structuredPs.StopMode 'Structured StopMode default'
 
+    $killShort = (@(ConvertTo-AuxProgramDefinitions -AuxPrograms @("[kill:FanatecMonitor.EXE]$launchPath") -WindowStyle Hidden))[0]
+    Assert-Equal 'KillExistingAndLaunch' $killShort.LaunchMode '[kill:...] shorthand LaunchMode'
+    Assert-Equal 'OwnedOnly' $killShort.StopMode '[kill:...] shorthand StopMode'
+
+    $killAllShort = (@(ConvertTo-AuxProgramDefinitions -AuxPrograms @("[killall:FanatecMonitor.EXE]$launchPath") -WindowStyle Hidden))[0]
+    Assert-Equal 'KillExistingAndLaunch' $killAllShort.LaunchMode '[killall:...] shorthand LaunchMode'
+    Assert-Equal 'ForceAll' $killAllShort.StopMode '[killall:...] shorthand StopMode'
+
+    $structuredKillForce = (@(ConvertTo-AuxProgramDefinitions -AuxPrograms @(@{
+        Id            = 'ForceKillHelper'
+        Path          = $launchPath
+        MatchType     = 'ProcessName'
+        ProcessName   = 'Helper.exe'
+        LaunchMode    = 'KillExistingAndLaunch'
+        StopMode      = 'ForceAll'
+    }) -WindowStyle Normal))[0]
+    Assert-Equal 'KillExistingAndLaunch' $structuredKillForce.LaunchMode 'Structured KillExistingAndLaunch LaunchMode'
+    Assert-Equal 'ForceAll' $structuredKillForce.StopMode 'Structured ForceAll StopMode'
+
     $invalidDefinitions = @(ConvertTo-AuxProgramDefinitions -AuxPrograms @(
         '[broken'
         @{ Path = $launchPath; MatchType = 'Unknown'; ProcessName = 'Helper.exe' }

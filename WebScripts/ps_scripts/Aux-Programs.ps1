@@ -294,6 +294,26 @@ function ConvertTo-AuxProgramDefinition {
                 return $null
             }
 
+            # Parse shorthand prefix for mode overrides:
+            # - [killall:...] -> Kill pre-existing on start AND kill all matching on exit.
+            # - [kill:...]    -> Kill pre-existing on start AND track/stop owned on exit.
+            # - standard      -> Launch if not running AND never stop on exit.
+            $shorthandLaunchMode = 'IfNotRunning'
+            $shorthandStopMode = 'Never'
+
+            if ($matcher.StartsWith('killall:', [System.StringComparison]::OrdinalIgnoreCase) -or
+                $matcher.StartsWith('kill-all:', [System.StringComparison]::OrdinalIgnoreCase) -or
+                $matcher.StartsWith('forceall:', [System.StringComparison]::OrdinalIgnoreCase)) {
+                $shorthandLaunchMode = 'KillExistingAndLaunch'
+                $shorthandStopMode = 'ForceAll'
+                $matcher = $matcher.Substring($matcher.IndexOf(':') + 1).Trim()
+            }
+            elseif ($matcher.StartsWith('kill:', [System.StringComparison]::OrdinalIgnoreCase)) {
+                $shorthandLaunchMode = 'KillExistingAndLaunch'
+                $shorthandStopMode = 'OwnedOnly'
+                $matcher = $matcher.Substring(5).Trim()
+            }
+
             if ($matcher.StartsWith('ps1:', [System.StringComparison]::OrdinalIgnoreCase)) {
                 $scriptMatcher = Remove-AuxOuterQuotes -Value $matcher.Substring(4)
                 if ([string]::IsNullOrWhiteSpace($scriptMatcher)) {
@@ -329,8 +349,8 @@ function ConvertTo-AuxProgramDefinition {
                     -ScriptPath $scriptPath `
                     -ScriptName $scriptName `
                     -PowerShellHostProcessName 'powershell.exe' `
-                    -LaunchMode 'IfNotRunning' `
-                    -StopMode 'Never' `
+                    -LaunchMode $shorthandLaunchMode `
+                    -StopMode $shorthandStopMode `
                     -StartupTimeoutSeconds 10 `
                     -WindowStyle $WindowStyle `
                     -SourceFormat 'PowerShellShorthand' `
@@ -347,8 +367,8 @@ function ConvertTo-AuxProgramDefinition {
                 -Path $launchPath `
                 -MatchType 'ProcessName' `
                 -ProcessName $processName `
-                -LaunchMode 'IfNotRunning' `
-                -StopMode 'Never' `
+                -LaunchMode $shorthandLaunchMode `
+                -StopMode $shorthandStopMode `
                 -StartupTimeoutSeconds 10 `
                 -WindowStyle $WindowStyle `
                 -SourceFormat 'ProcessShorthand' `
@@ -404,8 +424,13 @@ function ConvertTo-AuxProgramDefinition {
     elseif ($launchMode.Equals('IfNotRunning', [System.StringComparison]::OrdinalIgnoreCase)) {
         $launchMode = 'IfNotRunning'
     }
+    elseif ($launchMode.Equals('KillExistingAndLaunch', [System.StringComparison]::OrdinalIgnoreCase) -or
+            $launchMode.Equals('KillExisting', [System.StringComparison]::OrdinalIgnoreCase) -or
+            $launchMode.Equals('KillExistingBeforeLaunch', [System.StringComparison]::OrdinalIgnoreCase)) {
+        $launchMode = 'KillExistingAndLaunch'
+    }
     else {
-        Write-AuxProgramLog -ForegroundColor 'DarkYellow' -Message "Invalid LaunchMode '$launchMode' at AuxPrograms index $EntryIndex. Valid values: Always, IfNotRunning."
+        Write-AuxProgramLog -ForegroundColor 'DarkYellow' -Message "Invalid LaunchMode '$launchMode' at AuxPrograms index $EntryIndex. Valid values: Always, IfNotRunning, KillExistingAndLaunch."
         return $null
     }
 
@@ -419,8 +444,13 @@ function ConvertTo-AuxProgramDefinition {
     elseif ($stopMode.Equals('OwnedOnly', [System.StringComparison]::OrdinalIgnoreCase)) {
         $stopMode = 'OwnedOnly'
     }
+    elseif ($stopMode.Equals('ForceAll', [System.StringComparison]::OrdinalIgnoreCase) -or
+            $stopMode.Equals('KillAll', [System.StringComparison]::OrdinalIgnoreCase) -or
+            $stopMode.Equals('AllMatching', [System.StringComparison]::OrdinalIgnoreCase)) {
+        $stopMode = 'ForceAll'
+    }
     else {
-        Write-AuxProgramLog -ForegroundColor 'DarkYellow' -Message "Invalid StopMode '$stopMode' at AuxPrograms index $EntryIndex. Valid values: Never, OwnedOnly."
+        Write-AuxProgramLog -ForegroundColor 'DarkYellow' -Message "Invalid StopMode '$stopMode' at AuxPrograms index $EntryIndex. Valid values: Never, OwnedOnly, ForceAll."
         return $null
     }
 
@@ -900,6 +930,43 @@ function Add-OwnedAuxProcessRecords {
     }
 }
 
+function Stop-AllMatchingAuxProcesses {
+    <#
+    .SYNOPSIS
+        Unconditionally terminates all active processes matching an auxiliary definition,
+        regardless of PID creation time, ownership tracking, or pre-existence.
+    .DESCRIPTION
+        Used when LaunchMode=KillExistingAndLaunch (pre-launch cleanup) or
+        StopMode=ForceAll (unconditional exit cleanup).
+    #>
+    param(
+        [Parameter(Mandatory)][hashtable]$Definition,
+        [Parameter(Mandatory)][string]$Reason
+    )
+
+    $matchingQuery = Get-MatchingAuxProcesses -Definition $Definition
+    if (-not $matchingQuery.Succeeded) {
+        Write-AuxProgramLog -ForegroundColor 'DarkYellow' -Message "Process query failed while attempting forced kill for '$($Definition.IdentityKey)': $($matchingQuery.Error)"
+        return
+    }
+
+    if ($matchingQuery.Records.Count -eq 0) {
+        return
+    }
+
+    Write-AuxProgramLog -Title 'AUX KILL' -ForegroundColor 'Magenta' -Message "$Reason Terminating $($matchingQuery.Records.Count) matching process(es) for '$($Definition.IdentityKey)'."
+
+    foreach ($record in @($matchingQuery.Records)) {
+        try {
+            Stop-Process -Id ([int]$record.ProcessId) -Force -ErrorAction Stop
+            Write-AuxProgramLog -Title 'AUX KILL' -ForegroundColor 'Magenta' -Message "Killed matching process '$($Definition.IdentityKey)' [PID: $($record.ProcessId)]."
+        }
+        catch {
+            Write-AuxProgramLog -Title 'AUX KILL' -ForegroundColor 'DarkYellow' -Message "Failed to kill matching PID $($record.ProcessId) for '$($Definition.IdentityKey)': $($_.Exception.Message)"
+        }
+    }
+}
+
 function Start-ConfiguredAuxPrograms {
     param(
         [object[]]$Definitions,
@@ -932,9 +999,73 @@ function Start-ConfiguredAuxPrograms {
                 continue
             }
 
+            # Handle LaunchMode=KillExistingAndLaunch:
+            # First forcibly kill any pre-existing instances of this auxiliary tool,
+            # then start a fresh copy.
+            if ($definition.LaunchMode -eq 'KillExistingAndLaunch') {
+                Stop-AllMatchingAuxProcesses -Definition $definition -Reason 'LaunchMode=KillExistingAndLaunch requested pre-launch cleanup.'
+
+                if ($LifecycleState.PendingIfNotRunning.ContainsKey($definition.IdentityKey)) {
+                    $LifecycleState.PendingIfNotRunning.Remove($definition.IdentityKey)
+                }
+
+                $singletonState = $null
+                if ($definition.StopMode -in @('OwnedOnly', 'ForceAll', 'KillAll')) {
+                    if ($LifecycleState.SingletonByIdentity.ContainsKey($definition.IdentityKey)) {
+                        $singletonState = $LifecycleState.SingletonByIdentity[$definition.IdentityKey]
+                    }
+                    else {
+                        $singletonState = @{
+                            Definition     = $definition
+                            Consumers      = @{}
+                            OwnedProcesses = @{}
+                        }
+                        $LifecycleState.SingletonByIdentity[$definition.IdentityKey] = $singletonState
+                    }
+
+                    if ($singletonState.Consumers.ContainsKey([string]$ParentProcessId)) {
+                        Write-AuxProgramLog -ForegroundColor 'DarkGray' -Message "Duplicate start event ignored for '$($definition.IdentityKey)' and game PID $ParentProcessId."
+                        continue
+                    }
+
+                    [void](Add-AuxProgramConsumer -SingletonState $singletonState -ParentProcessId $ParentProcessId -ParentProgramName $ParentProgramName)
+                }
+
+                $launchTimeUtc = [datetime]::UtcNow
+                if (-not (Start-AuxProgramPath -Definition $definition -Reason 'LaunchMode=KillExistingAndLaunch.')) {
+                    if ($singletonState) {
+                        $singletonState.Consumers.Remove([string]$ParentProcessId)
+                        if ($singletonState.Consumers.Count -eq 0 -and $singletonState.OwnedProcesses.Count -eq 0) {
+                            $LifecycleState.SingletonByIdentity.Remove($definition.IdentityKey)
+                        }
+                    }
+                    continue
+                }
+
+                if ($definition.StopMode -eq 'OwnedOnly') {
+                    # Perform ownership discovery so newly spawned PID is tracked for game-exit cleanup
+                    $newRecords = @(Wait-ForNewAuxProcesses `
+                        -Definition $definition `
+                        -BeforeRecords @() `
+                        -LaunchTimeUtc $launchTimeUtc `
+                        -ScheduledActionState $ScheduledActionState)
+
+                    if ($newRecords.Count -gt 0) {
+                        Add-OwnedAuxProcessRecords -OwnedProcesses $singletonState.OwnedProcesses -Records $newRecords -IdentityKey $definition.IdentityKey
+                    }
+                    elseif (-not ($ScheduledActionState -and $ScheduledActionState.Error)) {
+                        Write-AuxProgramLog -ForegroundColor 'DarkYellow' -Message "Ownership PID discovery timed out for '$($definition.IdentityKey)'. No process will be stopped later."
+                    }
+                }
+                else {
+                    $LifecycleState.PendingIfNotRunning[$definition.IdentityKey] = [datetime]::UtcNow.AddSeconds([int]$definition.StartupTimeoutSeconds)
+                }
+                continue
+            }
+
             if ($definition.LaunchMode -eq 'IfNotRunning') {
                 $singletonState = $null
-                if ($definition.StopMode -eq 'OwnedOnly') {
+                if ($definition.StopMode -in @('OwnedOnly', 'ForceAll', 'KillAll')) {
                     if ($LifecycleState.SingletonByIdentity.ContainsKey($definition.IdentityKey)) {
                         $singletonState = $LifecycleState.SingletonByIdentity[$definition.IdentityKey]
                     }
@@ -1014,14 +1145,14 @@ function Start-ConfiguredAuxPrograms {
                     }
                 }
                 else {
-                    # StopMode=Never does not need ownership discovery. A bounded pending
+                    # StopMode=Never or ForceAll does not need ownership discovery. A bounded pending
                     # marker closes the indirect-launch race without delaying boost actions.
                     $LifecycleState.PendingIfNotRunning[$definition.IdentityKey] = [datetime]::UtcNow.AddSeconds([int]$definition.StartupTimeoutSeconds)
                 }
                 continue
             }
 
-            # Remaining valid combination: Always + OwnedOnly.
+            # Remaining valid combinations: Always + OwnedOnly / Always + ForceAll.
             $parentKey = [string]$ParentProcessId
             if ($LifecycleState.AlwaysByParentPid.ContainsKey($parentKey)) {
                 $parentState = $LifecycleState.AlwaysByParentPid[$parentKey]
@@ -1062,7 +1193,7 @@ function Start-ConfiguredAuxPrograms {
                 continue
             }
 
-            if ($canDiscoverOwnership) {
+            if ($canDiscoverOwnership -and $definition.StopMode -eq 'OwnedOnly') {
                 $newRecords = @(Wait-ForNewAuxProcesses `
                     -Definition $definition `
                     -BeforeRecords $beforeQuery.Records `
@@ -1164,18 +1295,32 @@ function Stop-ConfiguredAuxPrograms {
             Write-AuxProgramLog -ForegroundColor 'DarkGray' -Message "Consumer removed for '$identity': game PID $ParentProcessId."
 
             if ($singletonState.Consumers.Count -gt 0) {
-                Write-AuxProgramLog -ForegroundColor 'Cyan' -Message "Owned auxiliary '$identity' retained because $($singletonState.Consumers.Count) consumer(s) remain."
+                Write-AuxProgramLog -ForegroundColor 'Cyan' -Message "Auxiliary '$identity' retained because $($singletonState.Consumers.Count) consumer(s) remain."
                 continue
             }
 
-            Stop-OwnedAuxProcesses -Definition $singletonState.Definition -OwnedProcesses $singletonState.OwnedProcesses
+            # Final consumer exited!
+            if ($singletonState.Definition.StopMode -in @('ForceAll', 'KillAll')) {
+                # StopMode=ForceAll unconditionally kills all matching processes on game exit
+                Stop-AllMatchingAuxProcesses -Definition $singletonState.Definition -Reason "StopMode=ForceAll requested unconditional cleanup after final consumer (game PID $ParentProcessId) exited."
+            }
+            else {
+                # StopMode=OwnedOnly stops only verified owned PIDs
+                Stop-OwnedAuxProcesses -Definition $singletonState.Definition -OwnedProcesses $singletonState.OwnedProcesses
+            }
+
             $LifecycleState.SingletonByIdentity.Remove($identity)
         }
 
         if ($LifecycleState.AlwaysByParentPid.ContainsKey($consumerKey)) {
             $parentState = $LifecycleState.AlwaysByParentPid[$consumerKey]
             foreach ($launchRecord in @($parentState.Launches.Values)) {
-                Stop-OwnedAuxProcesses -Definition $launchRecord.Definition -OwnedProcesses $launchRecord.OwnedProcesses
+                if ($launchRecord.Definition.StopMode -in @('ForceAll', 'KillAll')) {
+                    Stop-AllMatchingAuxProcesses -Definition $launchRecord.Definition -Reason "StopMode=ForceAll requested unconditional cleanup after game PID $ParentProcessId exited."
+                }
+                else {
+                    Stop-OwnedAuxProcesses -Definition $launchRecord.Definition -OwnedProcesses $launchRecord.OwnedProcesses
+                }
             }
             $LifecycleState.AlwaysByParentPid.Remove($consumerKey)
         }
