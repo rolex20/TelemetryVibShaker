@@ -1,6 +1,7 @@
 ﻿$scriptDir = $PSScriptRoot
 . (Join-Path $scriptDir 'Write-VerboseDebug.ps1')
 . (Join-Path $scriptDir 'Gaming-Programs.ps1')
+. (Join-Path $scriptDir 'Aux-Programs.ps1')
 . (Join-Path $scriptDir 'Set-PowerScheme.ps1')
 . (Join-Path $scriptDir 'Set-IdealProcessor.ps1')
 . (Join-Path $scriptDir 'Cpu-Snapshots.ps1')
@@ -101,64 +102,6 @@ function Wait-UntilDueTime {
         Start-Sleep -Milliseconds $remainingMs
     }
 }
-
-function Start-ConfiguredAuxPrograms {
-    param(
-        [Parameter(Mandatory)]
-        [string[]]$AuxPrograms,
-
-        [string]$WindowStyle = 'Minimized'
-    )
-
-    # Resolve/validate once before the loop so we avoid repeating the same validation
-    # and avoid flooding logs with the same warning for each aux entry.
-    # Canonical tokens match Start-Process accepted enum names.
-    $canonicalWindowStyles = @{
-        'normal'    = 'Normal'
-        'hidden'    = 'Hidden'
-        'minimized' = 'Minimized'
-        'maximized' = 'Maximized'
-    }
-
-    $resolvedWindowStyle = 'Minimized'
-    $rawWindowStyle = [string]$WindowStyle
-    if ([string]::IsNullOrWhiteSpace($rawWindowStyle)) {
-        $resolvedWindowStyle = 'Minimized'
-    }
-    else {
-        $normalizedWindowStyle = $rawWindowStyle.Trim().ToLowerInvariant()
-        if ($canonicalWindowStyles.ContainsKey($normalizedWindowStyle)) {
-            $resolvedWindowStyle = $canonicalWindowStyles[$normalizedWindowStyle]
-        }
-        else {
-            # Invalid styles should not block aux launch entirely.
-            # We warn and degrade to Minimized so one bad value does not break the
-            # rest of the startup pipeline or hide other useful aux tools.
-            Write-VerboseDebug -Timestamp (Get-Date) -Title "AUX START" -ForegroundColor "DarkYellow" -Message "Invalid AuxPrograms WindowStyle '$rawWindowStyle'. Valid values: Normal, Hidden, Minimized, Maximized. Falling back to Minimized."
-            $resolvedWindowStyle = 'Minimized'
-        }
-    }
-
-    foreach ($aux in $AuxPrograms) {
-        # Profiles often contain blank placeholders while being edited.
-        # Skipping whitespace-only entries avoids noisy "path not found" logs.
-        if ([string]::IsNullOrWhiteSpace($aux)) {
-            continue
-        }
-
-        # Validate before launch so failures are explicit and non-fatal.
-        # We log and continue instead of throwing; one bad aux path should not block
-        # other aux tools or the rest of the start pipeline.
-        if (Test-Path $aux) {
-            Write-VerboseDebug -Timestamp (Get-Date) -Title "AUX START" -ForegroundColor "Green" -Message "Launching $aux (WindowStyle=$resolvedWindowStyle)"
-            Start-Process -FilePath $aux -WindowStyle $resolvedWindowStyle
-        }
-        else {
-            Write-VerboseDebug -Timestamp (Get-Date) -Title "AUX START" -ForegroundColor "DarkYellow" -Message "Aux program not found: $aux"
-        }
-    }
-}
-
 
 if (-not $Global:GameRuntimeByPid) {
     # Runtime state is keyed by PID (not process name) to handle multiple instances safely.
@@ -407,21 +350,38 @@ function Stop-GameRuntimeTracker {
     }
 }
 
-function Set-GamePowerScheme($traceName, $programName, $processId) {
+function Set-GamePowerScheme {
+    param(
+        [Parameter(Mandatory)]
+        [string]$traceName,
+
+        [Parameter(Mandatory)]
+        [string]$programName,
+
+        [Parameter(Mandatory)]
+        [int]$processId,
+
+        [hashtable]$AuxLifecycleState
+    )
+
     try {
         $powerSchemes = $null
+        $auxDefinitions = @()
+
+        # Event subscriptions pass one shared state reference to start and stop callbacks.
+        # Retain a standalone fallback for direct/manual calls to this function.
+        if (-not $AuxLifecycleState) {
+            if (-not $Global:AuxProgramLifecycleState) {
+                $Global:AuxProgramLifecycleState = New-AuxProgramLifecycleState
+            }
+            $AuxLifecycleState = $Global:AuxProgramLifecycleState
+        }
 
         # Check if there is a Speak action defined
         $speakText = Get-GameSpeakMessage -programName $programName
 
         # Resolve a TTS-friendly display name (nickname when configured)
         $nickName = Get-GameTtsDisplayName -programName $programName
-
-        # Retrieve any auxiliary programs configured for this title
-        $auxPrograms = Get-GameAuxPrograms -programName $programName
-        # WindowStyle is profile-scoped and applies to all AuxPrograms for this game.
-        # Getter fallback keeps old behavior (Minimized) when key is absent/empty.
-        $auxWindowStyle = Get-GameAuxProgramsWindowStyle -programName $programName
 
 
     # First phase: core lifecycle actions (kill, power scheme, runtime tracking, stutter enrollment).
@@ -448,6 +408,11 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
                 return
             }
 
+            # Capture and normalize the start-time definition once. Stop-time cleanup uses
+            # the stored runtime snapshot, so a later config hot reload cannot redirect it.
+            $auxPrograms = @(Get-GameAuxPrograms -programName $programName)
+            $auxWindowStyle = Get-GameAuxProgramsWindowStyle -programName $programName
+            $auxDefinitions = @(ConvertTo-AuxProgramDefinitions -AuxPrograms $auxPrograms -WindowStyle $auxWindowStyle)
             
             $powerSchemes = Get-StartPowerSchemes
             Start-GameRuntimeTracker -ProgramName $programName -ProcessId ([int]$processId)		
@@ -481,6 +446,9 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
         "Win32_ProcessStopTrace" { 
             
             $powerSchemes = Get-StopPowerSchemes 
+            # Registry cleanup is keyed only by the game PID and uses the definition captured
+            # at start time. It intentionally does not consult hot-reloaded AuxPrograms values.
+            Stop-ConfiguredAuxPrograms -LifecycleState $AuxLifecycleState -ParentProcessId ([int]$processId)
             $runtimeSummary = Stop-GameRuntimeTracker -ProgramName $programName -ProcessId ([int]$processId)
             if ($runtimeSummary) {
                 $wallClockFormatted = Format-GameplayDurationText -TotalSeconds $runtimeSummary.WallClockSeconds
@@ -548,7 +516,7 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
             # Precompute whether we actually have any usable aux entries.
             # Important pitfall: if no aux entries exist but delay is large, we should NOT
             # wait that delay. We only keep the fixed boost timing in that case.
-            $hasAuxPrograms = (@($auxPrograms | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }).Count -gt 0)
+            $hasAuxPrograms = ($auxDefinitions.Count -gt 0)
 
             $runBoost = {
                 # Look for a boost action using the full program name (with .exe).
@@ -569,12 +537,29 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
             }
             elseif ($auxDueAt -le $boostDueAt) {
                 # Aux should happen first (or same time as boost).
-                # Using absolute waits prevents us from accidentally adding 5s twice.
+                # Ownership discovery may remain active across the fixed boost deadline.
+                # A shared action state lets the discovery loop invoke boost when due,
+                # preserving the existing +5s schedule without running it twice.
+                $boostActionState = @{
+                    Action  = $runBoost
+                    DueAt   = $boostDueAt
+                    Invoked = $false
+                    Error   = $null
+                }
+
                 Wait-UntilDueTime -DueAt $auxDueAt
-                Start-ConfiguredAuxPrograms -AuxPrograms $auxPrograms -WindowStyle $auxWindowStyle
+                Start-ConfiguredAuxPrograms `
+                    -Definitions $auxDefinitions `
+                    -LifecycleState $AuxLifecycleState `
+                    -ParentProgramName $programName `
+                    -ParentProcessId ([int]$processId) `
+                    -ScheduledActionState $boostActionState
 
                 Wait-UntilDueTime -DueAt $boostDueAt
-                & $runBoost
+                Invoke-AuxScheduledActionIfDue -ScheduledActionState $boostActionState
+                if ($boostActionState.Error) {
+                    throw $boostActionState.Error
+                }
             }
             else {
                 # Boost is due before aux. Run boost at fixed +5s, then wait remaining
@@ -583,7 +568,11 @@ function Set-GamePowerScheme($traceName, $programName, $processId) {
                 & $runBoost
 
                 Wait-UntilDueTime -DueAt $auxDueAt
-                Start-ConfiguredAuxPrograms -AuxPrograms $auxPrograms -WindowStyle $auxWindowStyle
+                Start-ConfiguredAuxPrograms `
+                    -Definitions $auxDefinitions `
+                    -LifecycleState $AuxLifecycleState `
+                    -ParentProgramName $programName `
+                    -ParentProcessId ([int]$processId)
             }
         }
         "Win32_ProcessStopTrace" { 

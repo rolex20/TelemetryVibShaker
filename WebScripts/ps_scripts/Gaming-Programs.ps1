@@ -25,7 +25,8 @@
 #   - The 'Key' is the process name including the .exe extension (e.g., "DCS.exe").
 #   - The 'Value' is another hash table containing the 'Start' and 'Stop' power schemes,
 #     and optional fields like 'BoostAction' (JSON file), 'Speak' (text-to-speech), and
-#     'AuxPrograms' (array of helper executables to auto-launch when the game starts),
+#     'AuxPrograms' (legacy path strings, [Process.exe]Path / [ps1:Script.ps1]Path
+#     shorthand matchers, or structured lifecycle definitions),
 #     optional 'AuxProgramsDelaySeconds' (integer >= 0, fallback 5 when missing/invalid),
 #     and optional 'WindowStyle' (Normal/Hidden/Minimized/Maximized for AuxPrograms launch).
 #------------------------------------------------------------------------------------
@@ -182,7 +183,13 @@ function Get-GameTtsDisplayName {
 function Get-GameAuxPrograms {
     <#
     .SYNOPSIS
-        Retrieves auxiliary programs to launch when a given program starts, if configured.
+        Retrieves auxiliary program configuration entries for a game.
+
+    .DESCRIPTION
+        Entries may be legacy path strings, executable shorthand
+        ([ProcessName.exe]LaunchPath), PowerShell shorthand
+        ([ps1:C:\Path\Helper.ps1]LaunchPath), or structured hashtables.
+        Parsing and lifecycle validation are performed by Aux-Programs.ps1.
     #>
     param (
         [Parameter(Mandatory)]

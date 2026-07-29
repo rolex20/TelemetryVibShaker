@@ -5,10 +5,12 @@ $scriptDir = $PSScriptRoot
 . (Join-Path $scriptDir 'Watchdog-Operations.ps1')
 . (Join-Path $scriptDir 'SetAffinityAndPriority.ps1')
 . (Join-Path $scriptDir 'Get-ProcessWatcher.ps1')
+. (Join-Path $scriptDir 'Aux-Programs.ps1')
 . (Join-Path $scriptDir 'Send-IPC-ExitCommand.ps1')
 . (Join-Path $scriptDir 'Check-Admin-Privileges.ps1')
 . (Join-Path $scriptDir 'Get-HostConfig.ps1')
 $globalcfg = Bootstrap-Config
+$auxProgramLifecycleState = New-AuxProgramLifecycleState
 
 
 $need_restart = $false # make sure this object exists outside the  {}
@@ -126,7 +128,9 @@ try {
             $pName = $Event.SourceEventArgs.NewEvent.ProcessName.ToString()
             $traceName = $Event.SourceEventArgs.NewEvent.ToString()        
 
-            . ".\Set-GamePowerScheme.ps1"
+            $eventScriptDir = $Event.MessageData.ScriptDir
+            $eventAuxLifecycleState = $Event.MessageData.AuxLifecycleState
+            . (Join-Path $eventScriptDir 'Set-GamePowerScheme.ps1')
 
             # Parent metadata is purely diagnostic, but useful when launchers spawn games indirectly.
             $parentMsg = ""
@@ -175,12 +179,20 @@ try {
             Write-Host " "            
             Write-VerboseDebug -Timestamp $Event.TimeGenerated -Title "PROCESS" -Message "$traceName - $pName [$event_pId] $parentMsg$cmdLineMsg"
 
-            Set-GamePowerScheme -traceName $traceName -programName $pName -processId $event_pId
+            Set-GamePowerScheme `
+                -traceName $traceName `
+                -programName $pName `
+                -processId ([int]$event_pId) `
+                -AuxLifecycleState $eventAuxLifecycleState
         }
 		
         $processWatcher = $null # make sure this object exists outside the if {}
 		if ($globalcfg.features.processWatcher) {
-			$processWatcher = Get-ProcessWatchers $processAction
+            $processWatcherMessageData = @{
+                ScriptDir         = $scriptDir
+                AuxLifecycleState = $auxProgramLifecycleState
+            }
+			$processWatcher = Get-ProcessWatchers -Action $processAction -MessageData $processWatcherMessageData
 		}
 
     # 7- START NEW IPC PIPE SERVER THREAD FOR SPECIAL COMMANDS
@@ -216,6 +228,10 @@ try {
 
 finally {
     Write-VerboseDebug -Timestamp (Get-Date) -Title "FINALLY" -Message "Disposing objects" -ForegroundColor "Yellow"
+
+    # Do not stop lifecycle-managed auxiliary programs here. This block also runs during
+    # watchdog/config restarts while games may still be active. The next watcher instance
+    # must treat surviving helpers as pre-existing and unowned.
 	
 	Set-MpPreference -DisableRealtimeMonitoring $false -Force	
 	Set-MpPreference -ScanOnlyIfIdleEnabled $false

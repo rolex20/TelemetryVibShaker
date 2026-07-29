@@ -23,7 +23,14 @@ function Create-ProcessWatcherQuery {
 }
 
 
-function Get-ProcessWatchers($action) {
+function Get-ProcessWatchers {
+    param(
+        [Parameter(Mandatory)]
+        [scriptblock]$Action,
+
+        $MessageData
+    )
+
         Write-VerboseDebug -Timestamp (Get-Date) -Title "STARTING" -Message "Process Watchers"
         $programs = Get-GamingPrograms
 
@@ -35,8 +42,10 @@ function Get-ProcessWatchers($action) {
         # These source identifiers are stable names used elsewhere for bulk event cleanup.
         # If multiple watcher instances were ever allowed in one process, these would collide.
         # Current orchestrator design prevents that via single-instance mutex.
-        $startWatcher = Register-CimIndicationEvent -Query $startWatcherQuery -SourceIdentifier startSI -Action $action
-        $stopWatcher = Register-CimIndicationEvent -Query $stopWatcherQuery -SourceIdentifier stopSI -Action $action
+        # The same MessageData object reference is supplied to both subscriptions. This is
+        # how start and stop callbacks share exact auxiliary ownership state safely.
+        $startWatcher = Register-CimIndicationEvent -Query $startWatcherQuery -SourceIdentifier startSI -Action $Action -MessageData $MessageData
+        $stopWatcher = Register-CimIndicationEvent -Query $stopWatcherQuery -SourceIdentifier stopSI -Action $Action -MessageData $MessageData
 
         # Return subscribers so caller can explicitly dispose/unregister in finally{}.
         # Relying only on process-exit cleanup makes restarts noisier and less deterministic.
