@@ -1,100 +1,75 @@
-# WebScripts — VR headset-friendly controls + performance-first Windows automation
+# WebScripts — VR-Friendly Remote Control & Windows Automation Orchestrator
 
-This folder is the “glue layer” for my gaming/VR rigs: lightweight web pages that generate **atomic JSON commands**, and a PowerShell orchestrator that reacts to **file rename events**, **process start/stop traces**, and **IPC** to apply repeatable tuning and stutter-hunting workflows. It’s built with an efficiency mindset: event-driven first, minimal overhead, and everything is optional per PC.
-
-If you only read one thing: **`ps_scripts/Start-CommandWatchers.ps1` is the main orchestrator**. It can run standalone (process watcher + IPC) or pair with the web UI modules (remote control + War Thunder mission tools).
-
----
-
-## Folder map
-
-### `ps_scripts/` — the engine
-- **Main entry point:** `Start-CommandWatchers.ps1`
-- **What it does:**
-  - Watches for JSON rename handoffs (remote commands, War Thunder mission JSON)
-  - Subscribes to process start/stop events and triggers per-game policies
-  - Hosts an optional named-pipe IPC server (fast “do X now” commands / light introspection)
-  - Keeps itself low-impact (priority/QoS/affinity strategies) and uses a watchdog loop for resilience
-- **Customization:**
-  - `Gaming-Programs.ps1` holds per-host game profiles (power schemes, optional boosts, aux tools)
-  - `config/hosts.config.json` enables/disables features per machine and overrides tuning
-
-➡️ Start here: `ps_scripts/README.md`
+## Tech-Flex
+- **Atomic File-Watcher IPC Architecture:** Employs zero-bounce `.tmp` ➔ `.json` file renames to trigger PowerShell `FileSystemWatcher` event handlers without I/O flapping or partial read races.
+- **Asynchronous Named-Pipe Inter-Process Communication:** Multi-threaded PowerShell IPC pipe listener (`Stutter-Hunter-IPC.ps1`) handling instant command routing and status replies (`JSONB64`).
+- **Dynamic Process QoS & CPU Set Policy Router:** Event-driven process tracking that applies per-game CPU affinity masks, priority classes (`AboveNormal`/`High`), and EcoQoS policies upon game launch.
+- **Automated Windows Power Plan Controller:** Direct WMI/C# interop switching active Windows Power Schemes (`High Performance`, `Balanced`, `Balanced Max 80`) dynamically.
+- **Modular Multi-Host Profile Engine:** Schema-driven host profiles (`hosts.config.json`) customizing watcher modules and hardware affinity per machine.
 
 ---
 
-### `remote_control/` — phone UI for “don’t take off the headset”
-A simple web UI (PHP) that writes a command file as `command.tmp` and then renames it to `command.json`.
-That rename is the trigger the PowerShell watcher listens for.
+## Overview & Purpose
 
-- Typical actions:
-  - launch/kill apps
-  - foreground/minimize/maximize/move windows
-  - change/read power plans
-  - trigger boost profiles
-  - send messages to named pipes
+WebScripts is the "glue layer" for my gaming and VR rigs. It combines lightweight web interfaces that emit **atomic JSON commands** with a PowerShell orchestrator that listens for **file rename events**, **process start/stop traces**, and **named-pipe IPC messages**.
 
-There are also a few **experimental “commander” variants** (generated with different AIs) that explore nicer layouts and controls. They may change or be removed later; the stable contract is the JSON command output.
+When you're wearing a VR headset, taking off the headset to alt-tab, move windows, adjust power plans, or restart a hung sim completely ruins the immersion. WebScripts allows controlling the entire rig from a phone or tablet.
 
-➡️ Read: `remote_control/README.md`
+> [!NOTE]
+> **Primary Orchestrator:** [`ps_scripts/Start-CommandWatchers.ps1`](file:///c:/Users/ralch/source/repos/rolex20/TelemetryVibShaker/WebScripts/ps_scripts/README.md) is the main engine. It runs standalone or pairs with the web UI modules (`remote_control` and `warthunder`).
 
 ---
 
-### `warthunder/` — optional War Thunder mission tooling
-PHP pages that generate `mission_data.tmp` → rename to `mission_data.json`, which the PowerShell side can consume **when enabled for that PC**.
+## Folder Map & Module Inventory
 
-This is intentionally optional: I use it on one machine but not others, and it’s controlled via the same per-host feature toggles in `ps_scripts/config/hosts.config.json`.
+### `ps_scripts/` — The PowerShell Engine
+- **[ps_scripts/README.md](file:///c:/Users/ralch/source/repos/rolex20/TelemetryVibShaker/WebScripts/ps_scripts/README.md):** Main orchestrator and background services.
+- **`Start-CommandWatchers.ps1`:** Main entry point listening for JSON renames, process start/stop events, and named-pipe IPC commands.
+- **`Gaming-Programs.ps1`:** Per-host game profiles (power schemes, process boosts, auxiliary tool launchers).
+- **`config/hosts.config.json`:** Per-machine feature toggles and CPU tuning overrides.
 
-➡️ Read: `warthunder/README.md`
+### `remote_control/` — VR Phone Interface
+- **[remote_control/README.md](file:///c:/Users/ralch/source/repos/rolex20/TelemetryVibShaker/WebScripts/remote_control/README.md):** Web-based remote control panel.
+- **`commander.php`:** Main PHP control panel for launching/killing sims, moving windows, toggling power plans, applying boost profiles, and sending named-pipe messages.
+- **`commander_by_*.php`:** Experimental AI-generated UI variants (`gemini`, `claude`, `gpt`) exploring mobile layouts.
+- **`pipetest.php` & `echo.php`:** Internal development tools for testing pipe communication.
 
----
+### `warthunder/` — War Thunder Mission Tooling
+- **[warthunder/README.md](file:///c:/Users/ralch/source/repos/rolex20/TelemetryVibShaker/WebScripts/warthunder/README.md):** Custom mission generator for dogfight practice in VR.
+- **`dogfight_generator.php`:** PHP interface that builds dogfight parameters, saves options to cookies, and renames `mission_data.tmp` ➔ `mission_data.json` for instant mission updates.
 
-## How the pieces talk (the 10-second architecture)
-
-1) **Web UI writes a temp file**  
-   Example: `command.tmp` or `mission_data.tmp`
-
-2) **Web UI atomically renames it**  
-   Example: `.tmp → .json` (rename avoids partial reads)
-
-3) **PowerShell reacts to the rename**  
-   `Start-CommandWatchers.ps1` catches the rename and dispatches the action (often through a JSON router script)
-
-This same “event-in / action-out” approach is used across modules to keep overhead low.
-
----
-
-## Quick start
-
-### Minimal (no web UI)
-- Edit `ps_scripts/config/hosts.config.json` to enable only what you want (often: process watcher + IPC)
-- Run: `ps_scripts/Start-CommandWatchers.ps1`
-- Customize per-game policies in `ps_scripts/Gaming-Programs.ps1`
-
-### With web remote control
-- Set up a local PHP environment (WAMP/XAMPP/etc.)
-- Update paths in config/scripts as needed (paths in this repo are real examples from my rigs)
-- Enable the remote command watcher for your machine in `hosts.config.json`
-- Use the pages in `remote_control/` to emit `command.json`
-
-### With War Thunder module
-- Enable the War Thunder watcher for your machine in `hosts.config.json`
-- Use the pages in `warthunder/` to emit `mission_data.json`
+### Utilities
+- **`update_unzip_here.ps1`:** Deployment helper script for extracting and distributing updated WebScripts packages across multiple gaming PCs.
 
 ---
 
-## Customization notes (read before you rage at “it doesn’t work”)
+## How the Modules Talk (The 10-Second Architecture)
 
-- **Paths are examples.** Some watchers reference real paths from my PCs (WAMP roots, JSON locations, etc.). If you enable those watchers, you’ll likely adjust paths to your layout.
-- **Profiles are intentionally host-specific.** `Gaming-Programs.ps1` contains per-machine blocks. Copy/modify the block for your hostname and shape it to your rig.
-- **Everything is opt-in.** If you don’t need a watcher, don’t enable it. The point is flexibility, not running every module everywhere.
+```
+[Phone Web UI (PHP)]
+       │ (1. Writes command.tmp)
+       ▼
+[Atomic Rename: command.tmp ➔ command.json]
+       │ (2. Triggers FileSystemWatcher event)
+       ▼
+[Start-CommandWatchers.ps1 (PowerShell)]
+       │ (3. Dispatches command type)
+       ├─► RUN / KILL / MAXIMIZE ➔ Process Control
+       ├─► POWERSCHEME ➔ Set-PowerScheme.ps1
+       ├─► GAME_BOOST ➔ CPU Affinity & QoS Boost
+       └─► PIPE ➔ Send-MessageViaPipe.ps1 ➔ TelemetryVibShaker / Exporters
+```
 
 ---
 
-## Where to go next
+## CPU QoS Implementation Status & Roadmap ToDos
 
-- For the “engine room” and full technical details: `ps_scripts/README.md`
-- For the phone UI and JSON command format: `remote_control/README.md`
-- For the War Thunder mission tooling: `warthunder/README.md`
+### CPU QoS Status
+- **System-Wide Orchestration:** `ps_scripts` manages system-wide CPU QoS, affinity masks, and process priorities for all running applications based on host profiles in `hosts.config.json` and `Gaming-Programs.ps1`.
 
----
+### ToDos & Recommended Improvements
+- [x] Implement atomic `.tmp` ➔ `.json` file rename watcher.
+- [x] Implement asynchronous named-pipe IPC server (`Stutter-Hunter-IPC.ps1`).
+- [ ] **Unified Web UI Controller:** Refactor `remote_control` PHP scripts into a single modular controller class, separating UI rendering from command serialization.
+- [ ] **AJAX Status Polling:** Add live AJAX polling to `commander.php` to display current active power scheme, CPU load, and pipe watchdog status without refreshing the page.
+- [ ] **OS Reboot Trigger:** Add explicit `REBOOT` action to `Process-CommandFromJson.ps1` calling `shutdown.exe /r /t 0` for one-tap VR recovery from hard game hangs.
