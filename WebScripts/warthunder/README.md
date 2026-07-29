@@ -1,47 +1,52 @@
-# War Thunder mission PHP tools
+# War Thunder Mission Generator — VR Dogfight Builder
 
-These PHP pages let me design and launch dogfights from the couch: I tweak loadouts, terrain, and AI skill on my phone, and a PowerShell watcher instantly regenerates missions so I can dive back into VR without touching the desktop.
+## Tech-Flex
+- **Template-Driven Dynamic Mission Generator:** Reads master JSON configuration (`warthunder.json`) to dynamically populate aircraft, armament, weather, and map options without hardcoded PHP templates.
+- **Cookie-Persisted State Engine:** Automatically saves user selections (`selectedPlayerUnit`, `selectedEnemyUnit`, `selectedTerrain`, `enemySkill`) to HTTP cookies for instant VR session reloads.
+- **Atomic File-Watcher Handoff:** Writes mission data to `mission_data.tmp` before renaming to `mission_data.json` to trigger `WT_MissionType1.ps1` without file locking issues.
+- **WTRTI / Mission File Injector:** Directly regenerates custom mission `.blk` files on the fly, eliminating the need to restart War Thunder.
 
-**Tech flex:** PHP 5.3.x, JSON hand-off to PowerShell, cookie-based state, dynamic form rendering, mission templates driven by `warthunder.json`, and a rename-triggered pipeline caught by `ps_scripts/Start-CommandWatchers.ps1` + `WT_MissionType1.ps1`.
+---
 
-This module is optional and intended to be enabled per-PC (via `ps_scripts/config/hosts.config.json`) depending on how you use each machine.
+## Story & Purpose
 
-## Why the features matter
-- **Dogfight builder (`dogfight_generator.php`/`dogfight_setup_1.php`)** saves every selection to cookies so my favorite aircraft/armament combos are one tap away—perfect for rapid VR testing.
-- **Mission data exporter** writes a temporary JSON then renames it (`mission_data.json`), guaranteeing the watcher sees a single clean rename event with no flapping.
-- **Template-driven dropdowns** pull aircraft, weapons, weather, and terrain from `warthunder.json`, so expanding the library is just a data edit, not a code rewrite.
-- **Viewer helpers (`viewer_setup_1.php`)** let me inspect mission parameters from the phone before committing, reducing headset-off moments.
-- **PowerShell glue**: once `mission_data.json` flips, `ps_scripts/Start-CommandWatchers.ps1` calls `WT_MissionType1.ps1` to rebuild the mission—no manual file copying or sim restarts.
+These PHP pages let me design and launch custom dogfights right from my phone: I tweak aircraft loadouts, terrain, weather, and AI skill levels on my phone, submit the form, and a PowerShell watcher instantly regenerates the mission so I can dive straight back into VR without touching the desktop keyboard or mouse.
 
-## Architecture and file map
-- `dogfight_generator.php` — primary form that captures mission parameters, persists them via cookies, and writes `mission_data.json` on submit (using a `.tmp` rename to trigger the watcher).
-- `dogfight_setup_1.php` — alt layout for the same data capture, pointing at the same JSON output.
-- `mission1.php` / `generate_mission.php` — legacy/simple generators that also write `mission_data.json` for the watcher.
-- `viewer_setup_1.php` — read-only mission viewer useful on mobile.
-- `warthunder.json` — master data for aircraft, armament, environments, weather, and maps.
-- `mission_data.json` — the latest request consumed by `ps_scripts/WT_MissionType1.ps1` when the watcher notices the rename.
+---
 
-## Common updates
-- **Add aircraft or weapons**: edit `warthunder.json`; dropdowns will reflect the new entries automatically.
-- **Change mission defaults**: update the initial form values or cookie keys in `dogfight_generator.php` to match your favorite loadouts.
-- **Integrate new mission types**: mirror the rename-and-watch pattern—write to `mission_data.tmp`, rename to `mission_data.json`, then create a matching PowerShell script to consume it.
+## File Layout & Module Inventory
 
-## Future plans
-1. **Central data service** so all mission forms read/write through one PHP include, cutting duplication across generator variants.
-2. **Validation and presets** to ensure impossible combinations (e.g., wrong weapons for an airframe) never reach the PowerShell side.
-3. **Async status callbacks** from `WT_MissionType1.ps1` back to the page (via AJAX or a small status file) to confirm mission build success.
-4. **Modular CSS/JS** shared across the forms for faster UI tweaks and a consistent mobile feel.
-5. **Mission history** stored server-side so I can replay or tweak recent sorties without re-entering everything.
+- **`dogfight_generator.php`:** Primary web interface for configuring player aircraft, opponent aircraft, AI skill level, weather, terrain, and flight altitude.
+- **`dogfight_setup_1.php`:** Alternative UI layout pointing to the same mission generator backend.
+- **`generate_mission.php` & `mission1.php`:** Core script generators that format mission parameters into JSON handoffs.
+- **`viewer_setup_1.php`:** Mobile-friendly read-only mission parameters viewer.
+- **`warthunder.json`:** Master data library for aircraft, armaments, maps, weather, and AI skill presets.
+- **`mission_data.json`:** JSON handoff payload consumed by `ps_scripts/WT_MissionType1.ps1`.
 
-# Keywords
-War Thunder dogfight mission maker, custom mission generator, VR-friendly mission builder, instant mission regeneration, couch/phone mission editor, dynamic dogfight setup, AI skill/loadout selector, aircraft/armament presets, mission template system, JSON-driven mission configuration, cookie-saved presets, quick mission iteration, War Thunder simulator battles practice, custom dogfight scenarios, single-player dogfight creator, mission scripting helper, WTRTI/VR workflow, local PHP mission tool, WAMP/XAMPP War Thunder mission page, `.tmp → .json` atomic handoff, PowerShell watcher pipeline, fast no-restart mission updates, War Thunder mission_data.json generator, War Thunder custom missions automation, dogfight sandbox builder, rapid loadout testing tool.
+---
 
+## Data Schema Reference (`warthunder.json`)
 
+```json
+{
+  "aircraft": [
+    { "name": "f-16c_block_50", "displayName": "F-16C Block 50" },
+    { "name": "mig-29_smt", "displayName": "MiG-29SMT" }
+  ],
+  "weather": ["clear", "good", "cloudy", "rain"],
+  "terrains": ["stalingrad", "khalkhin_gol", "britain"]
+}
+```
 
+---
 
+## CPU QoS Implementation Status & ToDos
 
+### CPU QoS Status
+- **Mission Tooling:** Web frontend for mission creation. System QoS and process priority for `aces.exe` (War Thunder process) are managed by `ps_scripts` upon game launch.
 
-
-
-
-
+### ToDos & Recommended Improvements
+- [x] Implement cookie state persistence for instant loadout re-use.
+- [x] Implement atomic `.tmp` ➔ `.json` file rename trigger for `WT_MissionType1.ps1`.
+- [ ] **Central Data Service:** Refactor mission forms to consume a single PHP data class, eliminating redundant dropdown rendering code across generator pages.
+- [ ] **Asynchronous Build Confirmation:** Add live AJAX polling to confirm when `WT_MissionType1.ps1` completes mission file generation.

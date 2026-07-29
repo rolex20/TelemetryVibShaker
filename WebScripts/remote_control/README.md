@@ -1,50 +1,104 @@
-# commander.php — VR-friendly remote control panel
+# commander.php — VR-Friendly Remote Control Panel
 
-This PHP page is my lifeline when I am blindfolded by a VR headset: from the phone I can launch sims, shove their windows to the right monitor, or fire CPU-boost macros without ever alt-tabbing.
+## Tech-Flex
+- **Atomic File-Rename Command Bus:** Employs `.tmp` ➔ `.json` file creation and atomic renaming (`renameFile()`) to trigger PowerShell file system watchers without race conditions.
+- **Base64 Pipe Message Serializer (`JSONB64`):** Encodes complex JSON command payloads into Base64 strings for raw named-pipe socket transport across process boundaries.
+- **Multi-AI Layout Explorations:** Features customized PHP control panel implementations (`commander.php`, `commander_by_claude.php`, `commander_by_gemini.php`, `commander_by_gpt.php`) optimizing touch targets and UX for VR gloves and smartphones.
+- **Win32 Interprocess Synchronizer:** Shares handshake files (`watchdog.txt`, `outfile.txt`) with retry logic (`tryOpenFile`) to display process locations and watcher status without blocking web requests.
 
-**Tech flex:** PHP 8+, JSON IPC bridge to PowerShell, WAMP/Apache hosting, HTML/JS form helpers, pipe-based messaging, and Windows process/window management via PowerShell modules.
+---
 
-## Why the features matter
-- **One-click power plans** switch between Balanced, High Performance, and capped Balanced80 so the right cores turbo for MSFS/DCS without cooking the room.
-- **Launch/terminate/foreground controls** let me recover frozen apps or bring overlays into view while still in VR, avoiding the “rip-off-the-headset” routine.
-- **Boost tiers** (1–3) feed different `action-per-process-boost*.json` profiles to PowerShell so I can choose AboveNormal + ideal P-core threads or hard affinities depending on how the sim behaves that day.
-- **Thread inspector** (`SHOW_THREADS`) triggers per-process thread time dumps, perfect for spotting when critical game threads drift onto E-cores.
-- **Window movement/minimize/restore/maximize** keeps kneeboard apps visible on the right monitor even when VR mirroring gets messy.
-- **Pipe commands** blast messages to specific IPC pipes (`TelemetryVibShaker`, `WarThunderExporter`, `SimConnectExporter`, etc.) for in-game telemetry tools.
-- **Watchdog ping** confirms the PowerShell watcher and IPC server are alive; it even speaks errors so I hear them over the engine noise.
+## Why This Matters in VR
 
-## Architecture and flow
-1. **Front-end form** renders program choices from `programs.json` and posts actions back to `commander.php`.
-2. **Command builder** (`createJsonCommand`) writes the chosen action to `command.tmp` then renames it to `command.json`—the rename event is what `ps_scripts/Start-CommandWatchers.ps1` listens for.
-3. **JSON consumers**: the PowerShell watcher calls `Process-CommandFromJson.ps1`, which dispatches to window movers, power plan setters, IPC pipe senders, or boost routines.
-4. **Program catalog**: update `programs.json` when adding a new sim/utility so the drop-down shows it and launch/foreground commands know the executable path.
-5. **Output files**: commands like `GET-LOCATION` write to `outfile.txt`; `commander.php` reopens it with retries (`tryOpenFile`) so coordinates appear without racing the watcher.
+When you are wearing a VR headset, you are blind to your desktop. If a flight simulator freezes, opens on the wrong monitor, or starts dropping frames because Windows assigned game threads to Efficiency cores, taking off the headset to alt-tab and fix it ruins the experience.
 
-## File layout
-- `commander.php` — main UI and JSON command generator.
-- `programs.json` — friendly names, process names, and launch paths for the dropdown.
-- `command.json` / `command.tmp` — hand-off files picked up by the PowerShell watcher.
-- `watchdog.txt`, `outfile.txt` — responses from watchdog and window queries.
+`commander.php` is my lifeline from my smartphone:
+- **One-Tap Power Plans:** Instantly switch between `High Performance`, `Balanced`, and `Balanced Max 80` to keep cores turboing without cooking the PC room.
+- **Process Terminate (`KILL`) & Launch:** Recover frozen games or relaunch utilities without taking off the headset.
+- **Window Repositioning:** Move, minimize, maximize, or bring kneeboard overlay windows to the foreground.
+- **Boost Tiers (1–3):** Feed custom affinity and priority profiles to PowerShell depending on how a game behaves that day.
+- **IPC Pipe Router:** Send pipe messages directly to `TelemetryVibShaker`, `PerformanceMonitor`, `WarThunderExporter`, and `SimConnectExporter`.
 
-## Common updates
-- **Add a program**: append an entry to `programs.json` with `friendlyName`, `processName`, and `path` (exe or shortcut). Ensure the same process name is covered in `ps_scripts/Gaming-Programs.ps1` if you want power/boost automation.
-- **Tune boost profiles**: edit the `action-per-process-boost*.json` files in `ps_scripts` and point the dropdown to the one you prefer.
-- **Change default threads/instances**: adjust the default `Instance` value handling near the POST block if your sim spins more (or fewer) busy threads worth corralling.
+---
 
-## Experimental GUI variants
-You may see additional `commander_by_*.php` pages (AI-generated UI experiments). They’re optional and may change or be removed later; the stable contract is the JSON output (`command.tmp` → `command.json`).
+## Recovery Code Analysis: Game Terminate (`KILL`) & System Control
 
-## Future plans
-1. **Split UI from logic** with a lightweight controller class so adding buttons doesn’t bloat the single PHP file.
-2. **Server-side validation** for coordinates, pipe names, and thread limits to avoid bad JSON reaching the watcher.
-3. **Mobile-first polish** (bigger tap targets, dark mode) to make phone use effortless in VR gloves.
-4. **Persistent presets** stored per-game (power plan, boost level, window slot) so I can fire a whole profile with one tap.
-5. **Better status polling** via AJAX to show command completion, current power plan, and last watchdog state without refreshing the page.
+When a sim hangs, `commander.php` and its AI variants provide dedicated termination mechanisms:
 
-## Pipe IPC quick smoke test (JSONB64)
-1. Run `WebScripts/ps_scripts/Start-CommandWatchers.ps1` with `ipcServer` enabled.
-2. Open `remote_control/pipetest.php`.
-3. Click **Send ECHO** and verify the response is `ECHO`.
-4. Click **Run Notepad (JSONB64)** and verify response `OK` plus Notepad launch.
-5. Click **Read Power Scheme (JSONB64)** and verify response `OK`.
-6. Open `commander.php` and run a normal action to confirm `command.tmp -> command.json` rename flow still works.
+### PHP Process Termination Code ([commander.php:L268-L280](file:///c:/Users/ralch/source/repos/rolex20/TelemetryVibShaker/WebScripts/remote_control/commander.php#L268-L280))
+```php
+// CHECK FOR TERMINATE COMMAND
+$post_command = isset($_POST['Exit']) ? $_POST['Exit'] : "";
+if ($post_command == "Terminate") { 
+    $processName = $_POST['Process'];
+    $footer = "Terminate completed - [$processName]";
+            
+    // Atomic rename handoff to PowerShell watcher
+    $jsonData = createJsonCommand("KILL", array("processName" => $processName));
+    writeJsonToFile($jsonData, TEMP_FILE);
+    renameFile(TEMP_FILE, COMMAND_FILE);
+    $time_stamp = getTimestamp();
+}
+```
+
+In `commander_by_gpt.php`, a safety-held touch gesture prevents accidental taps:
+```html
+<!-- Press & Hold to confirm process KILL in commander_by_gpt.php -->
+<span style="color:rgba(255,59,87,.9)">Hold for 0.8s</span> to send <code>KILL</code>
+```
+
+---
+
+## Internal Development Tools (`pipetest.php` & `echo.php`)
+
+These helper scripts were created during development to test and validate named-pipe IPC communication between PHP (WAMP/Apache) and PowerShell:
+
+- **`echo.php`:** Simple HTTP endpoint that echoes parameters, used to test AJAX connectivity and web server response times.
+- **`pipetest.php`:** Smoke test bench for named-pipe IPC. Provides interactive buttons to test pipe connectivity:
+  1. **Send ECHO:** Sends an `ECHO` packet to `ipc_pipe_vr_server_commands` to confirm the IPC thread is listening.
+  2. **Run Notepad (`JSONB64`):** Serializes a `RUN` notepad command into Base64 and sends it through the named pipe.
+  3. **Read Power Scheme (`JSONB64`):** Queries current active Windows power plan over named pipes.
+
+---
+
+## File Layout & Module Inventory
+
+- **`commander.php`:** Primary production control panel UI.
+- **`commander_by_claude.php`:** Claude-generated UI variant featuring structured tab panels and quick-fire pipe buttons.
+- **`commander_by_gemini.php`:** Gemini-generated UI variant focused on dark-mode glassmorphism design.
+- **`commander_by_gpt.php`:** GPT-generated UI variant featuring press-and-hold confirmation buttons for high-risk actions (`KILL`).
+- **`programs.json`:** Catalog of flight sims and utilities (friendly name, executable process name, file path).
+- **`pipetest.php` & `echo.php`:** Pipe IPC smoke testing utilities.
+- **`command.json` / `command.tmp`:** Atomic JSON hand-off files.
+
+---
+
+## `programs.json` Schema Reference
+
+```json
+[
+  {
+    "friendlyName": "DCS World",
+    "processName": "dcs",
+    "path": "C:\\Program Files\\Eagle Dynamics\\DCS World OpenBeta\\bin\\DCS.exe"
+  },
+  {
+    "friendlyName": "MSFS 2020",
+    "processName": "FlightSimulator",
+    "path": "C:\\XboxGames\\Microsoft Flight Simulator\\Content\\FlightSimulator.exe"
+  }
+]
+```
+
+---
+
+## CPU QoS Status & Roadmap ToDos
+
+### CPU QoS Status
+- **Client Interface:** `remote_control` emits high-level boost requests (`BOOST_1`, `BOOST_2`, `BOOST_3`) which `ps_scripts` translates into hard/soft CPU affinity masks.
+
+### ToDos & Recommended Improvements
+- [x] Implement atomic `.tmp` ➔ `.json` file rename trigger.
+- [x] Add press-and-hold safety gesture for process `KILL` in `commander_by_gpt.php`.
+- [ ] **Unified UI Selector:** Add a dropdown top-bar in `commander.php` allowing instant switching between the different AI UI variants (`claude`, `gemini`, `gpt`).
+- [ ] **Direct Reboot Button:** Add a red "System Reboot" button that sends `shutdown.exe /r /t 0` via PowerShell for one-tap recovery from hard system lockups.
