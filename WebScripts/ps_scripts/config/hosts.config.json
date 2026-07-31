@@ -62,17 +62,26 @@
       },
       "gameProfiles": {
         "Notepad.exe": {
+          "WindowStyle": "Normal",
           "Speak": "Notepad",
           "NickName": "Notepad",
           "ImmediateKill": false,
           "Stutter": false,
           "AuxPrograms": [
-            "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk"
+            "[killall:fanatecmonitor_GracemontO3.exe]C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
+            { 
+              "Id": "BioTelemetryDaemon",
+              "Path": "C:\\Users\\ralch\\Desktop\\BioDaemon.lnk",
+              "MatchType": "PowerShellScript",
+              "ScriptName": "BioTelemetryDaemon.ps1",
+              "LaunchMode": "IfNotRunning",
+              "StopMode": "Never",
+              "StartupTimeoutSeconds": 5
+            }
           ],
           "AuxProgramsDelaySeconds": 1,
           "comments": [
-            "BoostAction was commented out in Gaming-Programs.ps1 for Notepad (not enabled).",
-            "Host-specific AuxPrograms."
+            "BoostAction was commented out in Gaming-Programs.ps1 for Notepad (not enabled)."
           ]
         },
         "DCS.exe": {
@@ -111,46 +120,50 @@
           "NickName": "Forza",
           "Start": "Balanced",
           "Stop": "Balanced",
+          "WindowStyle": "Minimized",
           "AuxProgramsDelaySeconds": 0,          
           "AuxPrograms": [
-            "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
             "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk",
-            "C:\\Users\\ralch\\Desktop\\Joystick Gremlin.lnk",
-            "C:\\Users\\ralch\\Desktop\\BioDaemon.lnk"
+            "[killall:fanatecmonitor_GracemontO3.exe]C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
+            "[ps1:BioTelemetryDaemon.ps1]C:\\Users\\ralch\\Desktop\\BioDaemon.lnk",
+            "[joystick_gremlin.exe]C:\\Users\\ralch\\Desktop\\Joystick Gremlin.lnk" 
           ]
         },
         "forzamotorsport7.exe": {
           "NickName": "Forza",
           "Start": "Balanced",
           "Stop": "Balanced",
+          "WindowStyle": "Minimized",
           "BoostAction": "action-per-process-boost1.json",
           "AuxPrograms": [
-            "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
             "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk",
-            "C:\\Users\\ralch\\Desktop\\Joystick Gremlin.lnk",
-            "C:\\Users\\ralch\\Desktop\\BioDaemon.lnk"
+            "[killall:fanatecmonitor_GracemontO3.exe]C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
+            "[ps1:BioTelemetryDaemon.ps1]C:\\Users\\ralch\\Desktop\\BioDaemon.lnk",
+            "[joystick_gremlin.exe]C:\\Users\\ralch\\Desktop\\Joystick Gremlin.lnk" 
           ]
         },
         "ForzaHorizon5.exe": {
           "NickName": "Forza",
           "Start": "Balanced",
           "Stop": "Balanced",
+          "WindowStyle": "Minimized",
           "AuxPrograms": [
-            "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
             "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk",
-            "C:\\Users\\ralch\\Desktop\\Joystick Gremlin.lnk",
-            "C:\\Users\\ralch\\Desktop\\BioDaemon.lnk"
+            "[killall:fanatecmonitor_GracemontO3.exe]C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
+            "[ps1:BioTelemetryDaemon.ps1]C:\\Users\\ralch\\Desktop\\BioDaemon.lnk",
+            "[joystick_gremlin.exe]C:\\Users\\ralch\\Desktop\\Joystick Gremlin.lnk"  
           ]
         },
         "forzahorizon6.exe": {
           "NickName": "Forza",
           "Start": "Balanced",
           "Stop": "Balanced",
+          "WindowStyle": "Minimized",
           "AuxPrograms": [
-            "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
             "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk",
-            "C:\\Users\\ralch\\Desktop\\Joystick Gremlin.lnk",
-            "C:\\Users\\ralch\\Desktop\\BioDaemon.lnk"
+            "[killall:fanatecmonitor_GracemontO3.exe]C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
+            "[ps1:BioTelemetryDaemon.ps1]C:\\Users\\ralch\\Desktop\\BioDaemon.lnk",
+            "[joystick_gremlin.exe]C:\\Users\\ralch\\Desktop\\Joystick Gremlin.lnk"    
           ]
         },
         "AssettoCorsa.exe": {
@@ -159,7 +172,6 @@
           "Stop": "Balanced",
           "AuxPrograms": [
             "C:\\Users\\ralch\\Desktop\\C-Fanatec Monitor.lnk",
-            "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk",
             "C:\\Users\\ralch\\Desktop\\BioDaemon.lnk"
           ]
         },
