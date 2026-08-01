@@ -1,4 +1,12 @@
 ﻿$ipc_job_action = {
+    # ==============================================================================
+    # CONFIGURATION
+    # ==============================================================================
+    # Set to $true to alternate between all available English voices (male/female).
+    # Set to $false to use the legacy fixed Adult Female voice.
+    $UseDynamicVoices = $true
+    # ==============================================================================
+
     . ".\Write-VerboseDebug.ps1"
     . ".\Process-CommandFromJson.ps1"
 
@@ -51,10 +59,20 @@
     Add-Type -AssemblyName System.speech
     $tts = New-Object System.Speech.Synthesis.SpeechSynthesizer
     
-    try {
-        $tts.SelectVoiceByHints([System.Speech.Synthesis.VoiceGender]::Female, [System.Speech.Synthesis.VoiceAge]::Adult)
-    } catch {
-        Write-Host "Warning: Requested voice not found, using default."
+    if ($UseDynamicVoices) {
+        # Script-scoped tracking so inner functions share state across sequential SPEAK commands
+        $script:lastVoiceName = ""
+
+        # Pre-cache installed English voices to avoid expensive query loops inside Handle-Command
+        $script:englishVoices = $tts.GetInstalledVoices() | 
+            Where-Object { $_.Enabled -and $_.VoiceInfo.Culture.Name.StartsWith("en") } | 
+            Select-Object -ExpandProperty VoiceInfo
+    } else {
+        try {
+            $tts.SelectVoiceByHints([System.Speech.Synthesis.VoiceGender]::Female, [System.Speech.Synthesis.VoiceAge]::Adult)
+        } catch {
+            Write-Host "Warning: Requested voice not found, using default."
+        }
     }
     $tts.Rate = 0	
 
@@ -95,6 +113,18 @@ Add-Type @"
         switch ($verb) {
             "SPEAK" {
                 if ($payload) {
+                    if ($UseDynamicVoices -and $script:englishVoices) {
+                        # Exclude last voice used unless it's the only one installed
+                        $eligible = $script:englishVoices | Where-Object { $_.Name -ne $script:lastVoiceName }
+                        if (-not $eligible) { $eligible = $script:englishVoices }
+
+                        $selectedVoice = $eligible | Get-Random
+                        $script:lastVoiceName = $selectedVoice.Name
+
+                        # Synchronize voice change before starting async speech operation
+                        $tts.SelectVoice($selectedVoice.Name)
+                    }
+
                     $tts.SpeakAsync($payload) | Out-Null
                 }
             }		
@@ -142,14 +172,14 @@ Add-Type @"
                     }
                 
                 
-                # Display the filtered list of processes with positive CPU time differences
-                Write-Host "Processes with positive CPU time differences:"
+                    # Display the filtered list of processes with positive CPU time differences
+                    Write-Host "Processes with positive CPU time differences:"
                 
-                # Sort the processes by the Difference column in descending order
-                $sortedProcessesDiff = $processesDiff | Sort-Object -Property Difference -Descending
+                    # Sort the processes by the Difference column in descending order
+                    $sortedProcessesDiff = $processesDiff | Sort-Object -Property Difference -Descending
                 
-                # Display the sorted list in a table format
-                $sortedProcessesDiff | Format-Table -Property Name, Id, OldCPUTime, NewCPUTime, Difference -AutoSize | Out-String | ForEach-Object { Write-Host $_}
+                    # Display the sorted list in a table format
+                    $sortedProcessesDiff | Format-Table -Property Name, Id, OldCPUTime, NewCPUTime, Difference -AutoSize | Out-String | ForEach-Object { Write-Host $_}
                 
             }
             "ECHO" {
