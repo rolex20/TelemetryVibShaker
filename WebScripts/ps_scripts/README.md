@@ -121,6 +121,7 @@ To add or modify games, edit `config/hosts.config.json` under your machine's ent
   "ImmediateKill": false,
   "Stutter": true,
   "BoostAction": "action-per-process-boost1.json",
+  "BoostActionDelaySeconds": 5,
   "AuxProgramsDelaySeconds": 5,
   "WindowStyle": "Minimized",
   "AuxPrograms": [
@@ -148,7 +149,8 @@ To add or modify games, edit `config/hosts.config.json` under your machine's ent
 | **`Stop`** | String | `null` | Power scheme name (e.g. `"Balanced"`, `"Power Saver"`, or GUID) | Windows power plan applied when the monitored game process exits. |
 | **`ImmediateKill`** | Boolean | `false` | `true`, `false` | When `true`, forcibly terminates (`Stop-Process -Force`) the process immediately upon detection *before* any power schemes, aux programs, boost actions, TTS, or runtime trackers execute. Designed for blocking background hogs (`TiWorker.exe`, `CompatTelRunner.exe`) on legacy machines. |
 | **`Stutter`** | Boolean | `false` | `true`, `false` | When `true`, registers the process with `Stutter-Hunter-IPC.ps1` for real-time stutter tracking and CPU time delta introspection. |
-| **`BoostAction`** | String | `null` | Path to JSON file (e.g. `"action-per-process-boost1.json"`) | Relative JSON policy path containing process priority, CPU affinity masks, CPU Sets, or thread EcoQoS settings applied 5 seconds post-launch. |
+| **`BoostAction`** | String | `null` | Path to JSON file (e.g. `"action-per-process-boost1.json"`) | Relative JSON policy path containing process priority, CPU affinity masks, CPU Sets, or thread EcoQoS settings. |
+| **`BoostActionDelaySeconds`** | Integer | `5` | Non-negative integer (`>= 0`) | Delay in seconds after game launch before `BoostAction` is applied. Delays above the legacy 5-second settle time are scheduled with a one-shot timer and canceled if the original game PID exits before the boost is due, so long delays do not block process watcher callbacks. |
 | **`AuxProgramsDelaySeconds`** | Integer | `5` | Non-negative integer (`>= 0`) | Delay in seconds after game launch before auxiliary programs are started. Allows anchoring aux program launches relative to game startup. |
 | **`WindowStyle`** | String | `"Minimized"` | `"Normal"`, `"Hidden"`, `"Minimized"`, `"Maximized"` | Window state passed to `Start-Process -WindowStyle` when launching auxiliary program shortcuts or executables. |
 | **`AuxPrograms`** | Array | `[]` | Array of Strings or JSON objects | List of auxiliary tools, shortcuts, or scripts to launch and optionally track alongside the game process lifecycle. |

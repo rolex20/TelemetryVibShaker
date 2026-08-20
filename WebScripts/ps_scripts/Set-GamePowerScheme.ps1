@@ -79,12 +79,48 @@ function Restore-GameBoost {
     }
 }
 
-function Play-SeatBelt() {
+function Get-SeatBeltWavPath {
+    if (-not $Global:WebScriptsConfig -or
+        -not ($Global:WebScriptsConfig -is [System.Collections.IDictionary]) -or
+        -not $Global:WebScriptsConfig.ContainsKey('paths') -or
+        -not ($Global:WebScriptsConfig.paths -is [System.Collections.IDictionary]) -or
+        -not $Global:WebScriptsConfig.paths.ContainsKey('seatbeltWav')) {
+        return $null
+    }
+
+    $seatBeltWavPath = [string]$Global:WebScriptsConfig.paths.seatbeltWav
+    if ([string]::IsNullOrWhiteSpace($seatBeltWavPath)) {
+        return $null
+    }
+
+    return $seatBeltWavPath
+}
+
+function Play-SeatBelt {
+    param(
+        [string]$SeatBeltWavPath = (Get-SeatBeltWavPath)
+    )
+
+    if ([string]::IsNullOrWhiteSpace($SeatBeltWavPath)) {
+        return
+    }
+
+    if (-not (Test-Path -LiteralPath $SeatBeltWavPath)) {
+        Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST" -Message "Seatbelt sound configured but not found: '$SeatBeltWavPath'" -ForegroundColor "DarkYellow" -Speak $false
+        return
+    }
+
+    try {
         Add-Type -AssemblyName PresentationCore
         $player = New-Object System.Windows.Media.MediaPlayer
-        $player.Open([uri] "N:\MyPrograms\MySounds\Thirdwire\fasten_seatbelt.wav")
-        $player.Play()	
-		Start-Sleep -Seconds 1
+        $resolvedPath = (Resolve-Path -LiteralPath $SeatBeltWavPath).ProviderPath
+        $player.Open([uri]$resolvedPath)
+        $player.Play()
+        Start-Sleep -Seconds 1
+    }
+    catch {
+        Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST" -Message "Failed to play seatbelt sound '$SeatBeltWavPath': $($_.Exception.Message)" -ForegroundColor "DarkYellow" -Speak $false
+    }
 }
 
 function Wait-UntilDueTime {
@@ -107,6 +143,323 @@ if (-not $Global:GameRuntimeByPid) {
     # Runtime state is keyed by PID (not process name) to handle multiple instances safely.
     # This prevents one process exit from accidentally tearing down another instance's tracker.
     $Global:GameRuntimeByPid = @{}
+}
+
+if (-not $Global:DelayedGameBoostByPid) {
+    # Delayed boost state is keyed by PID so a long GRW-style delay can be canceled
+    # if that exact game process exits before its boost is due.
+    $Global:DelayedGameBoostByPid = @{}
+}
+
+function Test-GameProcessStillMatches {
+    param(
+        [Parameter(Mandatory)]
+        [string]$ProgramName,
+
+        [Parameter(Mandatory)]
+        [int]$ProcessId
+    )
+
+    $process = Get-Process -Id $ProcessId -ErrorAction SilentlyContinue
+    if (-not $process) {
+        return $false
+    }
+
+    $expectedProcessName = $ProgramName -replace '\.exe$', ''
+    return ($process.ProcessName -ieq $expectedProcessName)
+}
+
+function Invoke-GameBoostAction {
+    param(
+        [Parameter(Mandatory)]
+        [string]$ProgramName,
+
+        [Parameter(Mandatory)]
+        [int]$ProcessId,
+
+        [Parameter(Mandatory)]
+        [string]$BoostJsonPath,
+
+        [switch]$VerifyProcess
+    )
+
+    if ($VerifyProcess -and -not (Test-GameProcessStillMatches -ProgramName $ProgramName -ProcessId $ProcessId)) {
+        Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST" -Message "Skipping delayed boost for '$ProgramName' because PID:$ProcessId is no longer the expected process." -ForegroundColor "DarkYellow"
+        return
+    }
+
+    if (-not (Test-Path $BoostJsonPath)) {
+        return
+    }
+
+    Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST" -Message "Applying boost for '$ProgramName' from '$BoostJsonPath' [PID:$ProcessId]" -ForegroundColor "Green"
+    # Call Run-Actions-Per-Game with the EXTENSION-LESS name for JSON compatibility.
+    $normalizedProgramName = $ProgramName -replace '\.exe$', ''
+    Run-Actions-Per-Game -processName $normalizedProgramName -fileName $BoostJsonPath -threadsLimit 50
+    Play-SeatBelt
+}
+
+function Start-DelayedGameBoost {
+    param(
+        [Parameter(Mandatory)]
+        [string]$ProgramName,
+
+        [Parameter(Mandatory)]
+        [int]$ProcessId,
+
+        [Parameter(Mandatory)]
+        [string]$BoostJsonPath,
+
+        [Parameter(Mandatory)]
+        [datetime]$DueAt
+    )
+
+    $key = [string]$ProcessId
+    if ($Global:DelayedGameBoostByPid.ContainsKey($key)) {
+        Stop-DelayedGameBoost -ProcessId $ProcessId -RemoveState | Out-Null
+    }
+
+    $processStartTimeUtcText = $null
+    try {
+        $process = Get-Process -Id $ProcessId -ErrorAction Stop
+        $processStartTimeUtcText = $process.StartTime.ToUniversalTime().ToString('o')
+    }
+    catch {
+        # Some system/transient processes may deny StartTime. Name/PID verification still applies.
+    }
+
+    $timer = New-Object System.Timers.Timer
+    $remainingMs = [int][Math]::Ceiling(($DueAt - (Get-Date)).TotalMilliseconds)
+    $timer.Interval = [Math]::Max(1, $remainingMs)
+    $timer.AutoReset = $false
+    $sourceIdentifier = "DelayedGameBoost_${ProcessId}_$([guid]::NewGuid().ToString('N'))"
+
+    $Global:DelayedGameBoostByPid[$key] = @{
+        ProgramName                 = $ProgramName
+        ProcessId                   = $ProcessId
+        ProcessStartTimeUtcText     = $processStartTimeUtcText
+        BoostJsonPath               = $BoostJsonPath
+        DueAt                       = $DueAt
+        Timer                       = $timer
+        TimerEventSourceIdentifier  = $sourceIdentifier
+        BoostAttempted              = $false
+        BoostApplied                = $false
+        Canceled                    = $false
+        Outcome                     = $null
+        ErrorMessage                = $null
+        CompletedAtText             = $null
+    }
+
+    $messageData = @{
+        ProcessId = $ProcessId
+        ProgramName = $ProgramName
+        BoostJsonPath = $BoostJsonPath
+        ScriptDir = $PSScriptRoot
+        SeatBeltWavPath = Get-SeatBeltWavPath
+    }
+
+    $null = Register-ObjectEvent -InputObject $timer -EventName Elapsed -SourceIdentifier $sourceIdentifier -MessageData $messageData -Action {
+        $state = $null
+        try {
+            [System.Diagnostics.Process]::GetCurrentProcess().PriorityClass = [System.Diagnostics.ProcessPriorityClass]::Idle
+
+            # Timer event actions run outside the original function scope. Re-import
+            # the same dependencies used by the normal inline boost path.
+            $scriptDir = $Event.MessageData.ScriptDir
+            . (Join-Path $scriptDir 'Write-VerboseDebug.ps1')
+            . (Join-Path $scriptDir 'Set-IdealProcessor.ps1')
+
+            function Play-SeatBelt {
+                param(
+                    [string]$SeatBeltWavPath
+                )
+
+                if ([string]::IsNullOrWhiteSpace($SeatBeltWavPath)) {
+                    return
+                }
+
+                if (-not (Test-Path -LiteralPath $SeatBeltWavPath)) {
+                    Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST" -Message "Seatbelt sound configured but not found: '$SeatBeltWavPath'" -ForegroundColor "DarkYellow" -Speak $false
+                    return
+                }
+
+                try {
+                Add-Type -AssemblyName PresentationCore
+                $player = New-Object System.Windows.Media.MediaPlayer
+                    $resolvedPath = (Resolve-Path -LiteralPath $SeatBeltWavPath).ProviderPath
+                    $player.Open([uri]$resolvedPath)
+                $player.Play()
+                Start-Sleep -Seconds 1
+                }
+                catch {
+                    Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST" -Message "Failed to play seatbelt sound '$SeatBeltWavPath': $($_.Exception.Message)" -ForegroundColor "DarkYellow" -Speak $false
+                }
+            }
+
+            $eventPid = [int]$Event.MessageData.ProcessId
+            $key = [string]$eventPid
+            $eventProgramName = [string]$Event.MessageData.ProgramName
+            $eventBoostJsonPath = [string]$Event.MessageData.BoostJsonPath
+            $eventSeatBeltWavPath = [string]$Event.MessageData.SeatBeltWavPath
+
+            if (-not $Global:DelayedGameBoostByPid.ContainsKey($key)) {
+                return
+            }
+
+            $state = $Global:DelayedGameBoostByPid[$key]
+            if ($state['Canceled']) {
+                $state['Outcome'] = 'Canceled'
+                return
+            }
+
+            $process = Get-Process -Id $eventPid -ErrorAction SilentlyContinue
+            $expectedProcessName = $eventProgramName -replace '\.exe$', ''
+            if (-not $process -or $process.ProcessName -ine $expectedProcessName) {
+                $state['Outcome'] = 'SkippedProcessMissing'
+                Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST" -Message "Skipping delayed boost for '$eventProgramName' because PID:$eventPid is no longer the expected process." -ForegroundColor "DarkYellow"
+                return
+            }
+
+            if (-not [string]::IsNullOrWhiteSpace([string]$state['ProcessStartTimeUtcText'])) {
+                try {
+                    $currentStartTimeUtcText = $process.StartTime.ToUniversalTime().ToString('o')
+                    if ($currentStartTimeUtcText -ne $state['ProcessStartTimeUtcText']) {
+                        $state['Outcome'] = 'SkippedPidReuse'
+                        Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST" -Message "Skipping delayed boost for '$eventProgramName' because PID:$eventPid start time changed." -ForegroundColor "DarkYellow"
+                        return
+                    }
+                }
+                catch {
+                    # If the re-check is denied, fall back to the PID/name match above.
+                }
+            }
+
+            if (-not (Test-Path $eventBoostJsonPath)) {
+                $state['Outcome'] = 'MissingBoostFile'
+                return
+            }
+
+            $state['BoostAttempted'] = $true
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST" -Message "Applying delayed boost for '$eventProgramName' from '$eventBoostJsonPath' [PID:$eventPid]" -ForegroundColor "Green"
+            $normalizedProgramName = $eventProgramName -replace '\.exe$', ''
+            Run-Actions-Per-Game -processName $normalizedProgramName -fileName $eventBoostJsonPath -threadsLimit 50
+            $state['BoostApplied'] = $true
+            $state['Outcome'] = 'Applied'
+            Play-SeatBelt -SeatBeltWavPath $eventSeatBeltWavPath
+        }
+        catch {
+            if ($state) {
+                $state['ErrorMessage'] = $_.Exception.Message
+                if (-not $state['Outcome']) {
+                    $state['Outcome'] = 'Failed'
+                }
+            }
+
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST ERROR" -Message "Delayed boost failed: $($_.Exception.Message)" -ForegroundColor "Red"
+        }
+        finally {
+            if ($state) {
+                $state['CompletedAtText'] = (Get-Date).ToString('o')
+                if ($state['Timer']) {
+                    $state['Timer'].Stop()
+                    $state['Timer'].Dispose()
+                    $state['Timer'] = $null
+                }
+            }
+
+            Unregister-Event -SourceIdentifier $EventSubscriber.SourceIdentifier -ErrorAction SilentlyContinue
+        }
+    }
+
+    $timer.Start()
+
+    Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST" -Message "Scheduled delayed boost for '$ProgramName' at $($DueAt.ToString('yyyy-MM-dd HH:mm:ss')) [PID:$ProcessId]" -ForegroundColor "Green"
+}
+
+function Stop-DelayedGameBoost {
+    param(
+        [Parameter(Mandatory)]
+        [int]$ProcessId,
+
+        [switch]$RemoveState
+    )
+
+    $key = [string]$ProcessId
+    if (-not $Global:DelayedGameBoostByPid.ContainsKey($key)) {
+        return $null
+    }
+
+    $state = $Global:DelayedGameBoostByPid[$key]
+    $state['Canceled'] = $true
+    if (-not $state['Outcome']) {
+        $state['Outcome'] = 'Canceled'
+    }
+
+    if ($state.Timer) {
+        $state.Timer.Stop()
+    }
+    if ($state.TimerEventSourceIdentifier) {
+        Unregister-Event -SourceIdentifier $state.TimerEventSourceIdentifier -ErrorAction SilentlyContinue
+    }
+    if ($state.Timer) {
+        $state.Timer.Dispose()
+        $state.Timer = $null
+    }
+
+    if ($RemoveState) {
+        $Global:DelayedGameBoostByPid.Remove($key)
+    }
+
+    return $state
+}
+
+function Complete-DelayedGameBoostForStop {
+    param(
+        [Parameter(Mandatory)]
+        [string]$ProgramName,
+
+        [Parameter(Mandatory)]
+        [int]$ProcessId
+    )
+
+    $key = [string]$ProcessId
+    if (-not $Global:DelayedGameBoostByPid.ContainsKey($key)) {
+        return @{
+            HasDelayedState = $false
+            ShouldRestore   = $true
+        }
+    }
+
+    $state = $Global:DelayedGameBoostByPid[$key]
+    if (-not $state['BoostAttempted']) {
+        $outcome = [string]$state['Outcome']
+        $timerStillPending = ($state['Timer'] -and $state['Timer'].Enabled)
+        Stop-DelayedGameBoost -ProcessId $ProcessId -RemoveState | Out-Null
+        if ($timerStillPending) {
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST" -Message "Canceled delayed boost for '$ProgramName' because PID:$ProcessId exited before the boost delay elapsed." -ForegroundColor "DarkYellow"
+        }
+        elseif (-not [string]::IsNullOrWhiteSpace($outcome)) {
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST" -Message "Skipping boost restore for '$ProgramName' because delayed boost was not attempted. Outcome: $outcome." -ForegroundColor "DarkYellow"
+        }
+        else {
+            Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST" -Message "Skipping boost restore for '$ProgramName' because delayed boost was not attempted." -ForegroundColor "DarkYellow"
+        }
+
+        return @{
+            HasDelayedState = $true
+            ShouldRestore   = $false
+        }
+    }
+
+    # Boost was attempted, so stop-time restore should run even if the delayed
+    # action later reported failure after partially changing process settings.
+    Stop-DelayedGameBoost -ProcessId $ProcessId | Out-Null
+    $Global:DelayedGameBoostByPid.Remove($key)
+
+    return @{
+        HasDelayedState = $true
+        ShouldRestore   = $true
+    }
 }
 
 
@@ -501,33 +854,53 @@ function Set-GamePowerScheme {
             
  			
 	# Second phase: boost/restore + aux launches.
-    # Boost/restore keeps a fixed 5-second settle delay.
+    # Boost defaults to the historical fixed 5-second settle delay, but profiles
+    # can opt into a longer asynchronous delay without blocking the watcher.
     # Aux launch delay is per-profile and can be earlier/later than boost.
     # We anchor both schedules to the SAME timestamp to avoid cumulative drift:
-    # - boostDueAt = start + 5s
+    # - boostDueAt = start + configured boost delay
     # - auxDueAt   = start + configuredDelay
     # This guarantees boost timing stays stable even when aux is delayed longer.
     $secondPhaseStartedAt = Get-Date
-    $boostDueAt = $secondPhaseStartedAt.AddSeconds(5)
+    $inlineBoostDelayLimitSeconds = 5
+    $restoreDueAt = $secondPhaseStartedAt.AddSeconds(5)
     switch ($traceName) {
         "Win32_ProcessStartTrace" {
             $auxDelaySeconds = Get-GameAuxProgramsDelaySeconds -programName $programName
+            $boostDelaySeconds = Get-GameBoostActionDelaySeconds -programName $programName
             $auxDueAt = $secondPhaseStartedAt.AddSeconds($auxDelaySeconds)
+            $boostDueAt = $secondPhaseStartedAt.AddSeconds($boostDelaySeconds)
             # Precompute whether we actually have any usable aux entries.
             # Important pitfall: if no aux entries exist but delay is large, we should NOT
             # wait that delay. We only keep the fixed boost timing in that case.
             $hasAuxPrograms = ($auxDefinitions.Count -gt 0)
+            $boostJsonPath = Get-GameBoostActions -programName $programName
+            $hasBoostAction = ($boostJsonPath -and (Test-Path $boostJsonPath))
+            if (-not $hasBoostAction) {
+                # A configured boost delay only matters when there is a valid boost action.
+                # Otherwise a typo/missing file could stall the watcher for a long no-op.
+                $boostDueAt = $secondPhaseStartedAt.AddSeconds($inlineBoostDelayLimitSeconds)
+            }
 
             $runBoost = {
-                # Look for a boost action using the full program name (with .exe).
-                $boostJsonPath = Get-GameBoostActions -programName $programName
-                if ($boostJsonPath -and (Test-Path $boostJsonPath)) {                    
-                    Write-VerboseDebug -Timestamp (Get-Date) -Title "BOOST" -Message "Applying boost for '$programName' from '$boostJsonPath' [PID:$processId]" -ForegroundColor "Green"
-                    # Call Run-Actions-Per-Game with the EXTENSION-LESS name for JSON compatibility.
-                    $normalizedProgramName = $programName -replace '\.exe$', ''
-                    Run-Actions-Per-Game -processName $normalizedProgramName -fileName $boostJsonPath -threadsLimit 50
-                    Play-SeatBelt                    
+                if ($hasBoostAction) {
+                    Invoke-GameBoostAction -ProgramName $programName -ProcessId ([int]$processId) -BoostJsonPath $boostJsonPath
                 }
+            }
+
+            if ($hasBoostAction -and $boostDelaySeconds -gt $inlineBoostDelayLimitSeconds) {
+                Start-DelayedGameBoost -ProgramName $programName -ProcessId ([int]$processId) -BoostJsonPath $boostJsonPath -DueAt $boostDueAt
+
+                if ($hasAuxPrograms) {
+                    Wait-UntilDueTime -DueAt $auxDueAt
+                    Start-ConfiguredAuxPrograms `
+                        -Definitions $auxDefinitions `
+                        -LifecycleState $AuxLifecycleState `
+                        -ParentProgramName $programName `
+                        -ParentProcessId ([int]$processId)
+                }
+
+                break
             }
 
             if (-not $hasAuxPrograms) {
@@ -577,9 +950,14 @@ function Set-GamePowerScheme {
         }
         "Win32_ProcessStopTrace" { 
             #$powerSchemes = Get-StopPowerSchemes 
+            $delayedBoostStop = Complete-DelayedGameBoostForStop -ProgramName $programName -ProcessId ([int]$processId)
+            if (-not $delayedBoostStop.ShouldRestore) {
+                break
+            }
+
             # Stop flow intentionally keeps the original fixed settle delay before restore.
             # This avoids behavior changes on stop events while adding start-side aux delay.
-            Wait-UntilDueTime -DueAt $boostDueAt
+            Wait-UntilDueTime -DueAt $restoreDueAt
 
             # Look for a boost action using the full program name (with .exe).
             $boostJsonPath = Get-GameBoostActions -programName $programName

@@ -27,6 +27,7 @@
 #     and optional fields like 'BoostAction' (JSON file), 'Speak' (text-to-speech), and
 #     'AuxPrograms' (legacy path strings, [Process.exe]Path / [ps1:Script.ps1]Path
 #     shorthand matchers, or structured lifecycle definitions),
+#     optional 'BoostActionDelaySeconds' (integer >= 0, fallback 5 when missing/invalid),
 #     optional 'AuxProgramsDelaySeconds' (integer >= 0, fallback 5 when missing/invalid),
 #     and optional 'WindowStyle' (Normal/Hidden/Minimized/Maximized for AuxPrograms launch).
 #------------------------------------------------------------------------------------
@@ -123,6 +124,53 @@ function Get-GameBoostActions {
     
     # Return null if no boost action is configured for the program.
     return $null
+}
+
+function Get-GameBoostActionDelaySeconds {
+    <#
+    .SYNOPSIS
+        Retrieves per-game boost action delay in seconds.
+        Returns 5 when missing or invalid.
+    #>
+    param (
+        [Parameter(Mandatory)]
+        [string]$programName
+    )
+
+    # Backward-compat baseline:
+    # Boost actions have historically run after a fixed ~5s settle delay.
+    $defaultDelaySeconds = 5
+
+    # Unknown game profile: do not throw inside watcher event handlers.
+    if (-not $Global:GameProfiles.ContainsKey($programName)) {
+        return $defaultDelaySeconds
+    }
+
+    $profile = $Global:GameProfiles[$programName]
+    if (-not ($profile -is [System.Collections.IDictionary])) {
+        return $defaultDelaySeconds
+    }
+
+    # Optional key by design. Missing key means "use legacy behavior".
+    if (-not $profile.ContainsKey('BoostActionDelaySeconds')) {
+        return $defaultDelaySeconds
+    }
+
+    $rawDelay = $profile.BoostActionDelaySeconds
+    if ($null -eq $rawDelay) {
+        return $defaultDelaySeconds
+    }
+
+    $parsedDelay = 0
+    if (-not [int]::TryParse([string]$rawDelay, [ref]$parsedDelay)) {
+        return $defaultDelaySeconds
+    }
+
+    if ($parsedDelay -lt 0) {
+        return $defaultDelaySeconds
+    }
+
+    return $parsedDelay
 }
 
 function Get-GameSpeakMessage {
