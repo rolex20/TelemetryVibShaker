@@ -193,7 +193,8 @@
           "Start": "Balanced",
           "Stop": "Balanced",
           "AuxProgramsDelaySeconds": 0,
-          "BoostAction": "action-per-process-boost4.json",          
+          "BoostActionDelaySeconds": 1200,
+          "BoostAction": "action-per-process-boost4.json",
           "AuxPrograms": [
             "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk"
           ],
