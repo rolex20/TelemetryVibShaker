@@ -75,7 +75,7 @@
               "MatchType": "PowerShellScript",
               "ScriptName": "BioTelemetryDaemon.ps1",
               "LaunchMode": "IfNotRunning",
-              "StopMode": "Never",
+              "StopMode": "OwnedOnly",
               "StartupTimeoutSeconds": 5
             }
           ],
@@ -131,7 +131,7 @@
         },
         "forzamotorsport7.exe": {
           "NickName": "Forza",
-          "Start": "Balanced",
+          "Start": "High Performance",
           "Stop": "Balanced",
           "WindowStyle": "Minimized",
           "BoostAction": "action-per-process-boost1.json",
@@ -177,21 +177,34 @@
         },
         "GRB.exe": {
           "NickName": "Ghost Recon",
-          "Start": "Balanced",
+          "Start": "High Performance",
           "Stop": "Balanced",
           "AuxProgramsDelaySeconds": 0,          
+          "AuxPrograms": [
+            "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk",
+            "[cheatengine-x86_64-SSE4-AVX2.exe]C:\\Users\\ralch\\Desktop\\Spartan Mod.lnk"
+          ],
+          "comments": [
+            "Gaming-Programs.ps1 showed Spartan Mod as previously considered (commented out)."
+          ]
+        },
+        "GRW.exe": {
+          "NickName": "Ghost Recon",
+          "Start": "Balanced",
+          "Stop": "Balanced",
+          "AuxProgramsDelaySeconds": 0,
+          "BoostAction": "action-per-process-boost4.json",          
           "AuxPrograms": [
             "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk"
           ],
           "comments": [
             "Gaming-Programs.ps1 showed Spartan Mod as previously considered (commented out)."
           ]
-        },
-        "UbisoftConnect.exe": {
+        },        
+        "Eliminated-UbisoftConnect.exe": {
           "WindowStyle": "Normal",
           "AuxPrograms": [
-            "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk",
-            "C:\\Users\\ralch\\Desktop\\Spartan Mod.lnk"
+            "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk"
           ],
           "comments": [
             "Key normalized (no trailing tab)."
