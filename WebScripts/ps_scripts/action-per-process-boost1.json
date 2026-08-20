@@ -157,6 +157,19 @@
         }
     },
     {
+        "process_name": "GRW",
+        "parameters": {
+            "process_affinity": "P-Cores",
+            "process_priority": "AboveNormal",
+            "thread_ideal_processor": "DoNotChange",
+            "thread_priority": "DoNotChange",
+            "thread_cpu_sets": "DoNotChange",
+            "process_change_cpu_sets": false,
+            "override_higher_priority": false,
+            "dependencies": []
+        }
+    },    
+    {
         "process_name": "SmartersIPTV",
         "parameters": {
             "process_affinity": "P-Cores",
