@@ -190,11 +190,11 @@
         },
         "GRW.exe": {
           "NickName": "Ghost Recon",
-          "Start": "Balanced",
+          "Start": "High Performance",
           "Stop": "Balanced",
           "AuxProgramsDelaySeconds": 0,
           "BoostActionDelaySeconds": 1200,
-          "BoostAction": "action-per-process-boost4.json",
+          "BoostAction": "action-per-process-boost2.json",
           "AuxPrograms": [
             "C:\\Users\\ralch\\Desktop\\Disable-Antivirus.ps1.lnk"
           ],
