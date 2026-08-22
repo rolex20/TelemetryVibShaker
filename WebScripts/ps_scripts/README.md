@@ -398,3 +398,19 @@ In `config/hosts.config.json`, toggle flags under `machines.<HOSTNAME>.features`
 - Move remaining static file paths into `config/hosts.config.json`.
 - Dynamic CPU topology generation (auto-detecting P-cores / E-cores at startup to construct affinity masks dynamically).
 - Web-based status dashboard for VR headset viewable status.
+
+---
+
+## Notes For Future AI Agents: PowerShell Concurrency Patterns
+
+This project has a few known-good concurrency patterns. Prefer these before inventing a new background architecture:
+
+- **`Start-ThreadJob` is isolated from parent `$Global:*` state.** A thread job runs in a separate runspace; do not expect it to see `$Global:WebScriptsConfig`, `$Global:GameProfiles`, or other watcher globals unless values are passed explicitly or the script is designed to bootstrap itself. This was verified with an isolated probe: a thread job could not read parent `$Global:WebScriptsConfig.paths.seatbeltWav`.
+- **Use `Start-ThreadJob -StreamingHost $Host` for long-lived service loops that must print to the same console.** This pattern is already used successfully by the IPC server. Without `-StreamingHost`, host output can be buffered or disconnected from the main watcher console.
+- **For delayed one-shot actions inside the watcher process, prefer `System.Timers.Timer` + `Register-ObjectEvent`.** This matches the existing gameplay runtime timer pattern in `Set-GamePowerScheme.ps1`. Timer event actions can access watcher globals, but still pass immutable action inputs through `MessageData` so each scheduled action is explicit and stable.
+- **Timer event actions should re-import their dependencies.** Event actions may run outside the original function scope, so dot-source required helper scripts inside the action, as the runtime timer does with `Write-VerboseDebug.ps1` and `Cpu-Snapshots.ps1`.
+- **Use `MessageData` for event callbacks.** Process watchers, timers, and filesystem watchers should pass paths, PIDs, process names, config-derived values, and shared lifecycle state through `MessageData` instead of relying on ambient variables.
+- **Keep long waits out of process watcher callbacks.** A long `Start-Sleep` in a CIM process event handler can block other process lifecycle work. Use a cancellable timer/event state keyed by PID for delayed actions such as long game boost delays.
+- **Clean up subscriptions and timers.** Store source identifiers and timer objects in PID-keyed state, then `Stop()`, `Unregister-Event`, and `Dispose()` them on process exit or completion to avoid stale callbacks.
+
+When in doubt, inspect the existing patterns in `Start-CommandWatchers.ps1`, `Get-ProcessWatcher.ps1`, `Watchdog-Operations.ps1`, and `Set-GamePowerScheme.ps1` before introducing new multithreading behavior.
