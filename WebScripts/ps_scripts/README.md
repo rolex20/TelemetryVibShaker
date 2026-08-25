@@ -155,6 +155,36 @@ To add or modify games, edit `config/hosts.config.json` under your machine's ent
 | **`WindowStyle`** | String | `"Minimized"` | `"Normal"`, `"Hidden"`, `"Minimized"`, `"Maximized"` | Window state passed to `Start-Process -WindowStyle` when launching auxiliary program shortcuts or executables. |
 | **`AuxPrograms`** | Array | `[]` | Array of Strings or JSON objects | List of auxiliary tools, shortcuts, or scripts to launch and optionally track alongside the game process lifecycle. |
 
+
+## Process Launch Command-Line Logging
+Command-line logging can be enabled independently for any monitored process by adding the following field to its "gameProfiles" entry in "config/hosts.config.json":
+
+```json
+"CommandLine": true
+```
+
+Example:
+```json
+"forza_steamworks_release_final.exe": {
+  "NickName": "Forza",
+  "Start": "Balanced",
+  "Stop": "Balanced",
+  "CommandLine": true
+}
+```
+
+When the process starts, "Start-CommandWatchers.ps1" attempts to retrieve the full launch command line from "Win32_Process.CommandLine", including the executable path and any command-line arguments. The process parent name and PID are also included in the start-event diagnostic output.
+
+Example output:
+```
+PROCESS: Win32_ProcessStartTrace - forza_steamworks_release_final.exe [12345] - PARENT: steam [6789] - CMD: "C:\Program Files (x86)\Steam\steamapps\common\Forza Motorsport\forza_steamworks_release_final.exe" <arguments>
+```
+
+Command-line capture is disabled by default to avoid unnecessary CIM queries and log noise. The lookup is best-effort, so very short-lived processes may exit before the command line can be retrieved.
+
+«Backward compatibility: "Start-CommandWatchers.ps1" also recognizes the legacy misspelled key "ComandLine", but new configuration should always use "CommandLine".»
+
+
 ## Auxiliary program lifecycle formats (`Aux-Programs.ps1`)
 
 The `AuxPrograms` array accepts **four distinct formats** that can be **freely mixed in the same array**. Each entry is evaluated independently, so you can combine legacy paths, shorthand strings, and structured objects in any order within the same game profile.
