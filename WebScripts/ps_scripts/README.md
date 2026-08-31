@@ -344,21 +344,42 @@ The toolkit provides "hands-off" session tracking without polling overhead:
 
 ## Boost profiles and process tuning (`action-per-process-boost*.json`)
 
-Boost profiles define hardware scheduling, affinity masks, CPU Sets, and thread priorities for games and their dependencies.
+Boost profiles define fine-grained hardware scheduling, processor affinity masks, Windows CPU Sets, ideal processor distribution, and thread priorities for games and their background dependencies. They are implemented in [`Set-IdealProcessor.ps1`](Set-IdealProcessor.ps1) and orchestrated by [`Set-GamePowerScheme.ps1`](Set-GamePowerScheme.ps1) on game start and stop events.
 
-Example snippet (`action-per-process-boost1.json`):
+Boost actions can be associated with any game profile in `config/hosts.config.json` via the `"BoostAction"` (JSON file path) and `"BoostActionDelaySeconds"` (settle delay) properties, or triggered dynamically via remote JSON / IPC commands (`"GAME_BOOST"` in [`Process-CommandFromJson.ps1`](Process-CommandFromJson.ps1)).
+
+---
+
+### Boost Profile JSON Schema & Field Reference
+
+Each boost JSON file contains an array of process boost definition objects.
+
 ```json
 [
   {
-    "process_name": "Ace7Game-Win64-Shipping",
+    "comment": "Optional descriptive note",
+    "process_name": "TargetProcessName",
     "parameters": {
-      "priority": "High",
-      "cpu_affinity": [0, 2, 4, 6, 8, 10, 12, 14],
+      "process_affinity": "DoNotChange",
+      "process_priority": "AboveNormal",
+      "thread_ideal_processor": "P-Cores",
+      "thread_priority": "AboveNormal",
+      "thread_cpu_sets": "DoNotChange",
+      "process_change_cpu_sets": true,
+      "override_higher_priority": false,
+      "max_threads_to_change": 5,
       "dependencies": [
         {
           "process_name": "steamwebhelper",
-          "priority": "BelowNormal",
-          "dont_restore_boost": true
+          "dont_restore_boost": true,
+          "process_affinity": "E-Cores",
+          "process_priority": "Idle",
+          "thread_ideal_processor": "E-Cores",
+          "thread_priority": "Idle",
+          "thread_cpu_sets": "E-Cores",
+          "process_change_cpu_sets": true,
+          "override_higher_priority": true,
+          "max_threads_to_change": 1000
         }
       ]
     }
@@ -366,7 +387,75 @@ Example snippet (`action-per-process-boost1.json`):
 ]
 ```
 
-- **`dont_restore_boost` Flag**: When set to `true` on a dependency block, `Restore-GameBoost` will skip restoring that dependency back to default priorities when the game exits. This keeps background helper processes (like Steam overlay components) pinned to low-priority efficiency cores permanently.
+#### Formal Parameter Reference
+
+| Field | Data Type | Default | Allowed Values / Options | Description & Functionality |
+| :--- | :--- | :--- | :--- | :--- |
+| **`process_name`** | String | *None (Required)* | Process name(s) without `.exe` (e.g. `"FlightSimulator"`, `"notepad, chrome, explorer"`) | Target executable name(s) to match. Supports comma-separated strings which are automatically split and trimmed via `Get-TrimmedProcessNames`. |
+| **`comment`** | String | `null` | Any text string | Optional documentation note explaining the profile's tuning rationale. |
+| **`parameters`** | Object | *None (Required)* | JSON object | Container for process and thread scheduling configurations. |
+| **`parameters.process_affinity`** | String / Integer | `"DoNotChange"` | `"P-Cores"`, `"E-Cores"`, `"All-Cores"`, `"DoNotChange"`, or raw integer bitmask | Sets hard process affinity (`$Process.ProcessorAffinity`).<br>• `"P-Cores"`: Confines to Performance cores (e.g. mask `65535` on 28-thread 14700K HT, `255` on 20-thread).<br>• `"E-Cores"`: Confines to Efficiency cores (e.g. mask `268369920` on 28-thread 14700K HT, `1048320` on 20-thread).<br>• `"All-Cores"`: Unlocks all logical cores.<br>• `"DoNotChange"` / `null`: Leaves process affinity untouched. |
+| **`parameters.process_priority`** | String | `"DoNotChange"` | `"Idle"`, `"BelowNormal"`, `"Normal"`, `"AboveNormal"`, `"High"`, `"RealTime"`, `"DoNotChange"` | Sets process priority class via `System.Diagnostics.ProcessPriorityClass`. |
+| **`parameters.thread_ideal_processor`** | String / Integer | `"DoNotChange"` | `"P-Cores"`, `"E-Cores"`, `"All-Cores"`, `"DoNotChange"`, or integer bitmask | Soft ideal processor steering via Win32 `SetThreadIdealProcessor`. Converts the core mask into allowed processor IDs and prioritizes physical cores over SMT/HyperThreading siblings (`Add-100ToMatches`). Distributes ideal processors round-robin across the busiest threads. |
+| **`parameters.thread_priority`** | String | `"DoNotChange"` | `"Idle"`, `"Lowest"`, `"BelowNormal"`, `"Normal"`, `"AboveNormal"`, `"Highest"`, `"TimeCritical"`, `"DoNotChange"` | Sets thread priority level (`$thread.PriorityLevel` / `ThreadPriorityLevel`). |
+| **`parameters.thread_cpu_sets`** | String | `"DoNotChange"` | `"P-Cores"`, `"E-Cores"`, `"All-Cores"`, `"DoNotChange"` | Configures soft Windows CPU Sets for threads via Win32 `SetThreadSelectedCpuSets`. Unlike hard affinity, CPU Sets declare preferred cores in a manner fully compatible with Windows OS power management.<br>• `"P-Cores"`: Maps to Win32 CPU Set IDs `256..271` (14700K HT) or `256..263` (no HT).<br>• `"E-Cores"`: Maps to Win32 CPU Set IDs `272..283` (14700K HT) or `264..275` (no HT).<br>• `"All-Cores"`: Maps to all CPU Set IDs `256..283`. |
+| **`parameters.process_change_cpu_sets`** | Boolean | `false` | `true`, `false` | When `true`, also calls `[CpuSetHelper]::SetDefaultCpuSets` on the process handle so any future threads created by the process automatically inherit the default CPU sets. |
+| **`parameters.override_higher_priority`** | Boolean | `false` | `true`, `false` | Controls whether to demote a thread whose current priority is higher than the requested priority:<br>• `false`: Logs a warning and preserves the higher thread priority.<br>• `true`: Forces thread priority demotion to the configured target level. |
+| **`parameters.max_threads_to_change`** | Integer | Caller limit (50) | Integer (`> 0`) | Maximum number of busiest threads to modify. Threads are sorted descending by `TotalProcessorTime`, so scheduling tweaks are applied to the most active workload threads first. |
+| **`parameters.dependencies`** | Array | `[]` | Array of dependency objects | Auxiliary helper, launcher, or overlay processes tuned concurrently with the primary process. Supports all above parameter properties. |
+| **`dependencies[].dont_restore_boost`** | Boolean | `false` | `true`, `false` | When `true`, `Restore-GameBoost` skips restoring this dependency on game exit. Useful for pinning background helpers (e.g. `steamwebhelper`, telemetry agents) permanently to E-cores / Idle priority. |
+
+---
+
+### Profile Catalog (`boost1` through `boost4`)
+
+| Profile File | Primary Use Case | Key Characteristics | Typical Targets |
+| :--- | :--- | :--- | :--- |
+| **`action-per-process-boost1.json`** | **Standard Hybrid Balance** | Games use `thread_ideal_processor: "P-Cores"` and `thread_priority: "AboveNormal"` with `thread_cpu_sets: "DoNotChange"`, allowing the OS scheduler burst flexibility while steering the top active threads to P-cores. Support tools (`steamwebhelper`, `joystick_gremlin`) pinned to `E-Cores`. | `FlightSimulator`, `aces` (War Thunder), `dcs`, `Ace7Game`, `forzamotorsport7`, `SmartersIPTV`, `sfvip player` |
+| **`action-per-process-boost2.json`** | **CPU Sets Preference** | Sets `thread_cpu_sets: "P-Cores"` on sim processes (`FlightSimulator`, `aces`) for soft CPU set reservation. Includes profile for `GRW` (Ghost Recon Wildlands) with 1200s delayed boost. | `FlightSimulator`, `aces`, `dcs`, `GRW` |
+| **`action-per-process-boost3.json`** | **Aggressive P-Core Affinity** | Enforces hard `process_affinity: "P-Cores"` on games and VR runtimes (`OVRServer_x64`) to completely isolate the simulation workload from E-cores. | `FlightSimulator`, `aces`, `dcs`, `acs`, `SGWContracts2` |
+| **`action-per-process-boost4.json`** | **Background Throttle** | Throttles resource-heavy Windows update/telemetry processes permanently to `E-Cores` and `Idle` priority with `dont_restore_boost: true` to prevent micro-stutters and thermal spikes. | `TiWorker`, `CompatTelRunner` |
+
+---
+
+### Runtime Execution and Restore Mechanics
+
+```mermaid
+flowchart TD
+    A["Process Start Detected<br/>(Win32_ProcessStartTrace)"] --> B{"BoostAction<br/>Configured?"}
+    B -- No --> C["Proceed without boost"]
+    B -- Yes --> D{"Delay > 5s?"}
+    D -- Yes --> E["Start-DelayedGameBoost<br/>(Cancellable One-Shot Timer)"]
+    D -- No --> F["Wait 5s settle delay"]
+    E --> G["Run-Actions-Per-Game"]
+    F --> G
+    G --> H["Sort Threads by TotalProcessorTime Descending"]
+    H --> I["Apply Physical P-Cores First (Add-100ToMatches)"]
+    I --> J["Set Process & Thread Affinity, Priority, CPU Sets"]
+    J --> K["Apply Dependency Tuning (steamwebhelper, etc.)"]
+    K --> L["Play Seatbelt Sound (Play-SeatBelt)"]
+    
+    M["Process Stop Detected<br/>(Win32_ProcessStopTrace)"] --> N{"Delayed Boost<br/>Pending?"}
+    N -- Yes --> O["Cancel Timer & Skip Restore"]
+    N -- No --> P["Restore-GameBoost"]
+    P --> Q{"dont_restore_boost<br/>== true?"}
+    Q -- Yes --> R["Skip Dependency Restore<br/>(Remain on E-Cores / Idle)"]
+    Q -- No --> S["Restore-ProcessToDefaults<br/>(Priority -> Normal, Affinity -> All-Cores, CPU Sets -> Clear)"]
+```
+
+1. **Start Phase (`Set-GamePowerScheme.ps1` → `Run-Actions-Per-Game`)**:
+   - `Set-GamePowerScheme` checks for `BoostAction` in the game's profile.
+   - For standard delays ($\le 5\text{s}$), it waits for the process to settle inline; for longer delays (e.g. 1200s on `GRW.exe`), it schedules a non-blocking cancellable timer via `Start-DelayedGameBoost`.
+   - `Run-Actions-Per-Game` strips `.exe` from the process name, parses the target JSON, and locates the matching action block.
+   - It queries all process threads, sorts them descending by `TotalProcessorTime`, and applies settings up to `max_threads_to_change`.
+   - Ideal processors are assigned using `Add-100ToMatches` to ensure physical cores ($0, 2, 4, \dots$) receive the highest-load threads before hyperthreaded sibling logical cores.
+   - Plays an audible seatbelt chime (`Play-SeatBelt`) upon completion.
+
+2. **Stop / Restore Phase (`Restore-GameBoost` → `Restore-ProcessToDefaults`)**:
+   - When the monitored game process terminates, `Restore-GameBoost` inspects the boost JSON.
+   - The primary game process is already gone; `Restore-GameBoost` iterates through configured `dependencies`.
+   - If `dont_restore_boost: true` is set (e.g. for `steamwebhelper`), restore is skipped to keep the helper pinned to E-cores permanently.
+   - For all other dependencies, `Restore-ProcessToDefaults` restores priority to `Normal`, affinity to `All-Cores`, ideal processor to `All-Cores`, and clears thread/process CPU sets (`@()`).
 
 ---
 
