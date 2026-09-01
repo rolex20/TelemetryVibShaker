@@ -12,7 +12,6 @@
     This example runs the script, showing the initial and updated CPU times of processes with the differences.
 
 .NOTES
-    Author: [Your Name]
     Version: 1.0
     Created: [Date]
     Requirements: PowerShell 5.0 or higher.
