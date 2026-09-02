@@ -655,7 +655,7 @@ function Invoke-StutterHunterPipeCommand {
 function Start-StutterHunterServerIfNeeded {
     $scriptPath = Join-Path $PSScriptRoot 'Stutter-Hunter-IPC.ps1'
     Start-Process powershell.exe -WindowStyle Minimized -ArgumentList @(
-        '-NoLogo','-NoProfile','-ExecutionPolicy','Bypass',
+        '-NoExit', '-NoLogo','-NoProfile','-ExecutionPolicy','Bypass',
         '-File', "`"$scriptPath`"",
         '-Mode', 'Server'
     ) | Out-Null
