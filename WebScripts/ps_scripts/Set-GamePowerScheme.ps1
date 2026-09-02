@@ -781,14 +781,15 @@ function Set-GamePowerScheme {
 				#     '-GameProcessName', $programName
 				# )                
                 # IPC mode centralizes stutter tracking state in one coordinator process.
-				Start-Process powershell.exe -WindowStyle Minimized -ArgumentList @(
+                $scriptPath = Join-Path $PSScriptRoot 'Stutter-Hunter-IPC.ps1'
+                #Start-Process powershell.exe -WindowStyle Minimized -ArgumentList @(
+				Start-Process powershell.exe -ArgumentList @(
 					'-NoLogo','-NoProfile','-ExecutionPolicy','Bypass',
-					'-File', (Join-Path $PSScriptRoot 'Stutter-Hunter-IPC.ps1'),
+                    '-File', "`"$scriptPath`"",
 					'-Mode','Client',
 					'-Action','Add',
 					'-ProcessId', $processId,
 					'-GameProcessName', $programName
-				)
 			}
 
 			if ($speakText) {
