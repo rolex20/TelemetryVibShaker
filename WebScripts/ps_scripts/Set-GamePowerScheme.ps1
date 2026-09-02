@@ -789,7 +789,7 @@ function Set-GamePowerScheme {
 					'-Mode','Client',
 					'-Action','Add',
 					'-ProcessId', $processId,
-					'-GameProcessName', $programName
+					'-GameProcessName', $programName)
 			}
 
 			if ($speakText) {
