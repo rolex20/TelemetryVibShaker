@@ -48,6 +48,11 @@ or full paths. Defaults include System.dll, System.Core.dll, and Microsoft.CShar
 .PARAMETER Force
 Forces recompilation even if a valid cached DLL exists.  (Default is $False)
 
+.PARAMETER ShowDiagnostics
+Displays cache, compilation, and assembly-loading decisions to the caller. This is intentionally named
+ShowDiagnostics because Verbose is a PowerShell common parameter supplied automatically by CmdletBinding.
+The messages are emitted only when this switch is present and do not rely on Write-Verbose.
+
 .OUTPUTS
 None. The compiled assembly is loaded into the current process. Types become available for use via:
   [MyNamespace.MyType]::SomeMethod()
@@ -69,7 +74,7 @@ Import-OptimizedCSharp -Source $code -ExpectedTypeName "Demo.MathUtil" -CallerSc
 
 .EXAMPLE
 # Force rebuild of the cached assembly (e.g. after changing compiler options or troubleshooting)
-Import-OptimizedCSharp -Source $code -ExpectedTypeName "Demo.MathUtil" -CallerScriptPath $PSCommandPath -Force
+Import-OptimizedCSharp -Source $code -ExpectedTypeName "Demo.MathUtil" -CallerScriptPath $PSCommandPath -Force -ShowDiagnostics
 
 .NOTES
 - Designed for Windows PowerShell 5.1 and .NET Framework CodeDOM compilation.
@@ -97,8 +102,18 @@ function Import-OptimizedCSharp {
             "Microsoft.CSharp.dll"
         ),
 
-        [switch] $Force
+        [switch] $Force,
+
+        [switch] $ShowDiagnostics
     )
+
+    $showImportDiagnostic = {
+        param([string] $Message)
+
+        if ($ShowDiagnostics.IsPresent) {
+            Write-Host ("[Import-OptimizedCSharp] " + $Message) -ForegroundColor DarkCyan
+        }
+    }
 
     # Already loaded?
     # Important PS/.NET behavior: once an assembly is loaded into an AppDomain, it cannot be unloaded
@@ -107,7 +122,10 @@ function Import-OptimizedCSharp {
         ForEach-Object { $_.GetType($ExpectedTypeName, $false, $false) } |
         Where-Object { $_ } |
         Select-Object -First 1
-    if ($already) { return }
+    if ($already) {
+        & $showImportDiagnostic "Type '$ExpectedTypeName' is already loaded; no cache lookup or compilation is needed."
+        return
+    }
 
     $callerItem = Get-Item -LiteralPath $CallerScriptPath -ErrorAction Stop
 
@@ -116,6 +134,7 @@ function Import-OptimizedCSharp {
     }
     if (-not (Test-Path -LiteralPath $CacheRoot)) {
         New-Item -ItemType Directory -Path $CacheRoot -Force | Out-Null
+        & $showImportDiagnostic "Created cache directory '$CacheRoot'."
     }
 
     # Cache key = per-script + per-source + platform (+ refs)
@@ -143,8 +162,20 @@ function Import-OptimizedCSharp {
     # Recompile if forced, missing, or older than caller script.
     # Timestamp check gives a simple "script changed => rebuild" rule in addition to hash-keying.
     $needsCompile = $Force.IsPresent -or (-not $dllItem) -or ($dllItem.LastWriteTimeUtc -lt $callerItem.LastWriteTimeUtc)
+    $compiledThisCall = $false
 
     if ($needsCompile) {
+        if ($Force.IsPresent) {
+            & $showImportDiagnostic "Force was specified; compilation will run instead of reusing any cached assembly."
+        }
+        elseif (-not $dllItem) {
+            & $showImportDiagnostic "Cache miss; no compiled assembly exists at '$dllPath'."
+        }
+        else {
+            & $showImportDiagnostic "Cached assembly '$dllPath' is older than '$CallerScriptPath'; recompilation is required."
+        }
+        & $showImportDiagnostic "Compiling optimized C# for platform '$Platform' to '$dllPath'."
+
         # Make sure compiler types are available
         Add-Type -AssemblyName "Microsoft.CSharp" -ErrorAction Stop
         Add-Type -AssemblyName "System" -ErrorAction Stop
@@ -173,6 +204,12 @@ function Import-OptimizedCSharp {
             $errs = $results.Errors | ForEach-Object { $_.ToString() }
             throw ("C# compile failed:`n" + ($errs -join "`n"))
         }
+
+        $compiledThisCall = $true
+        & $showImportDiagnostic "Compilation completed and the assembly was cached on disk."
+    }
+    else {
+        & $showImportDiagnostic "Cache hit; compilation was skipped and '$dllPath' will be loaded from disk."
     }
 
     if (-not (Test-Path -LiteralPath $dllPath)) {
@@ -182,6 +219,12 @@ function Import-OptimizedCSharp {
     # Load without locking the DLL.
     # Reading bytes + Assembly.Load(byte[]) prevents file locking issues that break overwrite/rebuild
     # on subsequent runs (a common Add-Type pain point when iterating quickly).
+    if ($compiledThisCall) {
+        & $showImportDiagnostic "Loading the newly compiled assembly from disk without locking the cache file."
+    }
+    else {
+        & $showImportDiagnostic "Loading the cached assembly from disk without locking the cache file."
+    }
     $raw = [IO.File]::ReadAllBytes($dllPath)
     [void][System.Reflection.Assembly]::Load([byte[]]$raw)
 
@@ -191,4 +234,5 @@ function Import-OptimizedCSharp {
         Where-Object { $_ } |
         Select-Object -First 1
     if (-not $t) { throw "Loaded assembly, but type '$ExpectedTypeName' was not found." }
+    & $showImportDiagnostic "Assembly loaded successfully; type '$ExpectedTypeName' is available."
 }
