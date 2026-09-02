@@ -811,14 +811,17 @@ function Wait-ForNewAuxProcesses {
             $null -ne $ScheduledActionState.DueAt) {
             $millisecondsUntilAction = [Math]::Ceiling((([datetime]$ScheduledActionState.DueAt) - (Get-Date)).TotalMilliseconds)
             if ($millisecondsUntilAction -le 0) {
-                $sleepMilliseconds = 1
+                $sleepMilliseconds = 0 #flag to immediately invoke the action on the next loop iteration
             }
             elseif ($millisecondsUntilAction -lt $sleepMilliseconds) {
                 $sleepMilliseconds = [int]$millisecondsUntilAction
             }
         }
 
-        Start-Sleep -Milliseconds $sleepMilliseconds
+        if ($sleepMilliseconds -gt 0) {
+            Start-Sleep -Milliseconds $sleepMilliseconds
+        }
+
     }
     while ($true)
 
