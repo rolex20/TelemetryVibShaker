@@ -1,54 +1,19 @@
 [
     {
-        "comment": "Peksy windows process while i am busy",
-        "process_name": "TiWorker",
+        "comment": "Pesky windows background processes throttled to E-Cores and Idle while busy",
+        "process_name": [
+            "TiWorker",
+            "CompatTelRunner"
+        ],
         "parameters": {
             "process_affinity": "E-Cores",
             "process_priority": "Idle",
-            "thread_ideal_processor": "DoNotChange",
+            "thread_ideal_processor": "E-Cores",
             "thread_priority": "Idle",
             "thread_cpu_sets": "DoNotChange",
             "process_change_cpu_sets": false,
             "override_higher_priority": true,
-            "dependencies": [
-                {
-                    "process_name": "CompatTelRunner",
-                    "dont_restore_boost": true,
-                    "process_affinity": "E-Cores",
-                    "process_priority": "Idle",
-                    "thread_ideal_processor": "DoNotChange",
-                    "thread_priority": "Idle",
-                    "thread_cpu_sets": "DoNotChange",
-                    "process_change_cpu_sets": false,
-                    "override_higher_priority": true
-                }
-            ]
-        }
-    },
-    {
-        "comment": "Peksy windows process while i am busy",
-        "process_name": "CompatTelRunner",
-        "parameters": {
-            "process_affinity": "E-Cores",
-            "process_priority": "Idle",
-            "thread_ideal_processor": "DoNotChange",
-            "thread_priority": "Idle",
-            "thread_cpu_sets": "DoNotChange",
-            "process_change_cpu_sets": false,
-            "override_higher_priority": true,
-            "dependencies": [
-                {
-                    "process_name": "TiWorker",
-                    "dont_restore_boost": true,
-                    "process_affinity": "E-Cores",
-                    "process_priority": "Idle",
-                    "thread_ideal_processor": "DoNotChange",
-                    "thread_priority": "Idle",
-                    "thread_cpu_sets": "DoNotChange",
-                    "process_change_cpu_sets": false,
-                    "override_higher_priority": true
-                }
-            ]
+            "dependencies": []
         }
     }
 ]
