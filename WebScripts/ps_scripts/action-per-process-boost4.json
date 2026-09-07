@@ -8,7 +8,7 @@
         "parameters": {
             "process_affinity": "E-Cores",
             "process_priority": "Idle",
-            "thread_ideal_processor": "DoNotChange",
+            "thread_ideal_processor": "E-Cores",
             "thread_priority": "Idle",
             "thread_cpu_sets": "DoNotChange",
             "process_change_cpu_sets": false,
