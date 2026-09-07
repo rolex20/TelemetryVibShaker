@@ -1,4 +1,4 @@
-﻿# Define the SetProcessDefaultCpuSets, SetThreadSelectedCpuSets, GetThreadSelectedCpuSets, and GetSystemCpuSetInformation functions from kernel32.dll
+# Define the SetProcessDefaultCpuSets, SetThreadSelectedCpuSets, GetThreadSelectedCpuSets, and GetSystemCpuSetInformation functions from kernel32.dll
 # See and search for SetGet-DefaultCpuSets.ps1 for extended information
 Add-Type @"
 using System;
@@ -685,13 +685,35 @@ function Get-Cpu-Set($cpuSet, $cpuCount) {
 
 function Get-TrimmedProcessNames {
     param (
-        [string]$processNames
+        [Parameter(Mandatory = $false)]
+        $processNames
     )
 
-    # Split the string by comma and trim each process name
-    $trimmedNames = $processNames -split ',' | ForEach-Object { $_.Trim() }
+    if ($null -eq $processNames) {
+        return ,([string[]]@())
+    }
 
-    return $trimmedNames
+    $result = [System.Collections.Generic.List[string]]::new()
+    $seen = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+
+    # Handle single string, arrays/collections, or PSObject lists consistently
+    foreach ($item in @($processNames)) {
+        if ($null -ne $item) {
+            # Convert each item to string and split by comma to support mixed array/comma inputs
+            $splits = ([string]$item) -split ','
+            foreach ($split in $splits) {
+                # Trim whitespace and strip optional case-insensitive .exe extension
+                $trimmed = ($split.Trim()) -replace '(?i)\.exe$', ''
+                if (-not [string]::IsNullOrEmpty($trimmed)) {
+                    if ($seen.Add($trimmed)) {
+                        $result.Add($trimmed)
+                    }
+                }
+            }
+        }
+    }
+
+    return ,$result.ToArray()
 }
 
 

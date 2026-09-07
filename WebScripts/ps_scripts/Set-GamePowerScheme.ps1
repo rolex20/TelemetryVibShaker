@@ -1,4 +1,4 @@
-﻿$scriptDir = $PSScriptRoot
+$scriptDir = $PSScriptRoot
 . (Join-Path $scriptDir 'Write-VerboseDebug.ps1')
 . (Join-Path $scriptDir 'Gaming-Programs.ps1')
 . (Join-Path $scriptDir 'Aux-Programs.ps1')
@@ -29,7 +29,10 @@ function Restore-GameBoost {
     Write-VerboseDebug -Timestamp (Get-Date) -Title "RESTORE" -Message "Attempting to restore processes affected by '$normalizedProgramName' boost." -ForegroundColor "Yellow"
 
     # Find the specific action block for the program that just stopped using the NORMALIZED name.
-    $gameAction = $actions | Where-Object { $_.process_name -eq $normalizedProgramName } | Select-Object -First 1
+    $gameAction = $actions | Where-Object {
+        $actionProcessNames = Get-TrimmedProcessNames $_.process_name
+        $actionProcessNames -contains $normalizedProgramName
+    } | Select-Object -First 1
 
     if (-not $gameAction) {
         Write-VerboseDebug -Timestamp (Get-Date) -Title "RESTORE" -Message "No matching boost profile found for '$normalizedProgramName' in '$boostJsonPath'. Nothing to restore." -ForegroundColor "Gray"
@@ -62,7 +65,11 @@ function Restore-GameBoost {
             if ($skipDependencyRestore) {
                 # Non-fatal by design: one dependency opt-out should not impact other dependencies.
                 # We log explicitly so operators can confirm why a dependency was not restored.
-                Write-VerboseDebug -Timestamp (Get-Date) -Title "RESTORE" -Message "Skipping restore for dependency '$($dependence.process_name)' because dont_restore_boost=true in '$boostJsonPath'." -ForegroundColor "DarkYellow"
+                $depDisplayNames = (Get-TrimmedProcessNames $dependence.process_name) -join ', '
+                if ([string]::IsNullOrWhiteSpace($depDisplayNames)) {
+                    $depDisplayNames = [string]$dependence.process_name
+                }
+                Write-VerboseDebug -Timestamp (Get-Date) -Title "RESTORE" -Message "Skipping restore for dependency '$depDisplayNames' because dont_restore_boost=true in '$boostJsonPath'." -ForegroundColor "DarkYellow"
                 continue
             }
 

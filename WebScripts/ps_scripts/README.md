@@ -354,11 +354,19 @@ Boost actions can be associated with any game profile in `config/hosts.config.js
 
 Each boost JSON file contains an array of process boost definition objects.
 
+The **`process_name`** property (in both main action blocks and nested `dependencies`) is **polymorphic** and supports three interchangeable formats:
+1. **Single String (Legacy / Standard)**: `"process_name": "FlightSimulator"`
+2. **Comma-Separated String**: `"process_name": "notepad, chrome, explorer"`
+3. **JSON Array**: `"process_name": ["TiWorker", "CompatTelRunner"]`
+
+Spaces around process names are automatically trimmed, duplicate names (case-insensitive) are deduplicated, and optional `.exe` extensions (e.g. `"notepad.exe"`) are automatically stripped for safety.
+
+#### Example 1: Comma-Separated Multi-Process Rule & Array Dependencies
 ```json
 [
   {
-    "comment": "Optional descriptive note",
-    "process_name": "TargetProcessName",
+    "comment": "Flight simulation group sharing standard boost parameters",
+    "process_name": "FlightSimulator, aces, dcs",
     "parameters": {
       "process_affinity": "DoNotChange",
       "process_priority": "AboveNormal",
@@ -370,7 +378,7 @@ Each boost JSON file contains an array of process boost definition objects.
       "max_threads_to_change": 5,
       "dependencies": [
         {
-          "process_name": "steamwebhelper",
+          "process_name": ["steamwebhelper", "steam"],
           "dont_restore_boost": true,
           "process_affinity": "E-Cores",
           "process_priority": "Idle",
@@ -387,11 +395,34 @@ Each boost JSON file contains an array of process boost definition objects.
 ]
 ```
 
+#### Example 2: JSON Array Multi-Process Rule (as in `action-per-process-boost4.json`)
+```json
+[
+  {
+    "comment": "Throttle pesky background update/telemetry tasks to E-Cores & Idle",
+    "process_name": [
+      "TiWorker",
+      "CompatTelRunner"
+    ],
+    "parameters": {
+      "process_affinity": "E-Cores",
+      "process_priority": "Idle",
+      "thread_ideal_processor": "DoNotChange",
+      "thread_priority": "Idle",
+      "thread_cpu_sets": "DoNotChange",
+      "process_change_cpu_sets": false,
+      "override_higher_priority": true,
+      "dependencies": []
+    }
+  }
+]
+```
+
 #### Formal Parameter Reference
 
 | Field | Data Type | Default | Allowed Values / Options | Description & Functionality |
 | :--- | :--- | :--- | :--- | :--- |
-| **`process_name`** | String | *None (Required)* | Process name(s) without `.exe` (e.g. `"FlightSimulator"`, `"notepad, chrome, explorer"`) | Target executable name(s) to match. Supports comma-separated strings which are automatically split and trimmed via `Get-TrimmedProcessNames`. |
+| **`process_name`** | String / Array | *None (Required)* | • Single name: `"FlightSimulator"`<br>• Comma-separated: `"notepad, chrome, explorer"`<br>• JSON array: `["TiWorker", "CompatTelRunner"]`<br>*(Trailing `.exe` is automatically stripped)* | Target executable name(s) to match. Evaluated polymorphically by `Get-TrimmedProcessNames`. Supports both comma-separated strings and JSON arrays with automatic whitespace trimming, case-insensitive deduplication, and optional `.exe` removal. Applies to both primary actions and nested dependencies. |
 | **`comment`** | String | `null` | Any text string | Optional documentation note explaining the profile's tuning rationale. |
 | **`parameters`** | Object | *None (Required)* | JSON object | Container for process and thread scheduling configurations. |
 | **`parameters.process_affinity`** | String / Integer | `"DoNotChange"` | `"P-Cores"`, `"E-Cores"`, `"All-Cores"`, `"DoNotChange"`, or raw integer bitmask | Sets hard process affinity (`$Process.ProcessorAffinity`).<br>• `"P-Cores"`: Confines to Performance cores (e.g. mask `65535` on 28-thread 14700K HT, `255` on 20-thread).<br>• `"E-Cores"`: Confines to Efficiency cores (e.g. mask `268369920` on 28-thread 14700K HT, `1048320` on 20-thread).<br>• `"All-Cores"`: Unlocks all logical cores.<br>• `"DoNotChange"` / `null`: Leaves process affinity untouched. |
@@ -402,7 +433,7 @@ Each boost JSON file contains an array of process boost definition objects.
 | **`parameters.process_change_cpu_sets`** | Boolean | `false` | `true`, `false` | When `true`, also calls `[CpuSetHelper]::SetDefaultCpuSets` on the process handle so any future threads created by the process automatically inherit the default CPU sets. |
 | **`parameters.override_higher_priority`** | Boolean | `false` | `true`, `false` | Controls whether to demote a thread whose current priority is higher than the requested priority:<br>• `false`: Logs a warning and preserves the higher thread priority.<br>• `true`: Forces thread priority demotion to the configured target level. |
 | **`parameters.max_threads_to_change`** | Integer | Caller limit (50) | Integer (`> 0`) | Maximum number of busiest threads to modify. Threads are sorted descending by `TotalProcessorTime`, so scheduling tweaks are applied to the most active workload threads first. |
-| **`parameters.dependencies`** | Array | `[]` | Array of dependency objects | Auxiliary helper, launcher, or overlay processes tuned concurrently with the primary process. Supports all above parameter properties. |
+| **`parameters.dependencies`** | Array | `[]` | Array of dependency objects | Auxiliary helper, launcher, or overlay processes tuned concurrently with the primary process. Supports all above parameter properties, including multi-process strings or arrays in `dependencies[].process_name`. |
 | **`dependencies[].dont_restore_boost`** | Boolean | `false` | `true`, `false` | When `true`, `Restore-GameBoost` skips restoring this dependency on game exit. Useful for pinning background helpers (e.g. `steamwebhelper`, telemetry agents) permanently to E-cores / Idle priority. |
 
 ---
@@ -414,7 +445,7 @@ Each boost JSON file contains an array of process boost definition objects.
 | **`action-per-process-boost1.json`** | **Standard Hybrid Balance** | Games use `thread_ideal_processor: "P-Cores"` and `thread_priority: "AboveNormal"` with `thread_cpu_sets: "DoNotChange"`, allowing the OS scheduler burst flexibility while steering the top active threads to P-cores. Support tools (`steamwebhelper`, `joystick_gremlin`) pinned to `E-Cores`. | `FlightSimulator`, `aces` (War Thunder), `dcs`, `Ace7Game`, `forzamotorsport7`, `SmartersIPTV`, `sfvip player` |
 | **`action-per-process-boost2.json`** | **CPU Sets Preference** | Sets `thread_cpu_sets: "P-Cores"` on sim processes (`FlightSimulator`, `aces`) for soft CPU set reservation. Includes profile for `GRW` (Ghost Recon Wildlands) with 1200s delayed boost. | `FlightSimulator`, `aces`, `dcs`, `GRW` |
 | **`action-per-process-boost3.json`** | **Aggressive P-Core Affinity** | Enforces hard `process_affinity: "P-Cores"` on games and VR runtimes (`OVRServer_x64`) to completely isolate the simulation workload from E-cores. | `FlightSimulator`, `aces`, `dcs`, `acs`, `SGWContracts2` |
-| **`action-per-process-boost4.json`** | **Background Throttle** | Throttles resource-heavy Windows update/telemetry processes permanently to `E-Cores` and `Idle` priority with `dont_restore_boost: true` to prevent micro-stutters and thermal spikes. | `TiWorker`, `CompatTelRunner` |
+| **`action-per-process-boost4.json`** | **Background Throttle** | Throttles resource-heavy Windows update/telemetry processes permanently to `E-Cores` and `Idle` priority in a consolidated multi-process rule (`["TiWorker", "CompatTelRunner"]`) to prevent micro-stutters and thermal spikes. | `TiWorker`, `CompatTelRunner` |
 
 ---
 
