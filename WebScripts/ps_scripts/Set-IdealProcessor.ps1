@@ -682,7 +682,7 @@ function Set-ProcessAffinityAndPriority {
 	
 
         $processName = $process.Name
-        Write-Output "Affinity/Priority/CpuSet/EcoQos for '$processName' processes/threads have been set."
+        Write-Host "Affinity/Priority/CpuSet/EcoQos changes for '$processName' processes/threads have been set."
 
     } catch {
         Write-Host "An error occurred in Set-ProcessAffinityAndPriority: $($_.Exception.Message)"
