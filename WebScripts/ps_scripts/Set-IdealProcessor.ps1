@@ -119,20 +119,118 @@ public class CpuSetHelper {
 }
 "@
 
-# Define constants for thread access rights
+# Define constants for thread and process access rights
 $THREAD_SET_INFORMATION = 0x0020
 $THREAD_QUERY_INFORMATION = 0x0040
-
-
-# Define constants
-$THREAD_SET_INFORMATION = 0x0020
 $THREAD_SET_PRIORITY = 0x0040
 $THREAD_PRIORITY_IDLE = -15
 $IDLE_PRIORITY_CLASS = 0x40
 $SE_PRIVILEGE_ENABLED = 0x00000002
 $SE_INC_BASE_PRIORITY_NAME = "SeIncreaseBasePriorityPrivilege"
+$SE_DEBUG_NAME = "SeDebugPrivilege"
+$PROCESS_SET_INFORMATION = 0x0200
+
+# Define EcoQoSHelper for Windows 10/11 Power Throttling / Efficiency Mode
+if (-not ([System.Management.Automation.PSTypeName]'EcoQoSHelper').Type) {
+    Add-Type @"
+using System;
+using System.Runtime.InteropServices;
+
+public class EcoQoSHelper {
+    [StructLayout(LayoutKind.Sequential)]
+    public struct PROCESS_POWER_THROTTLING_STATE {
+        public uint Version;
+        public uint ControlMask;
+        public uint StateMask;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct THREAD_POWER_THROTTLING_STATE {
+        public uint Version;
+        public uint ControlMask;
+        public uint StateMask;
+    }
+
+    public const uint PROCESS_POWER_THROTTLING_CURRENT_VERSION = 1;
+    public const uint PROCESS_POWER_THROTTLING_EXECUTION_SPEED = 1;
+
+    public const uint THREAD_POWER_THROTTLING_CURRENT_VERSION = 1;
+    public const uint THREAD_POWER_THROTTLING_EXECUTION_SPEED = 1;
+
+    public const int ProcessPowerThrottling = 4;
+    public const int TIC_THREAD_POWER_THROTTLING_WIN11 = 3;
+    public const int TIC_THREAD_POWER_THROTTLING_WIN10 = 1;
+    public const int ERROR_INVALID_PARAMETER = 87;
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern IntPtr OpenProcess(uint dwDesiredAccess, bool bInheritHandle, uint dwProcessId);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern IntPtr OpenThread(uint dwDesiredAccess, bool bInheritHandle, uint dwThreadId);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern bool SetProcessInformation(
+        IntPtr hProcess,
+        int ProcessInformationClass,
+        ref PROCESS_POWER_THROTTLING_STATE ProcessInformation,
+        uint ProcessInformationSize);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern bool SetThreadInformation(
+        IntPtr hThread,
+        int ThreadInformationClass,
+        ref THREAD_POWER_THROTTLING_STATE ThreadInformation,
+        uint ThreadInformationSize);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool CloseHandle(IntPtr hObject);
+
+    public static bool SetProcessEcoQoS(IntPtr hProcess, bool enable, out int errorCode) {
+        errorCode = 0;
+        PROCESS_POWER_THROTTLING_STATE state = new PROCESS_POWER_THROTTLING_STATE();
+        state.Version = PROCESS_POWER_THROTTLING_CURRENT_VERSION;
+        state.ControlMask = PROCESS_POWER_THROTTLING_EXECUTION_SPEED;
+        state.StateMask = enable ? PROCESS_POWER_THROTTLING_EXECUTION_SPEED : 0u;
+
+        uint size = (uint)Marshal.SizeOf(typeof(PROCESS_POWER_THROTTLING_STATE));
+        if (!SetProcessInformation(hProcess, ProcessPowerThrottling, ref state, size)) {
+            errorCode = Marshal.GetLastWin32Error();
+            return false;
+        }
+        return true;
+    }
+
+    public static bool SetThreadEcoQoS(IntPtr hThread, bool enable, out int errorCode) {
+        errorCode = 0;
+        THREAD_POWER_THROTTLING_STATE state = new THREAD_POWER_THROTTLING_STATE();
+        state.Version = THREAD_POWER_THROTTLING_CURRENT_VERSION;
+        state.ControlMask = THREAD_POWER_THROTTLING_EXECUTION_SPEED;
+        state.StateMask = enable ? THREAD_POWER_THROTTLING_EXECUTION_SPEED : 0u;
+
+        uint size = (uint)Marshal.SizeOf(typeof(THREAD_POWER_THROTTLING_STATE));
+
+        // Try Windows 11 API first (Class 3)
+        if (SetThreadInformation(hThread, TIC_THREAD_POWER_THROTTLING_WIN11, ref state, size)) {
+            return true;
+        }
+
+        int err = Marshal.GetLastWin32Error();
+        // Fallback to Windows 10 API (Class 1) on ERROR_INVALID_PARAMETER (87)
+        if (err == ERROR_INVALID_PARAMETER &&
+            SetThreadInformation(hThread, TIC_THREAD_POWER_THROTTLING_WIN10, ref state, size)) {
+            return true;
+        }
+
+        errorCode = (err != 0) ? err : Marshal.GetLastWin32Error();
+        return false;
+    }
+}
+"@
+}
 
 # Import necessary functions from kernel32.dll and advapi32.dll
+if (-not ([System.Management.Automation.PSTypeName]'NativeMethods').Type) {
 Add-Type @"
 using System;
 using System.Runtime.InteropServices;
@@ -175,6 +273,7 @@ public class NativeMethods {
     }
 }
 "@
+}
 
 
 #12700K
@@ -349,6 +448,25 @@ function Get-SetBits {
     return [int[]]$setBits
 }
 
+function Get-EcoQoSParameter {
+    param (
+        $Parameters
+    )
+    if ($null -eq $Parameters) { return $null }
+
+    if ($Parameters -is [System.Collections.IDictionary]) {
+        if ($Parameters.Contains('eco_qos')) {
+            $val = $Parameters['eco_qos']
+            if ($val -is [bool]) { return $val }
+        }
+    } elseif ($Parameters.PSObject -and ($Parameters.PSObject.Properties.Name -contains 'eco_qos')) {
+        $val = $Parameters.eco_qos
+        if ($val -is [bool]) { return $val }
+    }
+
+    return $null
+}
+
 function Restore-ProcessToDefaults {
     <#
     .SYNOPSIS
@@ -404,6 +522,13 @@ function Restore-ProcessToDefaults {
     } else {
         $restoreParams.CpuSet = $null # Signal DoNotChange
     }
+
+    $origEcoQoS = Get-EcoQoSParameter $OriginalParameters
+    if ($origEcoQoS -eq $true) {
+        $restoreParams.EcoQoS = $false # Revert EcoQoS back to standard performance
+    } else {
+        $restoreParams.EcoQoS = $null  # Signal DoNotChange
+    }
     
     # Call the main function with the intelligently constructed restore parameters.
     Set-ProcessAffinityAndPriority @restoreParams
@@ -421,7 +546,9 @@ function Set-ProcessAffinityAndPriority {
         $CpuSet,
         $ChangeCpuSetForProcessAlso,
         $MaximumThreadsToChange,
-        $OverrideHigherPriority
+        $OverrideHigherPriority,
+        $EcoQoS = $null,
+        $ChangeEcoQoSForProcessAlso = $true
     )
 
     $ProcessId = $Process.Id
@@ -429,15 +556,17 @@ function Set-ProcessAffinityAndPriority {
     try {
 
         if (-not (Enable-Privilege -Privilege $SE_INC_BASE_PRIORITY_NAME)) {
-            Write-Host "Failed to enable privilege."
-            exit
+            Write-Host "Warning: Failed to enable $SE_INC_BASE_PRIORITY_NAME privilege." -ForegroundColor DarkYellow
+        }
+        if (-not (Enable-Privilege -Privilege $SE_DEBUG_NAME)) {
+            Write-Host "Warning: Failed to enable $SE_DEBUG_NAME privilege." -ForegroundColor DarkYellow
         }
 
 
         # Set the processor affinity	
-        if ($ProcessAffinity -ge 0) {
+        if ($null -ne $ProcessAffinity -and ([int64]$ProcessAffinity -gt 0)) {
 		    Write-Host "Set Process Affinity for process $($Process.Name) = $ProcessAffinity"
-		    $Process.ProcessorAffinity = [IntPtr]$ProcessAffinity
+		    $Process.ProcessorAffinity = [IntPtr][int64]$ProcessAffinity
 	    }
 
         # Set the process priority
@@ -446,9 +575,37 @@ function Set-ProcessAffinityAndPriority {
             $Process.PriorityClass = [System.Diagnostics.ProcessPriorityClass]::$ProcessPriority
         }
 
+        # Set Process-level EcoQoS
+        if ($null -ne $EcoQoS -and ($EcoQoS -is [bool]) -and $ChangeEcoQoSForProcessAlso) {
+            $hProcess = [EcoQoSHelper]::OpenProcess($PROCESS_SET_INFORMATION, $false, [uint32]$Process.Id)
+            if ($hProcess -eq [IntPtr]::Zero) {
+                $err = [System.Runtime.InteropServices.Marshal]::GetLastWin32Error()
+                $errMsg = Get-ErrorMessage -ErrorCode $err
+                Write-Host "Warning: Failed to open process handle (PROCESS_SET_INFORMATION) for $($Process.Name) (PID $($Process.Id)): $errMsg (Code $err)" -ForegroundColor DarkYellow
+            } else {
+                try {
+                    $errorCode = 0
+                    $success = [EcoQoSHelper]::SetProcessEcoQoS($hProcess, $EcoQoS, [ref]$errorCode)
+                    if ($success) {
+                        Write-Host "Set Process EcoQoS for process $($Process.Name) (PID $($Process.Id)) = $EcoQoS"
+                    } else {
+                        $errMsg = Get-ErrorMessage -ErrorCode $errorCode
+                        Write-Host "Warning: Failed to set EcoQoS on process $($Process.Name) (PID $($Process.Id)): $errMsg (Code $errorCode)" -ForegroundColor DarkYellow
+                    }
+                } finally {
+                    [EcoQoSHelper]::CloseHandle($hProcess) | Out-Null
+                }
+            }
+        }
+
 	
 	    # The new ideal cpu assignment will select the physical cores first to the most busy threads, and then hyperthreading threads.  This is a soft assignment
-	    $sortedThreads = $Process.Threads | Sort-Object TotalProcessorTime -Descending
+        $threads = try { $Process.Refresh(); @($Process.Threads) } catch { @() }
+	    $sortedThreads = try {
+            $threads | Where-Object { $_ -ne $null } | Sort-Object TotalProcessorTime -Descending -ErrorAction SilentlyContinue
+        } catch {
+            $threads
+        }
 
         # Set the default CpuSet for new threads created by the process
         if ($CpuSet -AND $CpuSet.Count -GT 0 -AND $ChangeCpuSetForProcessAlso) { 
@@ -496,8 +653,8 @@ function Set-ProcessAffinityAndPriority {
 
 		
 		    # Setting ProcessAffinity for the ThreadCount
-		    if ($ProcessAffinity -ge 0) {
-			    $thread.ProcessorAffinity = [IntPtr]$ProcessAffinity
+		    if ($null -ne $ProcessAffinity -and ([int64]$ProcessAffinity -gt 0)) {
+			    $thread.ProcessorAffinity = [IntPtr][int64]$ProcessAffinity
 		    }
 		
 		    # Set next ideal processor
@@ -508,6 +665,27 @@ function Set-ProcessAffinityAndPriority {
 
             # Set CPU-Sets 
             Set-Thread-Cpu-Sets $thread $CpuSet
+
+            # Set Thread-level EcoQoS
+            if ($null -ne $EcoQoS -and ($EcoQoS -is [bool])) {
+                $hThread = [EcoQoSHelper]::OpenThread($THREAD_SET_INFORMATION, $false, [uint32]$thread.Id)
+                if ($hThread -eq [IntPtr]::Zero) {
+                    $lastErr = [System.Runtime.InteropServices.Marshal]::GetLastWin32Error()
+                    $lastErrMsg = Get-ErrorMessage -ErrorCode $lastErr
+                    Write-Host "Warning: Failed to open thread handle (THREAD_SET_INFORMATION) for thread $($thread.Id) of process $($Process.Name): $lastErrMsg (Code $lastErr)" -ForegroundColor DarkYellow
+                } else {
+                    try {
+                        $errorCode = 0
+                        $ok = [EcoQoSHelper]::SetThreadEcoQoS($hThread, $EcoQoS, [ref]$errorCode)
+                        if (-not $ok) {
+                            $errMsg = Get-ErrorMessage -ErrorCode $errorCode
+                            Write-Host "Warning: Failed to set EcoQoS on thread $($thread.Id) of process $($Process.Name): $errMsg (Code $errorCode)" -ForegroundColor DarkYellow
+                        }
+                    } finally {
+                        [EcoQoSHelper]::CloseHandle($hThread) | Out-Null
+                    }
+                }
+            }
 	    }
 	
 
@@ -735,12 +913,13 @@ function Run-Actions-Per-Game($processName, $fileName, $threadsLimit) {
                 if ($action.parameters.max_threads_to_change -GT 0) { #Check if json/process has different definition for number of threads to change
                     $threadsLimit = $action.parameters.max_threads_to_change
                 }
+                $ecoQoS = Get-EcoQoSParameter $action.parameters
 
 				Write-Host " "
 				Write-Host "BOOSTING [$($process.Name)]"  -ForegroundColor Yellow
 				
 				
-				Set-ProcessAffinityAndPriority -Process $process -ProcessAffinity $paffinity -ProcessPriority $action.parameters.process_priority -ThreadIdealProcessor $taffinity -ThreadPriority $action.parameters.thread_priority -CpuSet $cpuset -ChangeCpuSetForProcessAlso $changeCpuSetForProcesses -MaximumThreadsToChange $threadsLimit -OverrideHigherPriority $overrideHigherPriority
+				Set-ProcessAffinityAndPriority -Process $process -ProcessAffinity $paffinity -ProcessPriority $action.parameters.process_priority -ThreadIdealProcessor $taffinity -ThreadPriority $action.parameters.thread_priority -CpuSet $cpuset -ChangeCpuSetForProcessAlso $changeCpuSetForProcesses -MaximumThreadsToChange $threadsLimit -OverrideHigherPriority $overrideHigherPriority -EcoQoS $ecoQoS
 
 				foreach ($dependence in $action.parameters.dependencies) {
 					$process_names_array = Get-TrimmedProcessNames $dependence.process_name
@@ -756,13 +935,12 @@ function Run-Actions-Per-Game($processName, $fileName, $threadsLimit) {
                             if ($dependence.max_threads_to_change -GT 0) { #Check if json/process has different definition for number of threads to change
                                 $threadsLimit = $dependence.max_threads_to_change
                             }
-
-							
+                            $depEcoQoS = Get-EcoQoSParameter $dependence
 
 							Write-Host " "
 							Write-Host "BOOSTING SUB [$($depProcess.Name)]" -ForegroundColor Yellow
 
-							Set-ProcessAffinityAndPriority -Process $depProcess -ProcessAffinity $paffinity -ProcessPriority $dependence.process_priority -ThreadIdealProcessor $taffinity -ThreadPriority $dependence.thread_priority -CpuSet $cpuset -ChangeCpuSetForProcessAlso $changeCpuSetForProcesses -MaximumThreadsToChange $threadsLimit -OverrideHigherPriority $overrideHigherPriority
+							Set-ProcessAffinityAndPriority -Process $depProcess -ProcessAffinity $paffinity -ProcessPriority $dependence.process_priority -ThreadIdealProcessor $taffinity -ThreadPriority $dependence.thread_priority -CpuSet $cpuset -ChangeCpuSetForProcessAlso $changeCpuSetForProcesses -MaximumThreadsToChange $threadsLimit -OverrideHigherPriority $overrideHigherPriority -EcoQoS $depEcoQoS
 						}
 					}
 				}

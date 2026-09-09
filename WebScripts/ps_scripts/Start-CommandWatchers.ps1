@@ -1,4 +1,4 @@
-﻿Set-Location $PSScriptRoot
+Set-Location $PSScriptRoot
 $scriptDir = $PSScriptRoot
 . (Join-Path $scriptDir 'Write-VerboseDebug.ps1')
 . (Join-Path $scriptDir 'Get-RenamesWatcher.ps1')
@@ -9,6 +9,7 @@ $scriptDir = $PSScriptRoot
 . (Join-Path $scriptDir 'Send-IPC-ExitCommand.ps1')
 . (Join-Path $scriptDir 'Check-Admin-Privileges.ps1')
 . (Join-Path $scriptDir 'Get-HostConfig.ps1')
+. (Join-Path $scriptDir 'Set-IdealProcessor.ps1')
 $globalcfg = Bootstrap-Config
 $auxProgramLifecycleState = New-AuxProgramLifecycleState
 
@@ -52,6 +53,8 @@ try {
     # 2- ADJUST PRIORITIES, AFFINITIES, ETC
 
         Check-Admin-Privileges | Out-Null
+        Enable-Privilege -Privilege "SeDebugPrivilege" | Out-Null
+        Enable-Privilege -Privilege "SeIncreaseBasePriorityPrivilege" | Out-Null
 
         $EfficiencyAffinity = 983040 # HyperThreading enabled
         try {
