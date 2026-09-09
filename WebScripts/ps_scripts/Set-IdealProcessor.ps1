@@ -377,7 +377,7 @@ function Set-ThreadIdealProcessor($threadObject, $newProcessor) {
     if (-not [NativeMethods]::SetThreadIdealProcessor($hThread, $newProcessor)) {
         Write-Host "Failed to set ideal processor for thread $($thread.Id): $newProcessor" -ForegroundColor DarkYellow
     } else {
-        Write-Host "Set ideal processor for thread $($thread.Id): $newProcessor"
+        Write-Host "Setting ideal processor for thread $($thread.Id): $newProcessor"
     }
 
 
@@ -622,6 +622,7 @@ function Set-ProcessAffinityAndPriority {
             if ($t++ -GT $MaximumThreadsToChange) { break }
 
             # Setting thread processor Priority
+            Write-Host "Setting Thread Priority for thread $($thread.Id) of process $($Process.Name) to $ThreadPriority"
             $flag_change_process_priority = $true;
             if ($ThreadPriority -EQ "DoNotChange") { $flag_change_process_priority  = $false }
             else {
@@ -641,6 +642,7 @@ function Set-ProcessAffinityAndPriority {
 
 		
 		    # Setting ProcessAffinity for the ThreadCount
+            Write-Host "Setting ProcessAffinity on thread $($thread.Id) of process $($Process.Name) to $ProcessAffinity"
 		    if ($null -ne $ProcessAffinity -and ([int64]$ProcessAffinity -gt 0)) {
 			    $thread.ProcessorAffinity = [IntPtr][int64]$ProcessAffinity
 		    }
@@ -651,7 +653,8 @@ function Set-ProcessAffinityAndPriority {
 			    Set-ThreadIdealProcessor $thread $optimizedProcessorAsignment[$index]			
 		    }
 
-            # Set CPU-Sets 
+            # Set CPU-Sets
+            Write-Host "Setting CpuSets on thread $($thread.Id) of process $($Process.Name)" 
             Set-Thread-Cpu-Sets $thread $CpuSet
 
             # Set Thread-level EcoQoS
@@ -663,6 +666,7 @@ function Set-ProcessAffinityAndPriority {
                     Write-Host "Warning: Failed to open thread handle (THREAD_SET_INFORMATION) for thread $($thread.Id) of process $($Process.Name): $lastErrMsg (Code $lastErr)" -ForegroundColor DarkYellow
                 } else {
                     try {
+                        Write-Host "Setting EcoQoS on thread $($thread.Id) of process $($Process.Name)"
                         $errorCode = 0
                         $ok = [EcoQoSHelper]::SetThreadEcoQoS($hThread, $EcoQoS, [ref]$errorCode)
                         if (-not $ok) {
@@ -678,7 +682,7 @@ function Set-ProcessAffinityAndPriority {
 	
 
         $processName = $process.Name
-        Write-Output "Affinity and priority for '$processName' processes/threads have been set."
+        Write-Output "Affinity/Priority/CpuSet/EcoQos for '$processName' processes/threads have been set."
 
     } catch {
         Write-Host "An error occurred in Set-ProcessAffinityAndPriority: $($_.Exception.Message)"
