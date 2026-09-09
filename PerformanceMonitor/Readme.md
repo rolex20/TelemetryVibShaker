@@ -59,3 +59,4 @@ The major advantage of PerformanceMonitor is that it displays side-by-side graph
 - [x] Implement EcoQoS power throttling for background threads.
 - [ ] Refactor `CPU_QoS.cs` to link directly with root [`CPU_QoS_Desktop.cs`](file:///c:/Users/ralch/source/repos/rolex20/TelemetryVibShaker/CPU_QoS_Desktop.cs) shared source to prevent code duplication.
 - [ ] Add support for AMD Ryzen 3D V-Cache CCO topology detection (targeting 3D V-Cache CCD cores vs standard CCD cores).
+- [ ] **Fix EcoQoS Fallback in SetEcoQoS:** Remove invalid fallback to ThreadInformationClass 1 (`ThreadAbsoluteCpuPriority`) in `CPU_QoS.cs` / `CPU_QoS_Desktop.cs`. According to the official Windows SDK `processthreadsapi.h` enum (`THREAD_INFORMATION_CLASS`), `ThreadPowerThrottling` is Class 3 only (supported on Windows 10 1709+ and Windows 11). Class 1 sets absolute CPU priority and has nothing to do with power throttling. Use Class 3 directly and throw/log on failure.

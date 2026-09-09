@@ -158,9 +158,7 @@ public class EcoQoSHelper {
     public const uint THREAD_POWER_THROTTLING_EXECUTION_SPEED = 1;
 
     public const int ProcessPowerThrottling = 4;
-    public const int TIC_THREAD_POWER_THROTTLING_WIN11 = 3;
-    public const int TIC_THREAD_POWER_THROTTLING_WIN10 = 1;
-    public const int ERROR_INVALID_PARAMETER = 87;
+    public const int ThreadPowerThrottling = 3;
 
     [DllImport("kernel32.dll", SetLastError = true)]
     public static extern IntPtr OpenProcess(uint dwDesiredAccess, bool bInheritHandle, uint dwProcessId);
@@ -209,21 +207,11 @@ public class EcoQoSHelper {
         state.StateMask = enable ? THREAD_POWER_THROTTLING_EXECUTION_SPEED : 0u;
 
         uint size = (uint)Marshal.SizeOf(typeof(THREAD_POWER_THROTTLING_STATE));
-
-        // Try Windows 11 API first (Class 3)
-        if (SetThreadInformation(hThread, TIC_THREAD_POWER_THROTTLING_WIN11, ref state, size)) {
-            return true;
+        if (!SetThreadInformation(hThread, ThreadPowerThrottling, ref state, size)) {
+            errorCode = Marshal.GetLastWin32Error();
+            return false;
         }
-
-        int err = Marshal.GetLastWin32Error();
-        // Fallback to Windows 10 API (Class 1) on ERROR_INVALID_PARAMETER (87)
-        if (err == ERROR_INVALID_PARAMETER &&
-            SetThreadInformation(hThread, TIC_THREAD_POWER_THROTTLING_WIN10, ref state, size)) {
-            return true;
-        }
-
-        errorCode = (err != 0) ? err : Marshal.GetLastWin32Error();
-        return false;
+        return true;
     }
 }
 "@
