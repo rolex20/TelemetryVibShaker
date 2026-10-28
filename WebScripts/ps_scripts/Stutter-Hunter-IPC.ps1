@@ -36,6 +36,87 @@ param(
     [int]$IdleExitSeconds = 60
 )
 
+
+function Restore-PowerShellWindow {
+    if (-not ('PSWindowRestore' -as [type])) {
+        Add-Type @"
+using System;
+using System.Text;
+using System.Runtime.InteropServices;
+public static class PSWindowRestore {
+    public delegate bool EnumProc(IntPtr hWnd, IntPtr parameter);
+    [DllImport("kernel32.dll")]
+    public static extern IntPtr GetConsoleWindow();
+    [DllImport("user32.dll")]
+    public static extern bool IsWindowVisible(IntPtr hWnd);
+    [DllImport("user32.dll")]
+    public static extern bool IsIconic(IntPtr hWnd);
+    [DllImport("user32.dll")]
+    public static extern bool ShowWindow(IntPtr hWnd, int command);
+    [DllImport("user32.dll")]
+    public static extern bool SetForegroundWindow(IntPtr hWnd);
+    [DllImport("user32.dll")]
+    private static extern bool EnumWindows(EnumProc callback, IntPtr parameter);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern int GetClassName(IntPtr hWnd, StringBuilder text, int count);
+    public static IntPtr FindVisibleWindow(string marker) {
+        IntPtr result = IntPtr.Zero; IntPtr consoleFallback = IntPtr.Zero;
+        EnumWindows(delegate(IntPtr hWnd, IntPtr parameter) {
+            var text = new StringBuilder(1024);
+            GetWindowText(hWnd, text, text.Capacity);
+            if (IsWindowVisible(hWnd) && text.ToString().Contains(marker)) {
+                var className = new StringBuilder(256);
+                GetClassName(hWnd, className, className.Capacity);
+                if (className.ToString() == "ConsoleWindowClass") { consoleFallback = hWnd; return true; }
+                result = hWnd;
+                return false;
+            }
+            return true;
+        }, IntPtr.Zero);
+        return result != IntPtr.Zero ? result : consoleFallback;
+    }
+}
+"@
+    }
+
+    $handle = [PSWindowRestore]::GetConsoleWindow()
+
+    # Windows Terminal uses a hidden console handle. Find its visible window
+    # using a temporary, unique title instead.
+    if ($env:WT_SESSION -or -not [PSWindowRestore]::IsWindowVisible($handle)) {
+        $oldTitle = $Host.UI.RawUI.WindowTitle
+        $marker = 'PS-Restore-' + [guid]::NewGuid().ToString('N')
+        try {
+            $Host.UI.RawUI.WindowTitle = $marker
+            $handle = [IntPtr]::Zero
+            for ($attempt = 0; $attempt -lt 30; $attempt++) {
+                Start-Sleep -Milliseconds 300
+                $handle = [PSWindowRestore]::FindVisibleWindow($marker)
+                if ($handle -ne [IntPtr]::Zero) { break }
+            }
+        }
+        finally {
+            $Host.UI.RawUI.WindowTitle = $oldTitle
+        }
+    }
+
+    if ($handle -eq [IntPtr]::Zero) {
+        throw 'Cannot find the visible host window. Windows Terminal may suppress application titles, or this script may have no visible host.'
+    }
+
+    [void][PSWindowRestore]::ShowWindow($handle, 9) # Restore
+    [void][PSWindowRestore]::ShowWindow($handle, 1) # Normal
+    [void][PSWindowRestore]::SetForegroundWindow($handle)
+
+    if ([PSWindowRestore]::IsIconic($handle)) {
+        throw 'The host window is still minimized.'
+    }
+}
+
+
+
 if ($Mode -eq 'Client') { # Server logs later
     Write-Host "Requesting Stutter-Hunter [Action $Action] for [$GameProcessName] [PID $ProcessId] ..." -ForegroundColor Cyan
 }
@@ -654,9 +735,10 @@ function Invoke-StutterHunterPipeCommand {
 
 function Start-StutterHunterServerIfNeeded {
     $scriptPath = Join-Path $PSScriptRoot 'Stutter-Hunter-IPC.ps1'
-    #Start-Process powershell.exe -WindowStyle Minimized -ArgumentList @(
-    Start-Process powershell.exe -ArgumentList @(
-        '-NoExit', '-NoLogo','-NoProfile','-ExecutionPolicy','Bypass',
+    Start-Process powershell.exe -WindowStyle Minimized -ArgumentList @(
+    #Start-Process powershell.exe -ArgumentList @(
+        #'-NoExit', 
+		'-NoLogo','-NoProfile','-ExecutionPolicy','Bypass',
         '-File', "`"$scriptPath`"",
         '-Mode', 'Server'
     ) | Out-Null
@@ -732,6 +814,7 @@ function Start-StutterHunterServer {
     }
 
     Write-Host 'Starting Stutter-Hunter-IPC server...' -ForegroundColor Cyan
+	Restore-PowerShellWindow
     _D "starting StutterHunterIpcRunner SampleIntervalMs=$SampleIntervalMs CpuSpikeThreshold=$CpuSpikeThreshold HardFaultThreshold=$HardFaultThreshold"
     [StutterHunterIpcRunner]::Start($SampleIntervalMs, $CpuSpikeThreshold, $HardFaultThreshold)
 

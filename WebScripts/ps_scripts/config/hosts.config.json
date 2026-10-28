@@ -247,7 +247,43 @@
           "Stutter": true,
           "NickName": "Compat Tel Runner",
           "Speak": "Windows Compat-Tel-Runner"
-        }
+        },
+        "Python.exe": {
+          "WindowStyle": "Minimized",
+          "Speak": "Python",
+          "NickName": "Python",
+          "ImmediateKill": false,
+          "Stutter": true,
+		  "CommandLine": true,
+          "AuxProgramsDelaySeconds": 0,
+          "comments": [
+            "No boost necessary here."
+          ]
+        },   
+        "sdcc.exe": {
+          "WindowStyle": "Minimized",
+          "Speak": "S.D.C.C",
+          "NickName": "SDCC",
+          "ImmediateKill": false,
+          "Stutter": true,
+		  "CommandLine": true,
+          "AuxProgramsDelaySeconds": 0,
+          "comments": [
+            "No boost necessary here."
+          ]
+        },   
+        "hd61.exe": {
+          "WindowStyle": "Minimized",
+          "Speak": "H.D. 61",
+          "NickName": "HD61",
+          "ImmediateKill": false,
+          "Stutter": true,
+		  "CommandLine": true,
+          "AuxProgramsDelaySeconds": 0,
+          "comments": [
+            "No boost necessary here."
+          ]
+        }                    
       }
     },
     "HP-PAV-BLACK": {
