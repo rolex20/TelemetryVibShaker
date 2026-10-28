@@ -271,7 +271,19 @@
           "comments": [
             "No boost necessary here."
           ]
-        },   
+        },  
+        "powershell.exe": {
+          "WindowStyle": "Minimized",
+          "Speak": "powershell",
+          "NickName": "powershell",
+          "ImmediateKill": false,
+          "Stutter": true,
+		  "CommandLine": true,
+          "AuxProgramsDelaySeconds": 0,
+          "comments": [
+            "No boost necessary here."
+          ]
+        },  		
         "hd61.exe": {
           "WindowStyle": "Minimized",
           "Speak": "H.D. 61",

@@ -16,9 +16,10 @@ MANUAL TESTS (Windows PowerShell 5.1)
    - Client invocations should exit quickly.
 
 Server behavior notes:
-   - Server mode uses one long-lived NamedPipeServerStream and blocks on WaitForConnection().
+   - Server mode uses one long-lived NamedPipeServerStream and blocks until a client connects or the one-shot idle timer expires.
    - One command is processed per connection, then the server replies once and disconnects.
-   - SHUTDOWN is an internal command used by idle self-poke logic; clients do not need to call it.
+   - Server exits after five minutes with no monitored targets by default.
+   - Target changes and process-exit events arm/cancel the idle timer; no idle polling.
 #>
 
 param(
@@ -33,7 +34,7 @@ param(
     [int]$SampleIntervalMs = 100,
     [double]$CpuSpikeThreshold = 25.0,
     [int]$HardFaultThreshold = 10,
-    [int]$IdleExitSeconds = 60
+    [int]$IdleExitSeconds = 300
 )
 
 
@@ -163,7 +164,48 @@ public class StutterHunterIpcRunner
     }
 
     private static readonly ConcurrentDictionary<int, string> _targets = new ConcurrentDictionary<int, string>();
+    private class TargetRegistration
+    {
+        public Process Process;
+        public EventHandler Exited;
+    }
+
+    private static readonly object _targetLock = new object();
+    private static readonly Dictionary<int, TargetRegistration> _registrations = new Dictionary<int, TargetRegistration>();
+    private static readonly ManualResetEvent _idleExpired = new ManualResetEvent(false);
+    private static readonly AutoResetEvent _targetsChanged = new AutoResetEvent(false);
+    private static Timer _idleTimer;
+    private static object _idleGeneration;
+    private static int _idleExitSeconds;
+    private static bool _acceptingTargets;
     private static readonly object _startStopLock = new object();
+
+    public static WaitHandle IdleExpired { get { return _idleExpired; } }
+
+    // Call only under _targetLock. A generation rejects callbacks already queued
+    // when a target was added or a newer idle period began.
+    private static void CancelIdleTimer()
+    {
+        _idleGeneration = null;
+        if (_idleTimer != null) { _idleTimer.Dispose(); _idleTimer = null; }
+    }
+
+    private static void ArmIdleTimer()
+    {
+        CancelIdleTimer();
+        object generation = new object();
+        _idleGeneration = generation;
+        _idleTimer = new Timer(delegate(object state) {
+            lock (_targetLock)
+            {
+                if (!_acceptingTargets || !object.ReferenceEquals(state, _idleGeneration) || !_targets.IsEmpty)
+                    return;
+
+                _acceptingTargets = false;
+                _idleExpired.Set();
+            }
+        }, generation, TimeSpan.FromSeconds(_idleExitSeconds), Timeout.InfiniteTimeSpan);
+    }
     private static volatile bool _stopRequested = false;
     private static volatile bool _running = false;
     private static Thread _thread;
@@ -173,7 +215,7 @@ public class StutterHunterIpcRunner
     private static int _wsDeltaAnnotateThresholdMb = 10;
     private static int _logicalCpuCount = Environment.ProcessorCount;
 
-    public static void Start(int sampleIntervalMs, double cpuSpikeThreshold, int wsDeltaAnnotateThresholdMb)
+    public static void Start(int sampleIntervalMs, double cpuSpikeThreshold, int wsDeltaAnnotateThresholdMb, int idleExitSeconds)
     {
         lock (_startStopLock)
         {
@@ -184,6 +226,13 @@ public class StutterHunterIpcRunner
             if (_running)
                 return;
 
+            lock (_targetLock)
+            {
+                _idleExitSeconds = Math.Max(1, idleExitSeconds);
+                _idleExpired.Reset();
+                _acceptingTargets = true;
+                ArmIdleTimer();
+            }
             _stopRequested = false;
             _thread = new Thread(new ThreadStart(MonitorLoop));
             _thread.IsBackground = true;
@@ -198,10 +247,23 @@ public class StutterHunterIpcRunner
         lock (_startStopLock)
         {
             _stopRequested = true;
+            _targetsChanged.Set();
             if (_thread != null)
             {
                 try { _thread.Join(1500); } catch { }
                 _thread = null;
+            }
+            lock (_targetLock)
+            {
+                _acceptingTargets = false;
+                CancelIdleTimer();
+                foreach (TargetRegistration registration in _registrations.Values)
+                {
+                    registration.Process.Exited -= registration.Exited;
+                    registration.Process.Dispose();
+                }
+                _registrations.Clear();
+                _targets.Clear();
             }
             _running = false;
         }
@@ -215,14 +277,70 @@ public class StutterHunterIpcRunner
         if (string.IsNullOrWhiteSpace(processName))
             processName = "<unknown>";
 
-        _targets.AddOrUpdate(pid, processName, (k, v) => processName);
-        return true;
+        lock (_targetLock)
+        {
+            if (!_acceptingTargets)
+                return false;
+
+            if (_registrations.ContainsKey(pid))
+            {
+                _targets[pid] = processName;
+                return true;
+            }
+
+            Process process = null;
+            EventHandler exited = null;
+            try
+            {
+                process = Process.GetProcessById(pid);
+                exited = delegate {
+                    lock (_targetLock)
+                    {
+                        TargetRegistration current;
+                        if (_registrations.TryGetValue(pid, out current) && object.ReferenceEquals(current.Process, process))
+                            RemoveTarget(pid);
+                    }
+                };
+                process.Exited += exited;
+                process.EnableRaisingEvents = true;
+                if (process.HasExited)
+                {
+                    process.Exited -= exited;
+                    process.Dispose();
+                    return false;
+                }
+            }
+            catch (ArgumentException) { SafeDispose(process); return false; }
+            catch (InvalidOperationException) { SafeDispose(process); return false; }
+            catch (System.ComponentModel.Win32Exception) { SafeDispose(process); return false; }
+
+            _registrations.Add(pid, new TargetRegistration { Process = process, Exited = exited });
+            _targets[pid] = processName;
+            CancelIdleTimer();
+            _targetsChanged.Set();
+            return true;
+        }
     }
 
     public static bool RemoveTarget(int pid)
     {
-        string oldName;
-        return _targets.TryRemove(pid, out oldName);
+        lock (_targetLock)
+        {
+            string oldName;
+            if (!_targets.TryRemove(pid, out oldName))
+                return false;
+
+            TargetRegistration registration;
+            if (_registrations.TryGetValue(pid, out registration))
+            {
+                _registrations.Remove(pid);
+                registration.Process.Exited -= registration.Exited;
+                registration.Process.Dispose();
+            }
+            if (_targets.IsEmpty && _acceptingTargets)
+                ArmIdleTimer();
+            return true;
+        }
     }
 
     public static int TargetCount()
@@ -247,6 +365,14 @@ public class StutterHunterIpcRunner
 
         while (!_stopRequested)
         {
+            if (_targets.IsEmpty)
+            {
+                prev.Clear();
+                threadHist.Clear();
+                _targetsChanged.WaitOne();
+                continue;
+            }
+
             long loopTick = sw.ElapsedTicks;
             double loopStartMs = sw.Elapsed.TotalMilliseconds;
 
@@ -264,8 +390,7 @@ public class StutterHunterIpcRunner
                 }
                 catch
                 {
-                    string oldName;
-                    _targets.TryRemove(pid, out oldName);
+                    RemoveTarget(pid);
                     prev.Remove(pid);
                     threadHist.Remove(pid);
                     continue;
@@ -569,90 +694,6 @@ public class StutterHunterIpcRunner
         }
     }
 }
-
-public sealed class StutterHunterIdleWatcher : IDisposable
-{
-    private readonly string _pipeName;
-    private readonly int _idleExitSeconds;
-    private readonly Timer _timer;
-    private readonly object _sync = new object();
-
-    private DateTime _emptySinceUtc;
-    private bool _isArmed;
-    private bool _pokeSent;
-    private bool _disposed;
-
-    public StutterHunterIdleWatcher(string pipeName, int idleExitSeconds)
-    {
-        _pipeName = pipeName;
-        _idleExitSeconds = Math.Max(1, idleExitSeconds);
-        _emptySinceUtc = DateTime.UtcNow;
-        _timer = new Timer(OnTick, null, 1000, 1000);
-    }
-
-    private void OnTick(object state)
-    {
-        lock (_sync)
-        {
-            if (_disposed || _pokeSent)
-                return;
-
-            int count = StutterHunterIpcRunner.TargetCount();
-
-            if (count > 0)
-            {
-                _isArmed = false;
-                _emptySinceUtc = DateTime.UtcNow;
-                return;
-            }
-
-            if (!_isArmed)
-            {
-                _isArmed = true;
-                _emptySinceUtc = DateTime.UtcNow;
-                return;
-            }
-
-            double idleSeconds = (DateTime.UtcNow - _emptySinceUtc).TotalSeconds;
-            if (idleSeconds < _idleExitSeconds)
-                return;
-
-            try
-            {
-                using (var client = new NamedPipeClientStream(".", _pipeName, PipeDirection.InOut))
-                {
-                    client.Connect(500);
-					using (var writer = new StreamWriter(client, new UTF8Encoding(false), 1024, true))
-					using (var reader = new StreamReader(client, new UTF8Encoding(false), false, 1024, true))
-                    {                       
-                        writer.WriteLine("SHUTDOWN");
-						writer.Flush();
-                        reader.ReadLine();
-                    }
-                }
-
-                _pokeSent = true;
-                _timer.Change(Timeout.Infinite, Timeout.Infinite);
-            }
-            catch
-            {
-                // Retry on next tick if server is transiently unavailable.
-            }
-        }
-    }
-
-    public void Dispose()
-    {
-        lock (_sync)
-        {
-            if (_disposed)
-                return;
-
-            _disposed = true;
-            _timer.Dispose();
-        }
-    }
-}
 '@
 
 Import-OptimizedCSharp `
@@ -813,30 +854,48 @@ function Start-StutterHunterServer {
         return
     }
 
-    Write-Host 'Starting Stutter-Hunter-IPC server...' -ForegroundColor Cyan
-	Restore-PowerShellWindow
-    _D "starting StutterHunterIpcRunner SampleIntervalMs=$SampleIntervalMs CpuSpikeThreshold=$CpuSpikeThreshold HardFaultThreshold=$HardFaultThreshold"
-    [StutterHunterIpcRunner]::Start($SampleIntervalMs, $CpuSpikeThreshold, $HardFaultThreshold)
-
-    _D "starting idle watcher IdleExitSeconds=$IdleExitSeconds"
-    $idleWatcher = New-Object StutterHunterIdleWatcher($pipeName, $IdleExitSeconds)
-
     $stopRequested = $false
     $pipe = $null
 
     try {
+        Write-Host 'Starting Stutter-Hunter-IPC server...' -ForegroundColor Cyan
+        Restore-PowerShellWindow
         _D "creating NamedPipeServerStream pipeName='$pipeName' maxInstances=1"
         $pipe = New-Object System.IO.Pipes.NamedPipeServerStream(
             $pipeName,
             [System.IO.Pipes.PipeDirection]::InOut,
             1,
             [System.IO.Pipes.PipeTransmissionMode]::Byte,
-            [System.IO.Pipes.PipeOptions]::None
+            [System.IO.Pipes.PipeOptions]::Asynchronous
         )
 
-        while (-not $stopRequested) {            
-            _D "WAIT begin (WaitForConnection)"
-            $pipe.WaitForConnection()
+        [StutterHunterIpcRunner]::Start($SampleIntervalMs, $CpuSpikeThreshold, $HardFaultThreshold, $IdleExitSeconds)
+
+        while (-not $stopRequested) {
+            _D "WAIT begin (connection or idle expiry)"
+            $connectionTask = $pipe.WaitForConnectionAsync()
+            $connectionWaitHandle = ([System.IAsyncResult]$connectionTask).AsyncWaitHandle
+            try {
+                # Both handles are signaled by events. No periodic wakeups.
+                $signaled = [System.Threading.WaitHandle]::WaitAny([System.Threading.WaitHandle[]]@(
+                    [StutterHunterIpcRunner]::IdleExpired,
+                    $connectionWaitHandle
+                ))
+                if ($signaled -eq 0) {
+                    Write-Host "No monitored targets for $IdleExitSeconds seconds. Exiting server." -ForegroundColor DarkGray
+                    break
+                }
+                $connectionTask.GetAwaiter().GetResult()
+            }
+            finally {
+                # On idle expiry the connection may still be pending. Disposing
+                # the pipe cancels it before its task/wait handle are released.
+                if (-not $connectionTask.IsCompleted) {
+                    $pipe.Dispose()
+                    try { $connectionTask.GetAwaiter().GetResult() } catch {}
+                }
+                $connectionTask.Dispose()
+            }
             _D "WAIT end (client connected)"
 
             if (-not $pipe.IsConnected) {
@@ -888,8 +947,12 @@ function Start-StutterHunterServer {
                                 else {
                                     $name = ($line.Substring($line.IndexOf($parts[2]))).Trim()
                                     Write-Host ("Adding target PID={0} Name='{1}'" -f $procid, $name) -ForegroundColor Green
-                                    [void][StutterHunterIpcRunner]::AddTarget($procid, $name)
-                                    $reply = "OK ADDED $procid"
+                                    if ([StutterHunterIpcRunner]::AddTarget($procid, $name)) {
+                                        $reply = "OK ADDED $procid"
+                                    }
+                                    else {
+                                        $reply = 'ERR target unavailable or server shutting down'
+                                    }
                                 }
                             }
                         }
@@ -951,7 +1014,6 @@ function Start-StutterHunterServer {
     }
     finally {
         _D "server cleanup begin"
-        if ($idleWatcher) { try { $idleWatcher.Dispose() } catch {} }
         [StutterHunterIpcRunner]::Stop()
         if ($pipe) {
             if ($pipe.IsConnected) {
