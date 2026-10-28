@@ -778,25 +778,28 @@ function Set-GamePowerScheme {
             Start-GameRuntimeTracker -ProgramName $programName -ProcessId ([int]$processId)		
             
 			if (Get-Stutter -programName $programName) {
-				Write-VerboseDebug -Timestamp (Get-Date) -Title "STUTTER HUNTER STARTED:" -ForegroundColor "Yellow" -Message "$programName"
-				# LEGACY FALLBACK: Uncomment to revert to one-process-per-game legacy behavior.
-				# Start-Process powershell.exe -WindowStyle Minimized -ArgumentList @(
-				# 	'-NoProfile',
-				# 	'-ExecutionPolicy', 'Bypass',
-				# 	'-File', '".\Stutter-Hunter.ps1"',
-				# 	'-ProcessId', $processId,
-				#     '-GameProcessName', $programName
-				# )                
-                # IPC mode centralizes stutter tracking state in one coordinator process.
-                $scriptPath = Join-Path $PSScriptRoot 'Stutter-Hunter-IPC.ps1'
-                Start-Process powershell.exe -WindowStyle Minimized -ArgumentList @(
-				#Start-Process powershell.exe -ArgumentList @(
-					'-NoLogo','-NoProfile','-ExecutionPolicy','Bypass',
-                    '-File', "`"$scriptPath`"",
-					'-Mode','Client',
-					'-Action','Add',
-					'-ProcessId', $processId,
-					'-GameProcessName', $programName)
+                # Fast check: if the process already exited (common for brief CLI/tools), skip spawning the client
+                $targetRunning = $false
+                try {
+                    $tp = [System.Diagnostics.Process]::GetProcessById([int]$processId)
+                    $targetRunning = (-not $tp.HasExited)
+                    $tp.Dispose()
+                } catch {}
+
+                if ($targetRunning) {
+                    Write-VerboseDebug -Timestamp (Get-Date) -Title "STUTTER HUNTER STARTED:" -ForegroundColor "Yellow" -Message "$programName"
+                    $scriptPath = Join-Path $PSScriptRoot 'Stutter-Hunter-IPC.ps1'
+                    Start-Process powershell.exe -WindowStyle Minimized -ArgumentList @(
+                        '-NoLogo','-NoProfile','-ExecutionPolicy','Bypass',
+                        '-File', "`"$scriptPath`"",
+                        '-Mode','Client',
+                        '-Action','Add',
+                        '-ProcessId', $processId,
+                        '-GameProcessName', $programName)
+                }
+                else {
+                    Write-VerboseDebug -Timestamp (Get-Date) -Title "STUTTER HUNTER SKIPPED:" -ForegroundColor "DarkYellow" -Message "$programName [PID:$processId] already exited."
+                }
 			}
 
 			if ($speakText) {
@@ -835,7 +838,8 @@ function Set-GamePowerScheme {
 					'-File', (Join-Path $PSScriptRoot 'Stutter-Hunter-IPC.ps1'),
 					'-Mode','Client',
 					'-Action','Remove',
-					'-ProcessId', $processId
+					'-ProcessId', $processId,
+					'-GameProcessName', $programName
 				)
 			}
             

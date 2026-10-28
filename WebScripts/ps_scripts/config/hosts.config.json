@@ -272,7 +272,7 @@
             "No boost necessary here."
           ]
         },  
-        "powershell.exe": {
+        "XXpowershell.exe": {
           "WindowStyle": "Minimized",
           "Speak": "powershell",
           "NickName": "powershell",

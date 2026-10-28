@@ -322,6 +322,14 @@ public class StutterHunterIpcRunner
         }
     }
 
+    public static string GetTargetName(int pid)
+    {
+        string name;
+        if (_targets.TryGetValue(pid, out name))
+            return name;
+        return string.Empty;
+    }
+
     public static bool RemoveTarget(int pid)
     {
         lock (_targetLock)
@@ -757,14 +765,14 @@ function Invoke-StutterHunterPipeCommand {
         _D ("READ ok reply='{0}'" -f $reply)
 
         if ([string]::IsNullOrWhiteSpace($reply)) {
-            return @{ Ok = $false; Reply = 'ERR empty reply' }
+            return @{ Ok = $false; Connected = $true; Reply = 'ERR empty reply' }
         }
 
-        return @{ Ok = $reply.StartsWith('OK'); Reply = $reply }
+        return @{ Ok = $reply.StartsWith('OK'); Connected = $true; Reply = $reply }
     }
     catch {
         _D ("EXCEPTION: {0}" -f $_.Exception.Message)
-        return @{ Ok = $false; Reply = "ERR $($_.Exception.Message)" }
+        return @{ Ok = $false; Connected = $false; Reply = "ERR $($_.Exception.Message)" }
     }
     finally {
         if ($writer) { try { $writer.Dispose() } catch {} }
@@ -798,17 +806,22 @@ function Invoke-StutterHunterClient {
         "ADD $ProcessId $GameProcessName"
     }
     else {
-        "REMOVE $ProcessId"
+        if (-not [string]::IsNullOrWhiteSpace($GameProcessName)) {
+            "REMOVE $ProcessId $GameProcessName"
+        }
+        else {
+            "REMOVE $ProcessId"
+        }
     }
 
     $result = Invoke-StutterHunterPipeCommand -CommandLine $commandLine -ConnectTimeoutMs 200
-    if (-not $result.Ok) {
+    if (-not $result.Connected) {
         Start-StutterHunterServerIfNeeded
 
         for ($i = 0; $i -lt 10; $i++) {
             Start-Sleep -Milliseconds 200
             $result = Invoke-StutterHunterPipeCommand -CommandLine $commandLine -ConnectTimeoutMs 500
-            if ($result.Ok) {
+            if ($result.Connected) {
                 break
             }
         }
@@ -816,6 +829,11 @@ function Invoke-StutterHunterClient {
 
     if ($result.Ok) {
         Write-Host $result.Reply -ForegroundColor Green
+        exit 0
+    }
+
+    if ($result.Reply -like '*already exited*' -or $result.Reply -like '*not found*') {
+        Write-Host $result.Reply -ForegroundColor DarkYellow
         exit 0
     }
 
@@ -860,13 +878,21 @@ function Start-StutterHunterServer {
     try {
         Write-Host 'Starting Stutter-Hunter-IPC server...' -ForegroundColor Cyan
         Restore-PowerShellWindow
-        _D "creating NamedPipeServerStream pipeName='$pipeName' maxInstances=1"
+        _D "creating NamedPipeServerStream pipeName='$pipeName' maxInstances=1 with PipeSecurity"
+        $pipeSecurity = New-Object System.IO.Pipes.PipeSecurity
+        $everyoneSid = New-Object System.Security.Principal.SecurityIdentifier([System.Security.Principal.WellKnownSidType]::WorldSid, $null)
+        $accessRule = New-Object System.IO.Pipes.PipeAccessRule($everyoneSid, [System.IO.Pipes.PipeAccessRights]::ReadWrite, [System.Security.AccessControl.AccessControlType]::Allow)
+        $pipeSecurity.AddAccessRule($accessRule)
+
         $pipe = New-Object System.IO.Pipes.NamedPipeServerStream(
             $pipeName,
             [System.IO.Pipes.PipeDirection]::InOut,
             1,
             [System.IO.Pipes.PipeTransmissionMode]::Byte,
-            [System.IO.Pipes.PipeOptions]::Asynchronous
+            [System.IO.Pipes.PipeOptions]::Asynchronous,
+            0,
+            0,
+            $pipeSecurity
         )
 
         [StutterHunterIpcRunner]::Start($SampleIntervalMs, $CpuSpikeThreshold, $HardFaultThreshold, $IdleExitSeconds)
@@ -885,14 +911,14 @@ function Start-StutterHunterServer {
                     Write-Host "No monitored targets for $IdleExitSeconds seconds. Exiting server." -ForegroundColor DarkGray
                     break
                 }
-                $connectionTask.GetAwaiter().GetResult()
+                [void]$connectionTask.GetAwaiter().GetResult()
             }
             finally {
                 # On idle expiry the connection may still be pending. Disposing
                 # the pipe cancels it before its task/wait handle are released.
                 if (-not $connectionTask.IsCompleted) {
                     $pipe.Dispose()
-                    try { $connectionTask.GetAwaiter().GetResult() } catch {}
+                    try { [void]$connectionTask.GetAwaiter().GetResult() } catch {}
                 }
                 $connectionTask.Dispose()
             }
@@ -941,32 +967,57 @@ function Start-StutterHunterServer {
                             }
                             else {
                                 $procid = 0
-                                if (-not [int]::TryParse($parts[1], [ref]$procid)) {
+                                if (-not [int]::TryParse($parts[1], [ref]$procid) -or $procid -le 0) {
                                     $reply = 'ERR invalid pid'
                                 }
                                 else {
                                     $name = ($line.Substring($line.IndexOf($parts[2]))).Trim()
-                                    Write-Host ("Adding target PID={0} Name='{1}'" -f $procid, $name) -ForegroundColor Green
                                     if ([StutterHunterIpcRunner]::AddTarget($procid, $name)) {
+                                        Write-Host ("Adding target PID={0} Name='{1}'" -f $procid, $name) -ForegroundColor Green
                                         $reply = "OK ADDED $procid"
                                     }
                                     else {
-                                        $reply = 'ERR target unavailable or server shutting down'
+                                        try {
+                                            $p = [System.Diagnostics.Process]::GetProcessById($procid)
+                                            $hasExited = $p.HasExited
+                                            $p.Dispose()
+                                            if ($hasExited) {
+                                                Write-Host ("Target PID={0} Name='{1}' already exited before registration" -f $procid, $name) -ForegroundColor DarkYellow
+                                                $reply = "ERR target PID $procid has already exited"
+                                            }
+                                            else {
+                                                Write-Host ("Target PID={0} Name='{1}' rejected: server shutting down" -f $procid, $name) -ForegroundColor DarkYellow
+                                                $reply = 'ERR target unavailable or server shutting down'
+                                            }
+                                        }
+                                        catch {
+                                            Write-Host ("Target PID={0} Name='{1}' already exited before registration" -f $procid, $name) -ForegroundColor DarkYellow
+                                            $reply = "ERR target PID $procid not found or already exited"
+                                        }
                                     }
                                 }
                             }
                         }
                         'REMOVE' {
                             if ($parts.Length -lt 2) {
-                                $reply = 'ERR usage: REMOVE <pid>'
+                                $reply = 'ERR usage: REMOVE <pid> [processName]'
                             }
                             else {
                                 $procid = 0
-                                if (-not [int]::TryParse($parts[1], [ref]$procid)) {
+                                if (-not [int]::TryParse($parts[1], [ref]$procid) -or $procid -le 0) {
                                     $reply = 'ERR invalid pid'
                                 }
                                 else {
-                                    Write-Host ("Removing target PID={0} Name='{1}'" -f $procid, $name) -ForegroundColor Green
+                                    $targetName = if ($parts.Length -ge 3) {
+                                        ($line.Substring($line.IndexOf($parts[2]))).Trim()
+                                    }
+                                    else {
+                                        [StutterHunterIpcRunner]::GetTargetName($procid)
+                                    }
+                                    if ([string]::IsNullOrWhiteSpace($targetName)) {
+                                        $targetName = '<unknown>'
+                                    }
+                                    Write-Host ("Removing target PID={0} Name='{1}'" -f $procid, $targetName) -ForegroundColor Green
                                     [void][StutterHunterIpcRunner]::RemoveTarget($procid)
                                     $reply = "OK REMOVED $procid"
                                 }
